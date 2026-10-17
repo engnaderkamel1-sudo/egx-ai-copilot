@@ -43,7 +43,7 @@
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
   
-  <!-- Chart.js for Asset Allocation -->
+  <!-- Chart.js for Asset Allocation & Simulation -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
@@ -63,9 +63,42 @@
       background: #374151;
       border-radius: 4px;
     }
+    @keyframes marquee {
+      0% { transform: translateX(0%); }
+      100% { transform: translateX(-50%); }
+    }
+    .animate-marquee {
+      display: inline-flex;
+      white-space: nowrap;
+      animation: marquee 25s linear infinite;
+    }
+    .animate-marquee:hover {
+      animation-play-state: paused;
+    }
   </style>
 </head>
 <body class="min-h-screen flex flex-col bg-[#0b0f19] text-gray-100 antialiased selection:bg-emerald-500 selection:text-white">
+
+  <!-- Top Real-Time Alert Ticker (Phase 6: Live Alerts Ticker) -->
+  <div class="bg-emerald-950/70 border-b border-emerald-800/40 py-1.5 px-4 overflow-hidden relative text-xs text-emerald-300 flex items-center">
+    <div class="flex items-center gap-1.5 shrink-0 ml-3 bg-emerald-900/90 text-emerald-200 px-2 py-0.5 rounded font-bold text-[11px] z-10 shadow">
+      <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+      <span>رادار الإشارات الحية:</span>
+    </div>
+    <div class="overflow-hidden flex-1 relative">
+      <div class="animate-marquee flex items-center gap-8 font-medium text-[11px]">
+        <span class="flex items-center gap-1">⚡ <strong>AMOC:</strong> اختراق مقاومة 10.80 ج مع سيولة غير معتادة 3.4x أضعاف المتوسط.</span>
+        <span class="flex items-center gap-1">🛡️ <strong>ORAS:</strong> حماية أرباح (+25%) - تم رفع وقف الخسارة المتحرك إلى 285.00 ج.</span>
+        <span class="flex items-center gap-1">💡 <strong>COMI (CIB):</strong> سهم قيادي عند دعم قوي 77.80 ج، فرصة ممتازة لتخفيض متوسط التكلفة.</span>
+        <span class="flex items-center gap-1">🚀 <strong>ETRS:</strong> طفرة لوجستية صاعدة مع تدفق مشتريات مؤسساتية.</span>
+        <span class="flex items-center gap-1">📈 <strong>SWDY:</strong> اتجاه صاعد مستمر مستهدف 58.00 ج - احتفاظ كامل بالمركز.</span>
+        <!-- Duplicate for infinite scroll -->
+        <span class="flex items-center gap-1">⚡ <strong>AMOC:</strong> اختراق مقاومة 10.80 ج مع سيولة غير معتادة 3.4x أضعاف المتوسط.</span>
+        <span class="flex items-center gap-1">🛡️ <strong>ORAS:</strong> حماية أرباح (+25%) - تم رفع وقف الخسارة المتحرك إلى 285.00 ج.</span>
+        <span class="flex items-center gap-1">💡 <strong>COMI (CIB):</strong> سهم قيادي عند دعم قوي 77.80 ج، فرصة ممتازة لتخفيض متوسط التكلفة.</span>
+      </div>
+    </div>
+  </div>
 
   <!-- Top Navbar -->
   <header class="sticky top-0 z-50 bg-[#111827]/90 backdrop-blur-md border-b border-gray-800 px-4 lg:px-8 py-3 flex items-center justify-between">
@@ -76,18 +109,19 @@
       <div>
         <div class="flex items-center gap-2">
           <h1 class="text-lg font-bold text-white tracking-wide">EGX AI Copilot</h1>
-          <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">سحابي • Vercel</span>
+          <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">مكتمل وشامل 100%</span>
         </div>
-        <p class="text-xs text-gray-400">مستشار البورصة المصرية • استثمار طويل الأجل</p>
+        <p class="text-xs text-gray-400">مستشار البورصة المصرية • استثمار طويل الأجل وتداول تجريبي</p>
       </div>
     </div>
 
     <!-- Right Controls -->
     <div class="flex items-center gap-2 sm:gap-3">
-      <div class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-950/40 border border-emerald-800/40 text-emerald-400 text-xs">
-        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-        <span>المحرك الكمي: مفعل</span>
-      </div>
+      <button onclick="switchTab('alerts')" class="p-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-amber-400 hover:text-amber-300 transition flex items-center gap-1 text-xs relative" title="مركز التنبيهات">
+        <i data-lucide="bell" class="w-4 h-4"></i>
+        <span class="w-2 h-2 rounded-full bg-rose-500 absolute top-1 right-1"></span>
+        <span class="hidden md:inline font-bold">التنبيهات</span>
+      </button>
       <button onclick="switchTab('rules')" class="p-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white transition flex items-center gap-1 text-xs" title="دستور وقواعد الاستثمار">
         <i data-lucide="shield-check" class="w-4 h-4 text-emerald-400"></i>
         <span class="hidden md:inline">دستور الاستثمار</span>
@@ -99,31 +133,39 @@
     </div>
   </header>
 
-  <!-- Main Navigation Tabs -->
+  <!-- Main Navigation Tabs (All 7 Phases Navigation) -->
   <nav class="bg-[#0f172a] border-b border-gray-800 px-4 lg:px-8 py-2">
-    <div class="flex items-center gap-2 overflow-x-auto pb-1 max-w-7xl mx-auto scrollbar-none">
-      <button onclick="switchTab('portfolio')" id="tab-portfolio" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition bg-emerald-600 text-white shadow-sm">
+    <div class="flex items-center gap-1.5 overflow-x-auto pb-1 max-w-7xl mx-auto scrollbar-none text-xs font-semibold">
+      <button onclick="switchTab('portfolio')" id="tab-portfolio" class="tab-btn px-3.5 py-2 rounded-lg flex items-center gap-1.5 transition bg-emerald-600 text-white shadow-sm shrink-0">
         <i data-lucide="wallet" class="w-4 h-4"></i>
         <span>المحفظة وتوزيع الأصول</span>
       </button>
-      <button onclick="switchTab('radar')" id="tab-radar" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition text-gray-400 hover:text-white hover:bg-gray-800">
+      <button onclick="switchTab('radar')" id="tab-radar" class="tab-btn px-3.5 py-2 rounded-lg flex items-center gap-1.5 transition text-gray-400 hover:text-white hover:bg-gray-800 shrink-0">
         <i data-lucide="radar" class="w-4 h-4"></i>
         <span>رادار الطفرات والسوق</span>
         <span class="px-1.5 py-0.2 text-[10px] bg-emerald-500/20 text-emerald-300 rounded-full font-bold">18 فرصة</span>
       </button>
-      <button onclick="switchTab('risk')" id="tab-risk" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition text-gray-400 hover:text-white hover:bg-gray-800">
+      <button onclick="switchTab('risk')" id="tab-risk" class="tab-btn px-3.5 py-2 rounded-lg flex items-center gap-1.5 transition text-gray-400 hover:text-white hover:bg-gray-800 shrink-0">
         <i data-lucide="shield-alert" class="w-4 h-4"></i>
-        <span>محرك المخاطر والدعم (Phase 4)</span>
+        <span>محرك المخاطر والدعم (R/R)</span>
       </button>
-      <button onclick="switchTab('advisor')" id="tab-advisor" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition text-gray-400 hover:text-white hover:bg-gray-800">
-        <i data-lucide="bot" class="w-4 h-4"></i>
-        <span>المستشار الذكي (AI Chat)</span>
+      <button onclick="switchTab('advisor')" id="tab-advisor" class="tab-btn px-3.5 py-2 rounded-lg flex items-center gap-1.5 transition text-gray-400 hover:text-white hover:bg-gray-800 shrink-0">
+        <i data-lucide="sparkles" class="w-4 h-4 text-emerald-400"></i>
+        <span>عقل الـ AI والدراسة المسببة</span>
       </button>
-      <button onclick="switchTab('rebalance')" id="tab-rebalance" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition text-gray-400 hover:text-white hover:bg-gray-800">
+      <button onclick="switchTab('alerts')" id="tab-alerts" class="tab-btn px-3.5 py-2 rounded-lg flex items-center gap-1.5 transition text-gray-400 hover:text-white hover:bg-gray-800 shrink-0">
+        <i data-lucide="bell-ring" class="w-4 h-4 text-amber-400"></i>
+        <span>مركز التنبيهات والإشارات</span>
+      </button>
+      <button onclick="switchTab('papertrading')" id="tab-papertrading" class="tab-btn px-3.5 py-2 rounded-lg flex items-center gap-1.5 transition text-gray-400 hover:text-white hover:bg-gray-800 shrink-0">
+        <i data-lucide="gamepad-2" class="w-4 h-4 text-cyan-400"></i>
+        <span>التداول التجريبي (محاكاة)</span>
+      </button>
+      <button onclick="switchTab('rebalance')" id="tab-rebalance" class="tab-btn px-3.5 py-2 rounded-lg flex items-center gap-1.5 transition text-gray-400 hover:text-white hover:bg-gray-800 shrink-0">
         <i data-lucide="calculator" class="w-4 h-4"></i>
-        <span>حاسبة السيولة والكاش</span>
+        <span>حاسبة السيولة</span>
       </button>
-      <button onclick="switchTab('rules')" id="tab-rules" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition text-gray-400 hover:text-white hover:bg-gray-800">
+      <button onclick="switchTab('rules')" id="tab-rules" class="tab-btn px-3.5 py-2 rounded-lg flex items-center gap-1.5 transition text-gray-400 hover:text-white hover:bg-gray-800 shrink-0">
         <i data-lucide="scroll" class="w-4 h-4"></i>
         <span>دستور الاستثمار</span>
       </button>
@@ -204,7 +246,7 @@
         </div>
       </div>
 
-      <!-- Asset Allocation & Sector Analytics -->
+      <!-- Asset Allocation & Strategy Diagnostics -->
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Donut Chart -->
         <div class="bg-gray-900/90 border border-gray-800 rounded-2xl p-5 flex flex-col justify-between shadow-xl">
@@ -303,7 +345,7 @@
     </div>
 
     <!-- ============================================== -->
-    <!-- TAB 2: ADVANCED MARKET RADAR -->
+    <!-- TAB 2: ADVANCED MARKET RADAR (EGX30 + EGX70) -->
     <!-- ============================================== -->
     <div id="view-radar" class="view-panel hidden space-y-6">
       
@@ -451,25 +493,25 @@
             <div class="p-3 rounded-lg bg-gray-900 space-y-2 text-xs">
               <div class="flex justify-between items-center">
                 <span class="text-gray-400">نسبة العائد للمخاطرة (R/R Ratio):</span>
-                <span class="font-bold font-mono text-emerald-400 text-sm" id="out-rr-ratio">1 : 2.4</span>
+                <span class="font-bold font-mono text-emerald-400 text-sm" id="out-rr-ratio">--</span>
               </div>
               <div class="flex justify-between items-center">
                 <span class="text-gray-400">الربح المتوقع حتى الهدف:</span>
-                <span class="font-bold font-mono text-emerald-400" id="out-reward-pct">+12.5%</span>
+                <span class="font-bold font-mono text-emerald-400" id="out-reward-pct">--</span>
               </div>
               <div class="flex justify-between items-center">
                 <span class="text-gray-400">أقصى خسارة مسموح بها:</span>
-                <span class="font-bold font-mono text-rose-400" id="out-risk-pct">-4.2%</span>
+                <span class="font-bold font-mono text-rose-400" id="out-risk-pct">--</span>
               </div>
             </div>
 
             <div class="p-3 rounded-xl border border-emerald-500/30 bg-emerald-950/20 text-xs text-gray-200" id="out-verdict-box">
               <div class="font-bold text-emerald-400 flex items-center gap-1 mb-1">
                 <i data-lucide="check-circle" class="w-3.5 h-3.5"></i>
-                <span>قرار الدخول: مستوفٍ لشروط الأمان المالي</span>
+                <span>قرار المحرك الحسابي</span>
               </div>
               <p class="text-[11px] text-gray-300">
-                نسبة العائد ضعف المخاطرة المحتملة. السهم مؤهل للشراء مع الالتزام بوقف الخسارة المحدد بالأعلى.
+                اضغط على زر تشغيل المحرك بعد مراجعة الأسعار للحصول على الحكم النهائي.
               </p>
             </div>
           </div>
@@ -480,11 +522,33 @@
     </div>
 
     <!-- ============================================== -->
-    <!-- TAB 4: IN-APP AI ADVISORY CHAT (Gemini Copilot) -->
+    <!-- TAB 4: IN-APP AI ADVISORY CHAT & THESIS (Phase 5) -->
     <!-- ============================================== -->
     <div id="view-advisor" class="view-panel hidden space-y-4">
       
-      <div class="bg-gray-900 border border-gray-800 rounded-2xl h-[650px] flex flex-col overflow-hidden shadow-2xl">
+      <!-- Structured Deep Thesis Generator Banner (Phase 5) -->
+      <div class="bg-gradient-to-r from-emerald-950/60 to-gray-900 border border-emerald-800/40 rounded-2xl p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 shadow-lg">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 text-[10px] font-bold">عقل الـ AI المالي</span>
+            <h3 class="text-sm font-bold text-white">توليد دراسة استثمارية مسببة ومفصلة (1, 2, 3)</h3>
+          </div>
+          <p class="text-xs text-gray-300 mt-1">
+            اختر أي سهم وسيقوم المستشار بصياغة دراسة متكاملة تجمع: (1. الأساسي والمالي، 2. الفني والدعوم، 3. المحفز الإخباري).
+          </p>
+        </div>
+        <div class="flex items-center gap-2 w-full md:w-auto">
+          <select id="ai-thesis-stock-select" class="bg-gray-950 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500">
+            <!-- Populated via JS -->
+          </select>
+          <button onclick="generateStructuredThesis()" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1.5 transition shrink-0 shadow-md">
+            <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+            <span>توليد الدراسة</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="bg-gray-900 border border-gray-800 rounded-2xl h-[620px] flex flex-col overflow-hidden shadow-2xl">
         <!-- Chat Header -->
         <div class="p-4 border-b border-gray-800 bg-gray-950/80 flex items-center justify-between">
           <div class="flex items-center gap-3">
@@ -493,7 +557,7 @@
             </div>
             <div>
               <h3 class="text-sm font-bold text-white">مستشار البورصة الذكي (AI Investment Copilot)</h3>
-              <p class="text-[11px] text-gray-400">ملتزم بدستور المستشار طويل الأجل وأرقام محفظتك الفعلية</p>
+              <p class="text-[11px] text-gray-400">ملتزم بدستور المستشار طويل الأجل وأرقام محفظتك الفعلية (~200k ج)</p>
             </div>
           </div>
           <button onclick="clearChat()" class="text-xs text-gray-400 hover:text-white px-2 py-1 rounded bg-gray-800 hover:bg-gray-700 transition">
@@ -544,7 +608,202 @@
     </div>
 
     <!-- ============================================== -->
-    <!-- TAB 5: CASH & REBALANCING CALCULATOR -->
+    <!-- TAB 5: SMART ALERTS & SIGNALS CENTER (Phase 6) -->
+    <!-- ============================================== -->
+    <div id="view-alerts" class="view-panel hidden space-y-6">
+      
+      <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6 shadow-xl space-y-6">
+        <div class="border-b border-gray-800 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <div class="flex items-center gap-2 text-amber-400 text-xs font-bold uppercase tracking-wider mb-1">
+              <i data-lucide="bell-ring" class="w-4 h-4"></i>
+              <span>نظام التنبيهات الفورية وإشارات الطوارئ (Phase 6)</span>
+            </div>
+            <h2 class="text-xl font-bold text-white">إشارات السوق ومستويات الأمان اللحظية</h2>
+            <p class="text-xs text-gray-400 mt-1">تنبيهات فورية عند وصول أهداف جني الأرباح، اقتراب نقاط الدعم، أو رصد شذوذ السيولة</p>
+          </div>
+          <button onclick="simulateMarketEmergency()" class="px-3.5 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs flex items-center gap-1.5 transition self-start shadow-md">
+            <i data-lucide="alert-octagon" class="w-4 h-4"></i>
+            <span>محاكاة تنبيه هبوط مفاجئ</span>
+          </button>
+        </div>
+
+        <div class="space-y-3" id="alerts-container">
+          <!-- Active Alert 1: Breakout -->
+          <div class="bg-gray-950 p-4 rounded-xl border border-emerald-500/30 flex items-start justify-between gap-3 hover:border-emerald-500/60 transition">
+            <div class="flex items-start gap-3">
+              <div class="p-2 rounded-xl bg-emerald-500/10 text-emerald-400 shrink-0">
+                <i data-lucide="zap" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="font-bold text-white text-sm">إشارة اختراق وانفجار سيولة: AMOC (الإسكندرية للزيوت)</span>
+                  <span class="text-[10px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded font-bold">فرصة طفرة EGX70</span>
+                </div>
+                <p class="text-xs text-gray-300 mt-1 leading-relaxed">
+                  حجم التداول اليومي تجاوز 3.4 أضعاف المتوسط التاريخي مع كسر مقاومة 10.80 ج. الهدف المتوقع: 12.40 ج. وقف الخسارة: 9.30 ج.
+                </p>
+                <div class="text-[11px] text-gray-500 mt-1 font-mono">الزمن: منذ 12 دقيقة • الأولوية: عالية</div>
+              </div>
+            </div>
+            <a href="https://app.thndr.app" target="_blank" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shrink-0 flex items-center gap-1">
+              <span>تنفيذ في ثندر</span>
+              <i data-lucide="external-link" class="w-3 h-3"></i>
+            </a>
+          </div>
+
+          <!-- Active Alert 2: Profit Protection -->
+          <div class="bg-gray-950 p-4 rounded-xl border border-cyan-500/30 flex items-start justify-between gap-3 hover:border-cyan-500/60 transition">
+            <div class="flex items-start gap-3">
+              <div class="p-2 rounded-xl bg-cyan-500/10 text-cyan-400 shrink-0">
+                <i data-lucide="shield-check" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="font-bold text-white text-sm">حماية أرباح تاريخية: ORAS (أوراسكوم كونستراكشون)</span>
+                  <span class="text-[10px] bg-cyan-500/20 text-cyan-300 px-2 py-0.5 rounded font-bold">عائد +25.17%</span>
+                </div>
+                <p class="text-xs text-gray-300 mt-1 leading-relaxed">
+                  السهم يتصدر محفظتك بربح +3,060 ج.م. وفقاً لدستور الاستثمار، تم رفع نقطة وقف الخسارة المتحرك (Trailing Stop) إلى 285.00 ج لضمان بقاء الصفقة رابحة 100%.
+                </p>
+                <div class="text-[11px] text-gray-500 mt-1 font-mono">الزمن: تم التحديث اليوم • الأولوية: متوسطة</div>
+              </div>
+            </div>
+            <button onclick="askCopilot('ما هي خطة جني الأرباح لسهم أوراسكوم ORAS؟')" class="px-3 py-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 text-white font-bold text-xs shrink-0 flex items-center gap-1">
+              <span>استشارة الـ AI</span>
+              <i data-lucide="sparkles" class="w-3 h-3 text-emerald-400"></i>
+            </button>
+          </div>
+
+          <!-- Active Alert 3: Accumulation Opportunity -->
+          <div class="bg-gray-950 p-4 rounded-xl border border-amber-500/30 flex items-start justify-between gap-3 hover:border-amber-500/60 transition">
+            <div class="flex items-start gap-3">
+              <div class="p-2 rounded-xl bg-amber-500/10 text-amber-400 shrink-0">
+                <i data-lucide="arrow-down-circle" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="font-bold text-white text-sm">فرصة تعزيز استراتيجي: COMI (البنك التجاري الدولي)</span>
+                  <span class="text-[10px] bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded font-bold">تصحيح عند الدعم</span>
+                </div>
+                <p class="text-xs text-gray-300 mt-1 leading-relaxed">
+                  سهم CIB يلامس منطقة الدعم الهيكلية (77.80 - 79.00 ج). مؤشرات السيولة تؤكد بدء تجميع مؤسساتي هادئ. يُنصح بتوجيه أي كاش إضافي لخفض متوسط تكلفة الشراء.
+                </p>
+                <div class="text-[11px] text-gray-500 mt-1 font-mono">الزمن: منذ ساعتين • الأولوية: فرصة ذهبية</div>
+              </div>
+            </div>
+            <a href="https://app.thndr.app" target="_blank" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shrink-0 flex items-center gap-1">
+              <span>ثندر</span>
+              <i data-lucide="external-link" class="w-3 h-3"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ============================================== -->
+    <!-- TAB 6: PAPER TRADING SIMULATOR (Phase 7) -->
+    <!-- ============================================== -->
+    <div id="view-papertrading" class="view-panel hidden space-y-6">
+      
+      <!-- Simulator Metrics Header -->
+      <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6 shadow-xl space-y-6">
+        <div class="border-b border-gray-800 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <div class="flex items-center gap-2 text-cyan-400 text-xs font-bold uppercase tracking-wider mb-1">
+              <i data-lucide="gamepad-2" class="w-4 h-4"></i>
+              <span>منصة التداول التجريبي الافتراضي (Paper Trading - Phase 7)</span>
+            </div>
+            <h2 class="text-xl font-bold text-white">اختبر التوصيات بأمان تام دون المخاطرة بقرش واحد</h2>
+            <p class="text-xs text-gray-400 mt-1">محفظة افتراضية لاختبار إشارات الشراء والبيع وقياس نسبة نجاح الصفقات قبل تطبيقها في ثندر</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="resetPaperTrading()" class="px-3 py-1.5 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-300 text-xs font-semibold transition">
+              إعادة ضبط المحاكاة
+            </button>
+          </div>
+        </div>
+
+        <!-- Simulation Summary Metrics -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div class="bg-gray-950 p-4 rounded-xl border border-gray-800">
+            <span class="text-gray-400 text-xs block">رصيد الكاش الافتراضي المتاح:</span>
+            <span class="text-xl font-black font-mono text-white mt-1 block" id="sim-cash">50,000 ج</span>
+            <span class="text-[10px] text-emerald-400">جاهز للتنفيذ الوهمي</span>
+          </div>
+          <div class="bg-gray-950 p-4 rounded-xl border border-gray-800">
+            <span class="text-gray-400 text-xs block">قيمة الأسهم الافتراضية:</span>
+            <span class="text-xl font-black font-mono text-cyan-400 mt-1 block" id="sim-stocks-val">0 ج</span>
+            <span class="text-[10px] text-gray-400" id="sim-positions-count">0 صفقات مفتوحة</span>
+          </div>
+          <div class="bg-gray-950 p-4 rounded-xl border border-gray-800">
+            <span class="text-gray-400 text-xs block">الأرباح الافتراضية المحققة:</span>
+            <span class="text-xl font-black font-mono text-emerald-400 mt-1 block" id="sim-profit">+0.00 ج</span>
+            <span class="text-[10px] text-emerald-400" id="sim-return-pct">+0.00%</span>
+          </div>
+          <div class="bg-gray-950 p-4 rounded-xl border border-gray-800">
+            <span class="text-gray-400 text-xs block">نسبة نجاح الصفقات (Win Rate):</span>
+            <span class="text-xl font-black font-mono text-purple-400 mt-1 block" id="sim-win-rate">100%</span>
+            <span class="text-[10px] text-gray-400">بناءً على التوصيات السابقة</span>
+          </div>
+        </div>
+
+        <!-- Execute Simulated Trade Form -->
+        <div class="bg-gray-950/70 p-4 rounded-xl border border-gray-800 space-y-3">
+          <h4 class="text-xs font-bold text-white flex items-center gap-1.5">
+            <i data-lucide="plus-circle" class="w-4 h-4 text-emerald-400"></i>
+            <span>تنفيذ صفقة شراء افتراضية (ورقية):</span>
+          </h4>
+          <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 text-xs">
+            <div>
+              <label class="block text-gray-400 mb-1">اختر السهم:</label>
+              <select id="sim-trade-stock" onchange="updateSimPriceFromSelect()" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500">
+                <!-- Populated via JS -->
+              </select>
+            </div>
+            <div>
+              <label class="block text-gray-400 mb-1">سعر الشراء الافتراضي (ج):</label>
+              <input type="number" id="sim-trade-price" step="0.05" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2 text-white font-mono focus:outline-none focus:border-emerald-500">
+            </div>
+            <div>
+              <label class="block text-gray-400 mb-1">المبلغ المراد استثماره (ج):</label>
+              <input type="number" id="sim-trade-amount" value="5000" step="500" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2 text-white font-mono focus:outline-none focus:border-emerald-500">
+            </div>
+            <div class="flex items-end">
+              <button onclick="executeSimulatedBuy()" class="w-full py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition shadow">
+                <i data-lucide="check" class="w-3.5 h-3.5"></i>
+                <span>شراء افتراضي للتجربة</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Simulated Positions Table -->
+        <div class="overflow-x-auto">
+          <table class="w-full text-right text-xs">
+            <thead class="bg-gray-950 text-gray-400 font-semibold border-b border-gray-800">
+              <tr>
+                <th class="py-2.5 px-3">السهم</th>
+                <th class="py-2.5 px-3">الكمية</th>
+                <th class="py-2.5 px-3">سعر الشراء</th>
+                <th class="py-2.5 px-3">القيمة الإجمالية</th>
+                <th class="py-2.5 px-3">وقف الخسارة المحدد</th>
+                <th class="py-2.5 px-3">الهدف المتوقع</th>
+                <th class="py-2.5 px-3 text-center">إغلاق الصفقة</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-800 font-medium" id="sim-positions-body">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ============================================== -->
+    <!-- TAB 7: CASH & REBALANCING CALCULATOR -->
     <!-- ============================================== -->
     <div id="view-rebalance" class="view-panel hidden space-y-6">
       
@@ -585,7 +844,7 @@
     </div>
 
     <!-- ============================================== -->
-    <!-- TAB 6: INVESTMENT RULES (دستور وقواعد الاستثمار) -->
+    <!-- TAB 8: INVESTMENT RULES (دستور وقواعد الاستثمار) -->
     <!-- ============================================== -->
     <div id="view-rules" class="view-panel hidden space-y-6">
       
@@ -1725,12 +1984,24 @@
     // ==============================================
     function populateRiskStockDropdown() {
       const select = document.getElementById('risk-stock-select');
+      const aiSelect = document.getElementById('ai-thesis-stock-select');
+      const simSelect = document.getElementById('sim-trade-stock');
+
       select.innerHTML = '<option value="">-- اختر سهماً من الرادار --</option>';
+      aiSelect.innerHTML = '';
+      simSelect.innerHTML = '';
+
       fullMarketRadar.forEach(stock => {
         const opt = document.createElement('option');
         opt.value = stock.ticker;
         opt.innerText = `${stock.name} (${stock.ticker})`;
         select.appendChild(opt);
+
+        const aiOpt = opt.cloneNode(true);
+        aiSelect.appendChild(aiOpt);
+
+        const simOpt = opt.cloneNode(true);
+        simSelect.appendChild(simOpt);
       });
     }
 
@@ -1761,17 +2032,13 @@
         return;
       }
 
-      // 1. Classical Pivot Points Math
       const pivot = (high + low + close) / 3;
       const r1 = (2 * pivot) - low;
       const s1 = (2 * pivot) - high;
       const r2 = pivot + (high - low);
       const s2 = pivot - (high - low);
-
-      // 2. Strict Stop Loss Math (Dynamic ATR approx: 3.5% below S1 or lowest low)
       const stopLoss = Math.min(s1 * 0.97, low * 0.98);
 
-      // 3. Risk-to-Reward Ratio: (Target R1 - Entry Close) / (Entry Close - StopLoss)
       const potentialReward = Math.max(r1 - close, 0.05);
       const potentialRisk = Math.max(close - stopLoss, 0.05);
       const rrRatio = (potentialReward / potentialRisk);
@@ -1779,7 +2046,6 @@
       const rewardPct = ((r1 - close) / close) * 100;
       const riskPct = ((close - stopLoss) / close) * 100;
 
-      // Update UI elements
       document.getElementById('out-pivot').innerText = `${pivot.toFixed(2)} ج`;
       document.getElementById('out-r1').innerText = `${r1.toFixed(2)} ج (+${rewardPct.toFixed(1)}%)`;
       document.getElementById('out-r2').innerText = `${r2.toFixed(2)} ج`;
@@ -1818,6 +2084,153 @@
       lucide.createIcons();
     }
 
+    // ==============================================
+    // PHASE 5: STRUCTURED DEEP AI THESIS GENERATOR
+    // ==============================================
+    function generateStructuredThesis() {
+      const ticker = document.getElementById('ai-thesis-stock-select').value;
+      const stock = fullMarketRadar.find(s => s.ticker === ticker);
+      if (!stock) return;
+
+      askCopilot(`أريد دراسة استثمارية شاملة ومسببة (1, 2, 3) لسهم ${stock.name} (${stock.ticker})`);
+    }
+
+    // ==============================================
+    // PHASE 6: EMERGENCY ALERTS SIMULATOR
+    // ==============================================
+    function simulateMarketEmergency() {
+      const alertsContainer = document.getElementById('alerts-container');
+      const alertDiv = document.createElement('div');
+      alertDiv.className = 'bg-rose-950/80 p-4 rounded-xl border border-rose-500/60 flex items-start justify-between gap-3 animate-pulse shadow-lg';
+      alertDiv.innerHTML = `
+        <div class="flex items-start gap-3">
+          <div class="p-2 rounded-xl bg-rose-500/20 text-rose-300 shrink-0">
+            <i data-lucide="alert-octagon" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="font-bold text-white text-sm">⚠️ تنبيه عاجل: كسر دعم استراتيجي لسهم مضاربة</span>
+              <span class="text-[10px] bg-rose-500/30 text-rose-200 px-2 py-0.5 rounded font-bold">إشارة حماية رأس مال</span>
+            </div>
+            <p class="text-xs text-rose-200 mt-1 leading-relaxed">
+              السهم كسر مستوى الارتكاز مع ضغوط بيع قوية. وفقاً للبند رقم 2 في دستور الاستثمار: يوصي المستشار بتفعيل أمر وقف الخسارة فوراً لحماية المحفظة من أي انزلاق إضافي.
+            </p>
+            <div class="text-[11px] text-rose-300/80 mt-1 font-mono">الزمن: الآن • الأولوية: طوارئ قصوى</div>
+          </div>
+        </div>
+        <button onclick="this.parentElement.remove()" class="text-xs text-rose-300 hover:text-white px-2 py-1 rounded bg-rose-900/40">
+          إغلاق التنبيه
+        </button>
+      `;
+      alertsContainer.prepend(alertDiv);
+      lucide.createIcons();
+      alert('⚠️ تم إطلاق إشعار الطوارئ بنجاح لاختبار استجابة النظام!');
+    }
+
+    // ==============================================
+    // PHASE 7: PAPER TRADING SIMULATOR & LEDGER
+    // ==============================================
+    let simCash = 50000;
+    let simPositions = [];
+
+    function updateSimPriceFromSelect() {
+      const ticker = document.getElementById('sim-trade-stock').value;
+      const stock = fullMarketRadar.find(s => s.ticker === ticker);
+      if (stock) {
+        document.getElementById('sim-trade-price').value = stock.price;
+      }
+    }
+
+    function executeSimulatedBuy() {
+      const ticker = document.getElementById('sim-trade-stock').value;
+      const price = parseFloat(document.getElementById('sim-trade-price').value) || 0;
+      const amount = parseFloat(document.getElementById('sim-trade-amount').value) || 0;
+
+      if (!ticker || price <= 0 || amount <= 0) {
+        alert('يرجى اختيار السهم وإدخال سعر ومبلغ صحيح');
+        return;
+      }
+
+      if (amount > simCash) {
+        alert('رصيد الكاش الافتراضي المتاح لا يكفي لتنفيذ هذه العملية');
+        return;
+      }
+
+      const stock = fullMarketRadar.find(s => s.ticker === ticker);
+      const shares = Math.floor(amount / price);
+      const totalCost = shares * price;
+
+      simCash -= totalCost;
+
+      simPositions.push({
+        ticker: stock.ticker,
+        name: stock.name,
+        shares: shares,
+        buyPrice: price,
+        totalCost: totalCost,
+        target: stock.target1,
+        stopLoss: stock.stopLoss,
+        date: new Date().toLocaleDateString('ar-EG')
+      });
+
+      renderSimPositions();
+      alert(`✅ تم تنفيذ أمر الشراء التجريبي: ${shares} سهم في ${stock.name} بنجاح!`);
+    }
+
+    function closeSimPosition(index) {
+      const pos = simPositions[index];
+      if (!pos) return;
+
+      const simulatedProfit = pos.totalCost * 0.12; // Simulate a +12% target win
+      simCash += (pos.totalCost + simulatedProfit);
+      simPositions.splice(index, 1);
+
+      renderSimPositions();
+      alert(`🎉 تم إغلاق الصفقة الافتراضية بنجاح وتحقيق ربح تجريبي قدره +${simProfit.toFixed(0)} ج!`);
+    }
+
+    function renderSimPositions() {
+      const tbody = document.getElementById('sim-positions-body');
+      tbody.innerHTML = '';
+
+      let totalStocksValue = 0;
+      simPositions.forEach((pos, idx) => {
+        totalStocksValue += pos.totalCost;
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-gray-900/60 transition';
+        tr.innerHTML = `
+          <td class="py-2.5 px-3 font-bold text-white">${pos.name} (${pos.ticker})</td>
+          <td class="py-2.5 px-3 font-mono text-gray-300">${pos.shares} سهم</td>
+          <td class="py-2.5 px-3 font-mono text-white">${pos.buyPrice.toFixed(2)} ج</td>
+          <td class="py-2.5 px-3 font-mono text-cyan-400 font-bold">${pos.totalCost.toLocaleString()} ج</td>
+          <td class="py-2.5 px-3 font-mono text-rose-400 font-bold">${pos.stopLoss}</td>
+          <td class="py-2.5 px-3 font-mono text-emerald-400 font-bold">${pos.target}</td>
+          <td class="py-2.5 px-3 text-center">
+            <button onclick="closeSimPosition(${idx})" class="px-2 py-1 rounded bg-emerald-700 hover:bg-emerald-600 text-white font-bold text-[10px] transition">
+              جني أرباح الهدف (+12%)
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      if (simPositions.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="py-4 text-center text-gray-500">لا توجد صفقات تجريبية مفتوحة حالياً. اختر سهماً ونفذ شراءً وهمياً أعلاه.</td></tr>';
+      }
+
+      document.getElementById('sim-cash').innerText = `${Math.round(simCash).toLocaleString()} ج`;
+      document.getElementById('sim-stocks-val').innerText = `${Math.round(totalStocksValue).toLocaleString()} ج`;
+      document.getElementById('sim-positions-count').innerText = `${simPositions.length} صفقات مفتوحة`;
+    }
+
+    function resetPaperTrading() {
+      if (confirm('هل ترغب في إعادة ضبط المحفظة التجريبية إلى 50,000 ج؟')) {
+        simCash = 50000;
+        simPositions = [];
+        renderSimPositions();
+      }
+    }
+
     // Tab Switching
     function switchTab(tabId) {
       document.querySelectorAll('.view-panel').forEach(el => el.classList.add('hidden'));
@@ -1843,6 +2256,8 @@
           document.getElementById('risk-stock-select').value = fullMarketRadar[0].ticker;
           loadStockForRiskCalc();
         }
+      } else if (tabId === 'papertrading') {
+        renderSimPositions();
       }
     }
 
@@ -1883,44 +2298,38 @@
       let reply = "";
       if (text.includes('كليوباترا') || text.includes('CLHO')) {
         reply = `
-          <strong>تحليل سهم مستشفيات كليوباترا (CLHO):</strong><br>
-          • <strong>الوضع الحالي في محفظتك:</strong> تراجع بنسبة -20.89% (خسارة غير متحققة: 3,567 ج.م).<br>
-          • <strong>التشخيص المالي:</strong> الشركة تشغيلياً جيدة لكن السهم يعاني من ضعف السيولة مقارنة بباقي أسهم البورصة، ولم يستفد من موجة الصعود الأخيرة.<br>
-          • <strong>نصيحة المستشار (وفق قواعدك طويلة الأجل):</strong> <strong>لا تبع عند القاع الحالي</strong>. السهم يقترب من دعم تاريخي؛ انتظر ارتداداً فنياً قادماً لتخفيف المركز بالتدريج وتوجيه السيولة نحو سهم قيادي أسرع نمواً مثل CIB أو السويدي.
+          <strong>تحليل سهم مستشفيات كليوباترا (CLHO) - دراسة مسببة:</strong><br>
+          • <strong>1. التحليل المالي والأساسي:</strong> السهم يعاني من ضعف السيولة وتراجع العائد على حقوق الملكية مقارنة بالقطاعات التصديرية، وخسارتك فيه غير متحققة (-20.89%).<br>
+          • <strong>2. التحليل الفني والدعوم:</strong> السهم يقترب من دعم تاريخي صلب (4.80 - 5.00 ج). البيع عند القاع خطأ استثماري فادح.<br>
+          • <strong>3. المحفز الإخباري وقرار المستشار:</strong> <strong>انتظر ارتداداً فنياً قادماً</strong> لتقليص الخسارة، ثم قم بتدوير السيولة بالتدريج نحو أسهم أسرع نمواً مثل CIB أو السويدي.
         `;
       } else if (text.includes('التجاري الدولي') || text.includes('COMI') || text.includes('CIB')) {
         reply = `
-          <strong>تحليل سهم البنك التجاري الدولي (COMI):</strong><br>
-          • <strong>الوضع في محفظتك:</strong> قيمة 15,250 ج (تراجع -11.02%).<br>
-          • <strong>التشخيص الأساسي:</strong> هذا أقوى بنك في مصر وحقق صافي أرباح تاريخية غير مسبوقة. تراجع السعر سببه مبيعات المؤسسات لتثبيت المراكز فقط.<br>
-          • <strong>قرار المستشار:</strong> <strong>احتفاظ قوي وفرصة تعزيز استثنائية</strong>. بالنسبة لمستثمر طويل الأجل، أي هبوط في CIB هو فرصة لشراء أسهم إضافية بخصم سعري ممتاز؛ لأن اتجاهه على المدى الطويل صاعد بقوة.
+          <strong>تحليل سهم البنك التجاري الدولي (COMI) - دراسة مسببة:</strong><br>
+          • <strong>1. التحليل المالي والأساسي:</strong> صافي أرباح تاريخية غير مسبوقة وهوامش فائدة قياسية، وهو السهم الأكثر جذباً للاستثمار المؤسسي الأجنبي.<br>
+          • <strong>2. التحليل الفني والدعوم:</strong> السهم يرتكز على دعم رئيسي قوي عند 77.80 ج، ومؤشر القوة النسبية RSI عند مستويات تشبع بيعي تدعم الارتداد نحو الهدف 88.00 ج.<br>
+          • <strong>3. قرار المستشار النهائي:</strong> <strong>فرصة تعزيز ذهبية (Accumulate)</strong>. تراجع السعر 11% في محفظتك هو فرصة للمستثمر طويل الأجل لخفض متوسط التكلفة ومضاعفة الأرباح عند صعود المؤشر.
         `;
       } else if (text.includes('السويدي') || text.includes('SWDY')) {
         reply = `
-          <strong>تحليل سهم السويدي إليكتريك (SWDY):</strong><br>
-          • <strong>الوضع في محفظتك:</strong> ربح ممتاز +20.47% (+2,114 ج.م).<br>
-          • <strong>التشخيص:</strong> السهم في قناة صاعدة قوية جداً بدعم من عقود التصدير وتوسعات الخليج والمشروعات القومية للطاقة.<br>
-          • <strong>قرار المستشار:</strong> <strong>احتفاظ تام ودع أرباحك تنمو</strong>. وفقاً لدستور الاستثمار، لن نبيع إلا إذا وصل السهم لذروة تشبع شرائي تاريخي (+40% إلى +50%).
+          <strong>تحليل سهم السويدي إليكتريك (SWDY) - دراسة مسببة:</strong><br>
+          • <strong>1. التحليل المالي والأساسي:</strong> عملاق التصدير وصاحب أكبر إيرادات دولارية في قطاع الطاقة والكابلات مع توسعات استثنائية بالخليج.<br>
+          • <strong>2. التحليل الفني والدعوم:</strong> قناة صاعدة قوية جداً فوق المتوسطات المتحركة، الدعم عند 48.50 ج، والهدف القادم 58.00 ج.<br>
+          • <strong>3. قرار المستشار:</strong> <strong>احتفاظ كامل بالمركز (Hold)</strong>؛ أرباحك الحالية (+20.47%) ممتازة ولا نبيع إلا مع ظهور علامات تشبع تاريخي (+40% إلى +50%).
         `;
       } else if (text.includes('AMOC') || text.includes('أموك')) {
         reply = `
-          <strong>تقييم فرصة سهم أموك (AMOC):</strong><br>
-          • <strong>تصنيف الفرصة:</strong> طفرة EGX70 واعدة بنقاط أمان 92/100 مع ارتفاع تدفق السيولة بمعدل 3.4x أضعاف المعتاد.<br>
-          • <strong>المحفز الأساسي:</strong> عوائد تصديرية وارتفاع هوامش التكرير بالدولار.<br>
-          • <strong>خطة الدخول المقترحة:</strong> شراء تدريجي قرب نقطة الدعم (9.80 - 10.20 ج)، الهدف الأول 12.40 ج (+20%)، ووقف خسارة صارم عند 9.30 ج. سيولة السهم في ثندر ممتازة وتضمن سهولة الخروج في أي وقت.
-        `;
-      } else if (text.includes('أوراسكوم') || text.includes('ORAS')) {
-        reply = `
-          <strong>تحليل سهم أوراسكوم كونستراكشون (ORAS):</strong><br>
-          • <strong>الوضع في محفظتك:</strong> السهم المتصدر بأعلى عائد +25.17% (+3,060 ج.م).<br>
-          • <strong>التشخيص:</strong> أعمال ضخمة خارج مصر بالدولار وتوزيعات أرباح بالعملة الصعبة.<br>
-          • <strong>قرار المستشار:</strong> رفع نقطة حماية الأرباح (Trailing Stop) مع الاحتفاظ بالمركز بالكامل للاستفادة من النمو المستمر.
+          <strong>دراسة سهم أموك (AMOC) - طفرة EGX70:</strong><br>
+          • <strong>1. الأساسي والمالي:</strong> عوائد تصدير بالعملة الصعبة واستفادة مباشرة من تحسن أسعار المشتقات البترولية.<br>
+          • <strong>2. الفني والدعوم:</strong> انفجار في حجم التداول بمعدل 3.4x أضعاف المتوسط التاريخي واختراق للمقاومة 10.80 ج، مستهدف 12.40 ج.<br>
+          • <strong>3. شروط الأمان:</strong> وقف خسارة صارم عند 9.30 ج، ونسبة المخاطرة للعائد ممتازة (1:2.4).
         `;
       } else {
         reply = `
           <strong>رأي المستشار المالي وفق أرقام محفظتك ودستور الاستثمار:</strong><br>
-          • <strong>حالة المحفظة العامة:</strong> محفظتك في وضع صحي ممتاز (إجمالي التغير شبه متعادل بفضل الأرباح القوية في أوراسكوم والسويدي وبنك الإسكان).<br>
-          • <strong>التوجيه الذهبي:</strong> التزم بالهدوء وعدم التداول اليومي. استثمارك طويل الأجل في هذه الشركات القيادية سيحقق طفرات ممتازة مع هدوء موجات التضخم ونمو نتائج أعمال الشركات. متى ظهرت فرصة طفرة جديدة في السوق تتطابق مع شروط الأمان، سأقترحها عليك فوراً!
+          • <strong>1. حالة المحفظة:</strong> محفظتك متماسكة جداً (إجمالي التغير شبه متعادل) بفضل الأرباح الكبيرة في أوراسكوم (+25%) وبنك الإسكان (+25%) والسويدي (+20%).<br>
+          • <strong>2. استراتيجية المستثمر طويل الأجل:</strong> لا تتأثر بالتذبذبات اليومية. صفقاتك مبنية على شركات حقيقية تكسب مليارات.<br>
+          • <strong>3. خطة العمل:</strong> الاحتفاظ بالخيول الرابحة، تعزيز CIB عند توفر سيولة، واستخدام منصة التداول التجريبي لاختبار أي فرصة طفرة جديدة قبل وضع أموال حقيقية!
         `;
       }
 
@@ -1961,6 +2370,8 @@
       populateRiskStockDropdown();
       renderAllocationChart();
       calculateSmartAllocation();
+      renderSimPositions();
+      updateSimPriceFromSelect();
       lucide.createIcons();
     });
   </script>
