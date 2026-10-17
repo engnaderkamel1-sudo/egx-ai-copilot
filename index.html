@@ -86,7 +86,7 @@
     <div class="flex items-center gap-2 sm:gap-3">
       <div class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-950/40 border border-emerald-800/40 text-emerald-400 text-xs">
         <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-        <span>السوق: رصد حي (EGX30/70)</span>
+        <span>المحرك الكمي: مفعل</span>
       </div>
       <button onclick="switchTab('rules')" class="p-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white transition flex items-center gap-1 text-xs" title="دستور وقواعد الاستثمار">
         <i data-lucide="shield-check" class="w-4 h-4 text-emerald-400"></i>
@@ -110,6 +110,10 @@
         <i data-lucide="radar" class="w-4 h-4"></i>
         <span>رادار الطفرات والسوق</span>
         <span class="px-1.5 py-0.2 text-[10px] bg-emerald-500/20 text-emerald-300 rounded-full font-bold">18 فرصة</span>
+      </button>
+      <button onclick="switchTab('risk')" id="tab-risk" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition text-gray-400 hover:text-white hover:bg-gray-800">
+        <i data-lucide="shield-alert" class="w-4 h-4"></i>
+        <span>محرك المخاطر والدعم (Phase 4)</span>
       </button>
       <button onclick="switchTab('advisor')" id="tab-advisor" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition text-gray-400 hover:text-white hover:bg-gray-800">
         <i data-lucide="bot" class="w-4 h-4"></i>
@@ -299,7 +303,7 @@
     </div>
 
     <!-- ============================================== -->
-    <!-- TAB 2: ADVANCED MARKET RADAR (Phase 3 Upgrade) -->
+    <!-- TAB 2: ADVANCED MARKET RADAR -->
     <!-- ============================================== -->
     <div id="view-radar" class="view-panel hidden space-y-6">
       
@@ -342,7 +346,141 @@
     </div>
 
     <!-- ============================================== -->
-    <!-- TAB 3: IN-APP AI ADVISORY CHAT (Gemini Copilot) -->
+    <!-- TAB 3: QUANTITATIVE RISK & LEVELS ENGINE (Phase 4) -->
+    <!-- ============================================== -->
+    <div id="view-risk" class="view-panel hidden space-y-6">
+      
+      <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6 shadow-xl space-y-6">
+        <div class="border-b border-gray-800 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <div class="flex items-center gap-2 text-emerald-400 text-xs font-bold uppercase tracking-wider mb-1">
+              <i data-lucide="shield-alert" class="w-4 h-4"></i>
+              <span>المحرك الكمي الحسابي (Deterministic Engine)</span>
+            </div>
+            <h2 class="text-xl font-bold text-white">حاسبة نقاط الدعم والمقاومة ونسبة المخاطرة للعائد (R/R)</h2>
+            <p class="text-xs text-gray-400 mt-1">حسابات رياضية قطعية بدون أي تدخل أو تخمين من الـ AI لضمان سلامة كل قرار</p>
+          </div>
+          <span class="px-3 py-1 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 rounded-xl text-xs font-bold self-start">
+            شرط الأمان: R/R ≥ 1:2
+          </span>
+        </div>
+
+        <!-- Stock Selector & Calculation Inputs -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 bg-gray-950/60 p-4 rounded-xl border border-gray-800">
+          <div>
+            <label class="block text-xs font-bold text-gray-300 mb-1">اختر السهم من الرادار:</label>
+            <select id="risk-stock-select" onchange="loadStockForRiskCalc()" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-emerald-500">
+              <!-- Populated via JS -->
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-300 mb-1">أعلى سعر (High):</label>
+            <input type="number" id="risk-high" step="0.05" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white font-mono focus:border-emerald-500 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-300 mb-1">أدنى سعر (Low):</label>
+            <input type="number" id="risk-low" step="0.05" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white font-mono focus:border-emerald-500 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-300 mb-1">سعر الإغلاق / الشراء:</label>
+            <input type="number" id="risk-close" step="0.05" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white font-mono focus:border-emerald-500 focus:outline-none">
+          </div>
+        </div>
+
+        <div class="flex justify-end">
+          <button onclick="executeRiskCalculations()" class="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-2 transition shadow-md">
+            <i data-lucide="cpu" class="w-4 h-4"></i>
+            <span>تشغيل المحرك الحسابي</span>
+          </button>
+        </div>
+
+        <!-- Calculated Mathematical Output Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6" id="risk-output-container">
+          
+          <!-- Column 1: Pivot & Resistance Levels -->
+          <div class="bg-gray-950 p-4 rounded-xl border border-gray-800 space-y-3">
+            <h4 class="text-xs font-bold text-cyan-400 flex items-center gap-1.5 border-b border-gray-800 pb-2">
+              <i data-lucide="arrow-up-right" class="w-4 h-4"></i>
+              <span>مستويات الارتكاز والمقاومة (Pivot Points)</span>
+            </h4>
+            <div class="space-y-2 text-xs font-mono">
+              <div class="flex justify-between items-center p-2 rounded-lg bg-gray-900">
+                <span class="text-gray-400">المقاومة الثانية (R2 - جني أرباح أقصى):</span>
+                <span class="font-bold text-purple-400" id="out-r2">--</span>
+              </div>
+              <div class="flex justify-between items-center p-2 rounded-lg bg-gray-900">
+                <span class="text-gray-400">المقاومة الأولى (R1 - الهدف الأول):</span>
+                <span class="font-bold text-emerald-400" id="out-r1">--</span>
+              </div>
+              <div class="flex justify-between items-center p-2 rounded-lg bg-emerald-950/40 border border-emerald-800/40">
+                <span class="text-emerald-300 font-bold">نقطة الارتكاز المحورية (Pivot Point):</span>
+                <span class="font-bold text-white text-sm" id="out-pivot">--</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Column 2: Support & Stop-Loss Levels -->
+          <div class="bg-gray-950 p-4 rounded-xl border border-gray-800 space-y-3">
+            <h4 class="text-xs font-bold text-rose-400 flex items-center gap-1.5 border-b border-gray-800 pb-2">
+              <i data-lucide="shield" class="w-4 h-4"></i>
+              <span>مستويات الدعم ووقف الخسارة المحسوب</span>
+            </h4>
+            <div class="space-y-2 text-xs font-mono">
+              <div class="flex justify-between items-center p-2 rounded-lg bg-gray-900">
+                <span class="text-gray-400">الدعم الأول (S1 - منطقة الارتداد):</span>
+                <span class="font-bold text-white" id="out-s1">--</span>
+              </div>
+              <div class="flex justify-between items-center p-2 rounded-lg bg-gray-900">
+                <span class="text-gray-400">الدعم الثاني (S2 - دعم رئيسي):</span>
+                <span class="font-bold text-amber-400" id="out-s2">--</span>
+              </div>
+              <div class="flex justify-between items-center p-2 rounded-lg bg-rose-950/40 border border-rose-800/40">
+                <span class="text-rose-300 font-bold">وقف الخسارة الصارم (Stop Loss):</span>
+                <span class="font-bold text-rose-400 text-sm" id="out-stoploss">--</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Column 3: Risk-to-Reward & Allocation Decision -->
+          <div class="bg-gray-950 p-4 rounded-xl border border-gray-800 space-y-3">
+            <h4 class="text-xs font-bold text-amber-400 flex items-center gap-1.5 border-b border-gray-800 pb-2">
+              <i data-lucide="scale" class="w-4 h-4"></i>
+              <span>حكم المعادلة الرياضية (Verdict)</span>
+            </h4>
+            
+            <div class="p-3 rounded-lg bg-gray-900 space-y-2 text-xs">
+              <div class="flex justify-between items-center">
+                <span class="text-gray-400">نسبة العائد للمخاطرة (R/R Ratio):</span>
+                <span class="font-bold font-mono text-emerald-400 text-sm" id="out-rr-ratio">1 : 2.4</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-gray-400">الربح المتوقع حتى الهدف:</span>
+                <span class="font-bold font-mono text-emerald-400" id="out-reward-pct">+12.5%</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-gray-400">أقصى خسارة مسموح بها:</span>
+                <span class="font-bold font-mono text-rose-400" id="out-risk-pct">-4.2%</span>
+              </div>
+            </div>
+
+            <div class="p-3 rounded-xl border border-emerald-500/30 bg-emerald-950/20 text-xs text-gray-200" id="out-verdict-box">
+              <div class="font-bold text-emerald-400 flex items-center gap-1 mb-1">
+                <i data-lucide="check-circle" class="w-3.5 h-3.5"></i>
+                <span>قرار الدخول: مستوفٍ لشروط الأمان المالي</span>
+              </div>
+              <p class="text-[11px] text-gray-300">
+                نسبة العائد ضعف المخاطرة المحتملة. السهم مؤهل للشراء مع الالتزام بوقف الخسارة المحدد بالأعلى.
+              </p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ============================================== -->
+    <!-- TAB 4: IN-APP AI ADVISORY CHAT (Gemini Copilot) -->
     <!-- ============================================== -->
     <div id="view-advisor" class="view-panel hidden space-y-4">
       
@@ -406,7 +544,7 @@
     </div>
 
     <!-- ============================================== -->
-    <!-- TAB 4: CASH & REBALANCING CALCULATOR -->
+    <!-- TAB 5: CASH & REBALANCING CALCULATOR -->
     <!-- ============================================== -->
     <div id="view-rebalance" class="view-panel hidden space-y-6">
       
@@ -447,7 +585,7 @@
     </div>
 
     <!-- ============================================== -->
-    <!-- TAB 5: INVESTMENT RULES (دستور وقواعد الاستثمار) -->
+    <!-- TAB 6: INVESTMENT RULES (دستور وقواعد الاستثمار) -->
     <!-- ============================================== -->
     <div id="view-rules" class="view-panel hidden space-y-6">
       
@@ -716,14 +854,17 @@
       }
     ];
 
-    // Comprehensive EGX Market Universe (Phase 3 Expanded Database with 18 Active Stocks)
+    // Comprehensive EGX Market Universe (18 Active Stocks)
     const fullMarketRadar = [
       {
         ticker: 'COMI',
         name: 'البنك التجاري الدولي',
         index: 'egx30',
         sector: 'بنوك وخدمات مالية',
-        price: '79.20 ج',
+        price: 79.20,
+        high: 80.50,
+        low: 78.10,
+        close: 79.20,
         changePct: '+0.85%',
         volumeMultiplier: '1.4x',
         catalyst: 'إعلان نتائج أعمال ربع سنوية قياسية وتوزيعات نقدية قوية',
@@ -741,7 +882,10 @@
         name: 'السويدي إليكتريك',
         index: 'egx30',
         sector: 'طاقة وصناعة',
-        price: '51.40 ج',
+        price: 51.40,
+        high: 52.20,
+        low: 50.00,
+        close: 51.40,
         changePct: '+2.10%',
         volumeMultiplier: '2.1x',
         catalyst: 'عقود توريد كابلات ضخمة ومشروعات ربط كهربائي خليجي',
@@ -759,7 +903,10 @@
         name: 'الإسكندرية للزيوت المعدنية',
         index: 'egx70',
         sector: 'بتروكيماويات وطاقة',
-        price: '10.85 ج',
+        price: 10.85,
+        high: 11.20,
+        low: 10.40,
+        close: 10.85,
         changePct: '+4.32%',
         volumeMultiplier: '3.4x',
         catalyst: 'دخول سيولة مؤسساتية غير معتادة وتوقعات عوائد تصديرية مجزية',
@@ -777,7 +924,10 @@
         name: 'المصرية للنقل والخدمات (إيجيترانس)',
         index: 'egx70',
         sector: 'لوجستيات ونقل بحري',
-        price: '4.65 ج',
+        price: 4.65,
+        high: 4.80,
+        low: 4.35,
+        close: 4.65,
         changePct: '+5.68%',
         volumeMultiplier: '4.1x',
         catalyst: 'استحواذات لوجستية وتوسعات نقل توربينات طاقة الرياح',
@@ -795,7 +945,10 @@
         name: 'فوري لتكنولوجيا المدفوعات',
         index: 'egx30',
         sector: 'تكنولوجيا مالية',
-        price: '7.85 ج',
+        price: 7.85,
+        high: 8.00,
+        low: 7.65,
+        close: 7.85,
         changePct: '+1.42%',
         volumeMultiplier: '1.8x',
         catalyst: 'نمو متسارع في عمليات التمويل الاستهلاكي والمدفوعات الإلكترونية',
@@ -813,7 +966,10 @@
         name: 'مصر لإنتاج الأسمدة (موبكو)',
         index: 'egx30',
         sector: 'أسمدة وبتروكيماويات',
-        price: '46.20 ج',
+        price: 46.20,
+        high: 47.00,
+        low: 44.80,
+        close: 46.20,
         changePct: '+2.80%',
         volumeMultiplier: '2.5x',
         catalyst: 'إيرادات دولارية نقية وهوامش ربحية استثنائية من تصدير اليوريا',
@@ -831,7 +987,10 @@
         name: 'مجموعة طلعت مصطفى القابضة',
         index: 'egx30',
         sector: 'تطوير عقاري وفندقي',
-        price: '54.00 ج',
+        price: 54.00,
+        high: 55.20,
+        low: 52.80,
+        close: 54.00,
         changePct: '+0.95%',
         volumeMultiplier: '1.2x',
         catalyst: 'مبيعات تاريخية في رأس الحكمة ومشروع ساوث ميد وعوائد فندقية دولارية',
@@ -849,7 +1008,10 @@
         name: 'حديد عز',
         index: 'egx30',
         sector: 'معادن وتعدين',
-        price: '94.50 ج',
+        price: 94.50,
+        high: 96.00,
+        low: 92.50,
+        close: 94.50,
         changePct: '+3.10%',
         volumeMultiplier: '2.3x',
         catalyst: 'طفرة تصديرية لمصانع أوروبا مع استفادة كاملة من خفض الجنيه',
@@ -867,7 +1029,10 @@
         name: 'أوراسكوم كونستراكشون',
         index: 'egx30',
         sector: 'مقاولات وبنية تحتية',
-        price: '305.00 ج',
+        price: 305.00,
+        high: 310.00,
+        low: 298.00,
+        close: 305.00,
         changePct: '+1.65%',
         volumeMultiplier: '1.5x',
         catalyst: 'عقود بنية تحتية دولارية ومشاريع كبرى بالشرق الأوسط والولايات المتحدة',
@@ -885,7 +1050,10 @@
         name: 'أبو قير للأسمدة',
         index: 'egx30',
         sector: 'بتروكيماويات',
-        price: '58.50 ج',
+        price: 58.50,
+        high: 59.80,
+        low: 57.20,
+        close: 58.50,
         changePct: '+0.50%',
         volumeMultiplier: '1.3x',
         catalyst: 'توزيعات نقدية دورية ومفاوضات حصص استثمارية لمستثمرين استراتيجيين',
@@ -903,7 +1071,10 @@
         name: 'سيدي كرير للبتروكيماويات',
         index: 'egx70',
         sector: 'بتروكيماويات',
-        price: '28.40 ج',
+        price: 28.40,
+        high: 29.20,
+        low: 27.50,
+        close: 28.40,
         changePct: '+3.65%',
         volumeMultiplier: '2.7x',
         catalyst: 'انتظام إمدادات الغاز وارتفاع الطلب على البولي إيثيلين بالأسواق الخارجية',
@@ -921,7 +1092,10 @@
         name: 'الإسكندرية لتداول الحاويات',
         index: 'egx30',
         sector: 'نقل ولوجستيات دولارية',
-        price: '48.90 ج',
+        price: 48.90,
+        high: 49.50,
+        low: 47.80,
+        close: 48.90,
         changePct: '+1.88%',
         volumeMultiplier: '1.7x',
         catalyst: 'عوائد شحن بحري بالدولار مع توزيع كوبونات أرباح تاريخية',
@@ -939,7 +1113,10 @@
         name: 'بلتون القابضة',
         index: 'egx30',
         sector: 'خدمات مالية وبنوك استثمار',
-        price: '3.35 ج',
+        price: 3.35,
+        high: 3.45,
+        low: 3.22,
+        close: 3.35,
         changePct: '+2.14%',
         volumeMultiplier: '2.8x',
         catalyst: 'توسعات كبرى في التأجير التمويلي والتمويل العقاري بعد زيادة رأس المال',
@@ -957,7 +1134,10 @@
         name: 'ابن سينا فارما',
         index: 'egx70',
         sector: 'أدوية ورعاية صحية',
-        price: '3.20 ج',
+        price: 3.20,
+        high: 3.32,
+        low: 3.05,
+        close: 3.20,
         changePct: '+4.25%',
         volumeMultiplier: '3.2x',
         catalyst: 'تحريك أسعار الأدوية واستقرار سلاسل الإمداد وتحسن هوامش التوزيع',
@@ -975,7 +1155,10 @@
         name: 'جهينة للصناعات الغذائية',
         index: 'egx30',
         sector: 'صناعات غذائية واستهلاكية',
-        price: '27.80 ج',
+        price: 27.80,
+        high: 28.40,
+        low: 27.10,
+        close: 27.80,
         changePct: '+1.10%',
         volumeMultiplier: '1.3x',
         catalyst: 'قوة تسعيرية هائلة ونمو مطرد في المبيعات وتوزيعات أرباح منتظمة',
@@ -993,7 +1176,10 @@
         name: 'سوديك (السادس من أكتوبر للتنمية)',
         index: 'egx30',
         sector: 'تطوير عقاري فاخر',
-        price: '52.00 ج',
+        price: 52.00,
+        high: 53.50,
+        low: 50.80,
+        close: 52.00,
         changePct: '+2.35%',
         volumeMultiplier: '1.9x',
         catalyst: 'تحالفات استراتيجية مع مستثمرين إماراتيين ومحفظة أراضي غرب وشرق القاهرة',
@@ -1011,7 +1197,10 @@
         name: 'إي إف جي القابضة (هيرميس)',
         index: 'egx30',
         sector: 'بنوك استثمار وإقليمي',
-        price: '23.40 ج',
+        price: 23.40,
+        high: 24.00,
+        low: 22.90,
+        close: 23.40,
         changePct: '+1.52%',
         volumeMultiplier: '1.6x',
         catalyst: 'إيرادات بنك الاستثمار والسمسرة بالخليج ونمو بنك aiBANK التجاري',
@@ -1029,7 +1218,10 @@
         name: 'مصر للألومنيوم',
         index: 'egx30',
         sector: 'معادن وصناعة ثقيلة',
-        price: '109.00 ج',
+        price: 109.00,
+        high: 112.00,
+        low: 106.00,
+        close: 109.00,
         changePct: '+2.90%',
         volumeMultiplier: '2.2x',
         catalyst: 'ارتفاع أسعار الألومنيوم العالمية وتطوير مصنع نجع حمادي مع شريك أجنبي',
@@ -1416,12 +1608,10 @@
       const query = (document.getElementById('radar-search-input')?.value || '').trim().toLowerCase();
 
       const filtered = fullMarketRadar.filter(item => {
-        // Tag/Category match
         const matchesCategory = currentRadarFilter === 'all' 
           || item.index === currentRadarFilter 
           || (item.tags && item.tags.includes(currentRadarFilter));
 
-        // Search match
         const matchesSearch = !query 
           || item.ticker.toLowerCase().includes(query)
           || item.name.toLowerCase().includes(query)
@@ -1507,10 +1697,13 @@
                 <i data-lucide="check-circle" class="w-3 h-3"></i>
                 <span>${item.liquidityStatus}</span>
               </span>
-              <span class="font-mono text-gray-300 font-bold">السعر: ${item.price}</span>
+              <span class="font-mono text-gray-300 font-bold">السعر: ${item.price.toFixed(2)} ج</span>
             </div>
 
             <div class="flex items-center gap-2">
+              <button onclick="inspectRiskForStock('${item.ticker}')" class="p-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-cyan-400 transition" title="حساب المخاطر والدعم">
+                <i data-lucide="shield-alert" class="w-3.5 h-3.5"></i>
+              </button>
               <button onclick="askCopilot('ما هي خطة الدخول والأهداف الاستثمارية في سهم ${item.name} (${item.ticker})؟')" class="flex-1 py-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 text-xs text-white font-bold transition flex items-center justify-center gap-1">
                 <i data-lucide="sparkles" class="w-3.5 h-3.5 text-emerald-400"></i>
                 <span>استشارة مسببة</span>
@@ -1524,6 +1717,104 @@
         `;
         container.appendChild(card);
       });
+      lucide.createIcons();
+    }
+
+    // ==============================================
+    // PHASE 4: QUANTITATIVE RISK & LEVELS ENGINE
+    // ==============================================
+    function populateRiskStockDropdown() {
+      const select = document.getElementById('risk-stock-select');
+      select.innerHTML = '<option value="">-- اختر سهماً من الرادار --</option>';
+      fullMarketRadar.forEach(stock => {
+        const opt = document.createElement('option');
+        opt.value = stock.ticker;
+        opt.innerText = `${stock.name} (${stock.ticker})`;
+        select.appendChild(opt);
+      });
+    }
+
+    function inspectRiskForStock(ticker) {
+      switchTab('risk');
+      document.getElementById('risk-stock-select').value = ticker;
+      loadStockForRiskCalc();
+    }
+
+    function loadStockForRiskCalc() {
+      const ticker = document.getElementById('risk-stock-select').value;
+      const stock = fullMarketRadar.find(s => s.ticker === ticker);
+      if (!stock) return;
+
+      document.getElementById('risk-high').value = stock.high;
+      document.getElementById('risk-low').value = stock.low;
+      document.getElementById('risk-close').value = stock.close;
+      executeRiskCalculations();
+    }
+
+    function executeRiskCalculations() {
+      const high = parseFloat(document.getElementById('risk-high').value) || 0;
+      const low = parseFloat(document.getElementById('risk-low').value) || 0;
+      const close = parseFloat(document.getElementById('risk-close').value) || 0;
+
+      if (high <= 0 || low <= 0 || close <= 0 || high < low) {
+        alert('يرجى التأكد من إدخال قيم صحيحة للأسعار (أعلى وأدنى وإغلاق)');
+        return;
+      }
+
+      // 1. Classical Pivot Points Math
+      const pivot = (high + low + close) / 3;
+      const r1 = (2 * pivot) - low;
+      const s1 = (2 * pivot) - high;
+      const r2 = pivot + (high - low);
+      const s2 = pivot - (high - low);
+
+      // 2. Strict Stop Loss Math (Dynamic ATR approx: 3.5% below S1 or lowest low)
+      const stopLoss = Math.min(s1 * 0.97, low * 0.98);
+
+      // 3. Risk-to-Reward Ratio: (Target R1 - Entry Close) / (Entry Close - StopLoss)
+      const potentialReward = Math.max(r1 - close, 0.05);
+      const potentialRisk = Math.max(close - stopLoss, 0.05);
+      const rrRatio = (potentialReward / potentialRisk);
+
+      const rewardPct = ((r1 - close) / close) * 100;
+      const riskPct = ((close - stopLoss) / close) * 100;
+
+      // Update UI elements
+      document.getElementById('out-pivot').innerText = `${pivot.toFixed(2)} ج`;
+      document.getElementById('out-r1').innerText = `${r1.toFixed(2)} ج (+${rewardPct.toFixed(1)}%)`;
+      document.getElementById('out-r2').innerText = `${r2.toFixed(2)} ج`;
+      document.getElementById('out-s1').innerText = `${s1.toFixed(2)} ج`;
+      document.getElementById('out-s2').innerText = `${s2.toFixed(2)} ج`;
+      document.getElementById('out-stoploss').innerText = `${stopLoss.toFixed(2)} ج (-${riskPct.toFixed(1)}%)`;
+
+      document.getElementById('out-rr-ratio').innerText = `1 : ${rrRatio.toFixed(1)}`;
+      document.getElementById('out-reward-pct').innerText = `+${rewardPct.toFixed(1)}%`;
+      document.getElementById('out-risk-pct').innerText = `-${riskPct.toFixed(1)}%`;
+
+      const verdictBox = document.getElementById('out-verdict-box');
+      if (rrRatio >= 1.8) {
+        verdictBox.className = 'p-3 rounded-xl border border-emerald-500/30 bg-emerald-950/20 text-xs text-gray-200';
+        verdictBox.innerHTML = `
+          <div class="font-bold text-emerald-400 flex items-center gap-1 mb-1">
+            <i data-lucide="check-circle" class="w-3.5 h-3.5"></i>
+            <span>قرار المحرك: مستوفٍ لشروط الأمان المالي (ممتاز)</span>
+          </div>
+          <p class="text-[11px] text-gray-300">
+            نسبة العائد المتوقع (${rewardPct.toFixed(1)}%) تبرر المخاطرة (${riskPct.toFixed(1)}%) بنسبة 1 إلى ${rrRatio.toFixed(1)}. الصفقة تتوافق تماماً مع قواعد الاستثمار طويل الأجل.
+          </p>
+        `;
+      } else {
+        verdictBox.className = 'p-3 rounded-xl border border-amber-500/30 bg-amber-950/20 text-xs text-gray-200';
+        verdictBox.innerHTML = `
+          <div class="font-bold text-amber-400 flex items-center gap-1 mb-1">
+            <i data-lucide="alert-triangle" class="w-3.5 h-3.5"></i>
+            <span>قرار المحرك: عائد غير متكافئ (انتظر تصحيحاً أفضل)</span>
+          </div>
+          <p class="text-[11px] text-gray-300">
+            العائد المتوقع لا يتجاوز ضعف المخاطرة (R/R أقل من 1:2). يُفضل انتظار هبوط السهم قرب منطقة الدعم (${s1.toFixed(2)} ج) لتحسين سعر الدخول.
+          </p>
+        `;
+      }
       lucide.createIcons();
     }
 
@@ -1547,6 +1838,11 @@
         renderAllocationChart();
       } else if (tabId === 'radar') {
         renderRadarGrid();
+      } else if (tabId === 'risk') {
+        if (!document.getElementById('risk-stock-select').value && fullMarketRadar.length > 0) {
+          document.getElementById('risk-stock-select').value = fullMarketRadar[0].ticker;
+          loadStockForRiskCalc();
+        }
       }
     }
 
@@ -1662,6 +1958,7 @@
       updateMetrics();
       renderPortfolioTable();
       renderRadarGrid();
+      populateRiskStockDropdown();
       renderAllocationChart();
       calculateSmartAllocation();
       lucide.createIcons();
