@@ -43,7 +43,7 @@
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
   
-  <!-- Chart.js for Portfolio Allocation -->
+  <!-- Chart.js for Asset Allocation -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
@@ -52,7 +52,6 @@
       background-color: #0b0f19;
       color: #f3f4f6;
     }
-    /* Custom scrollbars */
     ::-webkit-scrollbar {
       width: 6px;
       height: 6px;
@@ -105,7 +104,7 @@
     <div class="flex items-center gap-2 overflow-x-auto pb-1 max-w-7xl mx-auto scrollbar-none">
       <button onclick="switchTab('portfolio')" id="tab-portfolio" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition bg-emerald-600 text-white shadow-sm">
         <i data-lucide="wallet" class="w-4 h-4"></i>
-        <span>المحفظة الفعلية (~200k ج)</span>
+        <span>المحفظة وتوزيع الأصول</span>
       </button>
       <button onclick="switchTab('radar')" id="tab-radar" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition text-gray-400 hover:text-white hover:bg-gray-800">
         <i data-lucide="radar" class="w-4 h-4"></i>
@@ -116,9 +115,13 @@
         <i data-lucide="bot" class="w-4 h-4"></i>
         <span>المستشار الذكي (AI Chat)</span>
       </button>
+      <button onclick="switchTab('rebalance')" id="tab-rebalance" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition text-gray-400 hover:text-white hover:bg-gray-800">
+        <i data-lucide="calculator" class="w-4 h-4"></i>
+        <span>حاسبة السيولة والكاش</span>
+      </button>
       <button onclick="switchTab('rules')" id="tab-rules" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition text-gray-400 hover:text-white hover:bg-gray-800">
         <i data-lucide="scroll" class="w-4 h-4"></i>
-        <span>قواعد الاستثمار الآمن</span>
+        <span>دستور الاستثمار</span>
       </button>
     </div>
   </nav>
@@ -142,9 +145,11 @@
           <div class="text-2xl font-black text-white tracking-tight" id="metric-total-wealth">
             198,937 <span class="text-xs text-gray-400 font-normal">ج.م</span>
           </div>
-          <div class="mt-2 flex items-center text-xs text-rose-400 font-medium">
-            <i data-lucide="trending-down" class="w-3.5 h-3.5 ml-1"></i>
-            <span>-0.54% (إجمالي التغير)</span>
+          <div class="mt-2 flex items-center text-xs font-semibold" id="metric-total-return-container">
+            <span id="metric-total-return-badge" class="flex items-center text-rose-400">
+              <i data-lucide="trending-down" class="w-3.5 h-3.5 ml-1"></i>
+              <span id="metric-total-return">-0.54% (-1,073 ج)</span>
+            </span>
           </div>
           <div class="absolute -right-6 -bottom-6 w-20 h-20 bg-emerald-500/5 rounded-full blur-xl pointer-events-none"></div>
         </div>
@@ -155,12 +160,12 @@
             <span>قيمة الأسهم (10 شركات)</span>
             <i data-lucide="pie-chart" class="w-4 h-4 text-cyan-400"></i>
           </div>
-          <div class="text-2xl font-black text-white tracking-tight">
+          <div class="text-2xl font-black text-white tracking-tight" id="metric-stocks-wealth">
             139,271 <span class="text-xs text-gray-400 font-normal">ج.م</span>
           </div>
           <div class="mt-2 text-xs text-emerald-400 font-medium flex items-center">
             <i data-lucide="check-circle" class="w-3.5 h-3.5 ml-1"></i>
-            <span>تنوع قطاعي قوي ومحمي</span>
+            <span>حصة 70% من إجمالي الأصول</span>
           </div>
         </div>
 
@@ -170,59 +175,106 @@
             <span>الصناديق (إن آي كابيتال)</span>
             <i data-lucide="landmark" class="w-4 h-4 text-amber-400"></i>
           </div>
-          <div class="text-2xl font-black text-white tracking-tight">
+          <div class="text-2xl font-black text-white tracking-tight" id="metric-funds-wealth">
             59,666 <span class="text-xs text-gray-400 font-normal">ج.م</span>
           </div>
-          <div class="mt-2 text-xs text-rose-400 font-medium flex items-center">
-            <i data-lucide="arrow-down-right" class="w-3.5 h-3.5 ml-1"></i>
-            <span>-4.68% (-2,927 ج)</span>
+          <div class="mt-2 text-xs text-amber-400/80 font-medium flex items-center">
+            <i data-lucide="shield" class="w-3.5 h-3.5 ml-1"></i>
+            <span>حصة 30% من إجمالي الأصول</span>
           </div>
         </div>
 
         <!-- Card 4: Top Winner Highlight -->
         <div class="bg-gray-900/80 border border-gray-800 rounded-2xl p-4 flex flex-col justify-between border-r-4 border-r-emerald-500">
           <div class="flex items-center justify-between text-gray-400 text-xs font-semibold mb-1">
-            <span>الأعلى عائداً في محفظتك</span>
+            <span>أعلى عائد استثماري محقق</span>
             <i data-lucide="trophy" class="w-4 h-4 text-emerald-400"></i>
           </div>
-          <div class="text-xl font-black text-emerald-400 tracking-tight">
+          <div class="text-xl font-black text-emerald-400 tracking-tight" id="metric-top-winner-title">
             ORAS • أوراسكوم
           </div>
-          <div class="mt-2 text-xs text-emerald-300 font-semibold flex items-center">
+          <div class="mt-2 text-xs text-emerald-300 font-semibold flex items-center" id="metric-top-winner-stats">
             <i data-lucide="trending-up" class="w-3.5 h-3.5 ml-1"></i>
             <span>+25.17% (+3,060 ج.م)</span>
           </div>
         </div>
       </div>
 
-      <!-- Strategy Advisory Banner based on INVESTMENT_RULES.md -->
-      <div class="bg-emerald-950/30 border border-emerald-800/40 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-        <div class="flex items-center gap-3">
-          <div class="p-2.5 rounded-xl bg-emerald-500/10 text-emerald-400 shrink-0">
-            <i data-lucide="shield-check" class="w-6 h-6"></i>
+      <!-- Asset Allocation & Sector Analytics (Phase 2 Upgrade) -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Donut Chart -->
+        <div class="bg-gray-900/90 border border-gray-800 rounded-2xl p-5 flex flex-col justify-between shadow-xl">
+          <div class="flex items-center justify-between mb-3 border-b border-gray-800 pb-2">
+            <div class="flex items-center gap-2">
+              <i data-lucide="pie-chart" class="w-4 h-4 text-emerald-400"></i>
+              <h3 class="font-bold text-white text-sm">توزيع الأصول والسيولة</h3>
+            </div>
+            <span class="text-[11px] text-gray-400">11 أصل مالي</span>
           </div>
-          <div>
-            <h4 class="text-sm font-bold text-white">توجيه المستشار الحالي (وفق دستور الاستثمار):</h4>
-            <p class="text-xs text-gray-300 mt-0.5">
-              أنت مستثمر طويل الأجل؛ <strong>لا تبع أي سهم خاسر بهلع</strong> (مثل التجاري الدولي COMI أو طلعت مصطفى TMGH). التراجع مؤقت ويعتبر فرصة ممتازة للتعزيز عند توفر سيولة.
-            </p>
+          <div class="relative w-full h-56 flex items-center justify-center">
+            <canvas id="allocationChart"></canvas>
+          </div>
+          <div class="text-center text-[11px] text-gray-400 mt-2">
+            حجم الصناديق يمثل 30% والأسهم القيادية تمثل 70%
           </div>
         </div>
-        <button onclick="askCopilot('ما هي التوصية الإستراتيجية الحالية لمحفظتي؟')" class="text-xs font-bold text-emerald-300 hover:text-white bg-emerald-800/50 hover:bg-emerald-700/60 px-3.5 py-2 rounded-xl transition shrink-0 flex items-center gap-1.5 border border-emerald-600/40">
-          <span>تحليل شامل للمحفظة</span>
-          <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
-        </button>
+
+        <!-- Strategy Advisory & Actions -->
+        <div class="lg:col-span-2 bg-gray-900/90 border border-gray-800 rounded-2xl p-5 flex flex-col justify-between shadow-xl space-y-4">
+          <div class="flex items-center justify-between border-b border-gray-800 pb-2">
+            <div class="flex items-center gap-2">
+              <i data-lucide="compass" class="w-4 h-4 text-cyan-400"></i>
+              <h3 class="font-bold text-white text-sm">تشخيص المستشار وخطة التحرك الذكية</h3>
+            </div>
+            <span class="text-[11px] bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded-full border border-emerald-500/20 font-bold">مستثمر طويل الأجل</span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+            <div class="bg-gray-950/60 p-3 rounded-xl border border-gray-800 space-y-1">
+              <span class="text-emerald-400 font-bold flex items-center gap-1">
+                <i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i>
+                خيول الأرباح (احمِ أرباحك ودعها تنمو)
+              </span>
+              <p class="text-gray-300 text-[11px] leading-relaxed">
+                أوراسكوم (+25%)، بنك التعمير (+25%)، السويدي (+20%)، وأبو قير (+15%). لا تستعجل بالبيع؛ ارفع نقطة وقف الخسارة لحماية المكاسب.
+              </p>
+            </div>
+            <div class="bg-gray-950/60 p-3 rounded-xl border border-gray-800 space-y-1">
+              <span class="text-cyan-400 font-bold flex items-center gap-1">
+                <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+                فرص التعزيز الذهبية
+              </span>
+              <p class="text-gray-300 text-[11px] leading-relaxed">
+                البنك التجاري الدولي COMI (-11%). السهم القيادي رقم 1 في مصر بأرباح تاريخية، الهبوط فرصة للشراء وتخفيض متوسط التكلفة.
+              </p>
+            </div>
+          </div>
+
+          <!-- Quick Action Controls -->
+          <div class="flex items-center justify-between flex-wrap gap-2 pt-2 border-t border-gray-800">
+            <div class="flex items-center gap-2">
+              <button onclick="openAddAssetModal()" class="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1.5 transition shadow-sm">
+                <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                <span>إضافة / تعديل أصل مالي</span>
+              </button>
+              <button onclick="resetToDefaultPortfolio()" class="px-3 py-1.5 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-300 text-xs font-semibold transition" title="استعادة بيانات المحفظة الأصلية من ثندر">
+                استعادة الأرقام الأصلية
+              </button>
+            </div>
+            <span class="text-[11px] text-gray-500">يتم الحفظ التلقائي في المتصفح فوراً ✅</span>
+          </div>
+        </div>
       </div>
 
       <!-- Real Holdings Table -->
       <div class="bg-gray-900/90 border border-gray-800 rounded-2xl overflow-hidden shadow-xl">
         <div class="p-4 sm:p-5 border-b border-gray-800 flex items-center justify-between flex-wrap gap-3">
           <div>
-            <h3 class="font-bold text-white text-base">الأسهم والصناديق المملوكة في ثندر</h3>
-            <p class="text-xs text-gray-400">مرتبة حسب أعلى نسبة ربح محققة</p>
+            <h3 class="font-bold text-white text-base">جدول الأصول والأسهم المملوكة</h3>
+            <p class="text-xs text-gray-400">يمكنك تعديل أي سهم أو حذفه بنقرة زر</p>
           </div>
           <div class="flex items-center gap-2">
-            <span class="text-xs text-gray-400 bg-gray-800 px-3 py-1 rounded-full border border-gray-700">11 أصل مالي</span>
+            <span class="text-xs text-gray-400 bg-gray-800 px-3 py-1 rounded-full border border-gray-700" id="assets-count-badge">11 أصل مالي</span>
           </div>
         </div>
 
@@ -233,8 +285,9 @@
                 <th class="py-3 px-4">السهم / الأصل</th>
                 <th class="py-3 px-4">القيمة الحالية</th>
                 <th class="py-3 px-4">العائد (الربح / الخسارة)</th>
-                <th class="py-3 px-4">رأي المستشار الذكي</th>
-                <th class="py-3 px-4 text-center">إجراء فوري</th>
+                <th class="py-3 px-4">الوزن النسبي</th>
+                <th class="py-3 px-4">توجيه المستشار</th>
+                <th class="py-3 px-4 text-center">إجراءات</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-800/60 font-medium" id="portfolio-table-body">
@@ -299,7 +352,7 @@
               AI
             </div>
             <div class="bg-gray-800 border border-gray-700 rounded-2xl rounded-tr-none p-3.5 text-xs text-gray-200 leading-relaxed max-w-xl shadow-sm">
-              أهلاً بك يا فندم! أنا مستشارك المالي الذكي للبورصة المصرية. أنا على دراية كاملة بمحفظتك في ثندر (قيمة 198,937 ج، والـ 10 أسهم المملوكة وصندوق NCS).
+              أهلاً بك يا فندم! أنا مستشارك المالي الذكي للبورصة المصرية. أنا على دراية كاملة بمحفظتك في ثندر (قيمة تقارب 200 ألف ج، والـ 10 أسهم وصندوق NCS).
               <br><br>
               وفقاً لقواعدنا، نحن مستثمرون طويلو الأجل لا نضارب يومياً. يمكنك سؤالي عن أي سهم، أو طلب تقييم لأي فرصة طفرة في السوق، أو استشارتي قبل اتخاذ أي قرار في ثندر!
             </div>
@@ -334,7 +387,48 @@
     </div>
 
     <!-- ============================================== -->
-    <!-- TAB 4: INVESTMENT RULES (دستور وقواعد الاستثمار) -->
+    <!-- TAB 4: CASH & REBALANCING CALCULATOR (Phase 2) -->
+    <!-- ============================================== -->
+    <div id="view-rebalance" class="view-panel hidden space-y-6">
+      
+      <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6 shadow-xl space-y-6">
+        <div class="border-b border-gray-800 pb-4">
+          <div class="flex items-center gap-2 text-emerald-400 text-xs font-bold uppercase tracking-wider mb-1">
+            <i data-lucide="calculator" class="w-4 h-4"></i>
+            <span>حاسبة توجيه السيولة الجديدة</span>
+          </div>
+          <h2 class="text-xl font-bold text-white">كيف توزع أي سيولة إضافية بذكاء؟</h2>
+          <p class="text-xs text-gray-400 mt-1">أدخل المبلغ المتاح معك (مثلاً 5,000 ج أو 10,000 ج) وسيقوم النظام بتوزيعه رياضياً وفق قواعد الاستثمار</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="md:col-span-1 bg-gray-950/60 p-4 rounded-xl border border-gray-800 space-y-4">
+            <div>
+              <label class="block text-xs font-bold text-gray-300 mb-1">المبلغ المتاح للشراء (ج.م):</label>
+              <input type="number" id="rebalance-amount-input" value="10000" step="500" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white font-mono font-bold focus:outline-none focus:border-emerald-500 transition">
+            </div>
+            <button onclick="calculateSmartAllocation()" class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-2 transition shadow-md">
+              <i data-lucide="wand-2" class="w-4 h-4"></i>
+              <span>احسب التوزيع الاستراتيجي</span>
+            </button>
+          </div>
+
+          <div class="md:col-span-2 bg-gray-950/40 p-4 rounded-xl border border-gray-800 space-y-3" id="rebalance-results">
+            <h4 class="text-xs font-bold text-emerald-400 flex items-center gap-1.5">
+              <i data-lucide="check-circle" class="w-4 h-4"></i>
+              <span>توزيع السيولة المقترح (بناءً على توازن محفظتك الحالية):</span>
+            </h4>
+            <div class="space-y-2 text-xs" id="rebalance-suggestions-list">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ============================================== -->
+    <!-- TAB 5: INVESTMENT RULES (دستور وقواعد الاستثمار) -->
     <!-- ============================================== -->
     <div id="view-rules" class="view-panel hidden space-y-6">
       
@@ -404,6 +498,62 @@
 
   </main>
 
+  <!-- Add / Edit Asset Modal (Phase 2) -->
+  <div id="asset-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-gray-900 border border-gray-800 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-gray-800 pb-3">
+        <h3 class="font-bold text-white text-base" id="modal-title">إضافة / تعديل أصل مالي</h3>
+        <button onclick="closeAssetModal()" class="text-gray-400 hover:text-white p-1">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="asset-form" onsubmit="handleSaveAsset(event)" class="space-y-3 text-xs">
+        <input type="hidden" id="asset-edit-index" value="-1">
+        
+        <div>
+          <label class="block text-gray-300 font-bold mb-1">رمز السهم (Ticker):</label>
+          <input type="text" id="modal-ticker" required placeholder="مثال: COMI أو SWDY" class="w-full bg-gray-950 border border-gray-700 rounded-xl px-3 py-2 text-white font-mono uppercase focus:border-emerald-500 focus:outline-none">
+        </div>
+
+        <div>
+          <label class="block text-gray-300 font-bold mb-1">اسم الشركة:</label>
+          <input type="text" id="modal-name" required placeholder="مثال: البنك التجاري الدولي" class="w-full bg-gray-950 border border-gray-700 rounded-xl px-3 py-2 text-white focus:border-emerald-500 focus:outline-none">
+        </div>
+
+        <div>
+          <label class="block text-gray-300 font-bold mb-1">القطاع والتصنيف:</label>
+          <input type="text" id="modal-category" required placeholder="مثال: EGX30 • قطاع بنكي" class="w-full bg-gray-950 border border-gray-700 rounded-xl px-3 py-2 text-white focus:border-emerald-500 focus:outline-none">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-gray-300 font-bold mb-1">القيمة الحالية (ج.م):</label>
+            <input type="number" id="modal-value" step="0.1" required placeholder="15000" class="w-full bg-gray-950 border border-gray-700 rounded-xl px-3 py-2 text-white font-mono focus:border-emerald-500 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-gray-300 font-bold mb-1">الربح / الخسارة (ج.م):</label>
+            <input type="number" id="modal-profit" step="0.1" required placeholder="+2000 أو -1500" class="w-full bg-gray-950 border border-gray-700 rounded-xl px-3 py-2 text-white font-mono focus:border-emerald-500 focus:outline-none">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-gray-300 font-bold mb-1">توجيه المستشار الحالي:</label>
+          <input type="text" id="modal-advice" required placeholder="مثال: احتفاظ • سهم قوي للاستثمار" class="w-full bg-gray-950 border border-gray-700 rounded-xl px-3 py-2 text-white focus:border-emerald-500 focus:outline-none">
+        </div>
+
+        <div class="flex items-center gap-2 pt-2">
+          <button type="submit" class="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition">
+            حفظ الأصل في المحفظة
+          </button>
+          <button type="button" onclick="closeAssetModal()" class="px-4 py-2.5 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-300 font-bold text-xs transition">
+            إلغاء
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- Footer -->
   <footer class="bg-gray-950 border-t border-gray-800 px-4 py-4 text-center text-xs text-gray-500">
     EGX AI Advisory Copilot • نظام استشاري سحابي مخصص للبورصة المصرية • التنفيذ اليدوي الآمن عبر ثندر (Thndr)
@@ -411,8 +561,8 @@
 
   <!-- Application Logic -->
   <script>
-    // 1. Initial State loaded with User's Real Portfolio Data from Thndr screenshots
-    const portfolioData = [
+    // Initial Seed Data from User's Real Thndr screenshots
+    const defaultPortfolioData = [
       {
         ticker: 'ORAS',
         name: 'أوراسكوم كونستراكشون',
@@ -547,6 +697,352 @@
       }
     ];
 
+    // Load from LocalStorage or use default
+    let portfolioData = [];
+    function loadPortfolio() {
+      const saved = localStorage.getItem('egx_copilot_portfolio');
+      if (saved) {
+        try {
+          portfolioData = JSON.parse(saved);
+        } catch (e) {
+          portfolioData = [...defaultPortfolioData];
+        }
+      } else {
+        portfolioData = [...defaultPortfolioData];
+      }
+    }
+
+    function savePortfolio() {
+      localStorage.setItem('egx_copilot_portfolio', JSON.stringify(portfolioData));
+      updateMetrics();
+      renderPortfolioTable();
+      renderAllocationChart();
+    }
+
+    function resetToDefaultPortfolio() {
+      if (confirm('هل ترغب في استعادة أرقام المحفظة الأصلية من ثندر؟')) {
+        portfolioData = JSON.parse(JSON.stringify(defaultPortfolioData));
+        savePortfolio();
+      }
+    }
+
+    // Chart.js instance holder
+    let chartInstance = null;
+
+    // Render Donut Chart (Asset Allocation)
+    function renderAllocationChart() {
+      const ctx = document.getElementById('allocationChart').getContext('2d');
+      if (chartInstance) {
+        chartInstance.destroy();
+      }
+
+      const labels = portfolioData.map(p => p.ticker);
+      const values = portfolioData.map(p => p.value);
+      const colors = [
+        '#10b981', '#06b6d4', '#3b82f6', '#8b5cf6', 
+        '#ec4899', '#f59e0b', '#14b8a6', '#6366f1', 
+        '#84cc16', '#f43f5e', '#a855f7'
+      ];
+
+      chartInstance = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: labels,
+          datasets: [{
+            data: values,
+            backgroundColor: colors,
+            borderColor: '#111827',
+            borderWidth: 2,
+            hoverOffset: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  const val = context.raw || 0;
+                  const total = values.reduce((a, b) => a + b, 0);
+                  const pct = ((val / total) * 100).toFixed(1);
+                  return ` ${context.label}: ${val.toLocaleString()} ج.م (${pct}%)`;
+                }
+              }
+            }
+          },
+          cutout: '68%'
+        }
+      });
+    }
+
+    // Update Top Metric Numbers
+    function updateMetrics() {
+      let totalWealth = 0;
+      let totalProfit = 0;
+      let stocksWealth = 0;
+      let fundsWealth = 0;
+
+      portfolioData.forEach(item => {
+        totalWealth += item.value;
+        totalProfit += item.profit;
+        if (item.ticker === 'NCS' || item.category.includes('صناديق')) {
+          fundsWealth += item.value;
+        } else {
+          stocksWealth += item.value;
+        }
+      });
+
+      const totalCost = totalWealth - totalProfit;
+      const totalReturnPct = totalCost > 0 ? (totalProfit / totalCost) * 100 : 0;
+
+      document.getElementById('metric-total-wealth').innerHTML = `${Math.round(totalWealth).toLocaleString()} <span class="text-xs text-gray-400 font-normal">ج.م</span>`;
+      document.getElementById('metric-stocks-wealth').innerHTML = `${Math.round(stocksWealth).toLocaleString()} <span class="text-xs text-gray-400 font-normal">ج.م</span>`;
+      document.getElementById('metric-funds-wealth').innerHTML = `${Math.round(fundsWealth).toLocaleString()} <span class="text-xs text-gray-400 font-normal">ج.م</span>`;
+      document.getElementById('assets-count-badge').innerText = `${portfolioData.length} أصل مالي`;
+
+      const returnBadge = document.getElementById('metric-total-return-badge');
+      const isPositive = totalProfit >= 0;
+      returnBadge.className = `flex items-center ${isPositive ? 'text-emerald-400' : 'text-rose-400'}`;
+      returnBadge.innerHTML = `
+        <i data-lucide="${isPositive ? 'trending-up' : 'trending-down'}" class="w-3.5 h-3.5 ml-1"></i>
+        <span>${isPositive ? '+' : ''}${totalReturnPct.toFixed(2)}% (${isPositive ? '+' : ''}${Math.round(totalProfit).toLocaleString()} ج)</span>
+      `;
+    }
+
+    // Render Portfolio Table
+    function renderPortfolioTable() {
+      const tbody = document.getElementById('portfolio-table-body');
+      tbody.innerHTML = '';
+
+      const totalWealth = portfolioData.reduce((acc, cur) => acc + cur.value, 0);
+
+      portfolioData.forEach((item, index) => {
+        const isPositive = item.profit >= 0;
+        const colorClass = isPositive ? 'text-emerald-400' : 'text-rose-400';
+        const bgBadgeClass = isPositive ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border-rose-500/20';
+
+        let badgeActionText = 'احتفاظ';
+        let badgeActionColor = 'bg-gray-800 text-gray-300';
+        if (item.action === 'ACCUMULATE') {
+          badgeActionText = 'تعزيز وشراء';
+          badgeActionColor = 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30';
+        } else if (item.action === 'REBALANCE_CANDIDATE') {
+          badgeActionText = 'مرشح للتدوير';
+          badgeActionColor = 'bg-amber-500/20 text-amber-300 border border-amber-500/30';
+        }
+
+        const weightPct = totalWealth > 0 ? ((item.value / totalWealth) * 100).toFixed(1) : 0;
+
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-gray-800/40 transition';
+        tr.innerHTML = `
+          <td class="py-3.5 px-4">
+            <div class="flex items-center gap-2.5">
+              <div class="w-8 h-8 rounded-lg bg-gray-800 border border-gray-700 flex items-center justify-center font-bold text-xs text-white">
+                ${item.ticker}
+              </div>
+              <div>
+                <div class="font-bold text-white text-xs sm:text-sm">${item.name}</div>
+                <div class="text-[11px] text-gray-400">${item.category}</div>
+              </div>
+            </div>
+          </td>
+          <td class="py-3.5 px-4 font-mono font-bold text-white text-xs sm:text-sm">
+            ${Math.round(item.value).toLocaleString()} <span class="text-[10px] text-gray-400 font-sans">ج.م</span>
+          </td>
+          <td class="py-3.5 px-4 font-mono font-bold ${colorClass} text-xs sm:text-sm">
+            ${isPositive ? '+' : ''}${Math.round(item.profit).toLocaleString()} ج.م
+            <span class="inline-block text-[10px] px-1.5 py-0.2 rounded-full border ${bgBadgeClass} ml-1">
+              ${isPositive ? '+' : ''}${item.returnPct.toFixed(2)}%
+            </span>
+          </td>
+          <td class="py-3.5 px-4 font-mono text-xs text-gray-300">
+            <div class="flex items-center gap-1.5">
+              <span>${weightPct}%</span>
+              <div class="w-12 h-1.5 bg-gray-800 rounded-full overflow-hidden hidden sm:block">
+                <div class="h-full bg-emerald-500 rounded-full" style="width: ${Math.min(weightPct * 3, 100)}%"></div>
+              </div>
+            </div>
+          </td>
+          <td class="py-3.5 px-4 text-xs text-gray-300">
+            <div class="flex items-center gap-1.5">
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold ${badgeActionColor}">${badgeActionText}</span>
+              <span class="hidden md:inline text-gray-400">${item.advice}</span>
+            </div>
+          </td>
+          <td class="py-3.5 px-4 text-center">
+            <div class="flex items-center justify-center gap-1">
+              <button onclick="editAsset(${index})" class="p-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white transition" title="تعديل الأصل">
+                <i data-lucide="edit-3" class="w-3.5 h-3.5 text-cyan-400"></i>
+              </button>
+              <button onclick="deleteAsset(${index})" class="p-1.5 rounded-lg bg-gray-800 hover:bg-rose-900/40 text-gray-300 hover:text-rose-400 transition" title="حذف الأصل">
+                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+              </button>
+              <a href="${item.thndrUrl || 'https://app.thndr.app'}" target="_blank" class="px-2.5 py-1 rounded-lg bg-emerald-600/80 hover:bg-emerald-500 text-white text-xs font-bold transition flex items-center gap-1" title="فتح في تطبيق ثندر">
+                <span>ثندر</span>
+                <i data-lucide="external-link" class="w-3 h-3"></i>
+              </a>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+      lucide.createIcons();
+    }
+
+    // Modal Operations
+    function openAddAssetModal() {
+      document.getElementById('modal-title').innerText = 'إضافة أصل مالي جديد';
+      document.getElementById('asset-edit-index').value = '-1';
+      document.getElementById('modal-ticker').value = '';
+      document.getElementById('modal-name').value = '';
+      document.getElementById('modal-category').value = 'EGX30';
+      document.getElementById('modal-value').value = '';
+      document.getElementById('modal-profit').value = '0';
+      document.getElementById('modal-advice').value = 'احتفاظ • استثمار طويل الأجل';
+      
+      const modal = document.getElementById('asset-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function editAsset(index) {
+      const item = portfolioData[index];
+      if (!item) return;
+
+      document.getElementById('modal-title').innerText = `تعديل سهم: ${item.name} (${item.ticker})`;
+      document.getElementById('asset-edit-index').value = index;
+      document.getElementById('modal-ticker').value = item.ticker;
+      document.getElementById('modal-name').value = item.name;
+      document.getElementById('modal-category').value = item.category;
+      document.getElementById('modal-value').value = item.value;
+      document.getElementById('modal-profit').value = item.profit;
+      document.getElementById('modal-advice').value = item.advice;
+
+      const modal = document.getElementById('asset-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeAssetModal() {
+      const modal = document.getElementById('asset-modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function handleSaveAsset(e) {
+      e.preventDefault();
+      const index = parseInt(document.getElementById('asset-edit-index').value, 10);
+      const ticker = document.getElementById('modal-ticker').value.trim().toUpperCase();
+      const name = document.getElementById('modal-name').value.trim();
+      const category = document.getElementById('modal-category').value.trim();
+      const value = parseFloat(document.getElementById('modal-value').value);
+      const profit = parseFloat(document.getElementById('modal-profit').value);
+      const advice = document.getElementById('modal-advice').value.trim();
+
+      const cost = value - profit;
+      const returnPct = cost > 0 ? (profit / cost) * 100 : 0;
+
+      const newAsset = {
+        ticker,
+        name,
+        category,
+        value,
+        profit,
+        returnPct,
+        status: profit >= 0 ? 'ربح' : 'تراجع',
+        advice,
+        action: profit < -15 ? 'REBALANCE_CANDIDATE' : (profit < -5 ? 'ACCUMULATE' : 'HOLD'),
+        thndrUrl: 'https://app.thndr.app'
+      };
+
+      if (index >= 0 && index < portfolioData.length) {
+        portfolioData[index] = newAsset;
+      } else {
+        portfolioData.push(newAsset);
+      }
+
+      savePortfolio();
+      closeAssetModal();
+    }
+
+    function deleteAsset(index) {
+      const item = portfolioData[index];
+      if (!item) return;
+      if (confirm(`هل أنت متأكد من حذف ${item.name} (${item.ticker}) من المحفظة؟`)) {
+        portfolioData.splice(index, 1);
+        savePortfolio();
+      }
+    }
+
+    // Smart Rebalancing & Cash Allocation Calculator (Phase 2)
+    function calculateSmartAllocation() {
+      const amount = parseFloat(document.getElementById('rebalance-amount-input').value) || 0;
+      const container = document.getElementById('rebalance-suggestions-list');
+      container.innerHTML = '';
+
+      if (amount <= 0) {
+        container.innerHTML = '<p class="text-rose-400">يرجى إدخال مبلغ سيولة صحيح.</p>';
+        return;
+      }
+
+      // Investment rules logic:
+      // 1. Allocate 45% to COMI (CIB) for golden averaging down at heavy support
+      // 2. Allocate 35% to SWDY (Elsewedy) or ABUK to ride dollar exports
+      // 3. Keep 20% free cash cushion for market dips
+      const cibAmount = Math.round(amount * 0.45);
+      const swdyAmount = Math.round(amount * 0.35);
+      const cashCushion = Math.round(amount * 0.20);
+
+      container.innerHTML = `
+        <div class="p-3 rounded-xl bg-gray-900 border border-emerald-500/30 flex items-center justify-between">
+          <div>
+            <div class="font-bold text-white text-xs flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+              <span>شراء وتعزيز في البنك التجاري الدولي (COMI)</span>
+            </div>
+            <p class="text-[11px] text-gray-400 mt-0.5">السهم متراجع 11% عن قمم أرباحه؛ الشراء هنا يخفض متوسط تكلفتك ويعظم عوائدك عند الارتداد.</p>
+          </div>
+          <div class="text-right">
+            <span class="font-bold text-emerald-400 font-mono text-sm">${cibAmount.toLocaleString()} ج</span>
+            <span class="block text-[10px] text-gray-400">45% من السيولة</span>
+          </div>
+        </div>
+
+        <div class="p-3 rounded-xl bg-gray-900 border border-cyan-500/30 flex items-center justify-between">
+          <div>
+            <div class="font-bold text-white text-xs flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
+              <span>تعزيز في سهم السويدي إليكتريك (SWDY)</span>
+            </div>
+            <p class="text-[11px] text-gray-400 mt-0.5">عملاق الطاقة والتصدير؛ إضافة سيولة تدعم استثمارك طويل الأجل وتضاعف الأرباح الصاعدة.</p>
+          </div>
+          <div class="text-right">
+            <span class="font-bold text-cyan-400 font-mono text-sm">${swdyAmount.toLocaleString()} ج</span>
+            <span class="block text-[10px] text-gray-400">35% من السيولة</span>
+          </div>
+        </div>
+
+        <div class="p-3 rounded-xl bg-gray-900 border border-amber-500/30 flex items-center justify-between">
+          <div>
+            <div class="font-bold text-white text-xs flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+              <span>الاحتفاظ كسيولة أمان كاش (Safety Cash Reserve)</span>
+            </div>
+            <p class="text-[11px] text-gray-400 mt-0.5">وفق بند رقم 3 في دستور الاستثمار: الحفاظ دائماً على سيولة طوارئ لاقتناص أي هبوط مفاجئ.</p>
+          </div>
+          <div class="text-right">
+            <span class="font-bold text-amber-400 font-mono text-sm">${cashCushion.toLocaleString()} ج</span>
+            <span class="block text-[10px] text-gray-400">20% كاش أمان</span>
+          </div>
+        </div>
+      `;
+    }
+
     // 2. Market Radar Samples (EGX30 + EGX70 breakout candidates)
     const radarOpportunities = [
       {
@@ -594,72 +1090,6 @@
         status: 'انفجار سيولة (Volume Surge)'
       }
     ];
-
-    // Render Portfolio Table
-    function renderPortfolioTable() {
-      const tbody = document.getElementById('portfolio-table-body');
-      tbody.innerHTML = '';
-
-      portfolioData.forEach(item => {
-        const isPositive = item.profit >= 0;
-        const colorClass = isPositive ? 'text-emerald-400' : 'text-rose-400';
-        const bgBadgeClass = isPositive ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border-rose-500/20';
-
-        let badgeActionText = 'احتفاظ';
-        let badgeActionColor = 'bg-gray-800 text-gray-300';
-        if (item.action === 'ACCUMULATE') {
-          badgeActionText = 'تعزيز وشراء';
-          badgeActionColor = 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30';
-        } else if (item.action === 'REBALANCE_CANDIDATE') {
-          badgeActionText = 'مرشح للتدوير';
-          badgeActionColor = 'bg-amber-500/20 text-amber-300 border border-amber-500/30';
-        }
-
-        const tr = document.createElement('tr');
-        tr.className = 'hover:bg-gray-800/40 transition';
-        tr.innerHTML = `
-          <td class="py-3.5 px-4">
-            <div class="flex items-center gap-2.5">
-              <div class="w-8 h-8 rounded-lg bg-gray-800 border border-gray-700 flex items-center justify-center font-bold text-xs text-white">
-                ${item.ticker}
-              </div>
-              <div>
-                <div class="font-bold text-white text-xs sm:text-sm">${item.name}</div>
-                <div class="text-[11px] text-gray-400">${item.category}</div>
-              </div>
-            </div>
-          </td>
-          <td class="py-3.5 px-4 font-mono font-bold text-white text-xs sm:text-sm">
-            ${item.value.toLocaleString()} <span class="text-[10px] text-gray-400 font-sans">ج.م</span>
-          </td>
-          <td class="py-3.5 px-4 font-mono font-bold ${colorClass} text-xs sm:text-sm">
-            ${isPositive ? '+' : ''}${item.profit.toLocaleString()} ج.م
-            <span class="inline-block text-[10px] px-1.5 py-0.2 rounded-full border ${bgBadgeClass} ml-1">
-              ${isPositive ? '+' : ''}${item.returnPct.toFixed(2)}%
-            </span>
-          </td>
-          <td class="py-3.5 px-4 text-xs text-gray-300">
-            <div class="flex items-center gap-1.5">
-              <span class="px-2 py-0.5 rounded text-[10px] font-bold ${badgeActionColor}">${badgeActionText}</span>
-              <span class="hidden md:inline text-gray-400">${item.advice}</span>
-            </div>
-          </td>
-          <td class="py-3.5 px-4 text-center">
-            <div class="flex items-center justify-center gap-1.5">
-              <button onclick="askCopilot('ما هو تحليلك ورأيك الحالي في سهم ${item.name} (${item.ticker})؟')" class="p-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white transition" title="استشارة الـ AI">
-                <i data-lucide="sparkles" class="w-4 h-4 text-emerald-400"></i>
-              </button>
-              <a href="${item.thndrUrl}" target="_blank" class="px-2.5 py-1 rounded-lg bg-emerald-600/80 hover:bg-emerald-500 text-white text-xs font-bold transition flex items-center gap-1" title="فتح في تطبيق ثندر">
-                <span>ثندر</span>
-                <i data-lucide="external-link" class="w-3 h-3"></i>
-              </a>
-            </div>
-          </td>
-        `;
-        tbody.appendChild(tr);
-      });
-      lucide.createIcons();
-    }
 
     // Render Radar Cards
     function renderRadarCards(filter = 'all') {
@@ -743,6 +1173,9 @@
         targetBtn.classList.remove('text-gray-400');
       }
       lucide.createIcons();
+      if (tabId === 'portfolio') {
+        renderAllocationChart();
+      }
     }
 
     // AI Copilot Chat Handling
@@ -811,7 +1244,7 @@
       } else {
         reply = `
           <strong>رأي المستشار المالي وفق أرقام محفظتك ودستور الاستثمار:</strong><br>
-          • <strong>حالة المحفظة العامة:</strong> محفظتك في وضع صحي ممتاز (إجمالي التغير شبه متعادل -0.54% بفضل الأرباح القوية في أوراسكوم والسويدي وبنك الإسكان).<br>
+          • <strong>حالة المحفظة العامة:</strong> محفظتك في وضع صحي ممتاز (إجمالي التغير شبه متعادل بفضل الأرباح القوية في أوراسكوم والسويدي وبنك الإسكان).<br>
           • <strong>التوجيه الذهبي:</strong> التزم بالهدوء وعدم التداول اليومي. استثمارك طويل الأجل في هذه الشركات القيادية سيحقق طفرات ممتازة مع هدوء موجات التضخم ونمو نتائج أعمال الشركات. متى ظهرت فرصة طفرة جديدة في السوق تتطابق مع شروط الأمان، سأقترحها عليك فوراً!
         `;
       }
@@ -846,8 +1279,12 @@
 
     // Initialize Page
     document.addEventListener('DOMContentLoaded', () => {
+      loadPortfolio();
+      updateMetrics();
       renderPortfolioTable();
       renderRadarCards();
+      renderAllocationChart();
+      calculateSmartAllocation();
       lucide.createIcons();
     });
   </script>
