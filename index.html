@@ -3490,7 +3490,23 @@
       const mubasherUrl = `https://www.mubasher.info/markets/EGX/stocks/${stock.ticker}`;
       const thndrUrl = `https://app.thndr.app`;
 
+      const currentQuote = stock.currentPrice || stock.price || 0;
+      const decTime = stock.decisionUpdatedAt || stock.priceUpdatedAt || 'جلسة اليوم';
+      const decBasis = stock.decisionBasis || `سعر السهم: ${Number(currentQuote).toFixed(2)} ج`;
+
       container.innerHTML = `
+        <!-- Decision Freshness & Pricing Basis Banner -->
+        <div class="bg-gray-950/90 border border-cyan-500/40 rounded-xl p-3 flex items-center justify-between flex-wrap gap-2 text-xs">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse"></span>
+            <span class="text-gray-300 text-[11px]">القرار الاستثماري صادر بناءً على: <strong class="text-cyan-300 font-mono">${decBasis}</strong></span>
+          </div>
+          <div class="text-[10px] text-gray-400 font-mono flex items-center gap-1.5">
+            <i data-lucide="clock" class="w-3.5 h-3.5 text-emerald-400"></i>
+            <span>تاريخ ووقت تقييم القرار: <strong class="text-emerald-300">${decTime}</strong></span>
+          </div>
+        </div>
+
         <!-- Pillar 1: Fundamental Analysis -->
         <div class="bg-gray-950 p-4 rounded-xl border border-gray-800 space-y-2">
           <div class="flex items-center justify-between">
@@ -3604,6 +3620,7 @@
       const currentPrice = parseFloat(document.getElementById('modal-current-price').value) || existing.currentPrice;
       const buyPrice = parseFloat(document.getElementById('modal-buy-price').value) || existing.buyPrice;
 
+      const nowStr = new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' }) + ' (' + new Date().toLocaleDateString('ar-EG', { day: 'numeric', month: 'numeric' }) + ')';
       const newAsset = {
         ...existing,
         ticker,
@@ -3618,6 +3635,10 @@
         status: profit >= 0 ? 'ربح' : 'تراجع',
         advice,
         action: profit < -15 ? 'REBALANCE_CANDIDATE' : (profit < -5 ? 'ACCUMULATE' : 'HOLD'),
+        priceUpdatedAt: nowStr,
+        priceSource: 'تعديل يدوي من المستخدم',
+        decisionUpdatedAt: nowStr,
+        decisionBasis: `سعر السهم: ${currentPrice ? Number(currentPrice).toFixed(2) + ' ج' : '--'}`,
         thndrUrl: existing.thndrUrl || 'https://app.thndr.app'
       };
 
