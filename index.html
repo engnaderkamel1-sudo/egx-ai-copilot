@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <title>EGX AI Copilot | المستشار الذكي للبورصة المصرية</title>
   
   <!-- Fonts -->
@@ -1267,7 +1270,7 @@
               <span class="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse"></span>
               <h3 class="font-bold text-white text-base">جدول الأصول والأسهم المملوكة في ثندر</h3>
             </div>
-            <p class="text-xs text-gray-400 mt-0.5" id="live-egx-status-text">أسعار الأسهم وقرارات المستشار محدثة بالدقيقة والثانية من شاشة البورصة المصرية</p>
+            <p class="text-xs text-cyan-400 mt-0.5 animate-pulse" id="live-egx-status-text">⏳ جاري الاتصال بالبورصة المصرية ومزامنة أحدث الأسعار اللحظية تلقائياً...</p>
           </div>
           <div class="flex items-center gap-2 flex-wrap">
             <button onclick="openTradeModal()" class="px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white border border-emerald-400/40 text-xs font-bold transition flex items-center gap-2 shadow-lg shadow-emerald-950/50 transform active:scale-95" title="تسجيل عملية شراء أو بيع نفذتها في ثندر">
@@ -6244,14 +6247,19 @@ ${topRadarSummary}
             });
           }
 
-          // 3. Update Full Market Radar with Live Data from All 249 EGX Stocks
-          if (data.radar && data.radar.length > 0) {
-            fullMarketRadar = data.radar;
-            renderRadarGrid();
-            populateRiskStockDropdown();
-          }
-
+          // 3. Save Portfolio & Re-render Holdings Table First (Guaranteed Sync)
           savePortfolio();
+
+          // 4. Update Full Market Radar with Live Data from All 249 EGX Stocks
+          if (data.radar && data.radar.length > 0) {
+            try {
+              fullMarketRadar = data.radar;
+              renderRadarGrid();
+              populateRiskStockDropdown();
+            } catch (radarErr) {
+              console.warn('Radar render non-fatal warning:', radarErr);
+            }
+          }
 
           // 4. Update Header Live Sync Indicator Badge
           if (statusText) {
