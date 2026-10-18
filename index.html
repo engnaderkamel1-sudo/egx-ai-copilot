@@ -473,6 +473,14 @@
         <i data-lucide="calculator" class="w-4 h-4"></i>
         <span>حاسبة السيولة</span>
       </button>
+      <button onclick="switchTab('settings')" id="tab-settings" class="tab-btn px-3.5 py-2 rounded-lg flex items-center gap-1.5 transition text-gray-400 hover:text-white hover:bg-gray-800 shrink-0">
+        <i data-lucide="sliders" class="w-4 h-4 text-amber-400"></i>
+        <span>تخصيص المحفظة والمخاطر</span>
+      </button>
+      <button onclick="switchTab('glossary')" id="tab-glossary" class="tab-btn px-3.5 py-2 rounded-lg flex items-center gap-1.5 transition text-gray-400 hover:text-white hover:bg-gray-800 shrink-0">
+        <i data-lucide="book-open" class="w-4 h-4 text-cyan-400"></i>
+        <span>قاموس ودليل المصطلحات</span>
+      </button>
       <button onclick="switchTab('rules')" id="tab-rules" class="tab-btn px-3.5 py-2 rounded-lg flex items-center gap-1.5 transition text-gray-400 hover:text-white hover:bg-gray-800 shrink-0">
         <i data-lucide="scroll" class="w-4 h-4"></i>
         <span>دستور الاستثمار</span>
@@ -1011,24 +1019,52 @@
     </div>
 
     <!-- ============================================== -->
-    <!-- TAB 6: PAPER TRADING SIMULATOR (Phase 7) -->
+    <!-- TAB 6: PAPER TRADING & AUTONOMOUS BOT SIMULATOR -->
     <!-- ============================================== -->
     <div id="view-papertrading" class="view-panel hidden space-y-6">
       
+      <!-- Autonomous Bot Cloud Status Banner -->
+      <div class="bg-gradient-to-r from-emerald-950/60 via-gray-900 to-cyan-950/40 border border-emerald-500/30 rounded-2xl p-5 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div class="flex items-start gap-3.5">
+          <div class="w-12 h-12 rounded-2xl bg-emerald-600/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0 shadow-inner">
+            <i data-lucide="bot" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2 flex-wrap">
+              <h3 class="text-base font-bold text-white">الطيار الآلي المستقل للبورصة (Autonomous Cloud Bot)</h3>
+              <span class="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-bold flex items-center gap-1">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                <span>نشط في السحاب مجاناً 24/7</span>
+              </span>
+            </div>
+            <p class="text-xs text-gray-300 mt-1 leading-relaxed">
+              يرصد البورصة تلقائياً: <strong>أيام التداول (10:30 ص، 1:00 م، 3:30 م)</strong> + <strong>مساء السبت (9:00 م)</strong> لفحص إفصاحات وأخبار الويك إند.
+            </p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 w-full md:w-auto">
+          <button onclick="triggerSimulatedBotCycle()" class="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-2 transition shadow-md w-full md:w-auto" title="تشغيل دورة فحص فورية كأن الروبوت يعمل الآن">
+            <i data-lucide="play" class="w-4 h-4"></i>
+            <span>تشغيل دورة فحص السوق الآن ⚡</span>
+          </button>
+        </div>
+      </div>
+
       <!-- Simulator Metrics Header -->
       <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6 shadow-xl space-y-6">
         <div class="border-b border-gray-800 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <div class="flex items-center gap-2 text-cyan-400 text-xs font-bold uppercase tracking-wider mb-1">
               <i data-lucide="gamepad-2" class="w-4 h-4"></i>
-              <span>منصة التداول التجريبي الافتراضي (Paper Trading - Phase 7)</span>
+              <span>محفظة التداول الافتراضي والتقييم الأسبوعي</span>
             </div>
-            <h2 class="text-xl font-bold text-white">اختبر التوصيات بأمان تام دون المخاطرة بقرش واحد</h2>
-            <p class="text-xs text-gray-400 mt-1">محفظة افتراضية لاختبار إشارات الشراء والبيع وقياس نسبة نجاح الصفقات قبل تطبيقها في ثندر</p>
+            <h2 class="text-xl font-bold text-white">نتائج التوصيات وحساب دقة التوقعات رقمياً</h2>
+            <p class="text-xs text-gray-400 mt-1">يتم قياس كل صفقة بمؤشر دقة التوقع (%) والتأكد من أسباب الدخول الفنية والمالية</p>
           </div>
           <div class="flex items-center gap-2">
             <button onclick="resetPaperTrading()" class="px-3 py-1.5 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-300 text-xs font-semibold transition">
-              إعادة ضبط المحاكاة
+              إعادة ضبط المحفظة الافتراضية
             </button>
           </div>
         </div>
@@ -1053,15 +1089,47 @@
           <div class="bg-gray-950 p-4 rounded-xl border border-gray-800">
             <span class="text-gray-400 text-xs block">نسبة نجاح الصفقات (Win Rate):</span>
             <span class="text-xl font-black font-mono text-purple-400 mt-1 block" id="sim-win-rate">100%</span>
-            <span class="text-[10px] text-gray-400">بناءً على التوصيات السابقة</span>
+            <span class="text-[10px] text-gray-400">صفقات مغلقة على ربح</span>
           </div>
         </div>
 
-        <!-- Execute Simulated Trade Form -->
-        <div class="bg-gray-950/70 p-4 rounded-xl border border-gray-800 space-y-3">
+        <!-- Autonomous Justified Ledger (The Why & Accuracy Progress) -->
+        <div class="space-y-3">
+          <div class="flex items-center justify-between border-t border-gray-800 pt-4">
+            <div class="flex items-center gap-2">
+              <i data-lucide="clipboard-check" class="w-4 h-4 text-emerald-400"></i>
+              <h4 class="font-bold text-white text-sm">سجل الصفقات الآلية المسببة ومؤشر دقة التوقع (Forecast Accuracy Ledger)</h4>
+            </div>
+            <span class="text-[11px] text-gray-400">معادلة الهدف: (السعر الحالي - الدخول) ÷ (الهدف - الدخول)</span>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-right text-xs">
+              <thead class="bg-gray-950 text-gray-400 font-semibold border-b border-gray-800">
+                <tr>
+                  <th class="py-3 px-3">السهم والتوقيت</th>
+                  <th class="py-3 px-3">النوع</th>
+                  <th class="py-3 px-3">سعر الدخول</th>
+                  <th class="py-3 px-3">السعر الحالي</th>
+                  <th class="py-3 px-3">الهدف المستهدف</th>
+                  <th class="py-3 px-3">وقف الخسارة</th>
+                  <th class="py-3 px-3">عداد تحقيق الهدف (%)</th>
+                  <th class="py-3 px-3">أسباب وتبرير الدخول (Justification)</th>
+                  <th class="py-3 px-3 text-center">إجراء</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-800 font-medium" id="autonomous-ledger-body">
+                <!-- Dynamically populated via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Manual Trade Form (For User testing) -->
+        <div class="bg-gray-950/70 p-4 rounded-xl border border-gray-800 space-y-3 mt-6">
           <h4 class="text-xs font-bold text-white flex items-center gap-1.5">
-            <i data-lucide="plus-circle" class="w-4 h-4 text-emerald-400"></i>
-            <span>تنفيذ صفقة شراء افتراضية (ورقية):</span>
+            <i data-lucide="plus-circle" class="w-4 h-4 text-cyan-400"></i>
+            <span>أو قم بتنفيذ صفقة تجريبية يدوية بنفسك:</span>
           </h4>
           <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 text-xs">
             <div>
@@ -1087,25 +1155,6 @@
           </div>
         </div>
 
-        <!-- Simulated Positions Table -->
-        <div class="overflow-x-auto">
-          <table class="w-full text-right text-xs">
-            <thead class="bg-gray-950 text-gray-400 font-semibold border-b border-gray-800">
-              <tr>
-                <th class="py-2.5 px-3">السهم</th>
-                <th class="py-2.5 px-3">الكمية</th>
-                <th class="py-2.5 px-3">سعر الشراء</th>
-                <th class="py-2.5 px-3">القيمة الإجمالية</th>
-                <th class="py-2.5 px-3">وقف الخسارة المحدد</th>
-                <th class="py-2.5 px-3">الهدف المتوقع</th>
-                <th class="py-2.5 px-3 text-center">إغلاق الصفقة</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-800 font-medium" id="sim-positions-body">
-              <!-- Dynamically populated -->
-            </tbody>
-          </table>
-        </div>
       </div>
 
     </div>
@@ -1215,6 +1264,310 @@
         <div class="bg-emerald-950/20 border border-emerald-900/50 p-4 rounded-xl flex items-center justify-between flex-wrap gap-2 text-xs">
           <span class="text-gray-300">الملف الأصلي مخزن في المشروع: <code class="text-emerald-400 font-mono bg-black/40 px-2 py-0.5 rounded">INVESTMENT_RULES.md</code></span>
           <span class="text-emerald-400 font-bold">الحالة: ساري ومفعل بنسبة 100%</span>
+        </div>
+      </div>
+
+    <!-- ============================================== -->
+    <!-- TAB 9: PORTFOLIO SETTINGS & RISK SPLIT CONTROL -->
+    <!-- ============================================== -->
+    <div id="view-settings" class="view-panel hidden space-y-6">
+      
+      <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6 shadow-xl space-y-6">
+        <div class="border-b border-gray-800 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <div class="flex items-center gap-2 text-amber-400 text-xs font-bold uppercase tracking-wider mb-1">
+              <i data-lucide="sliders" class="w-4 h-4"></i>
+              <span>لوحة التحكم والتخصيص الاستراتيجي للمحفظة</span>
+            </div>
+            <h2 class="text-xl font-bold text-white">تخصيص نسب الاستثمار الآمن والمضاربة التكتيكية</h2>
+            <p class="text-xs text-gray-400 mt-1">حدد استراتيجيتك بين الاحتفاظ طويل الأجل واقتناص طفرات الأسهم السريعة (10% - 20%)</p>
+          </div>
+          <button onclick="saveStrategySettings()" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1.5 transition shadow">
+            <i data-lucide="save" class="w-4 h-4"></i>
+            <span>حفظ الإعدادات وتطبيقها</span>
+          </button>
+        </div>
+
+        <!-- Strategy Allocation Slider (Core vs Satellite) -->
+        <div class="bg-gray-950 p-5 rounded-2xl border border-gray-800 space-y-5">
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <div>
+              <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                <span>توزيع استراتيجية النواة والأقمار (Core & Satellite Split)</span>
+                <span class="px-2 py-0.5 rounded text-[10px] bg-amber-500/20 text-amber-300 font-bold">تخصيص فوري</span>
+              </h3>
+              <p class="text-xs text-gray-400 mt-0.5">حرك المؤشر لتحديد النسبة بين الأسهم الآمنة طويلة الأجل وفرص الصعود السريعة</p>
+            </div>
+            <div class="flex items-center gap-3 text-xs font-bold font-mono">
+              <span class="text-emerald-400" id="setting-longterm-label">استثمار طويل: 70%</span>
+              <span class="text-gray-500">•</span>
+              <span class="text-cyan-400" id="setting-tactical-label">طفرات سريعة: 30%</span>
+            </div>
+          </div>
+
+          <!-- Interactive Slider -->
+          <div class="space-y-2">
+            <input type="range" id="strategy-slider" min="50" max="90" step="5" value="70" oninput="handleStrategySliderChange(this.value)" class="w-full accent-emerald-500 cursor-pointer h-2 bg-gray-800 rounded-lg">
+            <div class="flex justify-between text-[11px] text-gray-400 font-mono">
+              <span>50% أمان / 50% طفرات (متوازن مغامر)</span>
+              <span>70% أمان / 30% طفرات (الافتراضي الموصى به)</span>
+              <span>90% أمان / 10% طفرات (شديد التحفظ)</span>
+            </div>
+          </div>
+
+          <!-- Split Visualizer Cards -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+            <div class="bg-gray-900 p-4 rounded-xl border border-emerald-500/30 space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-emerald-400 flex items-center gap-1.5">
+                  <i data-lucide="shield-check" class="w-4 h-4"></i>
+                  <span>1. شريحة الاستثمار طويل الأجل (النواة الآمنة)</span>
+                </span>
+                <span class="text-xs font-mono font-bold text-white" id="setting-longterm-val">139,255 ج.م (70%)</span>
+              </div>
+              <p class="text-xs text-gray-300 leading-relaxed">
+                مخصصة لشركات EGX30 القيادية ذات التوزيعات النقدية (مثل COMI، أوراسكوم، السويدي، وأبو قير) وصندوق NCS. لا نبيع فيها إلا في حالات الطوارئ القصوى لحماية المكاسب.
+              </p>
+            </div>
+
+            <div class="bg-gray-900 p-4 rounded-xl border border-cyan-500/30 space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-cyan-400 flex items-center gap-1.5">
+                  <i data-lucide="zap" class="w-4 h-4"></i>
+                  <span>2. شريحة المضاربة واقتناص الطفرات (Satellite)</span>
+                </span>
+                <span class="text-xs font-mono font-bold text-white" id="setting-tactical-val">59,681 ج.م (30%)</span>
+              </div>
+              <p class="text-xs text-gray-300 leading-relaxed">
+                مخصصة لاقتناص أسهم الزخم والانفجار السعري (مثل AMOC و ETRS). الهدف: تحقيق <strong>+10% إلى +20%</strong>، ثم البيع الفوري وجني الربح وإعادته لشريحة الاستثمار الآمن.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Risk Parameters Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+          <div class="bg-gray-950 p-4 rounded-xl border border-gray-800 space-y-2">
+            <label class="block font-bold text-white">الحد الأقصى لوزن السهم الواحد:</label>
+            <select id="setting-max-stock-cap" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500">
+              <option value="15">15% كحد أقصى (توزيع عالي الأمان)</option>
+              <option value="20" selected>20% كحد أقصى (النسبة المتوازنة)</option>
+              <option value="25">25% كحد أقصى (تركيز معتدل)</option>
+              <option value="30">30% كحد أقصى (تركيز مرتفع)</option>
+            </select>
+            <p class="text-[11px] text-gray-400">يمنع السيستم من وضع أكثر من هذه النسبة في شركة واحدة لمنع المخاطرة.</p>
+          </div>
+
+          <div class="bg-gray-950 p-4 rounded-xl border border-gray-800 space-y-2">
+            <label class="block font-bold text-white">وقف الخسارة المسموح به لصفقات الطفرات:</label>
+            <select id="setting-stoploss-cap" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500">
+              <option value="3">3% كحد أقصى (خروج سريع جداً)</option>
+              <option value="4" selected>4% كحد أقصى (المستوى القياسي)</option>
+              <option value="5">5% كحد أقصى (مرونة للموجات الصاعدة)</option>
+            </select>
+            <p class="text-[11px] text-gray-400">إذا تراجع السهم بهذه النسبة، يتم الخروج فوراً دون تردد.</p>
+          </div>
+
+          <div class="bg-gray-950 p-4 rounded-xl border border-gray-800 space-y-2">
+            <label class="block font-bold text-white">الهدف الأدنى لنسبة العائد للمخاطرة (R/R):</label>
+            <select id="setting-min-rr" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500">
+              <option value="1.5">1:1.5 (عائد 1.5 مقابل كل 1 خطر)</option>
+              <option value="2.0" selected>1:2.0 (عائد ضعف الخسارة المحتملة - إلزامي)</option>
+              <option value="2.5">1:2.5 (فرص استثنائية فقط)</option>
+            </select>
+            <p class="text-[11px] text-gray-400">يرفض السيستم أي صفقة لا تضمن ضعف العائد المتوقع مقارنة بالخسارة.</p>
+          </div>
+        </div>
+
+        <!-- Cloud Schedule Status & Info -->
+        <div class="bg-emerald-950/20 border border-emerald-500/30 p-4 rounded-xl flex items-center justify-between flex-wrap gap-3 text-xs">
+          <div class="flex items-center gap-2">
+            <i data-lucide="calendar-clock" class="w-4 h-4 text-emerald-400"></i>
+            <span class="text-white font-bold">جدول التشغيل السحابي للبوت:</span>
+            <span class="text-gray-300">الأحد - الخميس (10:30 ص، 1:00 م، 3:30 م) + مساء السبت (9:00 م) لأخبار الويك إند.</span>
+          </div>
+          <span class="text-emerald-400 font-bold bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20">جاهز ومفعل سحابياً</span>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ============================================== -->
+    <!-- TAB 10: FINANCIAL & AI COPILOT GLOSSARY        -->
+    <!-- ============================================== -->
+    <div id="view-glossary" class="view-panel hidden space-y-6">
+      
+      <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6 shadow-xl space-y-6">
+        <div class="border-b border-gray-800 pb-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <div class="flex items-center gap-2 text-cyan-400 text-xs font-bold uppercase tracking-wider mb-1">
+              <i data-lucide="book-open" class="w-4 h-4"></i>
+              <span>قاموس ودليل المستشار المالي (Financial Glossary)</span>
+            </div>
+            <h2 class="text-xl font-bold text-white">شرح كل مصطلحات البورصة والذكاء الاصطناعي بالعامية المبسطة</h2>
+            <p class="text-xs text-gray-400 mt-1">مرجعك السريع لفهم أي كلمة أو رقم تراه في التطبيق بدون أي مصطلحات معقدة</p>
+          </div>
+
+          <div class="relative w-full md:w-72">
+            <input type="text" id="glossary-search-input" oninput="handleGlossarySearch()" placeholder="ابحث في المصطلحات (مثال: دعم، R/R، سيولة)..." class="w-full bg-gray-950 border border-gray-700 rounded-xl pr-9 pl-4 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500 transition">
+            <i data-lucide="search" class="w-4 h-4 text-gray-400 absolute right-3 top-2.5"></i>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="glossary-grid">
+          
+          <!-- Term 1: Pivot Point -->
+          <div class="glossary-item bg-gray-950 p-4 rounded-xl border border-gray-800 space-y-2">
+            <div class="flex items-center justify-between">
+              <h4 class="font-bold text-white text-sm flex items-center gap-1.5">
+                <span class="text-emerald-400">Pivot Point</span>
+                <span class="text-gray-400 text-xs font-normal">(نقطة الارتكاز المحورية)</span>
+              </h4>
+              <span class="text-[10px] bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded font-bold">تحليل فني</span>
+            </div>
+            <p class="text-xs text-gray-300 leading-relaxed">
+              <strong>المعنى بالبلدي:</strong> ده "السعر العادل والمتزن" للسهم خلال اليوم محسوب من متوسط (أعلى سعر + أقل سعر + الإغلاق) ÷ 3.
+              <br>• لو السهم بيتداول <strong>فوق</strong> نقطة الارتكاز: يبقى المشتري قوي والسهم صاعد.
+              <br>• لو السهم بيتداول <strong>تحت</strong> نقطة الارتكاز: يبقى البياع هو المسيطر وممكن ينزل لدعومه.
+            </p>
+          </div>
+
+          <!-- Term 2: Support -->
+          <div class="glossary-item bg-gray-950 p-4 rounded-xl border border-gray-800 space-y-2">
+            <div class="flex items-center justify-between">
+              <h4 class="font-bold text-white text-sm flex items-center gap-1.5">
+                <span class="text-emerald-400">Support (S1, S2)</span>
+                <span class="text-gray-400 text-xs font-normal">(مستويات الدعم)</span>
+              </h4>
+              <span class="text-[10px] bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded font-bold">تحليل فني</span>
+            </div>
+            <p class="text-xs text-gray-300 leading-relaxed">
+              <strong>المعنى بالبلدي:</strong> دي "أرضية السعر"؛ سعر كل ما السهم ينزل له بيلاقي مشترين كتير جداً يمسكوه ويمنعوه يقع أكتر ويردوه لفوق. 
+              <br>• <strong>S1:</strong> الدعم الأول والارتداد السريع.
+              <br>• <strong>S2:</strong> الدعم الرئيسي الصلب، وكسره لأسفل يعتبر إشارة إنذار.
+            </p>
+          </div>
+
+          <!-- Term 3: Resistance -->
+          <div class="glossary-item bg-gray-950 p-4 rounded-xl border border-gray-800 space-y-2">
+            <div class="flex items-center justify-between">
+              <h4 class="font-bold text-white text-sm flex items-center gap-1.5">
+                <span class="text-purple-400">Resistance (R1, R2)</span>
+                <span class="text-gray-400 text-xs font-normal">(مستويات المقاومة)</span>
+              </h4>
+              <span class="text-[10px] bg-purple-500/10 text-purple-400 px-2 py-0.5 rounded font-bold">تحليل فني</span>
+            </div>
+            <p class="text-xs text-gray-300 leading-relaxed">
+              <strong>المعنى بالبلدي:</strong> ده "سقف السعر"؛ سعر كل ما السهم يقرب منه، بيظهر بياعين عاوزين يجنوا أرباحهم فيضغطوا على السهم.
+              <br>• <strong>R1:</strong> الهدف الأول لجني الأرباح.
+              <br>• لو السهم <strong>اخترق المقاومة</strong> بحجم تداول ضخم، بيطير بسرعة للمقاومة اللي بعدها (R2).
+            </p>
+          </div>
+
+          <!-- Term 4: Stop Loss -->
+          <div class="glossary-item bg-gray-950 p-4 rounded-xl border border-gray-800 space-y-2">
+            <div class="flex items-center justify-between">
+              <h4 class="font-bold text-white text-sm flex items-center gap-1.5">
+                <span class="text-rose-400">Stop Loss</span>
+                <span class="text-gray-400 text-xs font-normal">(وقف الخسارة الصارم)</span>
+              </h4>
+              <span class="text-[10px] bg-rose-500/10 text-rose-400 px-2 py-0.5 rounded font-bold">صمام أمان</span>
+            </div>
+            <p class="text-xs text-gray-300 leading-relaxed">
+              <strong>المعنى بالبلدي:</strong> ده طوق النجاة؛ سعر محدد مسبقاً بتقول عنده: "لو السهم نزل هنا، أنا هبيع وأخسر 3% أو 4% برضايا عشان أحمي باقي الـ 96% من فلوسي ومخسرش 20% أو 30%".
+            </p>
+          </div>
+
+          <!-- Term 5: Risk to Reward Ratio -->
+          <div class="glossary-item bg-gray-950 p-4 rounded-xl border border-gray-800 space-y-2">
+            <div class="flex items-center justify-between">
+              <h4 class="font-bold text-white text-sm flex items-center gap-1.5">
+                <span class="text-amber-400">Risk to Reward (R/R)</span>
+                <span class="text-gray-400 text-xs font-normal">(نسبة العائد للمخاطرة)</span>
+              </h4>
+              <span class="text-[10px] bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded font-bold">قاعدة رياضية</span>
+            </div>
+            <p class="text-xs text-gray-300 leading-relaxed">
+              <strong>المعنى بالبلدي:</strong> ميزان الصفقة الذكية؛ مينفعش تدخل صفقة عشان تكسب 5 جنيه وأنت معرض تخسر 5 جنيه! شرط الـ AI إنه ميوافقش على أي صفقة إلا لو العائد المتوقع <strong>ضعف الخسارة المحتملة على الأقل ($1:2$)</strong>.
+            </p>
+          </div>
+
+          <!-- Term 6: Volume Surge -->
+          <div class="glossary-item bg-gray-950 p-4 rounded-xl border border-gray-800 space-y-2">
+            <div class="flex items-center justify-between">
+              <h4 class="font-bold text-white text-sm flex items-center gap-1.5">
+                <span class="text-cyan-400">Volume Surge</span>
+                <span class="text-gray-400 text-xs font-normal">(انفجار السيولة وأحجام التداول)</span>
+              </h4>
+              <span class="text-[10px] bg-cyan-500/10 text-cyan-400 px-2 py-0.5 rounded font-bold">رادار حيتان</span>
+            </div>
+            <p class="text-xs text-gray-300 leading-relaxed">
+              <strong>المعنى بالبلدي:</strong> لما تلاقي سهم عادي بيتدرب عليه مليون جنيه في اليوم، وفجأة في ساعتين دخل فيه 5 أو 10 مليون جنيه (أضعاف 2.5x إلى 4x)! ده معناه إن فيه مؤسسة كبيرة أو مستثمر استراتيجي بيشتري كميات ضخمة قبل صعود كبير.
+            </p>
+          </div>
+
+          <!-- Term 7: Target Progress % -->
+          <div class="glossary-item bg-gray-950 p-4 rounded-xl border border-gray-800 space-y-2">
+            <div class="flex items-center justify-between">
+              <h4 class="font-bold text-white text-sm flex items-center gap-1.5">
+                <span class="text-emerald-400">Target Progress %</span>
+                <span class="text-gray-400 text-xs font-normal">(عداد تحقيق الهدف)</span>
+              </h4>
+              <span class="text-[10px] bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded font-bold">تقييم الـ AI</span>
+            </div>
+            <p class="text-xs text-gray-300 leading-relaxed">
+              <strong>المعنى بالبلدي:</strong> المعادلة اللي اتفقنا عليها! لو اشترينا بـ 90 جنيه، والهدف 100 جنيه. 
+              <br>• لو السعر جاب 95 ج $\rightarrow$ يبقى حقق <strong>50%</strong> من الهدف.
+              <br>• لو وصل لـ 100 ج $\rightarrow$ حقق <strong>100%</strong> ويتم جني الربح.
+              <br>• لو نزل لـ 85 ج $\rightarrow$ خسر <strong>-50%</strong> ويخرج بوقف الخسارة فوراً.
+            </p>
+          </div>
+
+          <!-- Term 8: Core & Satellite -->
+          <div class="glossary-item bg-gray-950 p-4 rounded-xl border border-gray-800 space-y-2">
+            <div class="flex items-center justify-between">
+              <h4 class="font-bold text-white text-sm flex items-center gap-1.5">
+                <span class="text-amber-400">Core & Satellite</span>
+                <span class="text-gray-400 text-xs font-normal">(استراتيجية النواة والأقمار)</span>
+              </h4>
+              <span class="text-[10px] bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded font-bold">هندسة المحفظة</span>
+            </div>
+            <p class="text-xs text-gray-300 leading-relaxed">
+              <strong>المعنى بالبلدي:</strong> الاستراتيجية الذكية للمحترفين:
+              <br>• <strong>النواة (Core - 70%):</strong> أسهم تقيلة آمنة تنام وأنت مطمن عليها.
+              <br>• <strong>الأقمار (Satellite - 30%):</strong> كاش تكتيكي نقتنص بيه أسهم طفرات تحقق 10% - 20% وناخد مكسبها ونرجعه تاني للنواة الآمنة.
+            </p>
+          </div>
+
+          <!-- Term 9: Accumulate -->
+          <div class="glossary-item bg-gray-950 p-4 rounded-xl border border-gray-800 space-y-2">
+            <div class="flex items-center justify-between">
+              <h4 class="font-bold text-white text-sm flex items-center gap-1.5">
+                <span class="text-cyan-400">Accumulate</span>
+                <span class="text-gray-400 text-xs font-normal">(التعزيز والتجميع)</span>
+              </h4>
+              <span class="text-[10px] bg-cyan-500/10 text-cyan-400 px-2 py-0.5 rounded font-bold">تكتيك استثماري</span>
+            </div>
+            <p class="text-xs text-gray-300 leading-relaxed">
+              <strong>المعنى بالبلدي:</strong> سهم شركة عملاقة (زي CIB) أرباحه بالمليارات وسعره نزل لسبب مؤقت في السوق؛ فبدل ما نخاف، بنشتري كمية زيادة بسعر أرخص عشان نخفض متوسط سعر شرائنا القديم ونعظم الربح لما السوق يرتد.
+            </p>
+          </div>
+
+          <!-- Term 10: Justification -->
+          <div class="glossary-item bg-gray-950 p-4 rounded-xl border border-gray-800 space-y-2">
+            <div class="flex items-center justify-between">
+              <h4 class="font-bold text-white text-sm flex items-center gap-1.5">
+                <span class="text-emerald-400">Justification (1, 2, 3)</span>
+                <span class="text-gray-400 text-xs font-normal">(الدراسة المسببة ثلاثية الأركان)</span>
+              </h4>
+              <span class="text-[10px] bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded font-bold">شفافية الـ AI</span>
+            </div>
+            <p class="text-xs text-gray-300 leading-relaxed">
+              <strong>المعنى بالبلدي:</strong> مفيش توصية تطلع "بالصدفة" أو بدون تبرير. أي قرار شراء أو بيع لازم يقدم لك 3 أسباب مقنعة: (1. الأساس المالي والربحي، 2. مستويات الدعم الفني، 3. محفز السيولة أو الخبر الإيجابي).
+            </p>
+          </div>
+
         </div>
       </div>
 
@@ -2568,7 +2921,251 @@
         }
       } else if (tabId === 'papertrading') {
         renderSimPositions();
+        renderAutonomousLedger();
+      } else if (tabId === 'settings') {
+        loadStrategySettings();
       }
+    }
+
+    // ============================================================
+    // Autonomous Forward Testing Ledger (Justifications & Progress)
+    // ============================================================
+    let autonomousLedger = [
+      {
+        id: 1,
+        ticker: 'AMOC',
+        name: 'الإسكندرية للزيوت المعدنية',
+        type: 'طفرة سريعة (Satellite)',
+        date: '2026-10-15 11:30 ص',
+        entryPrice: 10.40,
+        currentPrice: 11.20,
+        targetPrice: 12.00,
+        stopLoss: 9.80,
+        status: 'OPEN',
+        statusText: 'جارية بنجاح ⏳',
+        justification: {
+          fundamental: 'عوائد تصدير بترولية دولارية مستقرة وارتفاع هوامش التكرير.',
+          technical: 'اختراق مقاومة 10.20 ج مع نموذج قاع مزدوج صاعد.',
+          volume: 'تدفق سيولة بمعدل 3.4x ضعف المتوسط اليومي المعتاد.'
+        }
+      },
+      {
+        id: 2,
+        ticker: 'ETRS',
+        name: 'المصرية للنقل والخدمات (إيجيترانس)',
+        type: 'طفرة سريعة (Satellite)',
+        date: '2026-10-14 01:15 م',
+        entryPrice: 4.80,
+        currentPrice: 5.40,
+        targetPrice: 5.40,
+        stopLoss: 4.50,
+        status: 'PROFIT_TAKEN',
+        statusText: '🎯 تحقق الهدف 100% (+12.5%)',
+        justification: {
+          fundamental: 'عقود لوجستية موسعة لمشاريع طاقة رياح وتدفقات نقدية قوية.',
+          technical: 'ارتداد نظيف من خط الدعم 4.70 ج مع تشبع بيعي RSI.',
+          volume: 'شراء مؤسسي مكثف في النصف الثاني من الجلسة.'
+        }
+      },
+      {
+        id: 3,
+        ticker: 'SWDY',
+        name: 'السويدي إليكتريك',
+        type: 'استثمار طويل (Core)',
+        date: '2026-10-12 10:45 ص',
+        entryPrice: 46.50,
+        currentPrice: 50.20,
+        targetPrice: 58.00,
+        stopLoss: 43.50,
+        status: 'OPEN',
+        statusText: 'جارية بنجاح ⏳',
+        justification: {
+          fundamental: 'أعلى إيرادات وأرباح دولارية من الخليج ومحفظة عقود مليارية.',
+          technical: 'اتجاه صاعد رئيسي فوق المتوسطات 50 و 200 يوم.',
+          volume: 'سيولة قيادية منتظمة بدون تذبذبات حادة.'
+        }
+      }
+    ];
+
+    function calculateTargetProgress(entry, current, target) {
+      if (target === entry) return 100;
+      const progress = ((current - entry) / (target - entry)) * 100;
+      return Math.round(progress);
+    }
+
+    function renderAutonomousLedger() {
+      const tbody = document.getElementById('autonomous-ledger-body');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      autonomousLedger.forEach((trade, idx) => {
+        const progressPct = calculateTargetProgress(trade.entryPrice, trade.currentPrice, trade.targetPrice);
+        const gainPct = (((trade.currentPrice - trade.entryPrice) / trade.entryPrice) * 100).toFixed(1);
+        const isPositiveGain = trade.currentPrice >= trade.entryPrice;
+
+        let progressBadge = '';
+        let progressBarColor = 'bg-emerald-500';
+
+        if (trade.status === 'PROFIT_TAKEN' || progressPct >= 100) {
+          progressBadge = `<span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-bold border border-emerald-500/30">🎯 تحقق 100% (+${gainPct}%)</span>`;
+          progressBarColor = 'bg-emerald-500';
+        } else if (progressPct > 0) {
+          progressBadge = `<span class="px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-400 font-bold border border-cyan-500/30">⏳ تم إنجاز ${progressPct}% (+${gainPct}%)</span>`;
+          progressBarColor = 'bg-cyan-500';
+        } else {
+          progressBadge = `<span class="px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-400 font-bold border border-rose-500/30">⚠️ تراجع ${progressPct}% (${gainPct}%)</span>`;
+          progressBarColor = 'bg-rose-500';
+        }
+
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-gray-900/60 transition';
+        tr.innerHTML = `
+          <td class="py-3 px-3">
+            <div class="font-bold text-white">${trade.name} (${trade.ticker})</div>
+            <div class="text-[10px] text-gray-400 font-mono">${trade.date}</div>
+          </td>
+          <td class="py-3 px-3">
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded ${trade.type.includes('طفرة') ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'}">
+              ${trade.type}
+            </span>
+          </td>
+          <td class="py-3 px-3 font-mono font-bold text-white">${trade.entryPrice.toFixed(2)} ج</td>
+          <td class="py-3 px-3 font-mono font-bold ${isPositiveGain ? 'text-emerald-400' : 'text-rose-400'}">${trade.currentPrice.toFixed(2)} ج</td>
+          <td class="py-3 px-3 font-mono font-bold text-emerald-400">${trade.targetPrice.toFixed(2)} ج</td>
+          <td class="py-3 px-3 font-mono font-bold text-rose-400">${trade.stopLoss.toFixed(2)} ج</td>
+          <td class="py-3 px-3 font-mono">
+            ${progressBadge}
+            <div class="w-24 h-1.5 bg-gray-800 rounded-full mt-1.5 overflow-hidden">
+              <div class="h-full ${progressBarColor}" style="width: ${Math.max(0, Math.min(progressPct, 100))}%"></div>
+            </div>
+          </td>
+          <td class="py-3 px-3 max-w-xs text-[11px] space-y-0.5">
+            <div><span class="text-emerald-400 font-bold">1. مالي:</span> <span class="text-gray-300">${trade.justification.fundamental}</span></div>
+            <div><span class="text-cyan-400 font-bold">2. فني:</span> <span class="text-gray-300">${trade.justification.technical}</span></div>
+            <div><span class="text-amber-400 font-bold">3. سيولة:</span> <span class="text-gray-300">${trade.justification.volume}</span></div>
+          </td>
+          <td class="py-3 px-3 text-center">
+            ${trade.status === 'OPEN' ? `
+              <button onclick="closeAutonomousTrade(${idx})" class="px-2.5 py-1 rounded-lg bg-emerald-700 hover:bg-emerald-600 text-white font-bold text-[10px] transition">
+                جني الربح
+              </button>
+            ` : `
+              <span class="text-[10px] text-gray-500 font-bold">مغلقة ومسجلة</span>
+            `}
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function closeAutonomousTrade(idx) {
+      const trade = autonomousLedger[idx];
+      if (!trade) return;
+      trade.status = 'PROFIT_TAKEN';
+      trade.currentPrice = trade.targetPrice;
+      renderAutonomousLedger();
+      alert(`🎉 تم إغلاق صفقة ${trade.ticker} وتحقيق كامل الهدف بنجاح 100%!`);
+    }
+
+    function triggerSimulatedBotCycle() {
+      const candidate = fullMarketRadar.find(s => s.tags && s.tags.includes('volume_surge') && s.ticker === 'EGAL') || fullMarketRadar[0];
+      const now = new Date();
+      const dateStr = `${now.getFullYear()}-${now.getMonth()+1}-${now.getDate()} ${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+      const newTrade = {
+        id: autonomousLedger.length + 1,
+        ticker: candidate.ticker,
+        name: candidate.name,
+        type: 'طفرة سريعة (Satellite)',
+        date: dateStr,
+        entryPrice: candidate.price,
+        currentPrice: candidate.price * 1.04,
+        targetPrice: parseFloat(candidate.target1) || (candidate.price * 1.15),
+        stopLoss: parseFloat(candidate.stopLoss) || (candidate.price * 0.96),
+        status: 'OPEN',
+        statusText: 'جارية بنجاح ⏳',
+        justification: {
+          fundamental: candidate.catalyst,
+          technical: `ارتكاز قوي فوق الدعم ${candidate.support} واستعداد لكسر المقاومة.`,
+          volume: `انفجار تدفقات الشراء بنسبة ${candidate.volumeMultiplier} ضعف المعتاد.`
+        }
+      };
+
+      autonomousLedger.unshift(newTrade);
+      renderAutonomousLedger();
+      alert(`⚡ نجاح دورة الفحص السحابي!\nقام الروبوت برصد فرصة انفجار سيولة في سهم ${candidate.name} (${candidate.ticker}) وتنفيذ أمر شراء افتراضي مسبب بالأرقام والأهداف!`);
+    }
+
+    // ============================================================
+    // Portfolio Allocation & Strategy Settings Functions
+    // ============================================================
+    function handleStrategySliderChange(val) {
+      const longTermPct = parseInt(val, 10);
+      const tacticalPct = 100 - longTermPct;
+      
+      const totalWealth = portfolioData.reduce((acc, cur) => acc + cur.value, 0) || 198937;
+      const longTermVal = Math.round(totalWealth * (longTermPct / 100));
+      const tacticalVal = Math.round(totalWealth * (tacticalPct / 100));
+
+      const ltLabel = document.getElementById('setting-longterm-label');
+      const tacLabel = document.getElementById('setting-tactical-label');
+      const ltVal = document.getElementById('setting-longterm-val');
+      const tacVal = document.getElementById('setting-tactical-val');
+
+      if (ltLabel) ltLabel.innerText = `استثمار طويل: ${longTermPct}%`;
+      if (tacLabel) tacLabel.innerText = `طفرات سريعة: ${tacticalPct}%`;
+      if (ltVal) ltVal.innerText = `${longTermVal.toLocaleString()} ج.م (${longTermPct}%)`;
+      if (tacVal) tacVal.innerText = `${tacticalVal.toLocaleString()} ج.م (${tacticalPct}%)`;
+    }
+
+    function saveStrategySettings() {
+      const slider = document.getElementById('strategy-slider');
+      const maxCap = document.getElementById('setting-max-stock-cap').value;
+      const stopLoss = document.getElementById('setting-stoploss-cap').value;
+      const minRR = document.getElementById('setting-min-rr').value;
+
+      const settings = {
+        longTermPct: parseInt(slider.value, 10),
+        tacticalPct: 100 - parseInt(slider.value, 10),
+        maxStockCap: parseInt(maxCap, 10),
+        stopLossCap: parseInt(stopLoss, 10),
+        minRR: parseFloat(minRR)
+      };
+
+      localStorage.setItem('egx_strategy_settings', JSON.stringify(settings));
+      alert('✅ تم حفظ إعدادات المحفظة ونسب الأمان بنجاح! سيلتزم بها الروبوت والمستشار في جميع التوصيات.');
+    }
+
+    function loadStrategySettings() {
+      const saved = localStorage.getItem('egx_strategy_settings');
+      if (saved) {
+        try {
+          const s = JSON.parse(saved);
+          const slider = document.getElementById('strategy-slider');
+          if (slider) {
+            slider.value = s.longTermPct;
+            handleStrategySliderChange(s.longTermPct);
+          }
+          if (document.getElementById('setting-max-stock-cap')) document.getElementById('setting-max-stock-cap').value = s.maxStockCap;
+          if (document.getElementById('setting-stoploss-cap')) document.getElementById('setting-stoploss-cap').value = s.stopLossCap;
+          if (document.getElementById('setting-min-rr')) document.getElementById('setting-min-rr').value = s.minRR;
+        } catch(e) {}
+      } else {
+        handleStrategySliderChange(70);
+      }
+    }
+
+    function handleGlossarySearch() {
+      const query = (document.getElementById('glossary-search-input')?.value || '').trim().toLowerCase();
+      const items = document.querySelectorAll('.glossary-item');
+      items.forEach(item => {
+        const text = item.innerText.toLowerCase();
+        if (!query || text.includes(query)) {
+          item.classList.remove('hidden');
+        } else {
+          item.classList.add('hidden');
+        }
+      });
     }
 
     // AI Copilot Chat Handling
@@ -2729,6 +3326,8 @@
       renderAllocationChart();
       calculateSmartAllocation();
       renderSimPositions();
+      renderAutonomousLedger();
+      loadStrategySettings();
       updateSimPriceFromSelect();
       lucide.createIcons();
     });

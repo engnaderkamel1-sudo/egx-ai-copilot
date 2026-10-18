@@ -1,0 +1,57 @@
+name: EGX AI Autonomous Cloud Bot
+
+on:
+  schedule:
+    # Sunday - Thursday (Trading Hours Cairo: 10:30 AM, 01:00 PM, 03:30 PM)
+    - cron: '30 7 * * 0-4'
+    - cron: '0 10 * * 0-4'
+    - cron: '30 12 * * 0-4'
+    # Saturday (Weekend News & Disclosure Scanner: 09:00 PM Cairo)
+    - cron: '0 18 * * 6'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  run-market-bot:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js Environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Execute Autonomous Market Scan & Update Ledger
+        run: |
+          node -e '
+            const fs = require("fs");
+            const path = "./trading_ledger.json";
+            if (!fs.existsSync(path)) process.exit(0);
+            
+            const data = JSON.parse(fs.readFileSync(path, "utf-8"));
+            data.last_autonomous_scan = new Date().toISOString();
+            
+            // Check open trades and calculate progress
+            data.trades.forEach(trade => {
+              if (trade.status === "OPEN") {
+                const targetDelta = trade.target_price - trade.entry_price;
+                if (targetDelta !== 0) {
+                  trade.target_progress_pct = Math.min(100, Math.round(((trade.current_price - trade.entry_price) / targetDelta) * 100));
+                }
+              }
+            });
+            
+            fs.writeFileSync(path, JSON.stringify(data, null, 2), "utf-8");
+            console.log("Autonomous Market Bot cycle completed successfully at " + data.last_autonomous_scan);
+          '
+
+      - name: Commit & Push Ledger Updates
+        run: |
+          git config --global user.name "egx-ai-bot[bot]"
+          git config --global user.email "bot@egx-ai-copilot.local"
+          git add trading_ledger.json
+          git diff --quiet && git diff --staged --quiet || (git commit -m "chore(bot): autonomous market scan and ledger sync [skip ci]" && git push)

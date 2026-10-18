@@ -1,0 +1,79 @@
+{
+  "system": "EGX AI Autonomous Bot",
+  "version": "1.0.0",
+  "schedule": {
+    "trading_days": "Sunday - Thursday (10:30 AM, 01:00 PM, 03:30 PM Cairo Time)",
+    "weekend_briefing": "Saturday (09:00 PM Cairo Time)"
+  },
+  "strategy_settings": {
+    "core_longterm_pct": 70,
+    "satellite_tactical_pct": 30,
+    "max_stock_cap_pct": 20,
+    "stoploss_cap_pct": 4,
+    "min_rr_ratio": 2.0
+  },
+  "summary": {
+    "total_trades": 3,
+    "winning_trades": 1,
+    "open_trades": 2,
+    "win_rate_pct": 100.0,
+    "sim_cash_egp": 50000,
+    "net_sim_profit_egp": 2400
+  },
+  "trades": [
+    {
+      "id": 1,
+      "ticker": "AMOC",
+      "name": "الإسكندرية للزيوت المعدنية",
+      "type": "طفرة سريعة (Satellite)",
+      "date": "2026-10-15 11:30 ص",
+      "entry_price": 10.40,
+      "current_price": 11.20,
+      "target_price": 12.00,
+      "stop_loss": 9.80,
+      "status": "OPEN",
+      "target_progress_pct": 50,
+      "justification": {
+        "fundamental": "عوائد تصدير بترولية دولارية مستقرة وارتفاع هوامش التكرير.",
+        "technical": "اختراق مقاومة 10.20 ج مع نموذج قاع مزدوج صاعد.",
+        "volume": "تدفق سيولة بمعدل 3.4x ضعف المتوسط اليومي المعتاد."
+      }
+    },
+    {
+      "id": 2,
+      "ticker": "ETRS",
+      "name": "المصرية للنقل والخدمات (إيجيترانس)",
+      "type": "طفرة سريعة (Satellite)",
+      "date": "2026-10-14 01:15 م",
+      "entry_price": 4.80,
+      "current_price": 5.40,
+      "target_price": 5.40,
+      "stop_loss": 4.50,
+      "status": "PROFIT_TAKEN",
+      "target_progress_pct": 100,
+      "justification": {
+        "fundamental": "عقود لوجستية موسعة لمشاريع طاقة رياح وتدفقات نقدية قوية.",
+        "technical": "ارتداد نظيف من خط الدعم 4.70 ج مع تشبع بيعي RSI.",
+        "volume": "شراء مؤسسي مكثف في النصف الثاني من الجلسة."
+      }
+    },
+    {
+      "id": 3,
+      "ticker": "SWDY",
+      "name": "السويدي إليكتريك",
+      "type": "استثمار طويل (Core)",
+      "date": "2026-10-12 10:45 ص",
+      "entry_price": 46.50,
+      "current_price": 50.20,
+      "target_price": 58.00,
+      "stop_loss": 43.50,
+      "status": "OPEN",
+      "target_progress_pct": 32,
+      "justification": {
+        "fundamental": "أعلى إيرادات وأرباح دولارية من الخليج ومحفظة عقود مليارية.",
+        "technical": "اتجاه صاعد رئيسي فوق المتوسطات 50 و 200 يوم.",
+        "volume": "سيولة قيادية منتظمة بدون تذبذبات حادة."
+      }
+    }
+  ]
+}
