@@ -507,12 +507,12 @@
             <i data-lucide="coins" class="w-4 h-4 text-emerald-400"></i>
           </div>
           <div class="text-2xl font-black text-white tracking-tight" id="metric-total-wealth">
-            198,937 <span class="text-xs text-gray-400 font-normal">ج.م</span>
+            219,215 <span class="text-xs text-gray-400 font-normal">ج.م</span>
           </div>
           <div class="mt-2 flex items-center text-xs font-semibold" id="metric-total-return-container">
             <span id="metric-total-return-badge" class="flex items-center text-rose-400">
               <i data-lucide="trending-down" class="w-3.5 h-3.5 ml-1"></i>
-              <span id="metric-total-return">-0.54% (-1,073 ج)</span>
+              <span id="metric-total-return">-0.54% (-1,192 ج)</span>
             </span>
           </div>
           <div class="absolute -right-6 -bottom-6 w-20 h-20 bg-emerald-500/5 rounded-full blur-xl pointer-events-none"></div>
@@ -521,46 +521,68 @@
         <!-- Card 2: Stocks Value -->
         <div class="bg-gray-900/80 border border-gray-800 rounded-2xl p-4 flex flex-col justify-between">
           <div class="flex items-center justify-between text-gray-400 text-xs font-semibold mb-1">
-            <span>قيمة الأسهم (10 شركات)</span>
+            <span>الأسهم (10 شركات)</span>
             <i data-lucide="pie-chart" class="w-4 h-4 text-cyan-400"></i>
           </div>
           <div class="text-2xl font-black text-white tracking-tight" id="metric-stocks-wealth">
             139,271 <span class="text-xs text-gray-400 font-normal">ج.م</span>
           </div>
           <div class="mt-2 text-xs text-emerald-400 font-medium flex items-center">
-            <i data-lucide="check-circle" class="w-3.5 h-3.5 ml-1"></i>
-            <span>حصة 70% من إجمالي الأصول</span>
+            <i data-lucide="trending-up" class="w-3.5 h-3.5 ml-1"></i>
+            <span>139.27k (+1.28% أرباح مجمعة)</span>
           </div>
         </div>
 
         <!-- Card 3: Funds Value -->
         <div class="bg-gray-900/80 border border-gray-800 rounded-2xl p-4 flex flex-col justify-between">
           <div class="flex items-center justify-between text-gray-400 text-xs font-semibold mb-1">
-            <span>الصناديق (إن آي كابيتال)</span>
+            <span>الصناديق (إن آي كابيتال + بلتون)</span>
             <i data-lucide="landmark" class="w-4 h-4 text-amber-400"></i>
           </div>
           <div class="text-2xl font-black text-white tracking-tight" id="metric-funds-wealth">
-            59,666 <span class="text-xs text-gray-400 font-normal">ج.م</span>
+            59,934 <span class="text-xs text-gray-400 font-normal">ج.م</span>
           </div>
-          <div class="mt-2 text-xs text-amber-400/80 font-medium flex items-center">
-            <i data-lucide="shield" class="w-3.5 h-3.5 ml-1"></i>
-            <span>حصة 30% من إجمالي الأصول</span>
+          <div class="mt-2 text-xs text-rose-400 font-medium flex items-center">
+            <i data-lucide="trending-down" class="w-3.5 h-3.5 ml-1"></i>
+            <span>59.93k (-4.70% NCS + BSB)</span>
           </div>
         </div>
 
-        <!-- Card 4: Top Winner Highlight -->
-        <div class="bg-gray-900/80 border border-gray-800 rounded-2xl p-4 flex flex-col justify-between border-r-4 border-r-emerald-500">
+        <!-- Card 4: Wallet Cash -->
+        <div class="bg-gray-900/80 border border-gray-800 rounded-2xl p-4 flex flex-col justify-between border-r-4 border-r-cyan-500">
           <div class="flex items-center justify-between text-gray-400 text-xs font-semibold mb-1">
-            <span>أعلى عائد استثماري محقق</span>
-            <i data-lucide="trophy" class="w-4 h-4 text-emerald-400"></i>
+            <span>المحفظة (الكاش والسيولة)</span>
+            <i data-lucide="wallet-cards" class="w-4 h-4 text-cyan-400"></i>
           </div>
-          <div class="text-xl font-black text-emerald-400 tracking-tight" id="metric-top-winner-title">
-            ORAS • أوراسكوم
+          <div class="text-2xl font-black text-cyan-300 tracking-tight" id="metric-cash-wealth">
+            20,010 <span class="text-xs text-gray-400 font-normal">ج.م</span>
           </div>
-          <div class="mt-2 text-xs text-emerald-300 font-semibold flex items-center" id="metric-top-winner-stats">
-            <i data-lucide="trending-up" class="w-3.5 h-3.5 ml-1"></i>
-            <span>+25.17% (+3,060 ج.م)</span>
+          <div class="mt-2 text-xs text-cyan-400 font-semibold flex items-center">
+            <i data-lucide="clock" class="w-3.5 h-3.5 ml-1"></i>
+            <span>20.01k • 2 طلبات اكتتاب قيد التنفيذ</span>
           </div>
+        </div>
+      </div>
+
+      <!-- Pending Orders & Buying Power Banner (Directly from Thndr) -->
+      <div class="bg-cyan-950/40 border border-cyan-800/40 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-xl bg-cyan-900/60 border border-cyan-700/50 flex items-center justify-center text-cyan-400 shrink-0">
+            <i data-lucide="clock" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <div class="font-bold text-white text-sm flex items-center gap-2">
+              <span>لديك 2 طلبات قيد التنفيذ (اكتتاب سهم حالاً HALN)</span>
+              <span class="px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 text-[10px] font-bold">قيد التنفيذ في ثندر</span>
+            </div>
+            <div class="text-gray-300 text-[11px] mt-0.5">
+              طلب 1: <strong>59,804.50 ج.م</strong> • طلب 2: <strong>19,992.00 ج.م</strong> (سعر الاكتتاب 24.50 ج) • القوة الشرائية المتاحة: <strong>10.79 ج.م</strong>
+            </div>
+          </div>
+        </div>
+        <div class="text-right shrink-0">
+          <span class="text-gray-400">إجمالي قيمة طلبات الاكتتاب:</span>
+          <span class="font-bold text-cyan-300 font-mono text-sm mr-1">79,796.50 ج.م</span>
         </div>
       </div>
 
@@ -1920,6 +1942,30 @@
         advice: 'مراجعة نوع الصندوق لمعرفة سرعة استرداد الكاش',
         action: 'REVIEW',
         thndrUrl: 'https://app.thndr.app'
+      },
+      {
+        ticker: 'BSB',
+        name: 'صندوق بلتون للأسهم (BSB)',
+        category: 'صناديق استثمارية • بلتون',
+        value: 268,
+        profit: -26.16,
+        returnPct: -8.89,
+        status: 'صندوق استثماري',
+        advice: 'احتفاظ ومراقبة أداء وثائق الصندوق',
+        action: 'HOLD',
+        thndrUrl: 'https://app.thndr.app'
+      },
+      {
+        ticker: 'CASH',
+        name: 'المحفظة (الرصيد النقدي والسيولة)',
+        category: 'محفظة نقدية • سيولة واكتتابات',
+        value: 20010,
+        profit: 0,
+        returnPct: 0.00,
+        status: 'طلبات اكتتاب قيد التنفيذ',
+        advice: 'سيولة محجوزة لاكتتاب سهم حالاً (HALN) وقوة شرائية متاحة 10.79 ج',
+        action: 'HOLD',
+        thndrUrl: 'https://app.thndr.app'
       }
     ];
 
@@ -2312,11 +2358,15 @@
       if (saved) {
         try {
           portfolioData = JSON.parse(saved);
+          if (!portfolioData.some(p => p.ticker === 'BSB') || !portfolioData.some(p => p.ticker === 'CASH')) {
+            portfolioData = JSON.parse(JSON.stringify(defaultPortfolioData));
+            savePortfolio();
+          }
         } catch (e) {
-          portfolioData = [...defaultPortfolioData];
+          portfolioData = JSON.parse(JSON.stringify(defaultPortfolioData));
         }
       } else {
-        portfolioData = [...defaultPortfolioData];
+        portfolioData = JSON.parse(JSON.stringify(defaultPortfolioData));
       }
     }
 
@@ -2395,11 +2445,14 @@
       let totalProfit = 0;
       let stocksWealth = 0;
       let fundsWealth = 0;
+      let cashWealth = 0;
 
       portfolioData.forEach(item => {
         totalWealth += item.value;
         totalProfit += item.profit;
-        if (item.ticker === 'NCS' || item.category.includes('صناديق')) {
+        if (item.ticker === 'CASH' || item.category.includes('محفظة نقدية')) {
+          cashWealth += item.value;
+        } else if (item.ticker === 'NCS' || item.ticker === 'BSB' || item.category.includes('صناديق')) {
           fundsWealth += item.value;
         } else {
           stocksWealth += item.value;
@@ -2409,19 +2462,34 @@
       const totalCost = totalWealth - totalProfit;
       const totalReturnPct = totalCost > 0 ? (totalProfit / totalCost) * 100 : 0;
 
-      document.getElementById('metric-total-wealth').innerHTML = `${Math.round(totalWealth).toLocaleString()} <span class="text-xs text-gray-400 font-normal">ج.م</span>`;
-      document.getElementById('metric-stocks-wealth').innerHTML = `${Math.round(stocksWealth).toLocaleString()} <span class="text-xs text-gray-400 font-normal">ج.م</span>`;
-      document.getElementById('metric-funds-wealth').innerHTML = `${Math.round(fundsWealth).toLocaleString()} <span class="text-xs text-gray-400 font-normal">ج.م</span>`;
-      document.getElementById('assets-count-badge').innerText = `${portfolioData.length} أصل مالي`;
-      document.getElementById('allocation-count-label').innerText = `${portfolioData.length} أصل مالي`;
+      const totalWealthEl = document.getElementById('metric-total-wealth');
+      if (totalWealthEl) totalWealthEl.innerHTML = `${Math.round(totalWealth).toLocaleString()} <span class="text-xs text-gray-400 font-normal">ج.م</span>`;
+      
+      const stocksWealthEl = document.getElementById('metric-stocks-wealth');
+      if (stocksWealthEl) stocksWealthEl.innerHTML = `${Math.round(stocksWealth).toLocaleString()} <span class="text-xs text-gray-400 font-normal">ج.م</span>`;
+      
+      const fundsWealthEl = document.getElementById('metric-funds-wealth');
+      if (fundsWealthEl) fundsWealthEl.innerHTML = `${Math.round(fundsWealth).toLocaleString()} <span class="text-xs text-gray-400 font-normal">ج.م</span>`;
+      
+      const cashWealthEl = document.getElementById('metric-cash-wealth');
+      if (cashWealthEl) cashWealthEl.innerHTML = `${Math.round(cashWealth).toLocaleString()} <span class="text-xs text-gray-400 font-normal">ج.م</span>`;
+      
+      const assetsCountEl = document.getElementById('assets-count-badge');
+      if (assetsCountEl) assetsCountEl.innerText = `${portfolioData.length} أصل مالي`;
+      
+      const allocCountEl = document.getElementById('allocation-count-label');
+      if (allocCountEl) allocCountEl.innerText = `${portfolioData.length} أصل مالي`;
 
       const returnBadge = document.getElementById('metric-total-return-badge');
-      const isPositive = totalProfit >= 0;
-      returnBadge.className = `flex items-center ${isPositive ? 'text-emerald-400' : 'text-rose-400'}`;
-      returnBadge.innerHTML = `
-        <i data-lucide="${isPositive ? 'trending-up' : 'trending-down'}" class="w-3.5 h-3.5 ml-1"></i>
-        <span>${isPositive ? '+' : ''}${totalReturnPct.toFixed(2)}% (${isPositive ? '+' : ''}${Math.round(totalProfit).toLocaleString()} ج)</span>
-      `;
+      if (returnBadge) {
+        const isPositive = totalProfit >= 0;
+        returnBadge.className = `flex items-center ${isPositive ? 'text-emerald-400' : 'text-rose-400'}`;
+        returnBadge.innerHTML = `
+          <i data-lucide="${isPositive ? 'trending-up' : 'trending-down'}" class="w-3.5 h-3.5 ml-1"></i>
+          <span>${isPositive ? '+' : ''}${totalReturnPct.toFixed(2)}% (${isPositive ? '+' : ''}${Math.round(totalProfit).toLocaleString()} ج)</span>
+        `;
+      }
+      if (window.lucide) lucide.createIcons();
     }
 
     // Render Portfolio Table
