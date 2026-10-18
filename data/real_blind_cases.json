@@ -1,0 +1,121 @@
+[
+  {
+    "id": "CASE-1-FWRY-CYBER-PANIC",
+    "ticker": "FWRY",
+    "name": "فوري لتكنولوجيا البنوك والمدفوعات",
+    "eventDate": "09 نوفمبر 2023",
+    "realContext": "انتشار شائعات على وسائل التواصل عن اختراق سيبراني لأنظمة فوري، مما أدى لموجة بيع ذعري للأفراد وهبوط السهم -9% في دقائق بحجم تداول قياسي.",
+    "preData": {
+      "price": 5.08,
+      "rsi": 29.8,
+      "volumeMultiplier": "5.2x",
+      "supportS1": 5.20,
+      "supportS2": 4.95,
+      "isSupportS1Broken": true,
+      "isSupportS2Broken": false,
+      "sma50": 5.45,
+      "marketBreadthCollapsing": false,
+      "companyDisclosure": "بيان رسمي من فوري والبنك المركزي ينفي تسريب أي بيانات مالية أو مصرفية، وكفاءة الأنظمة تعمل بنسبة 100%."
+    },
+    "aiExpectedDecision": "EVENT_PANIC_DIP_BUY",
+    "realOutcome": "توقف الذعر، وصعد السهم من 5.05 ج إلى 6.25 ج خلال 3 أسابيع محققاً أرباحاً تجاوزت +23.7%."
+  },
+  {
+    "id": "CASE-2-SKPC-RAS-ELHEKMA-REVERSAL",
+    "ticker": "SKPC",
+    "name": "سيدي كرير للبتروكيماويات",
+    "eventDate": "25 فبراير إلى مارس 2024",
+    "realContext": "إعلان صفقة رأس الحكمة (35 مليار دولار) وانهيار سعر الدولار في السوق الموازي من 70 ج إلى 48 ج، مما أدى لموجة تصحيح عنيفة في أسهم التصدير والبتروكيماويات الدولارية.",
+    "preData": {
+      "price": 36.50,
+      "rsi": 48.0,
+      "volumeMultiplier": "2.8x Selling",
+      "supportS1": 37.00,
+      "supportS2": 33.50,
+      "isSupportS1Broken": true,
+      "isSupportS2Broken": false,
+      "sma50": 38.20,
+      "marketBreadthCollapsing": false,
+      "macroRegimeShift": "انخفاض حاد في إيرادات إعادة تقييم الصادرات الدولارية مع توحيد سعر الصرف."
+    },
+    "aiExpectedDecision": "DEFENSIVE_EXIT_SECTOR_ROTATION",
+    "realOutcome": "كسر السهم دعومه تباعاً وهبط من 36.50 ج إلى 24.80 ج (-32%)؛ الخروج حمى رأس المال بالكامل."
+  },
+  {
+    "id": "CASE-3-TMGH-RAS-ELHEKMA-SURGE",
+    "ticker": "TMGH",
+    "name": "مجموعة طلعت مصطفى القابضة",
+    "eventDate": "23 فبراير 2024",
+    "realContext": "إعلان الشراكة وتطوير مشروع رأس الحكمة كأضخم صفقة استثمار أجنبي مباشر في تاريخ مصر.",
+    "preData": {
+      "price": 35.80,
+      "rsi": 72.5,
+      "volumeMultiplier": "6.4x Massive Institutional Inflow",
+      "resistanceR1": 34.50,
+      "resistanceR2": 38.00,
+      "isR1Broken": true,
+      "sma50": 26.50,
+      "marketBreadthCollapsing": false,
+      "catalyst": "تدفقات دولارية غير مسبوقة وتوسعات فندقية وتطوير عقاري ملياري."
+    },
+    "aiExpectedDecision": "BULLISH_EXPANSION_FIBONACCI_HOLD",
+    "realOutcome": "واصل السهم صعوده الصاروخي متجاوزاً كل المقاومات ووصل إلى 85.00 ج محققاً +137% مكاسب."
+  },
+  {
+    "id": "CASE-4-TAQA-LISTING-GLITCH",
+    "ticker": "TAQA",
+    "name": "طاقة عربية",
+    "eventDate": "09 يوليو 2023",
+    "realContext": "أول يوم تداول للسهم بالبورصة؛ صفقة فردية غير مقصودة نفذت بسعر 500 ج للسهم، وبدأ صغار المتداولين يطاردون السهم بالهلع (FOMO) في أسعار تفوق قيمته العادلة بـ 40 ضعفاً.",
+    "preData": {
+      "price": 45.00,
+      "rsi": 95.0,
+      "volumeMultiplier": "Frenzy Retail",
+      "fairValue": 10.50,
+      "priceToFairValueRatio": 4.3,
+      "isSupportS1Broken": false,
+      "sma50": null,
+      "marketBreadthCollapsing": false
+    },
+    "aiExpectedDecision": "PROHIBITED_FOMO_TRAP_BLOCK",
+    "realOutcome": "انهار السهم في الجلسات التالية من 45 ج حتى وصل إلى 10.80 ج؛ حظر الشراء أنقذ المتداول من خسارة -76%."
+  },
+  {
+    "id": "CASE-5-SWDY-ELECTRA-TENDER-OFFER",
+    "ticker": "SWDY",
+    "name": "السويدي إليكتريك",
+    "eventDate": "مايو 2024",
+    "realContext": "تقديم شركة Electra Investment الإماراتية عرض شراء إجباري (MTO) للاستحواذ على حصة حتى 24.5% من السويدي بسعر نقدي معلن (30.10 ج ثم عُدل إلى 32.00 ج).",
+    "preData": {
+      "price": 29.80,
+      "rsi": 58.0,
+      "volumeMultiplier": "High Strategic Volume",
+      "tenderOfferPrice": 32.00,
+      "downsideFloor": 29.50,
+      "supportS1": 29.50,
+      "isSupportS1Broken": false,
+      "sma50": 28.10
+    },
+    "aiExpectedDecision": "ARBITRAGE_HOLD_LOW_RISK",
+    "realOutcome": "استقر السهم وتداول تدريجياً صوب 32.00 ج، وحقق المستثمر عائداً مؤكداً بمخاطرة تكاد تكون منعدمة."
+  },
+  {
+    "id": "CASE-6-COMI-RATE-HIKE-600BPS",
+    "ticker": "COMI",
+    "name": "البنك التجاري الدولي (CIB)",
+    "eventDate": "06 مارس 2024",
+    "realContext": "اجتماع استثنائي للبنك المركزي: رفع أسعار الفائدة 600 نقطة أساس (6%) دفعة واحدة وتحرير سعر الصرف.",
+    "preData": {
+      "price": 78.50,
+      "rsi": 54.0,
+      "volumeMultiplier": "3.2x Institutional Buying",
+      "supportS1": 76.00,
+      "resistanceR1": 82.00,
+      "sma50": 74.00,
+      "sectorCatalyst": "اتساع هوامش الفائدة الصافية (NIM) للبنوك وارتفاع عوائد أذون وسندات الخزانة لأكثر من 30%.",
+      "marketBreadthCollapsing": false
+    },
+    "aiExpectedDecision": "BANKING_EXPANSION_ACCUMULATE",
+    "realOutcome": "سجل السهم قفزة قياسية مخترقاً المقاومة، ووصل إلى قمم جديدة فوق 92.00 ج محققاً أرباحاً للمؤسسات."
+  }
+]
