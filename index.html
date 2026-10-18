@@ -1262,6 +1262,9 @@
         </div>
       </div>
 
+      <!-- Active Rotation Plans & Watchdog Live Alarms Container -->
+      <div id="active-plans-radar-container" class="hidden mb-6"></div>
+
       <!-- Real Holdings Table -->
       <div class="bg-gray-900/90 border border-gray-800 rounded-2xl overflow-hidden shadow-xl">
         <div class="p-4 sm:p-5 border-b border-gray-800 flex items-center justify-between flex-wrap gap-3">
@@ -2893,7 +2896,7 @@
         </div>
 
         <!-- Strategy Option A: Buy Back at the Dip (إعادة الشراء عند القاع لزيادة عدد الأسهم) -->
-        <div class="bg-gray-950 p-3.5 rounded-xl border border-cyan-500/30 space-y-1.5">
+        <div class="bg-gray-950 p-3.5 rounded-xl border border-cyan-500/30 space-y-2">
           <div class="flex items-center justify-between">
             <span class="font-bold text-cyan-300 flex items-center gap-1.5">
               <i data-lucide="refresh-cw" class="w-3.5 h-3.5 text-cyan-400"></i>
@@ -2913,10 +2916,16 @@
             <i data-lucide="sparkles" class="w-3 h-3 text-emerald-400 shrink-0"></i>
             <span id="rot-scenario-a-outcome">النتيجة: أمنت أرباحك، وعدد أسهمك في أوراسكوم زاد من 17 إلى 18 سهماً مجاناً من حركة السوق!</span>
           </div>
+          <div class="pt-1.5">
+            <button type="button" onclick="commitRotationPlan('A')" class="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-cyan-600 via-teal-600 to-emerald-600 hover:from-cyan-500 hover:to-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-cyan-950/40 transition transform active:scale-95 cursor-pointer">
+              <i data-lucide="crosshair" class="w-4 h-4 text-cyan-200"></i>
+              <span>اعتمدت هذا الخيار وفعّل المراقبة 🎯 (رصد القاع لحظياً + إنذار لو هرب السهم)</span>
+            </button>
+          </div>
         </div>
 
         <!-- Strategy Option B: Deploy into Beaten-down CIB (تعزيز سهم متراجع بالمحفظة) -->
-        <div class="bg-gray-950 p-3.5 rounded-xl border border-indigo-500/30 space-y-1.5">
+        <div class="bg-gray-950 p-3.5 rounded-xl border border-indigo-500/30 space-y-2">
           <div class="flex items-center justify-between">
             <span class="font-bold text-indigo-300 flex items-center gap-1.5">
               <i data-lucide="trending-down" class="w-3.5 h-3.5 text-indigo-400"></i>
@@ -2935,15 +2944,29 @@
             <i data-lucide="check-circle" class="w-3 h-3 text-indigo-400 shrink-0"></i>
             <span>النتيجة: تخفيض متوسط تكلفة سهم CIB فوراً من 139 ج إلى ~135 ج، وتسريع تحول السهم للربح مع أول ارتداد.</span>
           </div>
+          <div class="pt-1.5">
+            <button type="button" onclick="commitRotationPlan('B')" class="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-700 hover:from-indigo-500 hover:to-purple-500 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-indigo-950/40 transition transform active:scale-95 cursor-pointer">
+              <i data-lucide="arrow-down-right" class="w-4 h-4 text-indigo-200"></i>
+              <span>اعتمدت هذا الخيار لشراء CIB 🎯 (تعديل التكلفة بربح السهم الرابح)</span>
+            </button>
+          </div>
         </div>
 
         <!-- Strategy Option C: Keep as Cash Reserve (كاش أمان لاقتناص الفرص) -->
-        <div class="bg-gray-950 p-3 rounded-xl border border-gray-800 flex items-center justify-between text-[11px]">
-          <div class="flex items-center gap-2">
-            <i data-lucide="shield" class="w-4 h-4 text-emerald-400"></i>
-            <span class="text-gray-300">الخيار الثالث: إبقاء المبلغ كاش أمان وقوة شرائية حرة في ثندر للاكتتابات وأيام الهبوط العام.</span>
+        <div class="bg-gray-950 p-3.5 rounded-xl border border-gray-800 space-y-2">
+          <div class="flex items-center justify-between text-[11px]">
+            <div class="flex items-center gap-2">
+              <i data-lucide="shield" class="w-4 h-4 text-emerald-400"></i>
+              <span class="text-gray-300 font-semibold">الخيار الثالث: إبقاء المبلغ كاش أمان وقوة شرائية حرة في ثندر للاكتتابات وأيام الهبوط العام.</span>
+            </div>
+            <span class="text-emerald-400 font-mono font-bold text-sm" id="rot-scenario-c-cash">4,350 ج</span>
           </div>
-          <span class="text-emerald-400 font-mono font-bold" id="rot-scenario-c-cash">4,350 ج</span>
+          <div class="pt-1">
+            <button type="button" onclick="commitRotationPlan('C')" class="w-full py-2 px-3 rounded-xl bg-gray-800 hover:bg-gray-700 text-emerald-300 border border-emerald-500/30 font-bold text-xs flex items-center justify-center gap-2 transition active:scale-95 cursor-pointer">
+              <i data-lucide="shield-check" class="w-4 h-4 text-emerald-400"></i>
+              <span>حفظ كاش أمان واعتماد الخطة 🎯 (حماية السيولة للمفاجآت)</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -4053,6 +4076,18 @@
           <td class="py-3.5 px-3 text-xs text-gray-300">
             <div class="flex flex-col gap-1 items-start">
               <div class="flex items-center gap-1.5 flex-wrap">
+                ${(() => {
+                  const activePlan = (typeof activeRotationPlans !== 'undefined' && Array.isArray(activeRotationPlans)) 
+                    ? activeRotationPlans.find(p => p.ticker === item.ticker) 
+                    : null;
+                  if (!activePlan) return '';
+                  return `
+                    <button onclick="scrollToActiveRadar('${activePlan.id}')" class="px-2 py-0.5 rounded text-[10px] font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 flex items-center gap-1 shadow-sm animate-pulse cursor-pointer" title="يوجد خطة معتمدة قيد المراقبة اللحظية لهذا السهم - اضغط للانتقال إلى الرادار">
+                      <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping"></span>
+                      <span>رادار المراقبة نشط 🎯</span>
+                    </button>
+                  `;
+                })()}
                 ${(item.action === 'REBALANCE_CANDIDATE' || item.returnPct >= 18) && item.ticker !== 'CASH' && item.ticker !== 'NCS' && item.ticker !== 'BSB' ? `
                   <button onclick="openRotationPlanModal(${index})" class="px-2 py-0.5 rounded text-[10px] font-bold ${badgeActionColor} hover:opacity-90 transition flex items-center gap-1 cursor-pointer" title="اضغط لعرض خطة بيع القمة لتأمين الكاش وإعادة الشراء في القاع">
                     <span>${badgeActionText}</span>
@@ -4997,6 +5032,577 @@
 
       // Scenario C: Cash cushion
       document.getElementById('rot-scenario-c-cash').innerText = `${sellCash.toLocaleString('en-US')} ج`;
+    }
+
+    // ============================================================
+    // Real-Time Commitment & Watchdog Live Alarms System
+    // ============================================================
+    let activeRotationPlans = [];
+    try {
+      activeRotationPlans = JSON.parse(localStorage.getItem('egx_copilot_active_plans') || '[]');
+      if (!Array.isArray(activeRotationPlans)) activeRotationPlans = [];
+    } catch(e) {
+      activeRotationPlans = [];
+    }
+
+    function commitRotationPlan(scenarioType) {
+      const index = parseInt(document.getElementById('rot-asset-index').value, 10);
+      const item = portfolioData[index];
+      if (!item) return;
+
+      const totalShares = parseInt(item.shares, 10) || 1;
+      const currentPrice = Number(item.currentPrice) || 0;
+      const buyPrice = Number(item.buyPrice) || 0;
+
+      let sellShares = Math.max(1, Math.round(totalShares * currentRotationRatio));
+      if (sellShares >= totalShares && totalShares > 1) sellShares = totalShares - 1;
+
+      const sellCash = Math.round(sellShares * currentPrice);
+      const realizedProfit = Math.round(sellShares * (currentPrice - buyPrice));
+      const remainingShares = totalShares - sellShares;
+
+      const supportLow = +(currentPrice * 0.86).toFixed(2);
+      const supportHigh = +(currentPrice * 0.89).toFixed(2);
+      const avgSupport = +((supportLow + supportHigh) / 2).toFixed(2);
+      const breakoutThreshold = +(currentPrice * 1.04).toFixed(2);
+
+      const planId = 'plan_' + Date.now();
+      const plan = {
+        id: planId,
+        ticker: item.ticker,
+        name: item.name,
+        scenario: scenarioType,
+        scenarioTitle: scenarioType === 'A' 
+          ? 'إعادة شراء في القاع لزيادة عدد الأسهم مجاناً' 
+          : (scenarioType === 'B' ? 'تعزيز وشراء البنك التجاري الدولي (CIB)' : 'حفظ كاش أمان وقوة شرائية حرة'),
+        decisionPrice: currentPrice,
+        buyPrice: buyPrice,
+        sellShares: sellShares,
+        remainingShares: remainingShares,
+        sellCash: sellCash,
+        realizedProfit: realizedProfit,
+        breakoutThreshold: breakoutThreshold,
+        supportLow: supportLow,
+        supportHigh: supportHigh,
+        targetPrice: avgSupport,
+        createdAt: Date.now(),
+        createdAtCairo: (typeof formatCairoTime === 'function') ? formatCairoTime(new Date(), true, true) : new Date().toLocaleTimeString('ar-EG'),
+        expiryTimestamp: Date.now() + (7 * 24 * 60 * 60 * 1000), // 7-day maximum window
+        status: 'ACTIVE'
+      };
+
+      // Replace or update existing plan for this ticker
+      activeRotationPlans = activeRotationPlans.filter(p => p.ticker !== item.ticker);
+      activeRotationPlans.unshift(plan);
+
+      try {
+        localStorage.setItem('egx_copilot_active_plans', JSON.stringify(activeRotationPlans));
+      } catch(e) {
+        console.error('Failed to save active plans:', e);
+      }
+
+      closeRotationModal();
+      renderActivePlansRadar();
+      renderPortfolioTable();
+
+      setTimeout(() => {
+        scrollToActiveRadar(planId);
+      }, 150);
+
+      const scenarioMsg = scenarioType === 'A' 
+        ? `🎯 تم اعتماد الخطة بنجاح وتفعيل رادار المراقبة اللحظية لسهم ${item.name}!\n\n` +
+          `• السعر المعتمد: ${currentPrice.toFixed(2)} ج\n` +
+          `• كمية البيع: ${sellShares} أسهم (كاش مضمون: ${sellCash.toLocaleString('en-US')} ج)\n` +
+          `• نطاق الشراء المستهدف في القاع: ${supportLow} - ${supportHigh} ج\n` +
+          `• سقف إلغاء الخطة (Stop-Breakout): ${breakoutThreshold} ج (+4%)\n` +
+          `• مهلة الانتظار القصوى: 7 أيام تداول لحماية كفاءة الكاش.\n\n` +
+          `النظام الآن يراقب السهم لحظياً مع كل نبضة للبورصة المصرية وسينبهك فوراً!`
+        : scenarioType === 'B'
+        ? `🎯 تم اعتماد خطة تعزيز CIB بنجاح!\nسيتم توجيه مبلغ ${sellCash.toLocaleString('en-US')} ج المحقق من ${item.name} لشراء أسهم CIB لخفض متوسط التكلفة وتعديل المحفظة.`
+        : `🎯 تم اعتماد حفظ كاش أمان بمبلغ ${sellCash.toLocaleString('en-US')} ج كسيولة استراتيجية في المحفظة.`;
+
+      alert(scenarioMsg);
+    }
+
+    function cancelRotationPlan(planId) {
+      const plan = activeRotationPlans.find(p => p.id === planId);
+      const name = plan ? plan.name : 'السهم';
+      if (!confirm(`هل أنت متأكد من إلغاء خطة المراقبة اللحظية لسهم ${name} وإيقاف التنبيهات؟`)) return;
+
+      activeRotationPlans = activeRotationPlans.filter(p => p.id !== planId);
+      try {
+        localStorage.setItem('egx_copilot_active_plans', JSON.stringify(activeRotationPlans));
+      } catch(e) {}
+
+      renderActivePlansRadar();
+      renderPortfolioTable();
+    }
+
+    function completeRotationPlan(planId, executionPrice) {
+      const plan = activeRotationPlans.find(p => p.id === planId);
+      if (!plan) return;
+
+      const sharesCanBuy = Math.max(1, Math.round(plan.sellCash / executionPrice));
+      const confirmMsg = `هل قمت بالفعل بتنفيذ أمر الشراء في ثندر لسهم ${plan.name} بسعر ${executionPrice.toFixed(2)} ج؟\n\n` +
+        `سيتم إضافة ${sharesCanBuy} سهم جديد إلى محفظتك تلقائياً وتحديث إجمالي الأسهم والأرباح.`;
+
+      if (!confirm(confirmMsg)) return;
+
+      const stock = portfolioData.find(s => s.ticker === plan.ticker);
+      if (stock) {
+        const prevShares = parseInt(stock.shares, 10) || 0;
+        const newShares = prevShares + sharesCanBuy;
+        const prevCost = prevShares * (stock.buyPrice || 0);
+        const addedCost = plan.sellCash;
+        const newBuyPrice = newShares > 0 ? (prevCost + addedCost) / newShares : stock.buyPrice;
+
+        stock.shares = newShares;
+        stock.buyPrice = +newBuyPrice.toFixed(2);
+        stock.currentPrice = executionPrice;
+        stock.value = Math.round(stock.shares * executionPrice);
+        const totalCost = Math.round(stock.shares * stock.buyPrice);
+        stock.profit = stock.value - totalCost;
+        stock.returnPct = totalCost > 0 ? parseFloat(((stock.profit / totalCost) * 100).toFixed(2)) : 0;
+        savePortfolio();
+      }
+
+      activeRotationPlans = activeRotationPlans.filter(p => p.id !== planId);
+      try {
+        localStorage.setItem('egx_copilot_active_plans', JSON.stringify(activeRotationPlans));
+      } catch(e) {}
+
+      renderActivePlansRadar();
+      renderPortfolioTable();
+
+      alert(`🎉 ألف مبروك! اكتملت الدورة بنجاح.\nتمت إضافة ${sharesCanBuy} سهم مجاني إلى رصيدك في (${plan.name}).\nإجمالي أسهمك الحالي: ${stock ? stock.shares : newShares} سهم!`);
+    }
+
+    function switchPlanToCIB(planId) {
+      const plan = activeRotationPlans.find(p => p.id === planId);
+      if (!plan) return;
+
+      plan.scenario = 'B';
+      plan.scenarioTitle = 'تعزيز وشراء البنك التجاري الدولي (CIB)';
+      try {
+        localStorage.setItem('egx_copilot_active_plans', JSON.stringify(activeRotationPlans));
+      } catch(e) {}
+
+      renderActivePlansRadar();
+      renderPortfolioTable();
+      alert(`✅ تم تحويل الخطة وتوجيه مبلغ الكاش (${plan.sellCash.toLocaleString('en-US')} ج) نحو تعزيز سهم CIB الخسران لخفض متوسط التكلفة.`);
+    }
+
+    function scrollToActiveRadar(planId) {
+      const el = document.getElementById(planId) || document.getElementById('active-plans-radar-container');
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        el.classList.add('ring-2', 'ring-cyan-400');
+        setTimeout(() => el.classList.remove('ring-2', 'ring-cyan-400'), 2000);
+      }
+    }
+
+    function renderActivePlansRadar() {
+      const container = document.getElementById('active-plans-radar-container');
+      if (!container) return;
+
+      if (!activeRotationPlans || activeRotationPlans.length === 0) {
+        container.classList.add('hidden');
+        container.innerHTML = '';
+        return;
+      }
+
+      container.classList.remove('hidden');
+
+      let cardsHtml = '';
+
+      activeRotationPlans.forEach(plan => {
+        const stock = portfolioData.find(s => s.ticker === plan.ticker);
+        const livePrice = stock && stock.currentPrice ? Number(stock.currentPrice) : plan.decisionPrice;
+        
+        const msRemaining = plan.expiryTimestamp - Date.now();
+        const daysRemaining = Math.max(0, Math.ceil(msRemaining / (24 * 3600 * 1000)));
+        const isExpired = msRemaining <= 0;
+
+        const priceDiffPct = plan.decisionPrice > 0 
+          ? (((livePrice - plan.decisionPrice) / plan.decisionPrice) * 100) 
+          : 0;
+
+        const isBreakout = (plan.scenario === 'A') && (livePrice >= plan.breakoutThreshold);
+        const isDipHit = (plan.scenario === 'A') && (livePrice <= plan.supportHigh) && !isBreakout;
+
+        const expiryDateObj = new Date(plan.expiryTimestamp);
+        const expiryDateStr = `${expiryDateObj.getDate()}/${expiryDateObj.getMonth()+1}/${expiryDateObj.getFullYear()}`;
+
+        // CIB Live Info
+        const cibStock = portfolioData.find(s => s.ticker === 'COMI');
+        const cibLivePrice = cibStock && cibStock.currentPrice ? Number(cibStock.currentPrice) : 123.56;
+        const cibSharesCanBuy = Math.floor(plan.sellCash / cibLivePrice);
+
+        if (plan.scenario === 'A') {
+          if (isBreakout) {
+            // ALARM 1: BREAKOUT STOP INVALIDATION 🚨
+            cardsHtml += `
+              <div id="${plan.id}" class="p-4 sm:p-5 rounded-2xl bg-rose-950/40 border-2 border-rose-500/80 shadow-2xl shadow-rose-950/50 space-y-3 relative overflow-hidden transition">
+                <div class="flex items-center justify-between flex-wrap gap-2 border-b border-rose-500/30 pb-3">
+                  <div class="flex items-center gap-2.5">
+                    <span class="w-3.5 h-3.5 rounded-full bg-rose-500 animate-ping"></span>
+                    <span class="px-2.5 py-1 rounded-lg bg-rose-500/20 text-rose-300 font-extrabold text-xs border border-rose-500/50 flex items-center gap-1.5">
+                      <i data-lucide="alert-octagon" class="w-4 h-4 text-rose-400"></i>
+                      <span>🚨 إنذار فوري: السهم كسر المقاومة للأعلى وتجاوز سعر البيع!</span>
+                    </span>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <span class="text-xs font-mono font-bold text-rose-300 bg-rose-900/50 px-2 py-0.5 rounded border border-rose-800">
+                      +${priceDiffPct.toFixed(1)}% ارتفاع مفاجئ
+                    </span>
+                    <button onclick="cancelRotationPlan('${plan.id}')" class="text-gray-400 hover:text-white text-xs font-bold px-2 py-1 rounded hover:bg-rose-900/40 transition cursor-pointer" title="إلغاء الخطة">
+                      ✕ إلغاء الخطة
+                    </button>
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+                  <div class="bg-gray-900/90 p-3 rounded-xl border border-rose-800/40">
+                    <span class="text-gray-400 block text-[11px]">سعر البيع وقت القرار:</span>
+                    <span class="text-white font-mono font-bold text-sm">${plan.decisionPrice.toFixed(2)} ج.م</span>
+                    <span class="text-[10px] text-gray-500 block">سقف الهروب (+4%): ${plan.breakoutThreshold} ج</span>
+                  </div>
+                  <div class="bg-gray-900/90 p-3 rounded-xl border border-rose-800/40">
+                    <span class="text-gray-400 block text-[11px]">السعر اللحظي الآن:</span>
+                    <span class="text-rose-400 font-mono font-extrabold text-base animate-pulse">${livePrice.toFixed(2)} ج.م</span>
+                    <span class="text-[10px] text-rose-300 block">تجاوز سقف الأمان (${(livePrice - plan.breakoutThreshold).toFixed(2)} ج زيادة)</span>
+                  </div>
+                  <div class="bg-gray-900/90 p-3 rounded-xl border border-rose-800/40">
+                    <span class="text-gray-400 block text-[11px]">الكاش المحمي معك:</span>
+                    <span class="text-emerald-400 font-mono font-bold text-sm">${plan.sellCash.toLocaleString('en-US')} ج.م</span>
+                    <span class="text-[10px] text-emerald-300 block">منها +${plan.realizedProfit.toLocaleString('en-US')} ج ربح محقق</span>
+                  </div>
+                </div>
+
+                <div class="p-3 rounded-xl bg-rose-900/30 border border-rose-500/40 text-xs text-rose-200 leading-relaxed flex items-start gap-2.5">
+                  <i data-lucide="shield-alert" class="w-5 h-5 text-rose-400 shrink-0 mt-0.5"></i>
+                  <div>
+                    <strong class="text-white block font-bold mb-1">الرؤية الاستشارية الصارمة: لا تطارد السهم في القمة!</strong>
+                    السهم أظهر قوة شرائية غير متوقعة ورفض التصحيح نحو القاع. 
+                    <strong>الإجراء الإلزامي:</strong> إلغاء أي أمر شراء معلق في ثندر فوراً. 
+                    أنت لا تزال تملك <strong class="text-white">${plan.remainingShares} سهماً</strong> كأصل دائم تستفيد من صعودها، ومبلغ الكاش (<strong class="text-white">${plan.sellCash.toLocaleString('en-US')} ج</strong>) نوجهه فوراً لسهم CIB الخسران في قاعه بدلاً من المخاطرة.
+                  </div>
+                </div>
+
+                <div class="flex items-center justify-between flex-wrap gap-2 pt-2 border-t border-rose-500/20">
+                  <div class="flex items-center gap-2">
+                    <button onclick="switchPlanToCIB('${plan.id}')" class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold text-xs flex items-center gap-1.5 shadow-lg shadow-indigo-950/40 transition cursor-pointer">
+                      <i data-lucide="arrow-left-right" class="w-3.5 h-3.5"></i>
+                      <span>تحويل الكاش لشراء CIB فوراً (${cibSharesCanBuy} سهم)</span>
+                    </button>
+                    <a href="https://app.thndr.app" target="_blank" class="px-3 py-2 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-200 font-bold text-xs flex items-center gap-1.5 transition">
+                      <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+                      <span>فتح ثندر لإلغاء الأمر المعلق</span>
+                    </a>
+                  </div>
+                  <button onclick="cancelRotationPlan('${plan.id}')" class="px-3 py-2 rounded-xl bg-rose-900/40 hover:bg-rose-900/60 text-rose-300 font-bold text-xs transition cursor-pointer">
+                    إغلاق الإنذار وإنهاء الخطة
+                  </button>
+                </div>
+              </div>
+            `;
+          } else if (isDipHit) {
+            // ALARM 2: DIP TARGET HIT 🎯
+            const sharesAtDip = +(plan.sellCash / livePrice).toFixed(1);
+            const freeSharesGain = +(sharesAtDip - plan.sellShares).toFixed(1);
+
+            cardsHtml += `
+              <div id="${plan.id}" class="p-4 sm:p-5 rounded-2xl bg-emerald-950/40 border-2 border-emerald-500/80 shadow-2xl shadow-emerald-950/50 space-y-3 relative overflow-hidden transition animate-pulse">
+                <div class="flex items-center justify-between flex-wrap gap-2 border-b border-emerald-500/30 pb-3">
+                  <div class="flex items-center gap-2.5">
+                    <span class="w-3.5 h-3.5 rounded-full bg-emerald-400 animate-ping"></span>
+                    <span class="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 font-extrabold text-xs border border-emerald-500/50 flex items-center gap-1.5">
+                      <i data-lucide="crosshair" class="w-4 h-4 text-emerald-400"></i>
+                      <span>🎯 إشارة تنفيذ فورية: سهم ${plan.name} وصل منطقة القاع المستهدفة!</span>
+                    </span>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <span class="text-xs font-mono font-bold text-emerald-300 bg-emerald-900/60 px-2 py-0.5 rounded border border-emerald-700">
+                      ${priceDiffPct.toFixed(1)}% تصحيح مثالي
+                    </span>
+                    <button onclick="cancelRotationPlan('${plan.id}')" class="text-gray-400 hover:text-white text-xs font-bold px-2 py-1 rounded hover:bg-emerald-900/40 transition cursor-pointer">
+                      ✕ إلغاء
+                    </button>
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+                  <div class="bg-gray-900/90 p-3 rounded-xl border border-emerald-800/40">
+                    <span class="text-gray-400 block text-[11px]">سعر البيع في القمة:</span>
+                    <span class="text-white font-mono font-bold text-sm">${plan.decisionPrice.toFixed(2)} ج.م</span>
+                    <span class="text-[10px] text-gray-500 block">بعت: ${plan.sellShares} أسهم</span>
+                  </div>
+                  <div class="bg-gray-900/90 p-3 rounded-xl border border-emerald-800/40">
+                    <span class="text-gray-400 block text-[11px]">سعر القاع الحالي (شراء الآن):</span>
+                    <span class="text-emerald-400 font-mono font-extrabold text-base">${livePrice.toFixed(2)} ج.م</span>
+                    <span class="text-[10px] text-emerald-300 block">نطاق الدعم: ${plan.supportLow} - ${plan.supportHigh} ج</span>
+                  </div>
+                  <div class="bg-gray-900/90 p-3 rounded-xl border border-emerald-800/40">
+                    <span class="text-gray-400 block text-[11px]">الكاش المحمي المتاح:</span>
+                    <span class="text-emerald-400 font-mono font-bold text-sm">${plan.sellCash.toLocaleString('en-US')} ج.م</span>
+                    <span class="text-[10px] text-cyan-300 block">يشتري: ${sharesAtDip} سهم (+${freeSharesGain} سهم مجاناً!)</span>
+                  </div>
+                </div>
+
+                <div class="p-3 rounded-xl bg-emerald-900/30 border border-emerald-500/40 text-xs text-emerald-200 leading-relaxed flex items-start gap-2.5">
+                  <i data-lucide="sparkles" class="w-5 h-5 text-emerald-400 shrink-0 mt-0.5"></i>
+                  <div>
+                    <strong class="text-white block font-bold mb-1">لحظة حصد الثمار: زيادة عدد أسهمك مجاناً!</strong>
+                    السهم وصل بالمللي لمنطقة الدعم الفني المحسوبة. الشراء الآن بالـ <strong class="text-white">${plan.sellCash.toLocaleString('en-US')} ج</strong> يعيد لك الـ ${plan.sellShares} أسهم المباعة ويمنحك <strong class="text-white font-mono">+${freeSharesGain} سهم زيادة</strong> بدون دفع مليم واحد إضافي من أموالك الخاصة.
+                  </div>
+                </div>
+
+                <div class="flex items-center justify-between flex-wrap gap-2 pt-2 border-t border-emerald-500/20">
+                  <div class="flex items-center gap-2">
+                    <a href="https://app.thndr.app" target="_blank" class="px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs flex items-center gap-1.5 shadow-lg shadow-emerald-950/40 transition">
+                      <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+                      <span>فتح ثندر وتنفيذ أمر الشراء الآن ⚡</span>
+                    </a>
+                    <button onclick="completeRotationPlan('${plan.id}', ${livePrice})" class="px-4 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs flex items-center gap-1.5 shadow-md transition cursor-pointer">
+                      <i data-lucide="check-circle" class="w-3.5 h-3.5"></i>
+                      <span>تم التنفيذ في ثندر وتحديث المحفظة ✅</span>
+                    </button>
+                  </div>
+                  <button onclick="cancelRotationPlan('${plan.id}')" class="px-3 py-2 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-300 font-bold text-xs transition cursor-pointer">
+                    إلغاء الخطة
+                  </button>
+                </div>
+              </div>
+            `;
+          } else if (isExpired) {
+            // ALARM 3: HORIZON EXPIRED ⏳
+            cardsHtml += `
+              <div id="${plan.id}" class="p-4 sm:p-5 rounded-2xl bg-amber-950/40 border-2 border-amber-500/80 shadow-2xl shadow-amber-950/50 space-y-3 relative overflow-hidden transition">
+                <div class="flex items-center justify-between flex-wrap gap-2 border-b border-amber-500/30 pb-3">
+                  <div class="flex items-center gap-2.5">
+                    <i data-lucide="clock" class="w-4 h-4 text-amber-400"></i>
+                    <span class="px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-300 font-extrabold text-xs border border-amber-500/50">
+                      ⏳ انتهاء المهلة الزمنية (7 أيام تداول) دون وصول السهم للقاع
+                    </span>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <span class="text-xs font-mono font-bold text-gray-400">انتهت الصلاحية: ${expiryDateStr}</span>
+                    <button onclick="cancelRotationPlan('${plan.id}')" class="text-gray-400 hover:text-white text-xs font-bold px-2 py-1 rounded hover:bg-amber-900/40 transition cursor-pointer">
+                      ✕
+                    </button>
+                  </div>
+                </div>
+
+                <div class="p-3 rounded-xl bg-amber-900/30 border border-amber-500/40 text-xs text-amber-200 leading-relaxed flex items-start gap-2.5">
+                  <i data-lucide="alert-triangle" class="w-5 h-5 text-amber-400 shrink-0 mt-0.5"></i>
+                  <div>
+                    <strong class="text-white block font-bold mb-1">تكلفة الفرصة البديلة (Opportunity Cost):</strong>
+                    مرت 7 أيام تداول كاملة وسعر السهم يتذبذب عرضياً قرب <strong class="text-white">${livePrice.toFixed(2)} ج.م</strong> دون كسر المقاومة أو الوصول للدعم (${plan.supportHigh} ج). حبس السيولة لفترة أطول يضر بكفاءة المحفظة؛ يُنصح بإلغاء أمر الشراء المعلق ونقل الكاش المضمون (<strong class="text-white">${plan.sellCash.toLocaleString('en-US')} ج</strong>) لفرصة بديلة جاهزة كالبنك التجاري الدولي (CIB).
+                  </div>
+                </div>
+
+                <div class="flex items-center justify-between flex-wrap gap-2 pt-2 border-t border-amber-500/20">
+                  <button onclick="switchPlanToCIB('${plan.id}')" class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold text-xs flex items-center gap-1.5 transition cursor-pointer">
+                    <i data-lucide="arrow-left-right" class="w-3.5 h-3.5"></i>
+                    <span>تحويل الكاش لشراء سهم CIB الخسران فوراً</span>
+                  </button>
+                  <button onclick="cancelRotationPlan('${plan.id}')" class="px-3 py-2 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-300 font-bold text-xs transition cursor-pointer">
+                    إلغاء الخطة وتحرير الكاش
+                  </button>
+                </div>
+              </div>
+            `;
+          } else {
+            // STATE 4: ACTIVE MONITORING 🟢
+            const distToDip = Math.max(0, +(livePrice - plan.supportHigh)).toFixed(2);
+            const distToDipPct = (( (livePrice - plan.supportHigh) / livePrice ) * 100).toFixed(1);
+            const distToBreakout = Math.max(0, +(plan.breakoutThreshold - livePrice)).toFixed(2);
+            const distToBreakoutPct = (( (plan.breakoutThreshold - livePrice) / livePrice ) * 100).toFixed(1);
+
+            cardsHtml += `
+              <div id="${plan.id}" class="p-4 sm:p-5 rounded-2xl bg-gray-950 border border-cyan-500/40 shadow-xl space-y-3 relative overflow-hidden transition">
+                <div class="flex items-center justify-between flex-wrap gap-2 border-b border-gray-800 pb-3">
+                  <div class="flex items-center gap-2.5">
+                    <span class="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse"></span>
+                    <span class="font-extrabold text-white text-xs sm:text-sm">
+                      مراقبة حية نشطة: ${plan.name} (${plan.ticker})
+                    </span>
+                    <span class="px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-300 font-mono font-bold text-[10px] border border-cyan-500/30">
+                      خطة تدوير القمة للقاع
+                    </span>
+                  </div>
+                  <div class="flex items-center gap-3">
+                    <span class="text-[11px] text-gray-400 font-mono">
+                      ⏳ باقي <strong class="text-amber-400">${daysRemaining} أيام</strong> على مهلة الانتظار
+                    </span>
+                    <button onclick="cancelRotationPlan('${plan.id}')" class="text-gray-500 hover:text-rose-400 text-xs font-bold transition cursor-pointer" title="إلغاء المراقبة">
+                      ✕ إلغاء
+                    </button>
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs">
+                  <div class="bg-gray-900/90 p-2.5 rounded-xl border border-gray-800">
+                    <span class="text-gray-400 block text-[10px]">سعر اعتماد البيع:</span>
+                    <span class="text-white font-mono font-bold">${plan.decisionPrice.toFixed(2)} ج.م</span>
+                    <span class="text-[9px] text-gray-500 block">كاش محقق: ${plan.sellCash.toLocaleString('en-US')} ج</span>
+                  </div>
+                  <div class="bg-gray-900/90 p-2.5 rounded-xl border border-cyan-800/40">
+                    <span class="text-gray-400 block text-[10px]">السعر اللحظي الآن:</span>
+                    <span class="text-cyan-300 font-mono font-extrabold">${livePrice.toFixed(2)} ج.م</span>
+                    <span class="text-[9px] ${priceDiffPct >= 0 ? 'text-rose-400' : 'text-emerald-400'} block">
+                      ${priceDiffPct >= 0 ? '+' : ''}${priceDiffPct.toFixed(1)}% عن سعر البيع
+                    </span>
+                  </div>
+                  <div class="bg-gray-900/90 p-2.5 rounded-xl border border-emerald-800/40">
+                    <span class="text-emerald-400 block text-[10px]">نطاق شراء القاع:</span>
+                    <span class="text-white font-mono font-bold">${plan.supportLow} - ${plan.supportHigh} ج</span>
+                    <span class="text-[9px] text-emerald-300 block">باقي ${distToDip} ج (${distToDipPct}%)</span>
+                  </div>
+                  <div class="bg-gray-900/90 p-2.5 rounded-xl border border-rose-800/40">
+                    <span class="text-rose-400 block text-[10px]">سقف إلغاء الخطة (+4%):</span>
+                    <span class="text-white font-mono font-bold">${plan.breakoutThreshold} ج.م</span>
+                    <span class="text-[9px] text-rose-300 block">باقي ${distToBreakout} ج (${distToBreakoutPct}%)</span>
+                  </div>
+                </div>
+
+                <!-- Visual Distance Progress Tracker -->
+                <div class="bg-gray-900 p-2.5 rounded-xl border border-gray-800/80 space-y-1.5 text-[11px]">
+                  <div class="flex items-center justify-between text-gray-400 text-[10px]">
+                    <span class="text-emerald-400 font-bold flex items-center gap-1">
+                      <i data-lucide="arrow-down" class="w-3 h-3"></i>
+                      <span>القاع المستهدف (${plan.supportHigh} ج)</span>
+                    </span>
+                    <span class="text-cyan-300 font-mono font-bold">السعر الآن: ${livePrice.toFixed(2)} ج</span>
+                    <span class="text-rose-400 font-bold flex items-center gap-1">
+                      <span>سقف الهروب (${plan.breakoutThreshold} ج)</span>
+                      <i data-lucide="arrow-up" class="w-3 h-3"></i>
+                    </span>
+                  </div>
+                  <div class="w-full h-2 rounded-full bg-gray-800 overflow-hidden flex">
+                    <div class="bg-emerald-500 h-full" style="width: 35%"></div>
+                    <div class="bg-cyan-500 h-full" style="width: 30%"></div>
+                    <div class="bg-rose-500 h-full" style="width: 35%"></div>
+                  </div>
+                  <div class="flex items-center justify-between text-[10px] text-gray-500">
+                    <span>🎯 اقتراب من القاع: باقي ${distToDip} ج</span>
+                    <span>🚨 إنذار الهروب: باقي ${distToBreakout} ج</span>
+                  </div>
+                </div>
+
+                <div class="flex items-center justify-between flex-wrap gap-2 pt-1">
+                  <span class="text-[10px] text-gray-400">
+                    🛡️ رادار المراقبة يعمل تلقائياً مع كل تحديث لحظي للبورصة
+                  </span>
+                  <div class="flex items-center gap-2">
+                    <a href="https://app.thndr.app" target="_blank" class="px-3 py-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-300 text-xs font-bold flex items-center gap-1 transition">
+                      <i data-lucide="external-link" class="w-3 h-3"></i>
+                      <span>متابعة في ثندر</span>
+                    </a>
+                    <button onclick="cancelRotationPlan('${plan.id}')" class="px-3 py-1.5 rounded-lg bg-gray-900 hover:bg-gray-800 text-rose-400 border border-rose-900/50 text-xs font-bold transition cursor-pointer">
+                      إلغاء الخطة
+                    </button>
+                  </div>
+                </div>
+              </div>
+            `;
+          }
+        } else if (plan.scenario === 'B') {
+          // Scenario B: Deploy to CIB
+          cardsHtml += `
+            <div id="${plan.id}" class="p-4 sm:p-5 rounded-2xl bg-indigo-950/40 border border-indigo-500/40 shadow-xl space-y-3 relative overflow-hidden transition">
+              <div class="flex items-center justify-between flex-wrap gap-2 border-b border-indigo-500/30 pb-3">
+                <div class="flex items-center gap-2.5">
+                  <i data-lucide="arrow-down-right" class="w-4 h-4 text-indigo-400"></i>
+                  <span class="font-extrabold text-white text-xs sm:text-sm">
+                    خطة معتمدة: تعزيز سهم CIB بكاش أرباح ${plan.name}
+                  </span>
+                </div>
+                <button onclick="cancelRotationPlan('${plan.id}')" class="text-gray-400 hover:text-white text-xs font-bold px-2 py-1 rounded hover:bg-indigo-900/40 transition cursor-pointer">
+                  ✕ إلغاء
+                </button>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs">
+                <div class="bg-gray-900/90 p-3 rounded-xl border border-indigo-800/40">
+                  <span class="text-gray-400 block text-[10px]">الكاش المحصل من بيع ${plan.name}:</span>
+                  <span class="text-emerald-400 font-mono font-bold text-sm">${plan.sellCash.toLocaleString('en-US')} ج.م</span>
+                </div>
+                <div class="bg-gray-900/90 p-3 rounded-xl border border-indigo-800/40">
+                  <span class="text-gray-400 block text-[10px]">سعر سهم CIB اللحظي:</span>
+                  <span class="text-white font-mono font-bold text-sm">${cibLivePrice.toFixed(2)} ج.م</span>
+                </div>
+                <div class="bg-gray-900/90 p-3 rounded-xl border border-indigo-800/40">
+                  <span class="text-gray-400 block text-[10px]">عدد أسهم CIB الممكن شراؤها:</span>
+                  <span class="text-indigo-300 font-mono font-extrabold text-sm">${cibSharesCanBuy} سهم جديد</span>
+                </div>
+              </div>
+
+              <div class="flex items-center justify-between flex-wrap gap-2 pt-2 border-t border-indigo-500/20">
+                <a href="https://app.thndr.app" target="_blank" class="px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold text-xs flex items-center gap-1.5 transition">
+                  <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+                  <span>فتح ثندر لشراء ${cibSharesCanBuy} سهم في CIB ⚡</span>
+                </a>
+                <button onclick="cancelRotationPlan('${plan.id}')" class="px-3 py-2 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-300 font-bold text-xs transition cursor-pointer">
+                  تم التنفيذ أو إلغاء الخطة
+                </button>
+              </div>
+            </div>
+          `;
+        } else {
+          // Scenario C: Cash Cushion
+          cardsHtml += `
+            <div id="${plan.id}" class="p-4 sm:p-5 rounded-2xl bg-gray-950 border border-emerald-500/30 shadow-xl space-y-3 relative overflow-hidden transition">
+              <div class="flex items-center justify-between flex-wrap gap-2 border-b border-gray-800 pb-3">
+                <div class="flex items-center gap-2.5">
+                  <i data-lucide="shield-check" class="w-4 h-4 text-emerald-400"></i>
+                  <span class="font-extrabold text-white text-xs sm:text-sm">
+                    خطة معتمدة: كاش أمان محمي (${plan.sellCash.toLocaleString('en-US')} ج.م)
+                  </span>
+                </div>
+                <button onclick="cancelRotationPlan('${plan.id}')" class="text-gray-400 hover:text-white text-xs font-bold px-2 py-1 rounded hover:bg-gray-800 transition cursor-pointer">
+                  ✕ إلغاء
+                </button>
+              </div>
+              <p class="text-xs text-gray-300 leading-relaxed">
+                تم تجنيب هذا المبلغ كسيولة حرة في ثندر لاقتناص أي هبوط عام مفاجئ للبورصة أو المشاركة في اكتتابات جديدة دون تسييل استثماراتك الأساسية.
+              </p>
+            </div>
+          `;
+        }
+      });
+
+      container.innerHTML = `
+        <div class="bg-gradient-to-br from-gray-900 via-gray-950 to-gray-900 border border-amber-500/40 rounded-2xl p-4 sm:p-5 shadow-2xl relative overflow-hidden">
+          <div class="flex items-center justify-between border-b border-gray-800 pb-3 mb-4 flex-wrap gap-2">
+            <div class="flex items-center gap-2.5">
+              <div class="relative flex items-center justify-center">
+                <span class="w-3.5 h-3.5 rounded-full bg-amber-400 animate-ping absolute"></span>
+                <span class="w-3.5 h-3.5 rounded-full bg-amber-400 relative"></span>
+              </div>
+              <div>
+                <h3 class="font-extrabold text-white text-sm sm:text-base flex items-center gap-2">
+                  <span>رادار المراقبة اللحظية للخطط المعتمدة وتنبيهات البورصة الحية</span>
+                  <span class="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-bold text-xs border border-amber-500/40">${activeRotationPlans.length} خطة نشطة</span>
+                </h3>
+                <p class="text-xs text-gray-400 mt-0.5">النظام يراقب حركة الأسعار لحظياً ضد القرارات التي اعتمدتها لتقديم إشارات البيع والشراء والإنذارات المبكرة</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="fetchLiveEGXPricesAndReevaluate()" class="px-3 py-1.5 rounded-xl bg-gray-800 hover:bg-gray-700 text-cyan-300 border border-cyan-800 text-xs font-bold transition flex items-center gap-1.5 shadow-sm active:scale-95 cursor-pointer">
+                <i data-lucide="refresh-cw" class="w-3 h-3 text-cyan-400"></i>
+                <span>فحص الأسعار الآن</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="space-y-4">
+            ${cardsHtml}
+          </div>
+        </div>
+      `;
+
+      if (window.lucide) lucide.createIcons();
     }
 
     // Smart Rebalancing & Cash Allocation Calculator
@@ -6584,6 +7190,7 @@ ${topRadarSummary}
 
           // 3. Save Portfolio & Re-render Holdings Table First (Guaranteed Sync)
           savePortfolio();
+          try { renderActivePlansRadar(); } catch(e){}
 
           // 4. Update Full Market Radar with Live Data from All 249 EGX Stocks
           if (data.radar && data.radar.length > 0) {
@@ -6715,6 +7322,7 @@ ${topRadarSummary}
       try { loadPortfolio(); } catch(e){}
       try { updateMetrics(); } catch(e){}
       try { renderPortfolioTable(); } catch(e){}
+      try { renderActivePlansRadar(); } catch(e){}
 
       // PRIORITY 1: Fetch live EGX quotes and start heartbeat immediately
       fetchLiveEGXPrices();
