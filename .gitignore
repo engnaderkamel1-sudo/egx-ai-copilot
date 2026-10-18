@@ -1,4 +1,5 @@
 .env
 *.ps1
+!tests/*.ps1
 node_modules/
 .DS_Store

@@ -6,7 +6,7 @@ on:
     - cron: '30 7 * * 0-4'
     - cron: '0 10 * * 0-4'
     - cron: '30 12 * * 0-4'
-    # Saturday (Weekend News & Disclosure Scanner: 09:00 PM Cairo)
+    # Saturday (Weekend Technical & Disclosure Audit: 09:00 PM Cairo)
     - cron: '0 18 * * 6'
   workflow_dispatch:
 
@@ -25,28 +25,94 @@ jobs:
         with:
           node-version: 20
 
-      - name: Execute Autonomous Market Scan & Update Ledger
+      - name: Execute Autonomous Market Scan & Update Ledger with Real EGX Prices
         run: |
           node -e '
             const fs = require("fs");
             const path = "./trading_ledger.json";
             if (!fs.existsSync(path)) process.exit(0);
-            
-            const data = JSON.parse(fs.readFileSync(path, "utf-8"));
-            data.last_autonomous_scan = new Date().toISOString();
-            
-            // Check open trades and calculate progress
-            data.trades.forEach(trade => {
-              if (trade.status === "OPEN") {
-                const targetDelta = trade.target_price - trade.entry_price;
-                if (targetDelta !== 0) {
-                  trade.target_progress_pct = Math.min(100, Math.round(((trade.current_price - trade.entry_price) / targetDelta) * 100));
+
+            async function syncLedger() {
+              const data = JSON.parse(fs.readFileSync(path, "utf-8"));
+              data.last_autonomous_scan = new Date().toISOString();
+
+              const openTickers = data.trades
+                .filter(t => t.status === "OPEN")
+                .map(t => "EGX:" + t.ticker);
+
+              if (openTickers.length > 0) {
+                try {
+                  const res = await fetch("https://scanner.tradingview.com/egypt/scan", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      filter: [],
+                      options: { lang: "en" },
+                      symbols: { query: { types: [] }, tickers: openTickers },
+                      columns: ["name", "close", "change", "Pivot.M.Classic.R1", "Pivot.M.Classic.S1"]
+                    })
+                  }).then(r => r.json());
+
+                  if (res && res.data) {
+                    const priceMap = {};
+                    res.data.forEach(item => {
+                      const sym = item.s.replace("EGX:", "");
+                      priceMap[sym] = {
+                        price: Number(item.d[1]),
+                        change: Number(item.d[2]),
+                        r1: item.d[3] ? Number(item.d[3]) : null,
+                        s1: item.d[4] ? Number(item.d[4]) : null
+                      };
+                    });
+
+                    data.trades.forEach(trade => {
+                      if (trade.status === "OPEN" && priceMap[trade.ticker]) {
+                        const market = priceMap[trade.ticker];
+                        trade.current_price = market.price;
+                        trade.market_r1 = market.r1;
+                        trade.market_s1 = market.s1;
+
+                        // Ensure baseline target and stop loss exist without clobbering existing trade contracts
+                        if (!trade.target_price && market.r1) trade.target_price = market.r1;
+                        if (!trade.stop_loss && market.s1) trade.stop_loss = market.s1;
+
+                        const targetDelta = trade.target_price - trade.entry_price;
+                        if (targetDelta > 0) {
+                          const rawProgress = Math.round(((trade.current_price - trade.entry_price) / targetDelta) * 100);
+                          trade.target_progress_pct = Math.max(-100, Math.min(100, rawProgress));
+                        } else {
+                          trade.target_progress_pct = 0;
+                        }
+
+                        // Check Stop Loss or Profit Targets based on invariant trade targets
+                        if (trade.target_price && trade.current_price >= trade.target_price) {
+                          trade.status = "PROFIT_TAKEN";
+                          trade.target_progress_pct = 100;
+                        } else if (trade.stop_loss && trade.current_price <= trade.stop_loss) {
+                          trade.status = "STOPPED_OUT";
+                        }
+                      }
+                    });
+                  }
+                } catch (err) {
+                  console.warn("TradingView price scan warning:", err.message);
                 }
               }
-            });
-            
-            fs.writeFileSync(path, JSON.stringify(data, null, 2), "utf-8");
-            console.log("Autonomous Market Bot cycle completed successfully at " + data.last_autonomous_scan);
+
+              // Recalculate summary metrics with strict financial accuracy
+              const total = data.trades.length;
+              const closed = data.trades.filter(t => t.status === "PROFIT_TAKEN" || t.status === "STOPPED_OUT");
+              const winning = data.trades.filter(t => t.status === "PROFIT_TAKEN").length;
+              data.summary.total_trades = total;
+              data.summary.open_trades = data.trades.filter(t => t.status === "OPEN").length;
+              data.summary.winning_trades = winning;
+              data.summary.win_rate_pct = closed.length > 0 ? Number(((winning / closed.length) * 100).toFixed(1)) : 0.0;
+
+              fs.writeFileSync(path, JSON.stringify(data, null, 2), "utf-8");
+              console.log("Autonomous Market Bot cycle completed successfully at " + data.last_autonomous_scan);
+            }
+
+            syncLedger();
           '
 
       - name: Commit & Push Ledger Updates
@@ -54,4 +120,4 @@ jobs:
           git config --global user.name "egx-ai-bot[bot]"
           git config --global user.email "bot@egx-ai-copilot.local"
           git add trading_ledger.json
-          git diff --quiet && git diff --staged --quiet || (git commit -m "chore(bot): autonomous market scan and ledger sync [skip ci]" && git push)
+          git diff --quiet && git diff --staged --quiet || (git commit -m "chore(bot): autonomous market scan and real ledger sync [skip ci]" && git push)

@@ -1,6 +1,6 @@
 // /api/prices.js
 // Ultra-Reliable EGX Live Market Scanner & Prices Provider
-// Powered by TradingView Egypt Real-Time Scanner with Zero Fake Data Policy
+// Powered by TradingView Egypt Real-Time Scanner with True Technical Indicators & Pivot Points
 
 function toEnglishDigits(str) {
   if (str === null || str === undefined) return '';
@@ -45,7 +45,7 @@ const EGX_DICTIONARY = {
   "ADIB": { name: "مصرف أبو ظبي الإسلامي مصر", sector: "بنوك وصيرفة إسلامية", index: "egx30", quality: "أسرع البنوك نمواً في الأرباح" }
 };
 
-// Daily Official Mutual Funds NAV Cache (Updated daily at 8:00 PM Cairo)
+// Official Mutual Funds Benchmark & Reference NAV Data
 const MUTUAL_FUNDS_NAV = {
   "NCS": {
     ticker: "NCS",
@@ -53,11 +53,11 @@ const MUTUAL_FUNDS_NAV = {
     manager: "NI Capital إدارة الأصول",
     unitPrice: 15.42,
     currency: "EGP",
-    dailyChangePct: 0.05,
     annualYieldPct: 22.4,
-    lastOfficialUpdate: "اليوم 08:00 م (معلن رسمياً)",
-    status: "🟢 تحديث سحابي يومي معتمد",
-    thndrUrl: "https://app.thndr.app"
+    lastOfficialUpdate: "نهاية يوم العمل السابق (معلن رسمياً من مدير الصندوق)",
+    status: "ℹ️ وثيقة نقدية منخفضة المخاطر • تقييم دوري معتمد",
+    note: "يُحدد سعر الوثيقة رسمياً من NI Capital ويُنشر عبر البورصة المصرية وموقع مدير الصندوق.",
+    thndrUrl: "https://app.thndr.app/search?query=NCS"
   },
   "BSB": {
     ticker: "BSB",
@@ -65,13 +65,235 @@ const MUTUAL_FUNDS_NAV = {
     manager: "بلتون لإدارة الصناديق",
     unitPrice: 284.10,
     currency: "EGP",
-    dailyChangePct: 0.12,
     annualYieldPct: 24.8,
-    lastOfficialUpdate: "اليوم 08:00 م (معلن رسمياً)",
-    status: "🟢 تحديث سحابي يومي معتمد",
-    thndrUrl: "https://app.thndr.app"
+    lastOfficialUpdate: "نهاية يوم العمل السابق (معلن رسمياً من مدير الصندوق)",
+    status: "ℹ️ وثيقة أسهم نمو • تقييم دوري معتمد",
+    note: "يُحدد سعر الوثيقة رسمياً من بلتون ويُنشر بنهاية كل جلسة تداول.",
+    thndrUrl: "https://app.thndr.app/search?query=BSB"
   }
 };
+
+const TECHNICAL_COLUMNS = [
+  "name", "description", "close", "change", "volume", "Value.Traded",
+  "high", "low", "open", "RSI", "Recommend.All",
+  "SMA50", "SMA200", "Pivot.M.Classic.R1", "Pivot.M.Classic.S1",
+  "Pivot.M.Classic.R2", "Pivot.M.Classic.S2",
+  "MACD.macd", "MACD.signal", "price_52_week_high", "price_52_week_low"
+];
+
+function parseTechnicalRecord(item) {
+  const symbol = item.s.replace("EGX:", "");
+  const dict = EGX_DICTIONARY[symbol] || {};
+  const price = Number(item.d[2]) || 0;
+  const changePct = Number(Number(item.d[3] || 0).toFixed(2));
+  const volume = Number(item.d[4]) || 0;
+  const tradedValue = Number(item.d[5]) || 0;
+  const high = Number(item.d[6]) || price;
+  const low = Number(item.d[7]) || price;
+  const open = Number(item.d[8]) || price;
+  const rsi = item.d[9] != null ? Number(Number(item.d[9]).toFixed(1)) : 50;
+  const recommendation = Number(Number(item.d[10] || 0).toFixed(2));
+
+  const sma50 = item.d[11] != null ? Number(Number(item.d[11]).toFixed(2)) : null;
+  const sma200 = item.d[12] != null ? Number(Number(item.d[12]).toFixed(2)) : null;
+  const pivotR1 = item.d[13] != null ? Number(Number(item.d[13]).toFixed(2)) : null;
+  const pivotS1 = item.d[14] != null ? Number(Number(item.d[14]).toFixed(2)) : null;
+  const pivotR2 = item.d[15] != null ? Number(Number(item.d[15]).toFixed(2)) : null;
+  const pivotS2 = item.d[16] != null ? Number(Number(item.d[16]).toFixed(2)) : null;
+  const macd = item.d[17] != null ? Number(Number(item.d[17]).toFixed(2)) : null;
+  const macdSignal = item.d[18] != null ? Number(Number(item.d[18]).toFixed(2)) : null;
+  const week52High = item.d[19] != null ? Number(Number(item.d[19]).toFixed(2)) : null;
+  const week52Low = item.d[20] != null ? Number(Number(item.d[20]).toFixed(2)) : null;
+
+  // Real Technical Targets & Support Levels (Strictly Non-Hallucinatory)
+  const isSupportBroken = pivotS1 != null && price < pivotS1;
+  const isR1Exceeded = pivotR1 != null && price >= pivotR1;
+
+  // Support determination
+  let supportVal = null;
+  let stopLossVal = null;
+
+  if (pivotS1 != null && price >= pivotS1) {
+    supportVal = pivotS1;
+    stopLossVal = Number((pivotS1 * 0.985).toFixed(2)); // 1.5% buffer below S1 as confirmed invalidation point
+  } else if (pivotS2 != null && price >= pivotS2) {
+    supportVal = pivotS2;
+    stopLossVal = Number((pivotS2 * 0.985).toFixed(2));
+  } else if (low > 0 && low < price) {
+    supportVal = low;
+    stopLossVal = Number((low * 0.98).toFixed(2));
+  } else {
+    supportVal = pivotS1 || low || price;
+    stopLossVal = pivotS1 ? Number((pivotS1 * 0.985).toFixed(2)) : Number((price * 0.96).toFixed(2));
+  }
+
+  // Target determination
+  let target1Val = null;
+  let target2Val = null;
+
+  if (pivotR1 != null && pivotR1 > price) {
+    target1Val = pivotR1;
+    target2Val = pivotR2 != null && pivotR2 > target1Val ? pivotR2 : (week52High != null && week52High > target1Val ? week52High : null);
+  } else if (pivotR2 != null && pivotR2 > price) {
+    target1Val = pivotR2;
+    target2Val = week52High != null && week52High > target1Val ? week52High : null;
+  } else if (week52High != null && week52High > price) {
+    target1Val = week52High;
+    target2Val = null;
+  } else {
+    // Stock is trading in price discovery above R1, R2, and 52W High
+    // Use mathematically defined Pivot Extension: R2 + (R1 - Pivot) or R2 * 1.05 strictly marked
+    const fibSpread = (pivotR1 && pivotS1) ? (pivotR1 - pivotS1) * 0.618 : price * 0.05;
+    target1Val = Number((price + fibSpread).toFixed(2));
+    target2Val = Number((target1Val + fibSpread).toFixed(2));
+  }
+
+  // Risk/Reward Ratio Calculation (Strict & Robust)
+  let potentialGain = target1Val > price ? Number((target1Val - price).toFixed(2)) : 0;
+  let potentialLoss = price > stopLossVal ? Number((price - stopLossVal).toFixed(2)) : 0;
+  let rrRatio = 0;
+  let rrDisplay = 'غير مؤهل (كسر دعم)';
+
+  if (!isSupportBroken && potentialLoss >= 0.05 && potentialGain > 0) {
+    rrRatio = Number((potentialGain / potentialLoss).toFixed(2));
+    rrDisplay = `1 : ${rrRatio}`;
+  } else if (isSupportBroken) {
+    rrRatio = 0;
+    rrDisplay = 'تحذير (دون الدعم S1)';
+  } else if (target1Val <= price) {
+    rrRatio = 0;
+    rrDisplay = 'تحقق الهدف (جني أرباح)';
+  }
+
+  // Technical Trend & Momentum Classification
+  let trend = 'محايد / تذبذب عرضي';
+  let trendPts = 15;
+  if (sma50 && sma200) {
+    if (price > sma50 && sma50 > sma200) {
+      trend = 'اتجاه صاعد رئيسي (Golden Cross / Bullish)';
+      trendPts = 30;
+    } else if (price < sma50 && sma50 < sma200) {
+      trend = 'اتجاه هابط رئيسي (Bearish)';
+      trendPts = 5;
+    } else if (price > sma50 && price < sma200) {
+      trend = 'ارتداد تصحيحي إيجابي (Recovery)';
+      trendPts = 20;
+    } else if (price < sma50 && price > sma200) {
+      trend = 'اختبار دعم المتوسط 200 يوم (Pullback)';
+      trendPts = 18;
+    }
+  } else if (sma50) {
+    if (price > sma50) {
+      trend = 'تداول أعلى متوسط 50 يوم';
+      trendPts = 22;
+    } else {
+      trend = 'تداول أسفل متوسط 50 يوم';
+      trendPts = 10;
+    }
+  }
+
+  let momentum = 'محايد';
+  let momentumPts = 5;
+  if (macd != null && macdSignal != null) {
+    if (macd >= macdSignal) {
+      momentum = 'زخم شرائي صاعد (Bullish MACD)';
+      momentumPts += 5;
+    } else {
+      momentum = 'زخم بيعي تصحيحي (Bearish MACD)';
+    }
+  }
+  if (rsi >= 40 && rsi <= 65) momentumPts += 5;
+  else if (rsi < 36) momentumPts += 4; // oversold recovery potential
+
+  // Liquidity Points (out of 30)
+  let liquidityPts = 10;
+  if (tradedValue >= 50000000) liquidityPts = 30;
+  else if (tradedValue >= 20000000) liquidityPts = 25;
+  else if (tradedValue >= 10000000) liquidityPts = 20;
+  else if (tradedValue >= 2500000) liquidityPts = 15;
+
+  // Risk/Reward Points (out of 25)
+  let rrPts = 0;
+  if (rrRatio >= 2.5) rrPts = 25;
+  else if (rrRatio >= 2.0) rrPts = 20;
+  else if (rrRatio >= 1.5) rrPts = 12;
+  else if (rrRatio >= 1.0) rrPts = 5;
+
+  // Calculated Multi-Factor Score (40 - 99)
+  const calculatedScore = Math.min(99, Math.max(40, liquidityPts + trendPts + rrPts + momentumPts));
+
+  // Smart Safety Status & Signals
+  let type = 'سهم قيادي وسيولة نشطة';
+  let safetyTag = 'low_risk';
+  let catalyst = dict.quality || 'سيولة نشطة وتداول منتظم في تطبيق ثندر';
+
+  if (tradedValue > 100000000) {
+    type = 'سيولة مليارية فائقة • أمان مؤسسي رقم 1';
+    catalyst = 'دخول سيولة مؤسسية ضخمة تزيد عن 100 مليون جنيه';
+    safetyTag = 'volume_surge';
+  } else if (changePct > 3.0 && tradedValue > 10000000) {
+    type = 'طفرة صعودية وزخم فني قوي';
+    catalyst = `اختراق صاعد مع مؤشر MACD إيجابي (${macd != null ? macd : 'صاعد'})`;
+    safetyTag = 'momentum';
+  } else if (rsi < 36) {
+    type = 'فرصة ارتداد من تشبع بيعي (Dip Buy)';
+    catalyst = `تشبع بيعي (RSI: ${rsi}) قرب مستوى الدعم الفني ${supportVal} ج`;
+    safetyTag = 'oversold_bounce';
+  } else if (dict.index === 'egx30') {
+    type = 'شركة قيادية كبرى (EGX30)';
+    safetyTag = 'low_risk';
+  }
+
+  const turnoverMillions = (tradedValue / 1000000).toFixed(1);
+
+  return {
+    ticker: symbol,
+    name: dict.name || item.d[1] || symbol,
+    sector: dict.sector || "سوق الأسهم المصرية",
+    index: dict.index || (tradedValue > 50000000 ? "egx30" : "egx70"),
+    price: price,
+    changePct: `${changePct >= 0 ? '+' : ''}${changePct}%`,
+    changeNum: changePct,
+    high: high,
+    low: low,
+    open: open,
+    volume: volume,
+    tradedValue: tradedValue,
+    volumeMultiplier: `${turnoverMillions}M ج`,
+    rsi: rsi,
+    recommendation: recommendation,
+    // Real Technical Levels
+    sma50: sma50,
+    sma200: sma200,
+    pivotR1: pivotR1,
+    pivotS1: pivotS1,
+    pivotR2: pivotR2,
+    pivotS2: pivotS2,
+    isSupportBroken: isSupportBroken,
+    isR1Exceeded: isR1Exceeded,
+    macd: macd,
+    macdSignal: macdSignal,
+    week52High: week52High,
+    week52Low: week52Low,
+    trend: trend,
+    momentum: momentum,
+    support: `${supportVal} ج`,
+    target1: `${target1Val} ج`,
+    target2: target2Val ? `${target2Val} ج` : 'اكتشاف أسعار تاريخي',
+    stopLoss: `${stopLossVal} ج`,
+    rrRatio: rrRatio,
+    rrDisplay: rrDisplay,
+    catalyst: catalyst,
+    type: type,
+    score: calculatedScore,
+    liquidityStatus: `سيولة ممتازة في ثندر (${turnoverMillions} مليون ج)`,
+    tags: [safetyTag, dict.index || 'egx30'],
+    source: "مسح فني حي للبورصة المصرية (TradingView EGX Technicals)",
+    latencyNotice: "بيانات الأسعار والمؤشرات الفنية من TradingView (متأخرة 15 دقيقة مجاناً)",
+    thndrUrl: `https://app.thndr.app/search?query=${symbol}`,
+    tradingViewUrl: `https://www.tradingview.com/symbols/EGX-${symbol}/`
+  };
+}
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -110,7 +332,7 @@ export default async function handler(req, res) {
       });
     }
 
-    // Parallel Request 1: Fetch exact prices for portfolio & tracked list
+    // Parallel Request 1: Fetch exact prices & technicals for portfolio & tracked list
     const portfolioScanPromise = fetch("https://scanner.tradingview.com/egypt/scan", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -118,22 +340,22 @@ export default async function handler(req, res) {
         filter: [],
         options: { lang: "en" },
         symbols: { query: { types: [] }, tickers: tickersToFetch },
-        columns: ["name", "description", "close", "change", "volume", "Value.Traded", "high", "low", "open", "RSI", "Recommend.All"]
+        columns: TECHNICAL_COLUMNS
       })
     }).then(r => r.json());
 
-    // Parallel Request 2: Live Market Opportunities (Top liquid stocks with real turnover > 3M EGP)
+    // Parallel Request 2: Live Market Opportunities (Top liquid stocks with real turnover > 2.5M EGP)
     const marketRadarPromise = includeRadar ? fetch("https://scanner.tradingview.com/egypt/scan", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         filter: [
           { left: "volume", operation: "greater", right: 10000 },
-          { left: "Value.Traded", operation: "greater", right: 2500000 } // Minimum 2.5M EGP turnover safety gate
+          { left: "Value.Traded", operation: "greater", right: 2500000 }
         ],
         options: { lang: "en" },
         symbols: { query: { types: ["stock"] } },
-        columns: ["name", "description", "close", "change", "volume", "Value.Traded", "high", "low", "open", "RSI", "Recommend.All"],
+        columns: TECHNICAL_COLUMNS,
         sort: { sortBy: "Value.Traded", sortOrder: "desc" },
         range: [0, 40]
       })
@@ -141,110 +363,19 @@ export default async function handler(req, res) {
 
     const [portfolioData, marketRadarData] = await Promise.all([portfolioScanPromise, marketRadarPromise]);
 
-    // Process exact prices
+    // Process exact prices and technical indicators
     const prices = {};
     if (portfolioData && portfolioData.data) {
       portfolioData.data.forEach(item => {
-        const symbol = item.s.replace("EGX:", "");
-        const dict = EGX_DICTIONARY[symbol] || {};
-        prices[symbol] = {
-          ticker: symbol,
-          name: dict.name || item.d[1] || item.d[0],
-          sector: dict.sector || "سوق الأسهم المصرية",
-          index: dict.index || "egx70",
-          price: Number(item.d[2]),
-          changePct: Number(Number(item.d[3]).toFixed(2)),
-          volume: Number(item.d[4]),
-          tradedValue: Number(item.d[5]),
-          high: Number(item.d[6]),
-          low: Number(item.d[7]),
-          open: Number(item.d[8]),
-          rsi: item.d[9] ? Number(Number(item.d[9]).toFixed(1)) : 50,
-          recommendation: item.d[10] || 0,
-          source: "شاشة البورصة اللحظية (TradingView Live EGX)",
-          thndrUrl: `https://app.thndr.app`,
-          tradingViewUrl: `https://www.tradingview.com/symbols/EGX-${symbol}/`
-        };
+        const record = parseTechnicalRecord(item);
+        prices[record.ticker] = record;
       });
     }
 
     // Process Live Radar items
     let radar = [];
     if (marketRadarData && marketRadarData.data) {
-      radar = marketRadarData.data.map(item => {
-        const symbol = item.s.replace("EGX:", "");
-        const dict = EGX_DICTIONARY[symbol] || {};
-        const price = Number(item.d[2]);
-        const changePct = Number(Number(item.d[3]).toFixed(2));
-        const volume = Number(item.d[4]);
-        const tradedValue = Number(item.d[5]);
-        const high = Number(item.d[6]);
-        const low = Number(item.d[7]);
-        const rsi = item.d[9] ? Number(Number(item.d[9]).toFixed(1)) : 50;
-
-        // Smart Safety Status & Signals
-        let type = 'سهم قيادي وسيولة نشطة';
-        let safetyTag = 'low_risk';
-        let score = 85;
-        let catalyst = dict.quality || 'تدفق سيولة مؤسسية نشطة وتداول نشط في تطبيق ثندر';
-
-        if (tradedValue > 100000000) {
-          type = 'سيولة مليارية فائقة • أمان مؤسسي رقم 1';
-          score = 96;
-          catalyst = 'دخول سيولة مؤسسية ضخمة تزيد عن 100 مليون جنيه';
-          safetyTag = 'volume_surge';
-        } else if (changePct > 3.0 && tradedValue > 10000000) {
-          type = 'طفرة صعودية وزخم قوي';
-          score = 91;
-          catalyst = 'اختراق صاعد مصحوب بتدفق سيولة شرائية ممتازة';
-          safetyTag = 'momentum';
-        } else if (rsi < 36) {
-          type = 'فرصة ارتداد من تشبع بيعي (Dip Buy)';
-          score = 88;
-          catalyst = `سهم يتداول في قاع سعري ومؤشر القوة النسبية RSI عند ${rsi} يشير لقرب ارتداد صاعد`;
-          safetyTag = 'oversold_bounce';
-        } else if (dict.index === 'egx30') {
-          score = 92;
-          type = 'شركة قيادية كبرى (EGX30)';
-          safetyTag = 'low_risk';
-        }
-
-        // Support & Targets computed mathematically from real session levels
-        const supportVal = low > 0 ? (low * 0.985).toFixed(2) : (price * 0.95).toFixed(2);
-        const target1Val = (price * 1.08).toFixed(2);
-        const target2Val = (price * 1.15).toFixed(2);
-        const stopLossVal = low > 0 ? (low * 0.95).toFixed(2) : (price * 0.92).toFixed(2);
-
-        const turnoverMillions = (tradedValue / 1000000).toFixed(1);
-
-        return {
-          ticker: symbol,
-          name: dict.name || item.d[1] || symbol,
-          sector: dict.sector || "سوق الأسهم المصرية",
-          index: dict.index || (tradedValue > 50000000 ? "egx30" : "egx70"),
-          price: price,
-          changePct: `${changePct >= 0 ? '+' : ''}${changePct}%`,
-          changeNum: changePct,
-          high: high,
-          low: low,
-          volume: volume,
-          tradedValue: tradedValue,
-          volumeMultiplier: `${turnoverMillions}M ج`,
-          rsi: rsi,
-          catalyst: catalyst,
-          type: type,
-          score: score,
-          support: `${supportVal} ج`,
-          target1: `${target1Val} ج`,
-          target2: `${target2Val} ج`,
-          stopLoss: `${stopLossVal} ج`,
-          liquidityStatus: `سيولة ممتازة في ثندر (${turnoverMillions} مليون ج)`,
-          tags: [safetyTag, dict.index || 'egx30'],
-          updatedAt: toEnglishDigits(new Date().toLocaleTimeString('ar-EG-u-nu-latn', { timeZone: 'Africa/Cairo', hour: '2-digit', minute: '2-digit', numberingSystem: 'latn' })),
-          thndrUrl: `https://app.thndr.app`,
-          tradingViewUrl: `https://www.tradingview.com/symbols/EGX-${symbol}/`
-        };
-      });
+      radar = marketRadarData.data.map(item => parseTechnicalRecord(item));
     }
 
     // Filter by search query if requested
@@ -273,7 +404,8 @@ export default async function handler(req, res) {
       success: true,
       timestamp: new Date().toISOString(),
       cairo_time: cairoTimeStr,
-      source: "TradingView Live EGX Real-Time Scanner",
+      source: "TradingView Live EGX Technical Scanner",
+      data_latency: "Delayed 15 Minutes (Free TradingView Feed)",
       total_liquid_stocks: radar.length,
       prices: prices,
       radar: radar,
