@@ -75,8 +75,11 @@ const MUTUAL_FUNDS_NAV = {
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Cache-Control', 's-maxage=15, stale-while-revalidate=30');
+  if (req.url && req.url.includes('_t=')) {
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+  } else {
+    res.setHeader('Cache-Control', 's-maxage=5, stale-while-revalidate=15');
+  }
 
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
