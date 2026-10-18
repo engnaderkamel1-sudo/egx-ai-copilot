@@ -2883,6 +2883,15 @@
       return toEnDigits(Number(num).toLocaleString('en-US'));
     }
 
+    const MONTHS_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+    function formatCairoDateOnly(date = new Date()) {
+      const d = date instanceof Date ? date : new Date(date);
+      const day = d.getDate();
+      const month = MONTHS_SHORT[d.getMonth()] || 'Oct';
+      return `${day} ${month}`;
+    }
+
     function formatCairoTime(date = new Date(), includeSeconds = false, timeOnly = false) {
       const d = date instanceof Date ? date : new Date(date);
       const timeStr = d.toLocaleTimeString('ar-EG-u-nu-latn', {
@@ -2892,22 +2901,34 @@
         numberingSystem: 'latn'
       });
       if (timeOnly) return toEnDigits(timeStr);
-      const dateStr = d.toLocaleDateString('ar-EG-u-nu-latn', {
-        day: 'numeric',
-        month: 'numeric',
-        numberingSystem: 'latn'
-      });
+      const dateStr = formatCairoDateOnly(d);
       return toEnDigits(`${timeStr} (${dateStr})`);
     }
 
-    function formatCairoDateOnly(date = new Date()) {
-      const d = date instanceof Date ? date : new Date(date);
-      const dateStr = d.toLocaleDateString('ar-EG-u-nu-latn', {
-        day: 'numeric',
-        month: 'numeric',
-        numberingSystem: 'latn'
+    function formatDateTimeDisplay(str) {
+      if (!str || str === 'جلسة اليوم' || str === 'جلسة البورصة اليوم') return str || 'جلسة اليوم';
+      let s = toEnDigits(String(str)).trim();
+      s = s.replace(/^الساعة\s+/, '');
+      s = s.replace(/\(?(\d{1,2})\/(\d{1,2})\)?/g, (match, p1, p2) => {
+        let d = parseInt(p2, 10);
+        let m = parseInt(p1, 10) - 1;
+        if (parseInt(p1, 10) > 12) {
+          d = parseInt(p1, 10);
+          m = parseInt(p2, 10) - 1;
+        }
+        const mName = MONTHS_SHORT[m] || 'Oct';
+        return `(${d} ${mName})`;
       });
-      return toEnDigits(dateStr);
+      s = s.replace(/\(\(([^\)]+)\)\)/g, '($1)');
+      return s;
+    }
+
+    function formatDecisionTimeString(str) {
+      const formatted = formatDateTimeDisplay(str);
+      if (!formatted || formatted === 'جلسة اليوم' || formatted === 'جلسة البورصة اليوم') {
+        return 'جلسة اليوم';
+      }
+      return `الساعة ${formatted}`;
     }
 
     function enforceEnglishNumbers(root = document.body) {
@@ -3599,8 +3620,8 @@
             savePortfolio();
           } else {
             portfolioData.forEach(item => {
-              if (item.priceUpdatedAt) item.priceUpdatedAt = toEnDigits(item.priceUpdatedAt);
-              if (item.decisionUpdatedAt) item.decisionUpdatedAt = toEnDigits(item.decisionUpdatedAt);
+              if (item.priceUpdatedAt) item.priceUpdatedAt = formatDateTimeDisplay(item.priceUpdatedAt);
+              if (item.decisionUpdatedAt) item.decisionUpdatedAt = formatDateTimeDisplay(item.decisionUpdatedAt);
               if (item.decisionBasis) item.decisionBasis = toEnDigits(item.decisionBasis);
               if (item.advice) item.advice = toEnDigits(item.advice);
               if (!item.priceUpdatedAt) item.priceUpdatedAt = 'جلسة البورصة اليوم';
@@ -3797,7 +3818,7 @@
                   </div>
                   <div class="flex items-center gap-1 mt-1 text-[9px] text-gray-400 font-mono">
                     <span class="w-1.5 h-1.5 rounded-full ${item.priceSource && item.priceSource.includes('يدوي') ? 'bg-amber-400' : 'bg-emerald-400 animate-pulse'}"></span>
-                    <span>آخر تحديث: ${toEnDigits(item.priceUpdatedAt) || 'جلسة اليوم'}</span>
+                    <span>آخر تحديث: ${formatDateTimeDisplay(item.priceUpdatedAt)}</span>
                   </div>
                   <span class="text-[8.5px] text-gray-500 font-sans mt-0.5">(${item.priceSource || 'شاشة البورصة اللحظية'})</span>
                  </div>`
@@ -3859,7 +3880,7 @@
               </div>
               <div class="bg-gray-950/90 border border-gray-800 px-2 py-1 rounded-md text-[9px] text-cyan-300 font-mono flex items-center gap-1 mt-0.5">
                 <i data-lucide="clock" class="w-2.5 h-2.5 text-cyan-400 shrink-0"></i>
-                <span>القرار صادر بناءً على سعر: <strong>${item.currentPrice ? Number(item.currentPrice).toFixed(2) + ' ج' : '--'}</strong> (الساعة ${toEnDigits(item.decisionUpdatedAt) || 'جلسة اليوم'})</span>
+                <span>القرار صادر بناءً على سعر: <strong>${item.currentPrice ? Number(item.currentPrice).toFixed(2) + ' ج' : '--'}</strong> • ${formatDecisionTimeString(item.decisionUpdatedAt)}</span>
               </div>
             </div>
           </td>
@@ -4326,7 +4347,7 @@
           </div>
           <div class="text-[10px] text-gray-400 font-mono flex items-center gap-1.5">
             <i data-lucide="clock" class="w-3.5 h-3.5 text-emerald-400"></i>
-            <span>تاريخ ووقت تقييم القرار: <strong class="text-emerald-300">${decTime}</strong></span>
+            <span>تاريخ ووقت تقييم القرار: <strong class="text-emerald-300">${formatDateTimeDisplay(decTime)}</strong></span>
           </div>
         </div>
 
@@ -4505,7 +4526,7 @@
       const priceUpdated = item.priceUpdatedAt || 'جلسة اليوم';
       const priceSource = item.priceSource || 'شاشة البورصة اللحظية';
       const ftUpdatedEl = document.getElementById('ft-price-updated-at');
-      if (ftUpdatedEl) ftUpdatedEl.innerText = `آخر تحديث: ${priceUpdated}`;
+      if (ftUpdatedEl) ftUpdatedEl.innerText = `آخر تحديث: ${formatDateTimeDisplay(priceUpdated)}`;
       const ftSourceEl = document.getElementById('ft-price-source-badge');
       if (ftSourceEl) {
         ftSourceEl.innerText = priceSource;

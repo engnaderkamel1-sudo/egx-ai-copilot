@@ -9,12 +9,15 @@ function toEnglishDigits(str) {
 
 export default async function handler(req, res) {
   const now = new Date();
-  const cairoTime = toEnglishDigits(new Intl.DateTimeFormat('ar-EG-u-nu-latn', {
+  const MONTHS_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const timePart = now.toLocaleTimeString('ar-EG-u-nu-latn', {
     timeZone: 'Africa/Cairo',
-    dateStyle: 'short',
-    timeStyle: 'medium',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
     numberingSystem: 'latn'
-  }).format(now));
+  });
+  const cairoTime = toEnglishDigits(`${timePart} (${now.getDate()} ${MONTHS_SHORT[now.getMonth()]})`);
 
   res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
   res.setHeader('Content-Type', 'application/json');

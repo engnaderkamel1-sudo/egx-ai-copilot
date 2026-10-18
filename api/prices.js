@@ -258,12 +258,16 @@ export default async function handler(req, res) {
     }
 
     // Cairo Time stamp
-    const cairoTimeStr = toEnglishDigits(new Intl.DateTimeFormat('ar-EG-u-nu-latn', {
+    const now = new Date();
+    const MONTHS_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const timePart = now.toLocaleTimeString('ar-EG-u-nu-latn', {
       timeZone: 'Africa/Cairo',
-      dateStyle: 'full',
-      timeStyle: 'medium',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
       numberingSystem: 'latn'
-    }).format(new Date()));
+    });
+    const cairoTimeStr = toEnglishDigits(`${timePart} (${now.getDate()} ${MONTHS_SHORT[now.getMonth()]})`);
 
     return res.status(200).json({
       success: true,

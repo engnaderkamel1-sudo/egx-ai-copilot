@@ -10,13 +10,15 @@ function toEnglishDigits(str) {
 export default async function handler(req, res) {
   try {
     const now = new Date();
-    const cairoFormatter = new Intl.DateTimeFormat('ar-EG-u-nu-latn', {
+    const MONTHS_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const timePart = now.toLocaleTimeString('ar-EG-u-nu-latn', {
       timeZone: 'Africa/Cairo',
-      dateStyle: 'full',
-      timeStyle: 'medium',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
       numberingSystem: 'latn'
     });
-    const cairoTime = toEnglishDigits(cairoFormatter.format(now));
+    const cairoTime = toEnglishDigits(`${timePart} (${now.getDate()} ${MONTHS_SHORT[now.getMonth()]})`);
 
     // Fetch real-time market data directly from TradingView Egypt Scanner
     const tickers = [
