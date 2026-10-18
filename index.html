@@ -1274,6 +1274,10 @@
               <i data-lucide="zap" class="w-4 h-4 text-amber-300" id="icon-live-egx-refresh"></i>
               <span id="btn-refresh-text">⚡ تحديث الأسعار اللحظية</span>
             </button>
+            <div id="live-auto-countdown-badge" class="px-3 py-2 rounded-xl bg-gray-950 border border-cyan-800/60 text-cyan-300 text-xs font-mono flex items-center gap-1.5 shadow-sm" title="العداد التنازلي لنبض التحديث التلقائي">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span>تحديث تلقائي خلال: <strong id="live-countdown-secs" class="text-white font-bold">30</strong> ث</span>
+            </div>
             <span class="text-xs text-gray-400 bg-gray-800 px-3 py-1 rounded-full border border-gray-700" id="assets-count-badge">12 أصل مالي</span>
           </div>
         </div>
@@ -6182,6 +6186,83 @@ ${topRadarSummary}
       return fetchLiveEGXPricesAndReevaluate();
     }
 
+    // ============================================================
+    // Precision Auto-Refresh Engine (Web Worker + Visual Countdown + Instant Tab Wake-up)
+    // ============================================================
+    let autoRefreshSeconds = 30;
+    let countdownTimerId = null;
+
+    function startAutoRefreshEngine() {
+      if (countdownTimerId) clearInterval(countdownTimerId);
+      autoRefreshSeconds = 30;
+      updateCountdownUI();
+
+      // 1. Foreground Visual Countdown (Ticks every 1 second)
+      countdownTimerId = setInterval(() => {
+        autoRefreshSeconds--;
+        if (autoRefreshSeconds <= 0) {
+          autoRefreshSeconds = 30;
+          fetchLiveEGXPricesAndReevaluate(true);
+        }
+        updateCountdownUI();
+      }, 1000);
+
+      // 2. Background Web Worker (Immune to browser background tab freezing/throttling)
+      initBackgroundHeartbeatWorker();
+
+      // 3. Instant Wake-up on Tab Focus (fires the exact millisecond user returns to browser)
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+          autoRefreshSeconds = 30;
+          updateCountdownUI();
+          fetchLiveEGXPricesAndReevaluate(false);
+        }
+      });
+
+      window.addEventListener('focus', () => {
+        autoRefreshSeconds = 30;
+        updateCountdownUI();
+        fetchLiveEGXPricesAndReevaluate(false);
+      });
+    }
+
+    function resetCountdownTimer() {
+      autoRefreshSeconds = 30;
+      updateCountdownUI();
+    }
+
+    function updateCountdownUI() {
+      const el = document.getElementById('live-countdown-secs');
+      if (el) el.innerText = Math.max(0, autoRefreshSeconds);
+    }
+
+    function initBackgroundHeartbeatWorker() {
+      try {
+        const workerScript = `
+          let interval = null;
+          self.onmessage = function(e) {
+            if (e.data === 'start') {
+              if (interval) clearInterval(interval);
+              interval = setInterval(function() {
+                self.postMessage('TICK_FETCH');
+              }, 30000);
+            }
+          };
+        `;
+        const blob = new Blob([workerScript], { type: 'application/javascript' });
+        const worker = new Worker(URL.createObjectURL(blob));
+        worker.onmessage = function(e) {
+          if (e.data === 'TICK_FETCH') {
+            resetCountdownTimer();
+            fetchLiveEGXPricesAndReevaluate(true);
+          }
+        };
+        worker.postMessage('start');
+      } catch (err) {
+        console.warn('Worker initialization fallback:', err);
+      }
+    }
+
     // Initialize Page and Live Auto-Refresh Heartbeat
     document.addEventListener('DOMContentLoaded', () => {
       initTheme();
@@ -6200,12 +6281,8 @@ ${topRadarSummary}
       updateGeminiStatusUI();
       fetchCloudStatus();
       fetchLiveEGXPrices();
+      startAutoRefreshEngine();
       lucide.createIcons();
-
-      // Automatic background heartbeat polling every 45 seconds
-      setInterval(() => {
-        fetchLiveEGXPricesAndReevaluate(true);
-      }, 45000);
     });
   </script>
 </body>
