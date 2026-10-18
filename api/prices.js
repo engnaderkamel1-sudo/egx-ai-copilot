@@ -4,7 +4,11 @@
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Cache-Control', 's-maxage=30, stale-while-revalidate=60');
+  if (req.query && req.query._t) {
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+  } else {
+    res.setHeader('Cache-Control', 's-maxage=10, stale-while-revalidate=30');
+  }
 
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
