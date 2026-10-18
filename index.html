@@ -1281,6 +1281,10 @@
               <i data-lucide="zap" class="w-4 h-4 text-amber-300" id="icon-live-egx-refresh"></i>
               <span id="btn-refresh-text">⚡ تحديث الأسعار اللحظية</span>
             </button>
+            <button onclick="forceFreshSync()" class="px-3 py-2 rounded-xl bg-gray-800 hover:bg-gray-700 text-cyan-300 border border-cyan-700/50 text-xs font-bold transition flex items-center gap-1.5 shadow-md active:scale-95" title="تفريغ الكاش ومزامنة كافة أسعار البورصة فوراً">
+              <i data-lucide="rotate-ccw" class="w-3.5 h-3.5 text-cyan-400"></i>
+              <span>مزامنة نظيفة 🔄</span>
+            </button>
             <div id="live-auto-countdown-badge" class="px-3 py-2 rounded-xl bg-gray-950 border border-cyan-800/60 text-cyan-300 text-xs font-mono flex items-center gap-1.5 shadow-sm" title="العداد التنازلي لنبض التحديث التلقائي">
               <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
               <span>تحديث تلقائي خلال: <strong id="live-countdown-secs" class="text-white font-bold">30</strong> ث</span>
@@ -3782,6 +3786,12 @@
     function loadPortfolio() {
       const saved = localStorage.getItem('egx_copilot_portfolio');
       if (saved) {
+        // Auto-purge stale freeze from 01:22 session
+        if (saved.includes('01:22') || saved.includes('(10/18)')) {
+          try { localStorage.removeItem('egx_copilot_portfolio'); } catch(e){}
+          portfolioData = JSON.parse(JSON.stringify(defaultPortfolioData));
+          return;
+        }
         try {
           portfolioData = JSON.parse(saved);
           if (!portfolioData.some(p => p.ticker === 'BSB') || !portfolioData.some(p => p.ticker === 'CASH') || !portfolioData.some(p => p.shares) || !portfolioData.some(p => p.ticker === 'ORAS' && p.currentPrice > 800)) {
@@ -6492,10 +6502,13 @@ ${topRadarSummary}
       }
 
       try {
-        const res = await fetch(`/api/prices?include_radar=true&_t=${Date.now()}`, {
+        const apiBase = (window.location.protocol === 'file:' || !window.location.host) 
+          ? 'https://egx-ai-copilot.vercel.app' 
+          : '';
+        const res = await fetch(`${apiBase}/api/prices?include_radar=true&_t=${Date.now()}`, {
           headers: { 'Cache-Control': 'no-cache' }
         });
-        if (!res.ok) throw new Error('API prices response error');
+        if (!res.ok) throw new Error(`سيرفر البورصة رد برمز ${res.status}`);
         const data = await res.json();
 
         if (data.success) {
@@ -6583,7 +6596,7 @@ ${topRadarSummary}
             }
           }
 
-          // 4. Update Header Live Sync Indicator Badge
+          // 5. Update Header Live Sync Indicator Badge
           if (statusText) {
             if (isSessionOpen) {
               statusText.innerHTML = `🟢 متصل بالبورصة المصرية لحظياً • تم التحديث الآن: <strong class="text-cyan-300 font-mono">${timeStr}</strong> • الأسعار مطابقة لشاشة التداول الرسمية في ثندر`;
@@ -6593,9 +6606,9 @@ ${topRadarSummary}
           }
         }
       } catch (err) {
-        console.warn('Live price fetch fallback:', err);
+        console.error('Live price fetch fallback:', err);
         if (statusText) {
-          statusText.innerText = 'أسعار الأسهم وقرارات المستشار محدثة وفق آخر إغلاق رسمي لجلسة البورصة المصرية';
+          statusText.innerHTML = `<span class="text-rose-400 font-bold">⚠️ تعذر الاتصال اللحظي بالبورصة (${err.message}) • انقر "مزامنة نظيفة 🔄" لإعادة المحاولة فوراً</span>`;
         }
       } finally {
         if (!isSilent) {
@@ -6603,6 +6616,14 @@ ${topRadarSummary}
           if (btnText) btnText.innerText = '⚡ تحديث الأسعار اللحظية';
         }
       }
+    }
+
+    // Force fresh sync & clear cached portfolio
+    function forceFreshSync() {
+      localStorage.removeItem('egx_copilot_portfolio');
+      portfolioData = JSON.parse(JSON.stringify(defaultPortfolioData));
+      renderPortfolioTable();
+      fetchLiveEGXPricesAndReevaluate(false);
     }
 
     // Backwards compatibility alias
@@ -6689,24 +6710,27 @@ ${topRadarSummary}
 
     // Initialize Page and Live Auto-Refresh Heartbeat
     document.addEventListener('DOMContentLoaded', () => {
-      initTheme();
-      initSidebar();
-      loadPortfolio();
-      updateMetrics();
-      renderPortfolioTable();
-      renderRadarGrid();
-      populateRiskStockDropdown();
-      renderAllocationChart();
-      calculateSmartAllocation();
-      renderSimPositions();
-      renderAutonomousLedger();
-      loadStrategySettings();
-      updateSimPriceFromSelect();
-      updateGeminiStatusUI();
-      fetchCloudStatus();
+      try { initTheme(); } catch(e){}
+      try { initSidebar(); } catch(e){}
+      try { loadPortfolio(); } catch(e){}
+      try { updateMetrics(); } catch(e){}
+      try { renderPortfolioTable(); } catch(e){}
+
+      // PRIORITY 1: Fetch live EGX quotes and start heartbeat immediately
       fetchLiveEGXPrices();
       startAutoRefreshEngine();
-      lucide.createIcons();
+
+      try { renderRadarGrid(); } catch(e){}
+      try { populateRiskStockDropdown(); } catch(e){}
+      try { renderAllocationChart(); } catch(e){}
+      try { calculateSmartAllocation(); } catch(e){}
+      try { renderSimPositions(); } catch(e){}
+      try { renderAutonomousLedger(); } catch(e){}
+      try { loadStrategySettings(); } catch(e){}
+      try { updateSimPriceFromSelect(); } catch(e){}
+      try { updateGeminiStatusUI(); } catch(e){}
+      try { fetchCloudStatus(); } catch(e){}
+      try { lucide.createIcons(); } catch(e){}
     });
   </script>
 </body>
