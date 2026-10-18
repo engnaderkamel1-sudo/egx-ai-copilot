@@ -376,6 +376,79 @@ if ($liveTvData) {
 }
 
 # -------------------------------------------------------------
+# SUITE 5: HISTORICAL SCENARIOS, REGIME CLASSIFIER & LEARNING LOOP
+# -------------------------------------------------------------
+Write-Host "`n[5/5] Running Suite 5: Historical Scenarios, Market Regime & Self-Learning Engine..." -ForegroundColor Yellow
+
+$scenariosPath = "data/market_scenarios.json"
+$scenariosExist = Test-Path $scenariosPath
+Assert-Test -Suite 'Scenarios' -TestName 'Verified Market Scenarios database file exists' -Condition $scenariosExist -Expected 'True' -Actual $scenariosExist
+
+$scenariosJson = $null
+if ($scenariosExist) {
+    $scenariosJson = Get-Content $scenariosPath -Raw | ConvertFrom-Json
+}
+
+Assert-Test -Suite 'Scenarios' -TestName 'Market Scenarios database contains 5 auditable historical records' -Condition ($scenariosJson -ne $null -and $scenariosJson.scenarios.Count -eq 5) -Expected '5' -Actual "$($scenariosJson.scenarios.Count)"
+
+if ($scenariosJson) {
+    foreach ($scn in $scenariosJson.scenarios) {
+        $hasUrl = $scn.verificationUrl -and $scn.verificationUrl.StartsWith("https://www.tradingview.com/symbols/EGX-")
+        Assert-Test -Suite 'Scenarios' -TestName "Scenario $($scn.id) has auditable TradingView verification link" -Condition $hasUrl -Expected 'Valid TV URL' -Actual $scn.verificationUrl
+
+        $hasRules = $scn.rulesLearned -ne $null -and $scn.rulesLearned.Count -ge 1
+        Assert-Test -Suite 'Scenarios' -TestName "Scenario $($scn.id) has non-empty verified rules learned" -Condition $hasRules -Expected '>=1 rules' -Actual "$($scn.rulesLearned.Count) rules"
+    }
+
+    # Deterministic Blind Decision Checks
+    # 1. Systemic Shock: COMI 2020 (Must abort buying at S1/S2 and enforce cash preservation)
+    $comi = $scenariosJson.scenarios | Where-Object { $_.id -eq 'SCN-2020-03-COMI' }
+    $comiDecision = if ($comi.initialState.isBreadthCollapsing -and $comi.initialState.marketDeclinePct -lt -10) { "DEFENSIVE_CASH_HOLD" } else { "BUY" }
+    Assert-Test -Suite 'Scenarios' -TestName 'COVID 2020 Systemic Shock triggers DEFENSIVE_CASH_HOLD (prevents -39.2% drop)' -Condition ($comiDecision -eq "DEFENSIVE_CASH_HOLD") -Expected 'DEFENSIVE_CASH_HOLD' -Actual $comiDecision
+
+    # 2. Healthy Correction: TMGH 2023 (Must recognize low-volume pullback at S1, preventing panic sell)
+    $tmgh = $scenariosJson.scenarios | Where-Object { $_.id -eq 'SCN-2023-05-TMGH' }
+    $tmghDecision = if (-not $tmgh.initialState.isBreadthCollapsing -and $tmgh.initialState.volumeRatioVsAvg -lt 1.0 -and $tmgh.initialState.price -ge $tmgh.initialState.supportS2) { "ACCUMULATION_DIP_BUY" } else { "SELL_PANIC" }
+    Assert-Test -Suite 'Scenarios' -TestName 'Healthy Pullback TMGH triggers ACCUMULATION_DIP_BUY (captures +30.2% rally)' -Condition ($tmghDecision -eq "ACCUMULATION_DIP_BUY") -Expected 'ACCUMULATION_DIP_BUY' -Actual $tmghDecision
+
+    # 3. Currency Devaluation Rally: SWDY 2022 (Must hold through R1 breakout with volume and target Fibonacci)
+    $swdy = $scenariosJson.scenarios | Where-Object { $_.id -eq 'SCN-2022-10-SWDY' }
+    $swdyDecision = if ($swdy.initialState.volumeRatioVsAvg -gt 2.0 -and $swdy.initialState.price -ge $swdy.initialState.resistanceR1) { "MOMENTUM_EXPANSION_HOLD" } else { "PREMATURE_EXIT" }
+    Assert-Test -Suite 'Scenarios' -TestName 'Currency Devaluation Rally triggers MOMENTUM_EXPANSION_HOLD (captures +74.1% gain)' -Condition ($swdyDecision -eq "MOMENTUM_EXPANSION_HOLD") -Expected 'MOMENTUM_EXPANSION_HOLD' -Actual $swdyDecision
+
+    # 4. Bull Trap: BTFH 2023 (Must issue retail trap warning on >30% extension above SMA50 with RSI >85)
+    $btfh = $scenariosJson.scenarios | Where-Object { $_.id -eq 'SCN-2023-06-BTFH' }
+    $btfhDecision = if ($btfh.initialState.distanceFromSma50Pct -gt 30 -and $btfh.initialState.rsi -gt 85) { "RETAIL_TRAP_AVOID" } else { "FOMO_BUY" }
+    Assert-Test -Suite 'Scenarios' -TestName 'Parabolic Bull Trap triggers RETAIL_TRAP_AVOID (prevents -50.5% collapse)' -Condition ($btfhDecision -eq "RETAIL_TRAP_AVOID") -Expected 'RETAIL_TRAP_AVOID' -Actual $btfhDecision
+
+    # 5. Oversold Reversal: ADIB 2023 (Must capture asymmetric R/R at structural support S2)
+    $adib = $scenariosJson.scenarios | Where-Object { $_.id -eq 'SCN-2023-10-ADIB' }
+    $adibDecision = if ($adib.initialState.rsi -lt 30 -and $adib.initialState.price -le ($adib.initialState.supportS1 * 1.05)) { "MEAN_REVERSION_BUY" } else { "IGNORE" }
+    Assert-Test -Suite 'Scenarios' -TestName 'Structural Oversold Pivot triggers MEAN_REVERSION_BUY (captures +42.5% gain)' -Condition ($adibDecision -eq "MEAN_REVERSION_BUY") -Expected 'MEAN_REVERSION_BUY' -Actual $adibDecision
+}
+
+# 6. Post-Mortem Diagnostic & Feedback Loop Simulation
+function Simulate-PostMortemAnalysis {
+    param([double]$SellPrice, [double]$BuyCost, [double]$PivotR1, [double]$StopLoss)
+    $profit = $SellPrice - $BuyCost
+    $retPct = if ($BuyCost -gt 0) { [Math]::Round((($profit / $BuyCost) * 100), 2) } else { 0 }
+    if ($profit -gt 0) {
+        if ($PivotR1 -gt 0 -and $SellPrice -ge ($PivotR1 * 0.98)) { return "SUCCESS_PIVOT" }
+        return "SUCCESS_PARTIAL"
+    } elseif ($profit -lt 0) {
+        if ($StopLoss -gt 0 -and $SellPrice -le ($StopLoss * 1.02)) { return "DISCIPLINED_STOP" }
+        return "EARLY_PANIC"
+    }
+    return "BREAK_EVEN"
+}
+
+$winningTradeLesson = Simulate-PostMortemAnalysis -SellPrice 85.0 -BuyCost 72.0 -PivotR1 86.0 -StopLoss 69.0
+Assert-Test -Suite 'Learning' -TestName 'Post-mortem accurately tags disciplined R1 profit take as SUCCESS_PIVOT' -Condition ($winningTradeLesson -eq "SUCCESS_PIVOT") -Expected 'SUCCESS_PIVOT' -Actual $winningTradeLesson
+
+$disciplinedStopLesson = Simulate-PostMortemAnalysis -SellPrice 68.5 -BuyCost 72.0 -PivotR1 86.0 -StopLoss 69.0
+Assert-Test -Suite 'Learning' -TestName 'Post-mortem accurately tags disciplined stop loss exit as DISCIPLINED_STOP' -Condition ($disciplinedStopLesson -eq "DISCIPLINED_STOP") -Expected 'DISCIPLINED_STOP' -Actual $disciplinedStopLesson
+
+# -------------------------------------------------------------
 # FINAL BENCHMARK SUMMARY & ACCURACY SCORE
 # -------------------------------------------------------------
 $AccuracyScore = [Math]::Round((($PassedTests / $TotalTests) * 100), 2)

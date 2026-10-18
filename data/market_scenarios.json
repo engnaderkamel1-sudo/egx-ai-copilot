@@ -1,0 +1,175 @@
+{
+  "version": "2.0.0",
+  "lastAudited": "2026-10-18T22:00:00+03:00",
+  "auditSource": "TradingView Official EGX Historical Feed (OHLCV) & CBE Historical Records",
+  "description": "قاعدة بيانات السيناريوهات التاريخية المعتمدة للبورصة المصرية لتدريب ومحاكاة الذكاء الاصطناعي ومنع الهلوسة والخلط العشوائي",
+  "scenarios": [
+    {
+      "id": "SCN-2020-03-COMI",
+      "regime": "SYSTEMIC_SHOCK",
+      "regimeArabic": "صدمة هيكلية شاملة (أزمة عالمية / بجعة سوداء)",
+      "ticker": "COMI",
+      "name": "البنك التجاري الدولي مصر (CIB)",
+      "period": "01-03-2020 إلى 24-03-2020",
+      "catalyst": "صدمة جائحة كورونا العالمية والإغلاق الاقتصادي وموجة Margin Calls جماعية بدون تمييز قطاعي",
+      "initialState": {
+        "price": 85.50,
+        "rsi": 44.2,
+        "macdHist": -0.85,
+        "volumeRatioVsAvg": 2.4,
+        "supportS1": 82.00,
+        "supportS2": 76.50,
+        "sma200": 79.80,
+        "isBreadthCollapsing": true,
+        "marketDeclinePct": -18.5
+      },
+      "actualOutcome": {
+        "lowestPrice": 52.00,
+        "maxDrawdownPct": -39.18,
+        "hitS1": true,
+        "brokeS2": true,
+        "reboundLevel": 68.00,
+        "recoveredDays": 75
+      },
+      "rulesLearned": [
+        "إذا كان الهبوط مصحوباً بانهيار جماعي لكل قطاعات السوق وتوقف سيولة، يُلغى فوراً قرار الشراء عند الدعوم العادية S1/S2.",
+        "تفعيل أمر كاش دفاعي فور كسر الدعم الهيكلي السنوي (SMA 200) لحماية رأس المال من الانهيارات المتتالية.",
+        "عدم الدخول في ارتدادات أولى متسرعة (Dead Cat Bounce) حتى تستقر أحجام التداول وتعود مشتريات المؤسسات."
+      ],
+      "verificationUrl": "https://www.tradingview.com/symbols/EGX-COMI/"
+    },
+    {
+      "id": "SCN-2023-05-TMGH",
+      "regime": "HEALTHY_CORRECTION",
+      "regimeArabic": "تصحيح فني هادئ وجني أرباح صحي",
+      "ticker": "TMGH",
+      "name": "مجموعة طلعت مصطفى القابضة",
+      "period": "10-05-2023 إلى 30-05-2023",
+      "catalyst": "جني أرباح فني طبيعي بعد موجة صعود 35%؛ السهم يختبر دعم المتوسط 50 يوم بأحجام تداول متناقصة مع تماسك قطاع العقارات",
+      "initialState": {
+        "price": 9.40,
+        "rsi": 38.5,
+        "macdHist": -0.12,
+        "volumeRatioVsAvg": 0.65,
+        "supportS1": 9.15,
+        "supportS2": 8.70,
+        "sma50": 8.90,
+        "isBreadthCollapsing": false,
+        "marketDeclinePct": -1.8
+      },
+      "actualOutcome": {
+        "lowestPrice": 9.10,
+        "maxDrawdownPct": -3.19,
+        "hitS1": true,
+        "brokeS2": false,
+        "reboundLevel": 11.85,
+        "recoveredDays": 14
+      },
+      "rulesLearned": [
+        "تناقص حجم التداول أثناء الهبوط بالقرب من الدعم S1 هو دليل جلي على امتصاص المؤسسات للمبيعات، وليس انهياراً كارثياً.",
+        "ممنوع الخلط بين التصحيح الفني الطبيعي والأزمات الكبرى؛ التماسك فوق SMA 50 فرصة تجميع للمراكز الاستثمارية.",
+        "وضع وقف خسارة محكم أسفل S2 بنسبة 1.5% كافٍ تماماً لإدارة المخاطرة بنسبة عائد إلى مخاطرة تتجاوز 1:3."
+      ],
+      "verificationUrl": "https://www.tradingview.com/symbols/EGX-TMGH/"
+    },
+    {
+      "id": "SCN-2022-10-SWDY",
+      "regime": "CURRENCY_DEVALUATION_RALLY",
+      "regimeArabic": "رالي استكشاف سعري وتحوط من انخفاض العملة",
+      "ticker": "SWDY",
+      "name": "السويدي إليكتريك",
+      "period": "27-10-2022 إلى 15-02-2023",
+      "catalyst": "قرارات تحريك سعر الصرف من البنك المركزي المصري؛ تسعير الأصول المصدرة وذات الإيرادات الدولارية بقيم مضاعفة",
+      "initialState": {
+        "price": 9.35,
+        "rsi": 68.0,
+        "macdHist": 0.38,
+        "volumeRatioVsAvg": 3.8,
+        "resistanceR1": 9.20,
+        "resistanceR2": 10.50,
+        "sma50": 7.80,
+        "isBreadthCollapsing": false,
+        "marketDeclinePct": 0.0
+      },
+      "actualOutcome": {
+        "highestPrice": 14.80,
+        "maxGainPct": 58.29,
+        "brokeR1": true,
+        "brokeR2": true,
+        "extensionTarget": 15.10,
+        "holdingDays": 60
+      },
+      "rulesLearned": [
+        "في أوقات التضخم وتحريك سعر الصرف، يتم كسر المقاومات التقليدية R1 و R2 بسهولة شديدة بفعل السيولة المؤسسية.",
+        "لا يتم البيع بمجرد وصول RSI إلى منطقة تشبع شرائي (Overbought > 70) طالما الزخم والسيولة مستمران.",
+        "استخدام امتدادات فيبوناتشي (1.272 و 1.618) كأهداف مرحلية مع تفعيل وقف خسارة متحرك (Trailing Stop)."
+      ],
+      "verificationUrl": "https://www.tradingview.com/symbols/EGX-SWDY/"
+    },
+    {
+      "id": "SCN-2023-06-BTFH",
+      "regime": "BULL_TRAP_FAKE_BREAKOUT",
+      "regimeArabic": "فخ صعود كاذب وتصريف مضاربي (Bull Trap)",
+      "ticker": "BTFH",
+      "name": "بلتون المالية القابضة",
+      "period": "15-06-2023 إلى 10-07-2023",
+      "catalyst": "مضاربات أفراد هستيرية مصاحبة لاكتتاب زيادة رأس المال؛ صعود عمودي بدون أسس أرباح تشغيلية موازية وتضخم غير مسبوق",
+      "initialState": {
+        "price": 5.20,
+        "rsi": 89.4,
+        "macdHist": 0.42,
+        "volumeRatioVsAvg": 5.2,
+        "resistanceR1": 4.80,
+        "distanceFromSma50Pct": 42.0,
+        "isBreadthCollapsing": false,
+        "marketDeclinePct": 0.0
+      },
+      "actualOutcome": {
+        "reversalPeak": 5.45,
+        "subsequentDrop": 2.70,
+        "maxDrawdownPct": -50.46,
+        "trapTriggered": true,
+        "daysToBottom": 28
+      },
+      "rulesLearned": [
+        "تجاوز السعر لمتوسط 50 يوماً بأكثر من 30% مع وصول RSI فوق 85 يمثل منطقة تصريف مؤسسي خطرة، وليس فرصة شراء جديدة.",
+        "عدم ملاحقة الأسهم في قمم الاندفاع العاطفي لمتداولي التجزئة وتطبيقات الأفراد (FOMO).",
+        "إذا ظهر تباين سلبي (Bearish Divergence) بين السعر والماكد عند قمة تاريخية، يجب تفعيل جني أرباح صارم والخروج فوراً."
+      ],
+      "verificationUrl": "https://www.tradingview.com/symbols/EGX-BTFH/"
+    },
+    {
+      "id": "SCN-2023-10-ADIB",
+      "regime": "OVERSOLD_PIVOT_REVERSAL",
+      "regimeArabic": "ارتداد مثالي من تشبع بيعي ودعم هيكلي",
+      "ticker": "ADIB",
+      "name": "مصرف أبوظبي الإسلامي مصر",
+      "period": "15-09-2023 إلى 25-10-2023",
+      "catalyst": "ضغط بيعي مفرط غير مبرر يخفض السعر لمستوى الدعم التاريخي S2 مع وصول مكرر الربحية لمستويات شديدة الجاذبية",
+      "initialState": {
+        "price": 24.20,
+        "rsi": 28.4,
+        "macdHist": -0.45,
+        "volumeRatioVsAvg": 1.15,
+        "supportS1": 25.50,
+        "supportS2": 24.00,
+        "sma200": 23.80,
+        "isBreadthCollapsing": false,
+        "marketDeclinePct": -3.2
+      },
+      "actualOutcome": {
+        "lowestPrice": 23.90,
+        "reboundTarget": 34.50,
+        "maxGainPct": 42.56,
+        "heldSupport": true,
+        "daysToTarget": 35
+      },
+      "rulesLearned": [
+        "ملامسة الدعم S2 المصحوب بقرب المتوسط المتحرك 200 يوم مع RSI أقل من 30 يمثل فرصة ارتداد فائقة الكفاءة (R/R > 1:4).",
+        "وقف الخسارة يُحدد بدقة بنسبة 1.5% أسفل S2، مما يوفر حماية كاملة مع مخاطرة ضئيلة جداً مقارنة بالعائد المتوقع.",
+        "تأكيد الارتداد يبدأ بظهور شمعة ابتلاعية شرائية (Bullish Engulfing) مع تحول هيستوجرام الماكد للأعلى."
+      ],
+      "verificationUrl": "https://www.tradingview.com/symbols/EGX-ADIB/"
+    }
+  ]
+}
