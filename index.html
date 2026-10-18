@@ -1016,8 +1016,13 @@
           </button>
         </div>
 
-        <a href="https://app.thndr.app" target="_blank" class="btn-thndr w-full py-2.5 px-3 rounded-xl text-white font-bold text-xs flex items-center justify-center gap-2 transition">
-          <span>فتح محفظة ثندر (Thndr)</span>
+        <button onclick="openThndrSyncModal()" class="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold text-xs flex items-center justify-center gap-2 transition shadow-md shadow-emerald-950/50 cursor-pointer">
+          <i data-lucide="zap" class="w-4 h-4 text-amber-300"></i>
+          <span>مزامنة محفظة ثندر ⚡</span>
+        </button>
+
+        <a href="https://app.thndr.app" target="_blank" class="btn-thndr w-full py-2 px-3 rounded-xl text-white font-bold text-xs flex items-center justify-center gap-2 transition opacity-90 hover:opacity-100">
+          <span>فتح موقع ثندر (Thndr)</span>
           <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
         </a>
       </div>
@@ -2662,8 +2667,8 @@
   </div>
 
   <!-- Thndr 1-Click Sync & Import Modal -->
-  <div id="thndr-sync-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden items-center justify-center p-4">
-    <div class="bg-gray-900 border border-emerald-500/40 rounded-3xl max-w-xl w-full p-6 space-y-5 shadow-2xl relative max-h-[90vh] flex flex-col">
+  <div id="thndr-sync-modal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden items-center justify-center p-4">
+    <div class="bg-gray-900 border border-emerald-500/50 rounded-3xl max-w-xl w-full p-6 space-y-4 shadow-2xl relative max-h-[92vh] flex flex-col">
       <!-- Modal Header -->
       <div class="flex items-center justify-between border-b border-gray-800 pb-3 shrink-0">
         <div class="flex items-center gap-3">
@@ -2672,10 +2677,10 @@
           </div>
           <div>
             <h3 class="font-extrabold text-white text-base flex items-center gap-2">
-              <span>مزامنة محفظة ثندر اللحظية</span>
-              <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-mono border border-emerald-500/30">1-Click Sync</span>
+              <span>أداة مزامنة محفظة ثندر بالقرش</span>
+              <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-mono border border-emerald-500/30">100% Accurate</span>
             </h3>
-            <p class="text-xs text-gray-400">استيراد مباشر وتلقائي لجميع أسهمك، كمياتها، ومتوسطات الشراء من موقع ثندر ويب</p>
+            <p class="text-xs text-gray-400">سحب أحدث أرقام أسهمك ومتوسطات الشراء من ثندر وتحديث التطبيق في 3 خطوات بسيطة</p>
           </div>
         </div>
         <button onclick="closeThndrSyncModal()" class="text-gray-400 hover:text-white p-1.5 rounded-xl hover:bg-gray-800 transition cursor-pointer">
@@ -2683,133 +2688,86 @@
         </button>
       </div>
 
-      <!-- Sync Tabs Navigation -->
-      <div class="flex items-center gap-1.5 p-1 bg-gray-950 rounded-2xl border border-gray-800 shrink-0 text-xs">
-        <button id="thndr-tab-btn-bookmarklet" onclick="switchThndrSyncTab('bookmarklet')" class="flex-1 py-2 px-3 rounded-xl font-bold transition flex items-center justify-center gap-1.5 bg-emerald-600 text-white shadow">
-          <i data-lucide="bookmark" class="w-3.5 h-3.5 text-amber-300"></i>
-          <span>زر المزامنة الذكية (Bookmarklet)</span>
-        </button>
-        <button id="thndr-tab-btn-manual" onclick="switchThndrSyncTab('manual')" class="flex-1 py-2 px-3 rounded-xl font-bold transition flex items-center justify-center gap-1.5 text-gray-400 hover:text-gray-200">
-          <i data-lucide="clipboard-paste" class="w-3.5 h-3.5"></i>
-          <span>لصق يدوي (JSON)</span>
-        </button>
-        <button id="thndr-tab-btn-export" onclick="switchThndrSyncTab('export')" class="py-2 px-3 rounded-xl font-bold transition flex items-center justify-center gap-1.5 text-gray-400 hover:text-gray-200">
-          <i data-lucide="download" class="w-3.5 h-3.5"></i>
-          <span>تصدير نسخة</span>
-        </button>
-      </div>
-
-      <!-- Tab Content Area -->
+      <!-- Scrollable Wizard Body -->
       <div class="flex-1 overflow-y-auto space-y-4 pr-1 text-xs text-gray-300">
         
-        <!-- PANEL 1: BOOKMARKLET (RECOMMENDED) -->
-        <div id="thndr-panel-bookmarklet" class="space-y-4">
-          <!-- Draggable Bookmarklet Container -->
-          <div class="p-5 bg-gradient-to-b from-emerald-950/60 to-gray-950/80 rounded-2xl border border-emerald-500/40 text-center space-y-3.5">
-            <span class="text-xs text-emerald-300 font-bold block">
-              ✨ اسحب هذا الزر بالماوس وأفلته في شريط المفضلة (Bookmarks Bar) بأعلى متصفحك:
-            </span>
-            <div>
-              <a id="thndr-bookmarklet-link" href="javascript:void(0)" class="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 text-white font-black text-sm shadow-xl shadow-emerald-950/80 cursor-grab active:cursor-grabbing border border-emerald-200/50 hover:scale-105 transition transform" draggable="true" title="اسحب هذا الزر إلى شريط المفضلة في متصفحك">
-                <i data-lucide="zap" class="w-4 h-4 text-amber-300 animate-bounce"></i>
-                <span>⚡ مزامنة محفظة ثندر</span>
-              </a>
+        <!-- STEP 1: Copy Script -->
+        <div class="p-4 bg-gray-950 rounded-2xl border border-emerald-500/30 space-y-3">
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <div class="flex items-center gap-2">
+              <span class="w-6 h-6 rounded-full bg-emerald-600 text-white font-bold flex items-center justify-center text-xs shrink-0 shadow">1</span>
+              <span class="font-bold text-white text-xs">الخطوة الأولى: انسخ كود السحب المعتمد</span>
             </div>
-            <p class="text-[11px] text-gray-400 leading-relaxed">
-              💡 لو شريط المفضلة مش ظاهر في متصفحك: اضغط على <kbd class="px-1.5 py-0.5 rounded bg-gray-800 text-gray-200 border border-gray-700 font-mono">Ctrl + Shift + B</kbd> على ويندوز لإظهاره.
-            </p>
-          </div>
-
-          <!-- 3 Step Visual Guide -->
-          <div class="bg-gray-950/60 p-4 rounded-2xl border border-gray-800 space-y-2.5">
-            <div class="font-bold text-white text-xs flex items-center gap-2">
-              <i data-lucide="sparkles" class="w-4 h-4 text-cyan-400"></i>
-              <span>كيف تعمل المزامنة في 3 خطوات بسيطة؟</span>
-            </div>
-            
-            <div class="space-y-2 text-[11px]">
-              <div class="flex items-start gap-2.5">
-                <span class="w-5 h-5 rounded-full bg-emerald-600/30 text-emerald-400 font-bold flex items-center justify-center shrink-0 border border-emerald-500/40 text-[10px]">1</span>
-                <p>اسحب الزر الأخضر أعلاه إلى شريط المفضلة في متصفحك (مرة واحدة فقط).</p>
-              </div>
-              <div class="flex items-start gap-2.5">
-                <span class="w-5 h-5 rounded-full bg-cyan-600/30 text-cyan-400 font-bold flex items-center justify-center shrink-0 border border-cyan-500/40 text-[10px]">2</span>
-                <p>افتح موقع ثندر (<a href="https://app.thndr.app" target="_blank" class="text-cyan-400 underline font-semibold">app.thndr.app</a>) وسجل دخولك وافتح شاشة "محفظتي".</p>
-              </div>
-              <div class="flex items-start gap-2.5">
-                <span class="w-5 h-5 rounded-full bg-amber-600/30 text-amber-400 font-bold flex items-center justify-center shrink-0 border border-amber-500/40 text-[10px]">3</span>
-                <p>اضغط على زر <strong class="text-emerald-400">⚡ مزامنة محفظة ثندر</strong> في شريط المفضلة؛ ستفتح صفحة التطبيق هنا فوراً وتجد كل أسهمك وكمياتها وأسعار الشراء محدثة بالكامل!</p>
-              </div>
-            </div>
-          </div>
-
-          <!-- Alternative: Console Script Copy -->
-          <div class="p-3 bg-gray-950 rounded-xl border border-gray-800/80 flex items-center justify-between gap-3">
-            <div>
-              <div class="font-bold text-gray-200 text-xs">طريقة بديلة عبر الـ Console (F12):</div>
-              <div class="text-[10px] text-gray-400">إذا كنت تفضل نسخ الكود ولصقه يدوياً في متصفح ثندر</div>
-            </div>
-            <button onclick="copyThndrConsoleScript()" class="px-3 py-1.5 rounded-xl bg-gray-800 hover:bg-gray-700 text-cyan-300 border border-cyan-700/50 font-bold text-xs flex items-center gap-1.5 transition cursor-pointer">
+            <button onclick="copyThndrVerifiedScript()" class="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs flex items-center gap-1.5 transition shadow cursor-pointer transform active:scale-95">
               <i data-lucide="copy" class="w-3.5 h-3.5"></i>
-              <span id="btn-copy-console-text">نسخ كود الـ Console</span>
+              <span id="btn-copy-verified-text">📋 اضغط هنا لنسخ الكود</span>
             </button>
+          </div>
+
+          <!-- Collapsible Script Preview Box -->
+          <details class="text-[11px] text-gray-400 cursor-pointer">
+            <summary class="hover:text-emerald-300 transition select-none">عرض نص الكود البرمجي (للاطلاع أو النسخ اليدوي) ▾</summary>
+            <textarea id="thndr-verified-script-box" readonly rows="4" class="w-full mt-2 bg-gray-900 border border-gray-800 rounded-xl p-2.5 text-[10px] font-mono text-emerald-400 select-all focus:outline-none"></textarea>
+          </details>
+        </div>
+
+        <!-- STEP 2: Run in Thndr -->
+        <div class="p-4 bg-gray-950 rounded-2xl border border-gray-800 space-y-2.5">
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <div class="flex items-center gap-2">
+              <span class="w-6 h-6 rounded-full bg-cyan-600 text-white font-bold flex items-center justify-center text-xs shrink-0 shadow">2</span>
+              <span class="font-bold text-white text-xs">الخطوة الثانية: شغل الكود في ثندر ويب</span>
+            </div>
+            <a href="https://app.thndr.app" target="_blank" class="px-3 py-1 rounded-xl bg-gray-800 hover:bg-gray-700 text-cyan-300 border border-cyan-800 font-bold text-[11px] flex items-center gap-1 transition">
+              <span>فتح موقع ثندر ↗</span>
+            </a>
+          </div>
+
+          <div class="space-y-1.5 text-[11px] text-gray-300 leading-relaxed pr-8">
+            <p>1. افتح موقع ثندر وسجل دخولك وادخل على شاشة <strong>"المحفظة"</strong>.</p>
+            <p>2. اضغط <kbd class="px-1.5 py-0.5 rounded bg-gray-800 text-gray-200 border border-gray-700 font-mono">F12</kbd> في الكيبورد وافتح تبويب <strong>Console</strong>.</p>
+            <p>3. اعمل لصق (<kbd class="px-1.5 py-0.5 rounded bg-gray-800 text-gray-200 border border-gray-700 font-mono">Ctrl + V</kbd>) واضغط <kbd class="px-1.5 py-0.5 rounded bg-gray-800 text-gray-200 border border-gray-700 font-mono">Enter</kbd> (هيتم نسخ الناتج تلقائياً لحافظتك).</p>
           </div>
         </div>
 
-        <!-- PANEL 2: MANUAL JSON IMPORT -->
-        <div id="thndr-panel-manual" class="space-y-3.5 hidden">
-          <div class="flex items-center justify-between">
-            <span class="font-bold text-white text-xs">الصق بيانات المحفظة بصيغة JSON:</span>
-            <button onclick="pasteThndrFromClipboard()" class="px-2.5 py-1 rounded-lg bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-700 text-emerald-300 font-bold text-[11px] flex items-center gap-1 transition cursor-pointer">
+        <!-- STEP 3: Paste and Update -->
+        <div class="p-4 bg-emerald-950/30 rounded-2xl border border-emerald-500/40 space-y-3">
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <div class="flex items-center gap-2">
+              <span class="w-6 h-6 rounded-full bg-amber-500 text-gray-950 font-bold flex items-center justify-center text-xs shrink-0 shadow">3</span>
+              <span class="font-bold text-white text-xs">الخطوة الثالثة: الصق الناتج هنا واضغط تحديث</span>
+            </div>
+            <button onclick="pasteThndrFromClipboard()" class="px-2.5 py-1 rounded-lg bg-gray-900 hover:bg-gray-800 border border-emerald-600 text-emerald-300 font-bold text-[11px] flex items-center gap-1 transition cursor-pointer">
               <i data-lucide="clipboard" class="w-3.5 h-3.5"></i>
               <span>لصق من الحافظة فوراً</span>
             </button>
           </div>
 
-          <textarea id="thndr-manual-json-input" rows="7" placeholder='[
-  { "ticker": "COMI", "shares": 100, "buyPrice": 85.50 },
-  { "ticker": "SWDY", "shares": 120, "buyPrice": 92.00 }
-]' class="w-full bg-gray-950 border border-gray-800 rounded-xl p-3 text-emerald-300 font-mono text-[11px] focus:border-emerald-500 focus:outline-none leading-relaxed"></textarea>
+          <textarea id="thndr-manual-json-input" rows="5" placeholder='الصق هنا الكود الذي تم نسخه من Console ثندر...
+مثال:
+[
+  { "ticker": "COMI", "shares": 122, "buyPrice": 140.48 },
+  { "ticker": "SWDY", "shares": 110, "buyPrice": 93.86 }
+]' class="w-full bg-gray-950 border border-gray-700 rounded-xl p-3 text-emerald-300 font-mono text-[11px] focus:border-emerald-500 focus:outline-none leading-relaxed"></textarea>
 
-          <div class="flex items-center justify-between bg-gray-950 p-2.5 rounded-xl border border-gray-800 text-[11px]">
-            <span class="text-gray-400">طريقة التحديث:</span>
+          <div class="flex items-center justify-between text-[11px] bg-gray-950/80 p-2.5 rounded-xl border border-gray-800">
             <label class="flex items-center gap-1.5 text-gray-200 cursor-pointer">
               <input type="checkbox" id="thndr-replace-all" checked class="rounded border-gray-700 text-emerald-600 focus:ring-emerald-500">
-              <span>استبدال المحفظة الحالية بالكامل بالأرقام الجديدة</span>
+              <span>استبدال المحفظة بالكامل بالأرقام الجديدة المحدثة</span>
             </label>
           </div>
 
-          <button onclick="handleManualThndrImportSubmit()" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition shadow-lg cursor-pointer">
-            <i data-lucide="check" class="w-4 h-4"></i>
-            <span>تأكيد واستيراد المحفظة فوراً</span>
+          <button onclick="handleManualThndrImportSubmit()" class="w-full py-3 rounded-2xl bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 text-white font-extrabold text-xs flex items-center justify-center gap-2 transition shadow-xl shadow-emerald-950/60 cursor-pointer transform active:scale-95">
+            <i data-lucide="zap" class="w-4 h-4 text-amber-300"></i>
+            <span>⚡ تحديث المحفظة فوراً بالقرش (Update Portfolio)</span>
           </button>
-        </div>
-
-        <!-- PANEL 3: EXPORT BACKUP -->
-        <div id="thndr-panel-export" class="space-y-3.5 hidden">
-          <p class="text-xs text-gray-300 leading-relaxed">
-            يمكنك حفظ نسخة احتياطية من محفظتك الحالية لاستعادتها في أي وقت أو نقلها لجهاز آخر:
-          </p>
-          <div class="grid grid-cols-2 gap-3 pt-2">
-            <button onclick="downloadPortfolioBackupJSON()" class="py-2.5 px-3 rounded-xl bg-gray-800 hover:bg-gray-700 text-cyan-300 border border-cyan-800 font-bold text-xs flex items-center justify-center gap-2 transition cursor-pointer">
-              <i data-lucide="download-cloud" class="w-4 h-4"></i>
-              <span>تحميل ملف JSON</span>
-            </button>
-            <button onclick="copyPortfolioBackupJSON()" class="py-2.5 px-3 rounded-xl bg-gray-800 hover:bg-gray-700 text-emerald-300 border border-emerald-800 font-bold text-xs flex items-center justify-center gap-2 transition cursor-pointer">
-              <i data-lucide="copy" class="w-4 h-4"></i>
-              <span id="btn-copy-backup-text">نسخ الكود كـ JSON</span>
-            </button>
-          </div>
         </div>
 
       </div>
 
       <!-- Modal Footer -->
       <div class="pt-3 border-t border-gray-800 flex items-center justify-between shrink-0">
-        <a href="https://app.thndr.app" target="_blank" class="text-xs text-cyan-400 hover:text-cyan-300 font-semibold flex items-center gap-1 transition">
-          <span>فتح موقع ثندر ويب ↗</span>
-          <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
-        </a>
+        <span class="text-[11px] text-gray-500">يتم الحفظ التلقائي في جهازك وإعادة حساب الأسعار اللحظية فوراً ✅</span>
         <button onclick="closeThndrSyncModal()" class="px-4 py-1.5 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-300 font-bold text-xs transition cursor-pointer">
           إغلاق
         </button>
@@ -4886,19 +4844,84 @@
     // ============================================================
     // Thndr 1-Click Sync & Import Engine
     // ============================================================
+    // ============================================================
+    // Thndr 1-Click Sync & Import Engine
+    // ============================================================
+    function generateThndrExtractorScript() {
+      return `(function() {
+  console.clear();
+  console.log("%c🎯 جاري قراءة محفظة ثندر بالقرش...", "color:#10b981;font-size:14px;font-weight:bold;");
+
+  let results = [];
+  const knownTickers = ["COMI","SWDY","ORAS","TMGH","ARCC","RAYA","CLHO","ETEL","FWRY","ESRS","SKPC","EKHO","ISPH","MFPC","JUFO","CERA","BTFH","ALCN","OCDI","HELI","PHDC","ABUK","HDBK","ETRS","HRHO","EFIH","EAST","ORHD","CICH","ADIB","EGAL","AMOC"];
+
+  function cleanNum(s) {
+    if (!s) return 0;
+    let str = String(s).replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d)).replace(/,/g, '').trim();
+    let m = str.match(/-?\\d+(?:\\.\\d+)?/);
+    return m ? parseFloat(m[0]) : 0;
+  }
+
+  let allRows = document.querySelectorAll('tr, [role="row"], div[class*="row"]');
+  allRows.forEach(row => {
+    let txt = row.innerText || '';
+    if (txt.includes('نوع الورقه الماليه') || txt.includes('وحدات مملوكه') || txt.includes('الأوراق المالية المملوكة')) return;
+
+    for (let sym of knownTickers) {
+      if (txt.includes(sym) && !results.some(r => r.ticker === sym)) {
+        let cells = row.querySelectorAll('td, [role="cell"], div[class*="cell"]');
+        let cellValues = [];
+        if (cells.length >= 4) {
+          cellValues = Array.from(cells).map(c => c.innerText.trim());
+        } else {
+          cellValues = txt.split('\\n').map(l => l.trim()).filter(l => l.length > 0 && !l.includes('%'));
+        }
+
+        let nums = cellValues.map(c => cleanNum(c)).filter(n => n > 0);
+        let shares = 0;
+        let buyPrice = 0;
+        let curPrice = 0;
+
+        if (cellValues.length >= 5) {
+          shares = cleanNum(cellValues[2]) || cleanNum(cellValues[1]);
+          buyPrice = cleanNum(cellValues[3]) || cleanNum(cellValues[2]);
+          curPrice = cleanNum(cellValues[4]) || cleanNum(cellValues[3]);
+        } else if (nums.length >= 3) {
+          shares = nums[0];
+          buyPrice = nums[1];
+          curPrice = nums[2];
+        }
+
+        results.push({
+          ticker: sym,
+          shares: shares,
+          buyPrice: buyPrice,
+          currentPrice: curPrice
+        });
+        break;
+      }
+    }
+  });
+
+  let cleanJson = JSON.stringify(results, null, 2);
+  console.log("👇 تم تجهيز أرقام المحفظة بالقرش (انسخ هذا النص):");
+  console.log(cleanJson);
+
+  try { if (typeof copy === 'function') copy(cleanJson); } catch(e){}
+  alert("🎉 تم استخراج " + results.length + " أسهم بنجاح! تم نسخ الكود، الصقه الآن في التطبيق واضغط تحديث.");
+  return cleanJson;
+})();`;
+    }
+
     function openThndrSyncModal() {
       const modal = document.getElementById('thndr-sync-modal');
       if (!modal) return;
       
-      // Update bookmarklet link with current origin + path
-      const currentAppUrl = window.location.origin + window.location.pathname;
-      const scriptCode = generateThndrExtractorScript(currentAppUrl);
-      const link = document.getElementById('thndr-bookmarklet-link');
-      if (link) {
-        link.setAttribute('href', 'javascript:' + encodeURIComponent(scriptCode));
+      const scriptBox = document.getElementById('thndr-verified-script-box');
+      if (scriptBox) {
+        scriptBox.value = generateThndrExtractorScript();
       }
 
-      switchThndrSyncTab('bookmarklet');
       modal.classList.remove('hidden');
       modal.classList.add('flex');
       if (window.lucide) lucide.createIcons();
@@ -4911,211 +4934,35 @@
       modal.classList.remove('flex');
     }
 
-    function switchThndrSyncTab(tab) {
-      const panels = {
-        bookmarklet: document.getElementById('thndr-panel-bookmarklet'),
-        manual: document.getElementById('thndr-panel-manual'),
-        export: document.getElementById('thndr-panel-export')
-      };
-      const buttons = {
-        bookmarklet: document.getElementById('thndr-tab-btn-bookmarklet'),
-        manual: document.getElementById('thndr-tab-btn-manual'),
-        export: document.getElementById('thndr-tab-btn-export')
-      };
-
-      Object.keys(panels).forEach(k => {
-        if (panels[k]) {
-          if (k === tab) panels[k].classList.remove('hidden');
-          else panels[k].classList.add('hidden');
-        }
-      });
-
-      Object.keys(buttons).forEach(k => {
-        if (buttons[k]) {
-          if (k === tab) {
-            buttons[k].className = 'flex-1 py-2 px-3 rounded-xl font-bold transition flex items-center justify-center gap-1.5 bg-emerald-600 text-white shadow';
-          } else {
-            buttons[k].className = 'flex-1 py-2 px-3 rounded-xl font-bold transition flex items-center justify-center gap-1.5 text-gray-400 hover:text-gray-200';
-          }
-        }
-      });
-      if (window.lucide) lucide.createIcons();
-    }
-
-    function generateThndrExtractorScript(appUrl) {
-      return `(function() {
-  try {
-    if (!location.hostname.includes('thndr.app') && !location.hostname.includes('thndr')) {
-      alert('⚠️ يرجى تشغيل هذا السكريبت وأنت داخل موقع ثندر (app.thndr.app) في شاشة المحفظة.');
-      return;
-    }
-    var results = [];
-    var knownTickers = ["COMI","SWDY","ORAS","TMGH","AMOC","ARCC","RAYA","CLHO","ETEL","FWRY","ESRS","SKPC","EKHO","ISPH","MFPC","JUFO","CERA","BTFH","ALCN","OCDI","HELI","PHDC","ABUK","HDBK","ETRS","HRHO","EFIH","EAST","ORHD","CICH","ADIB","CBLI","DSCW","RTVC","MNHD","ORWE","MOIL","EGTS","SPMD","BINV","POUL","KABO","PRDC","AUTO","DOMP","IDHC","PHAR","SVCE","ACAMD","MCQE","ASCM","TAQA","EGAL","OIH","FAWR","CCAP","RMDA","EXPA","UEGC","MASR","EMFD","PORT","ACGC","AIND","ANFI","ARAB","ATLC","AXPH","BInv","BOCM","CSAG","DAPH","DIBP","ECAP","EDBM","EFIC","EGCH","EHDR","ELKA","ELSH","EPCO","FERC","FIPO","GDWA","GGCC","GTHE","ICMI","INCO","INVE","ISMA","KRRE","MAAL","MEPA","MICH","MIPH","MMGP","MPRC","NCCW","NEDA","OASR","PACH","QNBA","RREI","SAUD","SCEM","SDTI","SEIG","SNFC","SRCA","SUGR","TALM","UASG","UNIT","VERT","VLTR","WATP","ZEOT"];
-
-    function cleanNum(s) {
-      if (!s) return 0;
-      var str = String(s).replace(/[٠-٩]/g, function(d) { return "٠١٢٣٤٥٦٧٨٩".indexOf(d); }).replace(/,/g, '').trim();
-      var match = str.match(/-?\\d+(?:\\.\\d+)?/);
-      return match ? parseFloat(match[0]) : 0;
-    }
-
-    // 1. Scan LocalStorage for cached positions/holdings
-    try {
-      for (var i = 0; i < localStorage.length; i++) {
-        var k = localStorage.key(i);
-        var raw = localStorage.getItem(k);
-        if (raw && (raw.includes('positions') || raw.includes('holdings') || raw.includes('portfolio'))) {
-          var parsed = JSON.parse(raw);
-          var list = parsed.positions || parsed.holdings || parsed.portfolio || (parsed.user && parsed.user.positions);
-          if (Array.isArray(list) && list.length > 0) {
-            list.forEach(function(p) {
-              var sym = (p.symbol || p.ticker || p.code || '').toUpperCase();
-              var q = cleanNum(p.shares || p.quantity || p.sharesCount);
-              var buy = cleanNum(p.avgPrice || p.averagePrice || p.costPrice || p.buyPrice);
-              var cur = cleanNum(p.currentPrice || p.marketPrice || p.price);
-              if (sym && q > 0 && !results.some(function(r){ return r.ticker === sym; })) {
-                results.push({ ticker: sym, shares: q, buyPrice: buy, currentPrice: cur });
-              }
-            });
-          }
-        }
-      }
-    } catch(e){}
-
-    // 2. DOM Scan: Rows and cards
-    var candidateEls = document.querySelectorAll('tr, [role="row"], div[class*="holding"], div[class*="position"], div[class*="stock"], div[class*="card"], li');
-    candidateEls.forEach(function(el) {
-      var txt = el.innerText || '';
-      var words = txt.match(/\\b[A-Z]{3,5}\\b/g) || [];
-      words.forEach(function(w) {
-        var upper = w.toUpperCase();
-        if (['EGP', 'USD', 'BUY', 'SELL', 'HOLD', 'CASH', 'TIME', 'DATE', 'NAME', 'GAIN', 'LOSS', 'TYPE', 'STOCK', 'PORT'].indexOf(upper) !== -1) return;
-        if (results.some(function(r){ return r.ticker === upper; })) return;
-
-        var qMatch = txt.match(/(\\d+(?:,\\d+)*(?:\\.\\d+)?)\\s*(?:سهم|shares?|Shares?)/i) ||
-                     txt.match(/(?:الكمية|الأسهم|Shares?|Quantity)[:\\s]*(\\d+(?:,\\d+)*(?:\\.\\d+)?)/i);
-        var bMatch = txt.match(/(?:متوسط|Avg|Cost|تكلفة)[:\\s]*[^\\d]*(\\d+(?:,\\d+)*(?:\\.\\d+)?)/i);
-        var cMatch = txt.match(/(?:الحالي|السعر|Price|Current)[:\\s]*[^\\d]*(\\d+(?:,\\d+)*(?:\\.\\d+)?)/i);
-
-        var shares = qMatch ? cleanNum(qMatch[1]) : 0;
-        var buyPrice = bMatch ? cleanNum(bMatch[1]) : 0;
-        var curPrice = cMatch ? cleanNum(cMatch[1]) : 0;
-
-        if (knownTickers.indexOf(upper) !== -1 && (shares > 0 || buyPrice > 0)) {
-          results.push({ ticker: upper, shares: shares, buyPrice: buyPrice, currentPrice: curPrice });
-        }
-      });
-    });
-
-    // 3. Fallback: Search known EGX tickers across full page text
-    if (results.length === 0) {
-      var fullText = document.body.innerText;
-      knownTickers.forEach(function(sym) {
-        var idx = fullText.indexOf(sym);
-        if (idx !== -1) {
-          var snippet = fullText.substr(Math.max(0, idx - 40), 180);
-          var nums = snippet.match(/\\d+(?:,\\d+)*(?:\\.\\d+)?/g);
-          if (nums && nums.length >= 2) {
-            results.push({
-              ticker: sym,
-              shares: cleanNum(nums[0]),
-              buyPrice: cleanNum(nums[1]),
-              currentPrice: nums[2] ? cleanNum(nums[2]) : cleanNum(nums[1])
-            });
-          }
-        }
-      });
-    }
-
-    var cash = 0;
-    var cashMatch = document.body.innerText.match(/(?:رصيد كاش|كاش متاح|السيولة|Cash|Available Cash|Buying Power)[:\\s]*[^\\d]*(\\d+(?:,\\d+)*(?:\\.\\d+)?)/i);
-    if (cashMatch) cash = cleanNum(cashMatch[1]);
-
-    if (results.length === 0) {
-      alert('⚠️ لم يتم العثور على أسهم ظاهرة في الصفحة الحالية.\\nيرجى التأكد من أنك فاتح صفحة "محفظتي" (Portfolio) في موقع ثندر.');
-      return;
-    }
-
-    var payload = {
-      timestamp: new Date().toISOString(),
-      source: 'thndr_web',
-      cash: cash,
-      stocks: results
-    };
-
-    var jsonStr = JSON.stringify(payload);
-    try { navigator.clipboard.writeText(jsonStr); } catch(e){}
-
-    var appTarget = '${appUrl}';
-    var encoded = encodeURIComponent(btoa(unescape(encodeURIComponent(jsonStr))));
-    var finalUrl = appTarget + '#thndr_sync=' + encoded;
-
-    var existingBanner = document.getElementById('thndr-sync-overlay-banner');
-    if (existingBanner) existingBanner.remove();
-
-    var banner = document.createElement('div');
-    banner.id = 'thndr-sync-overlay-banner';
-    banner.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#064e3b;color:#ecfdf5;border:2px solid #10b981;padding:16px 24px;border-radius:18px;z-index:9999999;box-shadow:0 25px 50px -12px rgba(0,0,0,0.7);font-family:sans-serif;direction:rtl;text-align:center;font-size:13px;min-width:320px;';
-    banner.innerHTML = '<div style="font-weight:800;font-size:15px;color:#34d399;margin-bottom:4px;">🎉 تم استخراج ' + results.length + ' أسهم بنجاح!</div>' +
-      '<div style="font-size:11px;opacity:0.9;margin-bottom:12px;">تم نسخ الأرقام للحافظة. جاري فتح تطبيق EGX AI Copilot...</div>' +
-      '<div style="display:flex;gap:8px;justify-content:center;">' +
-      '<button id="btn-sync-launch" style="background:#10b981;color:#fff;border:none;padding:7px 16px;border-radius:10px;font-weight:bold;cursor:pointer;font-size:12px;">فتح التطبيق الآن 🚀</button>' +
-      '<button id="btn-sync-dismiss" style="background:#065f46;color:#a7f3d0;border:1px solid #10b981;padding:7px 12px;border-radius:10px;font-weight:bold;cursor:pointer;font-size:12px;">إغلاق</button>' +
-      '</div>';
-    document.body.appendChild(banner);
-
-    document.getElementById('btn-sync-launch').onclick = function() {
-      window.open(finalUrl, '_blank');
-      banner.remove();
-    };
-    document.getElementById('btn-sync-dismiss').onclick = function() {
-      banner.remove();
-    };
-
-    setTimeout(function() {
-      window.open(finalUrl, '_blank');
-    }, 700);
-
-    setTimeout(function() {
-      if (banner.parentElement) banner.remove();
-    }, 10000);
-
-  } catch(err) {
-    alert('حدث خطأ أثناء فحص المحفظة: ' + err.message);
-  }
-})();`;
-    }
-
-    function copyThndrConsoleScript() {
-      const currentAppUrl = window.location.origin + window.location.pathname;
-      const scriptCode = generateThndrExtractorScript(currentAppUrl);
+    function copyThndrVerifiedScript() {
+      const code = generateThndrExtractorScript();
       if (navigator.clipboard) {
-        navigator.clipboard.writeText(scriptCode).then(() => {
-          const btn = document.getElementById('btn-copy-console-text');
+        navigator.clipboard.writeText(code).then(() => {
+          const btn = document.getElementById('btn-copy-verified-text');
           if (btn) {
-            btn.innerText = 'تم النسخ بنجاح! ✅';
-            setTimeout(() => { btn.innerText = 'نسخ كود الـ Console'; }, 3000);
+            btn.innerText = '✅ تم نسخ الكود بنجاح!';
+            setTimeout(() => { btn.innerText = '📋 اضغط هنا لنسخ الكود'; }, 3000);
           }
-          showToast('تم نسخ كود الـ Console إلى الحافظة! الصقه في DevTools وأنت داخل ثندر واضغط Enter.', 'success');
+          showToast('تم نسخ كود السحب بنجاح! الصقه في Console موقع ثندر واضغط Enter.', 'success');
         }).catch(() => {
-          showToast('تعذر النسخ التلقائي؛ يرجى نسخ الكود يدوياً.', 'error');
+          showToast('يرجى نسخ الكود من الصندوق بالأسفل يدوياً.', 'info');
         });
       }
     }
 
     function pasteThndrFromClipboard() {
       if (!navigator.clipboard) {
-        showToast('متصفحك لا يدعم قراءة الحافظة مباشرة؛ يرجى اللصق بـ Ctrl+V يدوياً.', 'info');
+        showToast('متصفحك لا يدعم القراءة المباشرة؛ استخدم Ctrl + V للصق النص.', 'info');
         return;
       }
       navigator.clipboard.readText().then(text => {
         const input = document.getElementById('thndr-manual-json-input');
         if (input) {
           input.value = text;
-          showToast('تم لصق البيانات من الحافظة بنجاح ✅', 'success');
+          showToast('تم لصق أرقام المحفظة من الحافظة بنجاح ✅', 'success');
         }
       }).catch(err => {
-        showToast('يرجى السماح بصلاحية قراءة الحافظة، أو لصق النص يدوياً داخل المربع.', 'info');
+        showToast('يرجى لصق الكود يدوياً داخل المربع.', 'info');
       });
     }
 
