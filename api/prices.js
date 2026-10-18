@@ -2,6 +2,12 @@
 // Ultra-Reliable EGX Live Market Scanner & Prices Provider
 // Powered by TradingView Egypt Real-Time Scanner with Zero Fake Data Policy
 
+function toEnglishDigits(str) {
+  if (str === null || str === undefined) return '';
+  const arabicDigits = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+  return String(str).replace(/[٠-٩]/g, d => arabicDigits.indexOf(d));
+}
+
 const EGX_DICTIONARY = {
   "COMI": { name: "البنك التجاري الدولي (CIB)", sector: "بنوك وخدمات مالية", index: "egx30", quality: "سهم دفاعي من الطراز الأول" },
   "SWDY": { name: "السويدي إليكتريك", sector: "طاقة وكابلات وتصدير", index: "egx30", quality: "إيرادات دولارية قوية" },
@@ -231,7 +237,7 @@ export default async function handler(req, res) {
           stopLoss: `${stopLossVal} ج`,
           liquidityStatus: `سيولة ممتازة في ثندر (${turnoverMillions} مليون ج)`,
           tags: [safetyTag, dict.index || 'egx30'],
-          updatedAt: new Date().toLocaleTimeString('ar-EG', { timeZone: 'Africa/Cairo', hour: '2-digit', minute: '2-digit' }),
+          updatedAt: toEnglishDigits(new Date().toLocaleTimeString('ar-EG-u-nu-latn', { timeZone: 'Africa/Cairo', hour: '2-digit', minute: '2-digit', numberingSystem: 'latn' })),
           thndrUrl: `https://app.thndr.app`,
           tradingViewUrl: `https://www.tradingview.com/symbols/EGX-${symbol}/`
         };
@@ -249,11 +255,12 @@ export default async function handler(req, res) {
     }
 
     // Cairo Time stamp
-    const cairoTimeStr = new Intl.DateTimeFormat('ar-EG', {
+    const cairoTimeStr = toEnglishDigits(new Intl.DateTimeFormat('ar-EG-u-nu-latn', {
       timeZone: 'Africa/Cairo',
       dateStyle: 'full',
-      timeStyle: 'medium'
-    }).format(new Date());
+      timeStyle: 'medium',
+      numberingSystem: 'latn'
+    }).format(new Date()));
 
     return res.status(200).json({
       success: true,

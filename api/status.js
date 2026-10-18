@@ -1,13 +1,20 @@
 // /api/status.js
 // Health check and real-time status of Autonomous Cloud Engine
 
+function toEnglishDigits(str) {
+  if (str === null || str === undefined) return '';
+  const arabicDigits = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+  return String(str).replace(/[٠-٩]/g, d => arabicDigits.indexOf(d));
+}
+
 export default async function handler(req, res) {
   const now = new Date();
-  const cairoTime = new Intl.DateTimeFormat('ar-EG', {
+  const cairoTime = toEnglishDigits(new Intl.DateTimeFormat('ar-EG-u-nu-latn', {
     timeZone: 'Africa/Cairo',
     dateStyle: 'short',
-    timeStyle: 'medium'
-  }).format(now);
+    timeStyle: 'medium',
+    numberingSystem: 'latn'
+  }).format(now));
 
   res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
   res.setHeader('Content-Type', 'application/json');

@@ -1,15 +1,22 @@
 // /api/cron.js
 // Vercel Serverless Function & Scheduled Cron Job for Autonomous Cloud Analysis & Mutual Funds Settlement
 
+function toEnglishDigits(str) {
+  if (str === null || str === undefined) return '';
+  const arabicDigits = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+  return String(str).replace(/[٠-٩]/g, d => arabicDigits.indexOf(d));
+}
+
 export default async function handler(req, res) {
   try {
     const now = new Date();
-    const cairoFormatter = new Intl.DateTimeFormat('ar-EG', {
+    const cairoFormatter = new Intl.DateTimeFormat('ar-EG-u-nu-latn', {
       timeZone: 'Africa/Cairo',
       dateStyle: 'full',
-      timeStyle: 'medium'
+      timeStyle: 'medium',
+      numberingSystem: 'latn'
     });
-    const cairoTime = cairoFormatter.format(now);
+    const cairoTime = toEnglishDigits(cairoFormatter.format(now));
 
     // Fetch real-time market data directly from TradingView Egypt Scanner
     const tickers = [

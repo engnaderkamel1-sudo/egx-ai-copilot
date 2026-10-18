@@ -47,6 +47,10 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
+    *, body {
+      font-variant-numeric: tabular-nums lining-nums;
+      font-feature-settings: "lnum" 1, "tnum" 1;
+    }
     body {
       font-family: 'Cairo', sans-serif;
       transition: background-color 0.2s ease, color 0.2s ease;
@@ -2862,6 +2866,91 @@
 
   <!-- Application Logic -->
   <script>
+    // ============================================================
+    // Strict General Rule: All Numbers in English (0-9) - No Eastern Arabic Digits
+    // ============================================================
+    function toEnDigits(str) {
+      if (str === null || str === undefined) return '';
+      const arabicDigits = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+      return String(str).replace(/[٠-٩]/g, d => arabicDigits.indexOf(d));
+    }
+
+    function formatNum(num) {
+      if (num === null || num === undefined || isNaN(num)) return '0';
+      return toEnDigits(Number(num).toLocaleString('en-US'));
+    }
+
+    function formatCairoTime(date = new Date(), includeSeconds = false, timeOnly = false) {
+      const d = date instanceof Date ? date : new Date(date);
+      const timeStr = d.toLocaleTimeString('ar-EG-u-nu-latn', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: includeSeconds ? '2-digit' : undefined,
+        numberingSystem: 'latn'
+      });
+      if (timeOnly) return toEnDigits(timeStr);
+      const dateStr = d.toLocaleDateString('ar-EG-u-nu-latn', {
+        day: 'numeric',
+        month: 'numeric',
+        numberingSystem: 'latn'
+      });
+      return toEnDigits(`${timeStr} (${dateStr})`);
+    }
+
+    function formatCairoDateOnly(date = new Date()) {
+      const d = date instanceof Date ? date : new Date(date);
+      const dateStr = d.toLocaleDateString('ar-EG-u-nu-latn', {
+        day: 'numeric',
+        month: 'numeric',
+        numberingSystem: 'latn'
+      });
+      return toEnDigits(dateStr);
+    }
+
+    function enforceEnglishNumbers(root = document.body) {
+      if (!root) return;
+      const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null, false);
+      let node;
+      while ((node = walker.nextNode())) {
+        if (/[٠-٩]/.test(node.nodeValue)) {
+          node.nodeValue = toEnDigits(node.nodeValue);
+        }
+      }
+    }
+
+    // Auto-intercept any dynamic Arabic numerals across the entire DOM
+    if (typeof MutationObserver !== 'undefined') {
+      const englishDigitsObserver = new MutationObserver(mutations => {
+        mutations.forEach(mutation => {
+          if (mutation.type === 'childList') {
+            mutation.addedNodes.forEach(node => {
+              if (node.nodeType === Node.TEXT_NODE) {
+                if (/[٠-٩]/.test(node.nodeValue)) {
+                  node.nodeValue = toEnDigits(node.nodeValue);
+                }
+              } else if (node.nodeType === Node.ELEMENT_NODE) {
+                enforceEnglishNumbers(node);
+              }
+            });
+          } else if (mutation.type === 'characterData') {
+            if (/[٠-٩]/.test(mutation.target.nodeValue)) {
+              mutation.target.nodeValue = toEnDigits(mutation.target.nodeValue);
+            }
+          }
+        });
+      });
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => {
+          enforceEnglishNumbers(document.body);
+          englishDigitsObserver.observe(document.body, { childList: true, subtree: true, characterData: true });
+        });
+      } else {
+        enforceEnglishNumbers(document.body);
+        englishDigitsObserver.observe(document.body, { childList: true, subtree: true, characterData: true });
+      }
+    }
+
     // Initial Seed Data from User's Real Thndr screenshots with estimated shares & buy prices
     const defaultPortfolioData = [
       {
@@ -3114,7 +3203,7 @@
     ];
 
     // Comprehensive EGX Market Universe (18 Active Stocks)
-    const fullMarketRadar = [
+    let fullMarketRadar = [
       {
         ticker: 'COMI',
         name: 'البنك التجاري الدولي',
@@ -3507,6 +3596,10 @@
             savePortfolio();
           } else {
             portfolioData.forEach(item => {
+              if (item.priceUpdatedAt) item.priceUpdatedAt = toEnDigits(item.priceUpdatedAt);
+              if (item.decisionUpdatedAt) item.decisionUpdatedAt = toEnDigits(item.decisionUpdatedAt);
+              if (item.decisionBasis) item.decisionBasis = toEnDigits(item.decisionBasis);
+              if (item.advice) item.advice = toEnDigits(item.advice);
               if (!item.priceUpdatedAt) item.priceUpdatedAt = 'جلسة البورصة اليوم';
               if (!item.priceSource) item.priceSource = 'شاشة البورصة المصرية اللحظية';
               if (!item.decisionUpdatedAt) item.decisionUpdatedAt = 'جلسة اليوم';
@@ -3580,7 +3673,7 @@
                   const val = context.raw || 0;
                   const total = values.reduce((a, b) => a + b, 0);
                   const pct = ((val / total) * 100).toFixed(1);
-                  return ` ${context.label}: ${val.toLocaleString()} ج.م (${pct}%)`;
+                  return ` ${context.label}: ${val.toLocaleString('en-US')} ج.م (${pct}%)`;
                 }
               }
             }
@@ -3614,16 +3707,16 @@
       const totalReturnPct = totalCost > 0 ? (totalProfit / totalCost) * 100 : 0;
 
       const totalWealthEl = document.getElementById('metric-total-wealth');
-      if (totalWealthEl) totalWealthEl.innerHTML = `${Math.round(totalWealth).toLocaleString()} <span class="text-xs text-gray-400 font-normal">ج.م</span>`;
+      if (totalWealthEl) totalWealthEl.innerHTML = `${Math.round(totalWealth).toLocaleString('en-US')} <span class="text-xs text-gray-400 font-normal">ج.م</span>`;
       
       const stocksWealthEl = document.getElementById('metric-stocks-wealth');
-      if (stocksWealthEl) stocksWealthEl.innerHTML = `${Math.round(stocksWealth).toLocaleString()} <span class="text-xs text-gray-400 font-normal">ج.م</span>`;
+      if (stocksWealthEl) stocksWealthEl.innerHTML = `${Math.round(stocksWealth).toLocaleString('en-US')} <span class="text-xs text-gray-400 font-normal">ج.م</span>`;
       
       const fundsWealthEl = document.getElementById('metric-funds-wealth');
-      if (fundsWealthEl) fundsWealthEl.innerHTML = `${Math.round(fundsWealth).toLocaleString()} <span class="text-xs text-gray-400 font-normal">ج.م</span>`;
+      if (fundsWealthEl) fundsWealthEl.innerHTML = `${Math.round(fundsWealth).toLocaleString('en-US')} <span class="text-xs text-gray-400 font-normal">ج.م</span>`;
       
       const cashWealthEl = document.getElementById('metric-cash-wealth');
-      if (cashWealthEl) cashWealthEl.innerHTML = `${Math.round(cashWealth).toLocaleString()} <span class="text-xs text-gray-400 font-normal">ج.م</span>`;
+      if (cashWealthEl) cashWealthEl.innerHTML = `${Math.round(cashWealth).toLocaleString('en-US')} <span class="text-xs text-gray-400 font-normal">ج.م</span>`;
       
       const assetsCountEl = document.getElementById('assets-count-badge');
       if (assetsCountEl) assetsCountEl.innerText = `${portfolioData.length} أصل مالي`;
@@ -3640,12 +3733,12 @@
         returnBadge.className = `flex items-center ${isPositive ? 'text-emerald-400' : 'text-rose-400'}`;
         returnBadge.innerHTML = `
           <i data-lucide="${isPositive ? 'trending-up' : 'trending-down'}" class="w-3.5 h-3.5 ml-1"></i>
-          <span>${isPositive ? '+' : ''}${totalReturnPct.toFixed(2)}% (${isPositive ? '+' : ''}${Math.round(totalProfit).toLocaleString()} ج)</span>
+          <span>${isPositive ? '+' : ''}${totalReturnPct.toFixed(2)}% (${isPositive ? '+' : ''}${Math.round(totalProfit).toLocaleString('en-US')} ج)</span>
         `;
       }
       const costSubtext = document.getElementById('metric-total-cost-subtext');
       if (costSubtext) {
-        costSubtext.innerText = `أصل الشراء: ${Math.round(totalCost).toLocaleString()} ج.م`;
+        costSubtext.innerText = `أصل الشراء: ${Math.round(totalCost).toLocaleString('en-US')} ج.م`;
       }
       if (window.lucide) lucide.createIcons();
     }
@@ -3701,7 +3794,7 @@
                   </div>
                   <div class="flex items-center gap-1 mt-1 text-[9px] text-gray-400 font-mono">
                     <span class="w-1.5 h-1.5 rounded-full ${item.priceSource && item.priceSource.includes('يدوي') ? 'bg-amber-400' : 'bg-emerald-400 animate-pulse'}"></span>
-                    <span>آخر تحديث: ${item.priceUpdatedAt || 'جلسة اليوم'}</span>
+                    <span>آخر تحديث: ${toEnDigits(item.priceUpdatedAt) || 'جلسة اليوم'}</span>
                   </div>
                   <span class="text-[8.5px] text-gray-500 font-sans mt-0.5">(${item.priceSource || 'شاشة البورصة اللحظية'})</span>
                  </div>`
@@ -3712,7 +3805,7 @@
           <td class="py-3.5 px-3 text-center font-mono font-bold text-indigo-300 text-xs sm:text-sm">
             ${item.shares 
               ? `<div class="bg-indigo-950/40 border border-indigo-800/40 px-2 py-1 rounded-lg inline-block">
-                  <span>${item.shares.toLocaleString()}</span>
+                  <span>${item.shares.toLocaleString('en-US')}</span>
                   <span class="text-[10px] text-indigo-400 font-sans">سهم</span>
                  </div>`
               : `<span class="text-gray-500 font-normal">--</span>`}
@@ -3728,17 +3821,17 @@
           <!-- 5. Total Market Value (إجمالي القيمة السوقية) -->
           <td class="py-3.5 px-3 text-xs sm:text-sm">
             <div class="font-mono font-bold text-white">
-              ${Math.round(item.value).toLocaleString()} <span class="text-[10px] text-gray-400 font-sans">ج.م</span>
+              ${Math.round(item.value).toLocaleString('en-US')} <span class="text-[10px] text-gray-400 font-sans">ج.م</span>
             </div>
             <div class="text-[10px] text-gray-500 font-mono mt-0.5">
-              التكلفة: ${Math.round(cost).toLocaleString()} ج (${weightPct}%)
+              التكلفة: ${Math.round(cost).toLocaleString('en-US')} ج (${weightPct}%)
             </div>
           </td>
 
           <!-- 6. Profit / Performance (التطور والأرباح) -->
           <td class="py-3.5 px-3 text-xs sm:text-sm">
             <div class="font-mono font-bold ${colorClass}">
-              ${isPositive ? '+' : ''}${Math.round(item.profit).toLocaleString()} <span class="text-[10px] font-sans">ج.م</span>
+              ${isPositive ? '+' : ''}${Math.round(item.profit).toLocaleString('en-US')} <span class="text-[10px] font-sans">ج.م</span>
             </div>
             <div class="mt-0.5 flex items-center gap-1 font-mono text-[10px]">
               <span class="px-1.5 py-0.2 rounded border ${bgBadgeClass} flex items-center gap-0.5">
@@ -3763,7 +3856,7 @@
               </div>
               <div class="bg-gray-950/90 border border-gray-800 px-2 py-1 rounded-md text-[9px] text-cyan-300 font-mono flex items-center gap-1 mt-0.5">
                 <i data-lucide="clock" class="w-2.5 h-2.5 text-cyan-400 shrink-0"></i>
-                <span>القرار صادر بناءً على سعر: <strong>${item.currentPrice ? Number(item.currentPrice).toFixed(2) + ' ج' : '--'}</strong> (الساعة ${item.decisionUpdatedAt || 'جلسة اليوم'})</span>
+                <span>القرار صادر بناءً على سعر: <strong>${item.currentPrice ? Number(item.currentPrice).toFixed(2) + ' ج' : '--'}</strong> (الساعة ${toEnDigits(item.decisionUpdatedAt) || 'جلسة اليوم'})</span>
               </div>
             </div>
           </td>
@@ -4001,7 +4094,7 @@
       const price = parseFloat(document.getElementById('trade-price-input').value) || 0;
       const totalVal = shares * price;
 
-      document.getElementById('trade-total-val').innerText = `${Math.round(totalVal).toLocaleString()} ج.م`;
+      document.getElementById('trade-total-val').innerText = `${Math.round(totalVal).toLocaleString('en-US')} ج.م`;
 
       const isCustom = !document.getElementById('trade-custom-ticker').classList.contains('hidden');
       const ticker = isCustom ? 
@@ -4023,7 +4116,7 @@
           
           impactEl.innerHTML = `سيصبح رصيدك: <strong class="text-white">${newTotalShares} سهم</strong> • متوسط التكلفة الجديد: <strong class="text-amber-300">${newAvgPrice} ج</strong> ${currentCash < totalVal ? '<span class="text-rose-400 font-bold">(تنبيه: يتجاوز الكاش المتوفر)</span>' : ''}`;
         } else {
-          impactEl.innerText = `الرصيد النقدي المتوفر بالكاش: ${Math.round(currentCash).toLocaleString()} ج.م`;
+          impactEl.innerText = `الرصيد النقدي المتوفر بالكاش: ${Math.round(currentCash).toLocaleString('en-US')} ج.م`;
         }
       } else {
         // SELL
@@ -4033,7 +4126,7 @@
           const totalProfit = Math.round(profitPerShare * shares);
           const remainingShares = (owned.shares || 0) - shares;
           
-          impactEl.innerHTML = `الأرباح المحققة: <strong class="${totalProfit >= 0 ? 'text-emerald-400' : 'text-rose-400'}">${totalProfit >= 0 ? '+' : ''}${totalProfit.toLocaleString()} ج.م</strong> • المتبقي بالمحفظة: <strong class="text-white">${remainingShares} سهم</strong>`;
+          impactEl.innerHTML = `الأرباح المحققة: <strong class="${totalProfit >= 0 ? 'text-emerald-400' : 'text-rose-400'}">${totalProfit >= 0 ? '+' : ''}${totalProfit.toLocaleString('en-US')} ج.م</strong> • المتبقي بالمحفظة: <strong class="text-white">${remainingShares} سهم</strong>`;
         } else {
           impactEl.innerText = owned ? `تملك ${owned.shares || 0} سهم للبيع` : '--';
         }
@@ -4072,8 +4165,7 @@
       }
 
       const now = new Date();
-      const timeStr = now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
-      const dateStr = now.toLocaleDateString('ar-EG', { day: 'numeric', month: 'numeric' });
+      const cairoTime = formatCairoTime(now);
 
       if (currentTradeMode === 'BUY') {
         let stock = portfolioData.find(p => p.ticker === ticker);
@@ -4093,6 +4185,8 @@
           stock.profit = stock.value - totalCost;
           stock.returnPct = totalCost > 0 ? parseFloat(((stock.profit / totalCost) * 100).toFixed(2)) : 0;
           stock.status = stock.profit >= 0 ? 'ربح' : 'تراجع';
+          stock.priceUpdatedAt = cairoTime;
+          stock.decisionUpdatedAt = cairoTime;
         } else {
           const stockName = radarItem ? radarItem.name : ticker;
           const stockCategory = radarItem ? `${radarItem.index.toUpperCase()} • ${radarItem.sector}` : 'EGX • أسهم مصرية';
@@ -4111,7 +4205,8 @@
             action: 'HOLD',
             thndrUrl: 'https://app.thndr.app',
             priceSource: 'شاشة البورصة اللحظية',
-            priceUpdatedAt: `${timeStr} (${dateStr})`
+            priceUpdatedAt: cairoTime,
+            decisionUpdatedAt: cairoTime
           };
           portfolioData.unshift(newStock);
         }
@@ -4124,7 +4219,7 @@
 
         savePortfolio();
         closeTradeModal();
-        alert(`✅ تم بنجاح تسجيل شراء ${shares} سهم في (${ticker}) بسعر ${price.toFixed(2)} ج بإجمالي ${totalValue.toLocaleString()} ج.م.`);
+        alert(`✅ تم بنجاح تسجيل شراء ${shares} سهم في (${ticker}) بسعر ${price.toFixed(2)} ج بإجمالي ${totalValue.toLocaleString('en-US')} ج.م.`);
       } else {
         // SELL Mode
         let stock = portfolioData.find(p => p.ticker === ticker);
@@ -4158,7 +4253,7 @@
 
         savePortfolio();
         closeTradeModal();
-        alert(`✅ تم بنجاح تسجيل بيع ${shares} سهم في (${ticker}) بسعر ${price.toFixed(2)} ج. عائد البيع: ${totalValue.toLocaleString()} ج تم إيداعه بالكاش. الأرباح المحققة: ${realizedProfit >= 0 ? '+' : ''}${realizedProfit.toLocaleString()} ج.م.`);
+        alert(`✅ تم بنجاح تسجيل بيع ${shares} سهم في (${ticker}) بسعر ${price.toFixed(2)} ج. عائد البيع: ${totalValue.toLocaleString('en-US')} ج تم إيداعه بالكاش. الأرباح المحققة: ${realizedProfit >= 0 ? '+' : ''}${realizedProfit.toLocaleString('en-US')} ج.م.`);
       }
 
       fetchLiveEGXPricesAndReevaluate();
@@ -4345,7 +4440,7 @@
       const currentPrice = parseFloat(document.getElementById('modal-current-price').value) || existing.currentPrice;
       const buyPrice = parseFloat(document.getElementById('modal-buy-price').value) || existing.buyPrice;
 
-      const nowStr = new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' }) + ' (' + new Date().toLocaleDateString('ar-EG', { day: 'numeric', month: 'numeric' }) + ')';
+      const nowStr = formatCairoTime(new Date());
       const newAsset = {
         ...existing,
         ticker,
@@ -4448,9 +4543,9 @@
       const pounds = Math.floor(num);
       const piastres = Math.round((num - pounds) * 100);
       if (piastres === 0) {
-        return `${pounds.toLocaleString()} ج تماماً`;
+        return `${pounds.toLocaleString('en-US')} ج تماماً`;
       }
-      return `${pounds.toLocaleString()} ج و ${piastres} قرش`;
+      return `${pounds.toLocaleString('en-US')} ج و ${piastres} قرش`;
     }
 
     function adjustFineTunePrice(fieldId, delta) {
@@ -4483,21 +4578,21 @@
       // Box 1: اشتريت بكام؟ (التكلفة)
       const costEl = document.getElementById('ft-preview-cost');
       const costDetailEl = document.getElementById('ft-preview-cost-detail');
-      if (costEl) costEl.innerHTML = `${Math.round(totalCost).toLocaleString()} <span class="text-[10px] text-gray-400 font-sans">ج.م</span>`;
-      if (costDetailEl) costDetailEl.innerText = `${shares.toLocaleString()} سهم @ ${buyPrice.toFixed(2)} ج`;
+      if (costEl) costEl.innerHTML = `${Math.round(totalCost).toLocaleString('en-US')} <span class="text-[10px] text-gray-400 font-sans">ج.م</span>`;
+      if (costDetailEl) costDetailEl.innerText = `${shares.toLocaleString('en-US')} سهم @ ${buyPrice.toFixed(2)} ج`;
 
       // Box 2: بقى بكام؟ (القيمة الآن)
       const valPreview = document.getElementById('ft-preview-value');
       const valDetailEl = document.getElementById('ft-preview-val-detail');
-      if (valPreview) valPreview.innerHTML = `${Math.round(newValue).toLocaleString()} <span class="text-[10px] text-gray-400 font-sans">ج.م</span>`;
-      if (valDetailEl) valDetailEl.innerText = `${shares.toLocaleString()} سهم @ ${currentPrice.toFixed(2)} ج`;
+      if (valPreview) valPreview.innerHTML = `${Math.round(newValue).toLocaleString('en-US')} <span class="text-[10px] text-gray-400 font-sans">ج.م</span>`;
+      if (valDetailEl) valDetailEl.innerText = `${shares.toLocaleString('en-US')} سهم @ ${currentPrice.toFixed(2)} ج`;
 
       // Box 3: التطور والفرق (المكسب / الخسارة)
       const profitPreview = document.getElementById('ft-preview-profit');
       const returnPctEl = document.getElementById('ft-preview-return-pct');
       if (profitPreview) {
         profitPreview.className = `font-bold font-mono text-xs sm:text-sm my-0.5 ${isPositive ? 'text-emerald-400' : 'text-rose-400'}`;
-        profitPreview.innerText = `${isPositive ? '+' : ''}${Math.round(profit).toLocaleString()} ج.م`;
+        profitPreview.innerText = `${isPositive ? '+' : ''}${Math.round(profit).toLocaleString('en-US')} ج.م`;
       }
       if (returnPctEl) {
         returnPctEl.className = `text-[9px] font-mono block ${isPositive ? 'text-emerald-400' : 'text-rose-400'}`;
@@ -4518,7 +4613,7 @@
         if (data.success && data.prices && data.prices[item.ticker]) {
           const live = data.prices[item.ticker];
           document.getElementById('ft-input-current-price').value = Number(live.price).toFixed(2);
-          const nowStr = new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' }) + ' (' + new Date().toLocaleDateString('ar-EG', { day: 'numeric', month: 'numeric' }) + ')';
+          const nowStr = formatCairoTime(new Date());
           const ftUpdatedEl = document.getElementById('ft-price-updated-at');
           if (ftUpdatedEl) ftUpdatedEl.innerText = `آخر تحديث: ${nowStr}`;
           if (badge) {
@@ -4551,7 +4646,7 @@
       const profit = Math.round(newValue - totalCost);
       const returnPct = totalCost > 0 ? parseFloat(((profit / totalCost) * 100).toFixed(2)) : 0;
 
-      const nowStr = new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' }) + ' (' + new Date().toLocaleDateString('ar-EG', { day: 'numeric', month: 'numeric' }) + ')';
+      const nowStr = formatCairoTime(new Date());
 
       item.shares = shares;
       item.buyPrice = buyPrice;
@@ -4594,7 +4689,7 @@
             <p class="text-[11px] text-gray-400 mt-0.5">السهم متراجع 11% عن قمم أرباحه؛ الشراء هنا يخفض متوسط تكلفتك ويعظم عوائدك عند الارتداد.</p>
           </div>
           <div class="text-right">
-            <span class="font-bold text-emerald-400 font-mono text-sm">${cibAmount.toLocaleString()} ج</span>
+            <span class="font-bold text-emerald-400 font-mono text-sm">${cibAmount.toLocaleString('en-US')} ج</span>
             <span class="block text-[10px] text-gray-400">45% من السيولة</span>
           </div>
         </div>
@@ -4608,7 +4703,7 @@
             <p class="text-[11px] text-gray-400 mt-0.5">عملاق الطاقة والتصدير؛ إضافة سيولة تدعم استثمارك طويل الأجل وتضاعف الأرباح الصاعدة.</p>
           </div>
           <div class="text-right">
-            <span class="font-bold text-cyan-400 font-mono text-sm">${swdyAmount.toLocaleString()} ج</span>
+            <span class="font-bold text-cyan-400 font-mono text-sm">${swdyAmount.toLocaleString('en-US')} ج</span>
             <span class="block text-[10px] text-gray-400">35% من السيولة</span>
           </div>
         </div>
@@ -4622,7 +4717,7 @@
             <p class="text-[11px] text-gray-400 mt-0.5">وفق بند السيولة في سياسة إدارة المحفظة: الحفاظ دائماً على سيولة أمان لاقتناص أي تصحيح سعري مغرٍ.</p>
           </div>
           <div class="text-right">
-            <span class="font-bold text-amber-400 font-mono text-sm">${cashCushion.toLocaleString()} ج</span>
+            <span class="font-bold text-amber-400 font-mono text-sm">${cashCushion.toLocaleString('en-US')} ج</span>
             <span class="block text-[10px] text-gray-400">20% كاش أمان</span>
           </div>
         </div>
@@ -4984,7 +5079,7 @@
         totalCost: totalCost,
         target: stock.target1,
         stopLoss: stock.stopLoss,
-        date: new Date().toLocaleDateString('ar-EG')
+        date: formatCairoDateOnly(new Date())
       });
 
       renderSimPositions();
@@ -5016,7 +5111,7 @@
           <td class="py-2.5 px-3 font-bold text-white">${pos.name} (${pos.ticker})</td>
           <td class="py-2.5 px-3 font-mono text-gray-300">${pos.shares} سهم</td>
           <td class="py-2.5 px-3 font-mono text-white">${pos.buyPrice.toFixed(2)} ج</td>
-          <td class="py-2.5 px-3 font-mono text-cyan-400 font-bold">${pos.totalCost.toLocaleString()} ج</td>
+          <td class="py-2.5 px-3 font-mono text-cyan-400 font-bold">${pos.totalCost.toLocaleString('en-US')} ج</td>
           <td class="py-2.5 px-3 font-mono text-rose-400 font-bold">${pos.stopLoss}</td>
           <td class="py-2.5 px-3 font-mono text-emerald-400 font-bold">${pos.target}</td>
           <td class="py-2.5 px-3 text-center">
@@ -5032,8 +5127,8 @@
         tbody.innerHTML = '<tr><td colspan="7" class="py-4 text-center text-gray-500">لا توجد صفقات تجريبية مفتوحة حالياً. اختر سهماً ونفذ شراءً وهمياً أعلاه.</td></tr>';
       }
 
-      document.getElementById('sim-cash').innerText = `${Math.round(simCash).toLocaleString()} ج`;
-      document.getElementById('sim-stocks-val').innerText = `${Math.round(totalStocksValue).toLocaleString()} ج`;
+      document.getElementById('sim-cash').innerText = `${Math.round(simCash).toLocaleString('en-US')} ج`;
+      document.getElementById('sim-stocks-val').innerText = `${Math.round(totalStocksValue).toLocaleString('en-US')} ج`;
       document.getElementById('sim-positions-count').innerText = `${simPositions.length} صفقات مفتوحة`;
     }
 
@@ -5393,8 +5488,8 @@
 
       if (ltLabel) ltLabel.innerText = `استثمار طويل: ${longTermPct}%`;
       if (tacLabel) tacLabel.innerText = `طفرات سريعة: ${tacticalPct}%`;
-      if (ltVal) ltVal.innerText = `${longTermVal.toLocaleString()} ج.م (${longTermPct}%)`;
-      if (tacVal) tacVal.innerText = `${tacticalVal.toLocaleString()} ج.م (${tacticalPct}%)`;
+      if (ltVal) ltVal.innerText = `${longTermVal.toLocaleString('en-US')} ج.م (${longTermPct}%)`;
+      if (tacVal) tacVal.innerText = `${tacticalVal.toLocaleString('en-US')} ج.م (${tacticalPct}%)`;
     }
 
     function saveStrategySettings() {
@@ -5806,7 +5901,7 @@
         const systemPrompt = `أنت "مستشار البورصة المصرية الذكي" (EGX Pro Copilot).
 المستخدم مستثمر في البورصة المصرية ولديه المحفظة التالية في تطبيق ثندر (Thndr):
 - إجمالي قيمة المحفظة: حوالي 219 ألف جنيه مصري.
-- الرصيد النقدي المتوفر (كاش): ${Math.round(cashBalance).toLocaleString()} ج.م.
+- الرصيد النقدي المتوفر (كاش): ${Math.round(cashBalance).toLocaleString('en-US')} ج.م.
 - تفاصيل الأسهم في محفظته الحالية بالأسعار اللحظية:
 ${portfolioSummary}
 
@@ -5983,7 +6078,7 @@ ${topRadarSummary}
 
     function fallbackLocalTimestamp() {
       const now = new Date();
-      const timeStr = now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+      const timeStr = formatCairoTime(now, false, true);
       const timestampEl = document.getElementById('cloud-sync-timestamp');
       if (timestampEl) {
         timestampEl.innerText = `اليوم ${timeStr} بتوقيت القاهرة (سيرفرات Vercel Edge)`;
@@ -6080,9 +6175,8 @@ ${topRadarSummary}
 
         if (data.success) {
           const now = new Date();
-          const timeStr = now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-          const dateStr = now.toLocaleDateString('ar-EG', { day: 'numeric', month: 'numeric' });
-          const cairoTime = `${timeStr} (${dateStr})`;
+          const timeStr = formatCairoTime(now, true, true);
+          const cairoTime = formatCairoTime(now, true, false);
 
           // Determine if EGX trading session is currently active (Sunday-Thursday, 10:00 AM - 02:30 PM Cairo)
           const day = now.getDay(); // 0 is Sunday, 4 is Thursday, 5 is Friday, 6 is Saturday
