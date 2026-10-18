@@ -1094,13 +1094,13 @@
                   <span class="text-[10px] bg-cyan-500/20 text-cyan-300 px-2 py-0.5 rounded font-bold">عائد +25.17%</span>
                 </div>
                 <p class="text-xs text-gray-300 mt-1 leading-relaxed">
-                  السهم يتصدر محفظتك بربح +3,060 ج.م. وفقاً لدستور الاستثمار، تم رفع نقطة وقف الخسارة المتحرك (Trailing Stop) إلى 285.00 ج لضمان بقاء الصفقة رابحة 100%.
+                  السهم يتصدر محفظتك بربح +3,060 ج.م. وفقاً لقواعد إدارة الأرباح، تم رفع نقطة وقف الخسارة المتحرك (Trailing Stop) إلى 285.00 ج لضمان بقاء الصفقة رابحة 100%.
                 </p>
                 <div class="text-[11px] text-gray-500 mt-1 font-mono">الزمن: تم التحديث اليوم • الأولوية: متوسطة</div>
               </div>
             </div>
             <button onclick="askCopilot('ما هي خطة جني الأرباح لسهم أوراسكوم ORAS؟')" class="px-3 py-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 text-white font-bold text-xs shrink-0 flex items-center gap-1">
-              <span>استشارة الـ AI</span>
+              <span>طلب استشارة</span>
               <i data-lucide="sparkles" class="w-3 h-3 text-emerald-400"></i>
             </button>
           </div>
@@ -1912,6 +1912,95 @@
         </button>
       </div>
     </div>
+  </div>
+
+  <!-- Fine-Tuning Shares & Purchase Cost Modal -->
+  <div id="fine-tune-modal" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-gray-900 border border-indigo-500/40 rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl relative">
+      <div class="flex items-center justify-between border-b border-gray-800 pb-3">
+        <div class="flex items-center gap-2.5">
+          <div class="w-10 h-10 rounded-xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
+            <i data-lucide="sliders" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-white text-base" id="ft-modal-title">الضبط الدقيق للأسهم</h3>
+            <p class="text-xs text-gray-400">عدّل عدد الأسهم أو متوسط الشراء وسيعاد حساب القيمة والأرباح لحظياً</p>
+          </div>
+        </div>
+        <button onclick="closeFineTuneModal()" class="text-gray-400 hover:text-white p-1 rounded-lg hover:bg-gray-800 transition">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <input type="hidden" id="ft-asset-index" value="-1">
+
+      <div class="space-y-4 text-xs">
+        <!-- Shares Control with Steppers -->
+        <div class="bg-gray-950 p-4 rounded-xl border border-gray-800 space-y-2">
+          <div class="flex items-center justify-between">
+            <label class="font-bold text-white text-xs flex items-center gap-1.5">
+              <i data-lucide="layers" class="w-3.5 h-3.5 text-indigo-400"></i>
+              <span>عدد الأسهم التي تملكها (Shares Quantity):</span>
+            </label>
+            <span class="text-[10px] text-gray-400">عدد صحيح بدون كسور</span>
+          </div>
+          
+          <div class="flex items-center gap-2">
+            <button type="button" onclick="adjustFineTuneShares(-10)" class="px-2.5 py-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-300 font-mono font-bold">-10</button>
+            <button type="button" onclick="adjustFineTuneShares(-1)" class="px-3 py-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-indigo-300 font-mono font-bold text-sm">-1</button>
+            <input type="number" id="ft-input-shares" min="1" step="1" oninput="recalcFineTunePreview()" class="flex-1 bg-gray-900 border border-indigo-500/50 rounded-xl px-3 py-2 text-center text-white font-mono font-bold text-base focus:border-indigo-400 focus:outline-none">
+            <button type="button" onclick="adjustFineTuneShares(+1)" class="px-3 py-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-indigo-300 font-mono font-bold text-sm">+1</button>
+            <button type="button" onclick="adjustFineTuneShares(+10)" class="px-2.5 py-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-300 font-mono font-bold">+10</button>
+          </div>
+        </div>
+
+        <!-- Prices Row -->
+        <div class="grid grid-cols-2 gap-3">
+          <div class="bg-gray-950 p-3.5 rounded-xl border border-gray-800 space-y-1.5">
+            <label class="block font-bold text-gray-300 text-[11px]">متوسط سعر الشراء (ج.م):</label>
+            <input type="number" id="ft-input-buy-price" step="0.01" oninput="recalcFineTunePreview()" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-white font-mono font-bold text-xs focus:border-indigo-400 focus:outline-none">
+            <span class="text-[10px] text-gray-500 block">سعر التكلفة لكل سهم</span>
+          </div>
+
+          <div class="bg-gray-950 p-3.5 rounded-xl border border-gray-800 space-y-1.5">
+            <label class="block font-bold text-gray-300 text-[11px]">سعر السهم الحالي بالبورصة (ج.م):</label>
+            <input type="number" id="ft-input-current-price" step="0.01" oninput="recalcFineTunePreview()" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-white font-mono font-bold text-xs focus:border-indigo-400 focus:outline-none">
+            <span class="text-[10px] text-emerald-400/80 block">سعر السوق الآن</span>
+          </div>
+        </div>
+
+        <!-- Real-Time Calculation Preview Card -->
+        <div class="p-4 rounded-xl bg-gradient-to-r from-gray-950 to-indigo-950/40 border border-indigo-500/30 space-y-2">
+          <div class="text-[11px] font-bold text-indigo-300 flex items-center justify-between">
+            <span>النتيجة الحسابية المحسوبة فوراً:</span>
+            <span class="px-2 py-0.2 rounded bg-indigo-500/20 text-indigo-300 font-mono text-[10px]">Live Preview</span>
+          </div>
+          <div class="grid grid-cols-2 gap-2 text-xs pt-1">
+            <div>
+              <span class="text-gray-400 block text-[11px]">القيمة السوقية الجديدة:</span>
+              <span class="font-bold text-white font-mono text-sm" id="ft-preview-value">0 ج.م</span>
+            </div>
+            <div>
+              <span class="text-gray-400 block text-[11px]">صافي الربح / الخسارة:</span>
+              <span class="font-bold font-mono text-sm" id="ft-preview-profit">0 ج.م</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="flex items-center gap-2 pt-2 border-t border-gray-800">
+        <button onclick="applyFineTuning()" class="flex-1 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition shadow">
+          <i data-lucide="check" class="w-4 h-4"></i>
+          <span>حفظ التعديل الدقيق في المحفظة ✅</span>
+        </button>
+        <button onclick="closeFineTuneModal()" class="px-4 py-2.5 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-300 font-bold text-xs transition">
+          إلغاء
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Autonomous Cloud Background Log Modal -->
   <div id="autonomous-log-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden items-center justify-center p-4">
     <div class="bg-gray-900 border border-gray-800 rounded-2xl max-w-2xl w-full p-6 space-y-4 shadow-2xl relative max-h-[90vh] overflow-y-auto">
@@ -1987,12 +2076,15 @@
 
   <!-- Application Logic -->
   <script>
-    // Initial Seed Data from User's Real Thndr screenshots
+    // Initial Seed Data from User's Real Thndr screenshots with estimated shares & buy prices
     const defaultPortfolioData = [
       {
         ticker: 'ORAS',
         name: 'أوراسكوم كونستراكشون',
         category: 'EGX30 • بنية تحتية ومقاولات دولارية',
+        shares: 50,
+        buyPrice: 243.10,
+        currentPrice: 304.30,
         value: 15215,
         profit: 3060,
         returnPct: 25.17,
@@ -2005,6 +2097,9 @@
         ticker: 'HDBK',
         name: 'بنك التعمير والإسكان',
         category: 'EGX30 • قطاع بنكي وعوائد نقدية',
+        shares: 200,
+        buyPrice: 49.79,
+        currentPrice: 62.165,
         value: 12433,
         profit: 2475,
         returnPct: 24.85,
@@ -2017,6 +2112,9 @@
         ticker: 'SWDY',
         name: 'السويدي إليكتريك',
         category: 'EGX30 • طاقة وتصدير',
+        shares: 240,
+        buyPrice: 43.02,
+        currentPrice: 51.83,
         value: 12439,
         profit: 2114,
         returnPct: 20.47,
@@ -2029,6 +2127,9 @@
         ticker: 'ABUK',
         name: 'أبو قير للأسمدة',
         category: 'EGX30 • بتروكيماويات وتصدير',
+        shares: 290,
+        buyPrice: 51.45,
+        currentPrice: 58.96,
         value: 17098,
         profit: 2176,
         returnPct: 14.59,
@@ -2041,6 +2142,9 @@
         ticker: 'EGAL',
         name: 'مصر للألومنيوم',
         category: 'EGX30 • معادن وثروة معدنية',
+        shares: 125,
+        buyPrice: 106.83,
+        currentPrice: 107.37,
         value: 13421,
         profit: 66.65,
         returnPct: 0.50,
@@ -2053,6 +2157,9 @@
         ticker: 'ARCC',
         name: 'العربية للأسمنت',
         category: 'EGX70 • مواد بناء وإنشاءات',
+        shares: 1200,
+        buyPrice: 18.44,
+        currentPrice: 18.46,
         value: 22151,
         profit: 20.08,
         returnPct: 0.09,
@@ -2065,6 +2172,9 @@
         ticker: 'COMI',
         name: 'البنك التجاري الدولي (CIB)',
         category: 'EGX30 • السهم القيادي رقم 1',
+        shares: 195,
+        buyPrice: 87.89,
+        currentPrice: 78.21,
         value: 15250,
         profit: -1888,
         returnPct: -11.02,
@@ -2077,6 +2187,9 @@
         ticker: 'TMGH',
         name: 'مجموعة طلعت مصطفى',
         category: 'EGX30 • عقارات وتنمية فندقية',
+        shares: 85,
+        buyPrice: 63.16,
+        currentPrice: 54.84,
         value: 4661,
         profit: -708,
         returnPct: -13.18,
@@ -2089,6 +2202,9 @@
         ticker: 'RAYA',
         name: 'راية القابضة للاستثمارات',
         category: 'EGX70 • تكنولوجيا وخدمات مالية',
+        shares: 2900,
+        buyPrice: 5.20,
+        currentPrice: 4.51,
         value: 13092,
         profit: -1988,
         returnPct: -13.18,
@@ -2101,6 +2217,9 @@
         ticker: 'CLHO',
         name: 'مستشفيات كليوباترا',
         category: 'EGX30 • رعاية صحية ودفاعي',
+        shares: 2950,
+        buyPrice: 5.79,
+        currentPrice: 4.58,
         value: 13511,
         profit: -3567,
         returnPct: -20.89,
@@ -2113,6 +2232,9 @@
         ticker: 'NCS',
         name: 'صندوق إن آي كابيتال (صناديق)',
         category: 'صناديق استثمارية • إدارة أصول',
+        shares: 59666,
+        buyPrice: 62593,
+        currentPrice: 59666,
         value: 59666,
         profit: -2927,
         returnPct: -4.68,
@@ -2125,6 +2247,9 @@
         ticker: 'BSB',
         name: 'صندوق بلتون للأسهم (BSB)',
         category: 'صناديق استثمارية • بلتون',
+        shares: 268,
+        buyPrice: 294.16,
+        currentPrice: 268,
         value: 268,
         profit: -26.16,
         returnPct: -8.89,
@@ -2137,6 +2262,9 @@
         ticker: 'CASH',
         name: 'المحفظة (الرصيد النقدي والسيولة)',
         category: 'محفظة نقدية • سيولة واكتتابات',
+        shares: 20010,
+        buyPrice: 20010,
+        currentPrice: 20010,
         value: 20010,
         profit: 0,
         returnPct: 0.00,
@@ -2536,7 +2664,7 @@
       if (saved) {
         try {
           portfolioData = JSON.parse(saved);
-          if (!portfolioData.some(p => p.ticker === 'BSB') || !portfolioData.some(p => p.ticker === 'CASH')) {
+          if (!portfolioData.some(p => p.ticker === 'BSB') || !portfolioData.some(p => p.ticker === 'CASH') || !portfolioData.some(p => p.shares)) {
             portfolioData = JSON.parse(JSON.stringify(defaultPortfolioData));
             savePortfolio();
           }
@@ -2703,8 +2831,14 @@
                 ${item.ticker}
               </div>
               <div>
-                <div class="font-bold text-white text-xs sm:text-sm">${item.name}</div>
-                <div class="text-[11px] text-gray-400">${item.category}</div>
+                <div class="font-bold text-white text-xs sm:text-sm flex items-center gap-1.5">
+                  <span>${item.name}</span>
+                  ${item.shares ? `<span class="px-1.5 py-0.2 rounded bg-indigo-500/15 text-indigo-400 border border-indigo-500/30 text-[10px] font-mono">${item.shares.toLocaleString()} سهم</span>` : ''}
+                </div>
+                <div class="text-[11px] text-gray-400 flex items-center gap-1.5 flex-wrap">
+                  <span>${item.category}</span>
+                  ${item.currentPrice && item.ticker !== 'CASH' && item.ticker !== 'NCS' ? `<span class="text-cyan-400 font-mono">@ ${Number(item.currentPrice).toFixed(2)} ج</span>` : ''}
+                </div>
               </div>
             </div>
           </td>
@@ -2737,6 +2871,10 @@
           </td>
           <td class="py-3.5 px-4 text-center">
             <div class="flex items-center justify-center gap-1">
+              <button onclick="openFineTuneModal(${index})" class="px-2 py-1.5 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/40 text-indigo-300 border border-indigo-500/30 transition flex items-center gap-1 text-[11px] font-bold" title="الضبط الدقيق لعدد الأسهم ومتوسط الشراء">
+                <i data-lucide="sliders" class="w-3.5 h-3.5 text-indigo-400"></i>
+                <span class="hidden sm:inline">ضبط</span>
+              </button>
               <button onclick="editAsset(${index})" class="p-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white transition" title="تعديل الأصل">
                 <i data-lucide="edit-3" class="w-3.5 h-3.5 text-cyan-400"></i>
               </button>
@@ -2954,8 +3092,10 @@
 
       const cost = value - profit;
       const returnPct = cost > 0 ? (profit / cost) * 100 : 0;
+      const existing = (index >= 0 && index < portfolioData.length) ? portfolioData[index] : {};
 
       const newAsset = {
+        ...existing,
         ticker,
         name,
         category,
@@ -2965,7 +3105,7 @@
         status: profit >= 0 ? 'ربح' : 'تراجع',
         advice,
         action: profit < -15 ? 'REBALANCE_CANDIDATE' : (profit < -5 ? 'ACCUMULATE' : 'HOLD'),
-        thndrUrl: 'https://app.thndr.app'
+        thndrUrl: existing.thndrUrl || 'https://app.thndr.app'
       };
 
       if (index >= 0 && index < portfolioData.length) {
@@ -2985,6 +3125,106 @@
         portfolioData.splice(index, 1);
         savePortfolio();
       }
+    }
+
+    // ============================================================
+    // Fine-Tuning Shares Quantity & Buy Price Modal Operations
+    // ============================================================
+    function openFineTuneModal(index) {
+      const item = portfolioData[index];
+      if (!item) return;
+
+      document.getElementById('ft-asset-index').value = index;
+      document.getElementById('ft-modal-title').innerText = `الضبط الدقيق: ${item.name} (${item.ticker})`;
+      
+      const currentShares = item.shares || (item.currentPrice ? Math.round(item.value / item.currentPrice) : 1);
+      const buyPrice = item.buyPrice || ((item.value - item.profit) / (currentShares || 1));
+      const currentPrice = item.currentPrice || (item.value / (currentShares || 1));
+
+      document.getElementById('ft-input-shares').value = currentShares;
+      document.getElementById('ft-input-buy-price').value = Number(buyPrice).toFixed(2);
+      document.getElementById('ft-input-current-price').value = Number(currentPrice).toFixed(2);
+
+      recalcFineTunePreview();
+
+      const modal = document.getElementById('fine-tune-modal');
+      if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      }
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function closeFineTuneModal() {
+      const modal = document.getElementById('fine-tune-modal');
+      if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+    }
+
+    function adjustFineTuneShares(delta) {
+      const input = document.getElementById('ft-input-shares');
+      if (!input) return;
+      let val = parseInt(input.value, 10) || 0;
+      val = Math.max(1, val + delta);
+      input.value = val;
+      recalcFineTunePreview();
+    }
+
+    function recalcFineTunePreview() {
+      const shares = parseInt(document.getElementById('ft-input-shares').value, 10) || 0;
+      const buyPrice = parseFloat(document.getElementById('ft-input-buy-price').value) || 0;
+      const currentPrice = parseFloat(document.getElementById('ft-input-current-price').value) || 0;
+
+      const newValue = shares * currentPrice;
+      const totalCost = shares * buyPrice;
+      const profit = newValue - totalCost;
+      const returnPct = totalCost > 0 ? (profit / totalCost) * 100 : 0;
+
+      const valPreview = document.getElementById('ft-preview-value');
+      const profitPreview = document.getElementById('ft-preview-profit');
+
+      if (valPreview) {
+        valPreview.innerHTML = `${Math.round(newValue).toLocaleString()} <span class="text-xs text-gray-400 font-normal">ج.م</span> <span class="text-[11px] text-indigo-300 font-mono">(${shares.toLocaleString()} × ${currentPrice.toFixed(2)})</span>`;
+      }
+
+      if (profitPreview) {
+        const isPositive = profit >= 0;
+        profitPreview.className = `font-bold font-mono text-sm ${isPositive ? 'text-emerald-400' : 'text-rose-400'}`;
+        profitPreview.innerText = `${isPositive ? '+' : ''}${Math.round(profit).toLocaleString()} ج.م (${isPositive ? '+' : ''}${returnPct.toFixed(2)}%)`;
+      }
+    }
+
+    function applyFineTuning() {
+      const index = parseInt(document.getElementById('ft-asset-index').value, 10);
+      const item = portfolioData[index];
+      if (!item) return;
+
+      const shares = parseInt(document.getElementById('ft-input-shares').value, 10) || 0;
+      const buyPrice = parseFloat(document.getElementById('ft-input-buy-price').value) || 0;
+      const currentPrice = parseFloat(document.getElementById('ft-input-current-price').value) || 0;
+
+      if (shares <= 0) {
+        alert('يرجى إدخال عدد أسهم صحيح أكبر من صفر.');
+        return;
+      }
+
+      const newValue = Math.round(shares * currentPrice);
+      const totalCost = shares * buyPrice;
+      const profit = Math.round(newValue - totalCost);
+      const returnPct = totalCost > 0 ? parseFloat(((profit / totalCost) * 100).toFixed(2)) : 0;
+
+      item.shares = shares;
+      item.buyPrice = buyPrice;
+      item.currentPrice = currentPrice;
+      item.value = newValue;
+      item.profit = profit;
+      item.returnPct = returnPct;
+      item.status = profit >= 0 ? 'ربح' : 'تراجع';
+
+      savePortfolio();
+      closeFineTuneModal();
     }
 
     // Smart Rebalancing & Cash Allocation Calculator
@@ -3037,7 +3277,7 @@
               <span class="w-2 h-2 rounded-full bg-amber-400"></span>
               <span>الاحتفاظ كسيولة أمان كاش (Safety Cash Reserve)</span>
             </div>
-            <p class="text-[11px] text-gray-400 mt-0.5">وفق بند رقم 3 في دستور الاستثمار: الحفاظ دائماً على سيولة طوارئ لاقتناص أي هبوط مفاجئ.</p>
+            <p class="text-[11px] text-gray-400 mt-0.5">وفق بند السيولة في سياسة إدارة المحفظة: الحفاظ دائماً على سيولة أمان لاقتناص أي تصحيح سعري مغرٍ.</p>
           </div>
           <div class="text-right">
             <span class="font-bold text-amber-400 font-mono text-sm">${cashCushion.toLocaleString()} ج</span>
@@ -3045,6 +3285,14 @@
           </div>
         </div>
       `;
+    }
+
+    function setRebalanceAmount(val) {
+      const input = document.getElementById('rebalance-amount-input');
+      if (input) {
+        input.value = val;
+        calculateSmartAllocation();
+      }
     }
 
     // Phase 3: Advanced Market Radar Logic & Filtering
@@ -3132,8 +3380,8 @@
                 <span>أمان: ${item.score}/100</span>
               </span>
               <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-cyan-950/80 text-cyan-300 border border-cyan-800/60 flex items-center gap-1">
-                <i data-lucide="users" class="w-3 h-3"></i>
-                <span>إجماع 3/3 وكلاء</span>
+                <i data-lucide="layers" class="w-3 h-3"></i>
+                <span>توافق المعايير الثلاثية</span>
               </span>
               ${isVolumeSpike ? `
                 <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-amber-950/80 text-amber-300 border border-amber-800/60 flex items-center gap-1 animate-pulse">
@@ -3173,9 +3421,9 @@
             </div>
 
             <div class="flex items-center gap-1.5 flex-wrap">
-              <button onclick="openAuditModal('${item.ticker}')" class="px-2.5 py-1.5 rounded-lg border border-gray-700 hover:border-emerald-500 bg-gray-800/80 text-gray-300 hover:text-emerald-400 font-bold text-[10px] flex items-center gap-1 transition" title="أدلة الوكلاء الثلاثة والمراجع الرسمية">
+              <button onclick="openAuditModal('${item.ticker}')" class="px-2.5 py-1.5 rounded-lg border border-gray-700 hover:border-emerald-500 bg-gray-800/80 text-gray-300 hover:text-emerald-400 font-bold text-[10px] flex items-center gap-1 transition" title="بطاقة التقييم الاستثماري والمصادر الرسمية">
                 <i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-400"></i>
-                <span>الأدلة والمراجع 🔍</span>
+                <span>بطاقة التقييم 📊</span>
               </button>
               <button onclick="inspectRiskForStock('${item.ticker}')" class="p-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 text-cyan-400 transition" title="حساب المخاطر والدعم">
                 <i data-lucide="shield-alert" class="w-3.5 h-3.5"></i>
@@ -3309,7 +3557,7 @@
       const stock = fullMarketRadar.find(s => s.ticker === ticker);
       if (!stock) return;
 
-      askCopilot(`أريد دراسة استثمارية شاملة ومسببة (1, 2, 3) لسهم ${stock.name} (${stock.ticker})`);
+      askCopilot(`أريد مذكرة تقييم استثماري متكاملة ومفصلة لسهم ${stock.name} (${stock.ticker}) تشمل التحليل المالي، الفني، وإدارة المخاطر.`);
     }
 
     // ==============================================
@@ -3330,7 +3578,7 @@
               <span class="text-[10px] bg-rose-500/30 text-rose-200 px-2 py-0.5 rounded font-bold">إشارة حماية رأس مال</span>
             </div>
             <p class="text-xs text-rose-200 mt-1 leading-relaxed">
-              السهم كسر مستوى الارتكاز مع ضغوط بيع قوية. وفقاً للبند رقم 2 في دستور الاستثمار: يوصي المستشار بتفعيل أمر وقف الخسارة فوراً لحماية المحفظة من أي انزلاق إضافي.
+              السهم كسر مستوى الارتكاز مع ضغوط بيع قوية. وفقاً لقواعد إدارة المخاطر: يُنصح بتفعيل أمر وقف الخسارة فوراً لحماية رأس المال من أي انزلاق إضافي.
             </p>
             <div class="text-[11px] text-rose-300/80 mt-1 font-mono">الزمن: الآن • الأولوية: طوارئ قصوى</div>
           </div>
@@ -3403,7 +3651,7 @@
       simPositions.splice(index, 1);
 
       renderSimPositions();
-      alert(`🎉 تم إغلاق الصفقة الافتراضية بنجاح وتحقيق ربح تجريبي قدره +${simProfit.toFixed(0)} ج!`);
+      alert(`🎉 تم إغلاق الصفقة الافتراضية بنجاح وتحقيق ربح تجريبي قدره +${simulatedProfit.toFixed(0)} ج!`);
     }
 
     function renderSimPositions() {
@@ -3594,12 +3842,12 @@
             </div>
           </td>
           <td class="py-3 px-3 max-w-xs text-[11px] space-y-0.5">
-            <div><span class="text-emerald-400 font-bold">1. مالي:</span> <span class="text-gray-300">${trade.justification.fundamental}</span></div>
-            <div><span class="text-cyan-400 font-bold">2. فني:</span> <span class="text-gray-300">${trade.justification.technical}</span></div>
-            <div><span class="text-amber-400 font-bold">3. سيولة:</span> <span class="text-gray-300">${trade.justification.volume}</span></div>
-            <button onclick="openAuditModal('${trade.ticker}')" class="text-[10px] text-cyan-400 hover:text-cyan-300 font-bold underline flex items-center gap-1 mt-1" title="فحص إجماع الوكلاء والمصادر الرسمية">
+            <div><span class="text-emerald-400 font-bold">التحليل المالي:</span> <span class="text-gray-300">${trade.justification.fundamental}</span></div>
+            <div><span class="text-cyan-400 font-bold">التحليل الفني:</span> <span class="text-gray-300">${trade.justification.technical}</span></div>
+            <div><span class="text-amber-400 font-bold">حركة السيولة:</span> <span class="text-gray-300">${trade.justification.volume}</span></div>
+            <button onclick="openAuditModal('${trade.ticker}')" class="text-[10px] text-cyan-400 hover:text-cyan-300 font-bold underline flex items-center gap-1 mt-1" title="فحص بطاقة التقييم الاستثماري والمصادر الرسمية">
               <i data-lucide="file-check" class="w-3 h-3 text-emerald-400"></i>
-              <span>فحص أدلة ومراجع الوكلاء 🔍</span>
+              <span>عرض بطاقة التقييم والأدلة 📊</span>
             </button>
           </td>
           <td class="py-3 px-3 text-center">
@@ -3651,7 +3899,7 @@
 
       autonomousLedger.unshift(newTrade);
       renderAutonomousLedger();
-      alert(`⚡ نجاح دورة الفحص السحابي!\nقام الروبوت برصد فرصة انفجار سيولة في سهم ${candidate.name} (${candidate.ticker}) وتنفيذ أمر شراء افتراضي مسبب بالأرقام والأهداف!`);
+      alert(`⚡ نجاح دورة الفحص الآلي للسوق!\nتم رصد فرصة تدفق سيولة إيجابية في سهم ${candidate.name} (${candidate.ticker}) وإضافتها للمحفظة التجريبية بالأهداف السعرية المحددة.`);
     }
 
     // ============================================================
@@ -3691,7 +3939,7 @@
       };
 
       localStorage.setItem('egx_strategy_settings', JSON.stringify(settings));
-      alert('✅ تم حفظ إعدادات المحفظة ونسب الأمان بنجاح! سيلتزم بها الروبوت والمستشار في جميع التوصيات.');
+      alert('✅ تم حفظ إعدادات المحفظة ونسب الأمان بنجاح! سيتم تطبيقها في جميع التحليلات وإدارة المحفظة.');
     }
 
     function loadStrategySettings() {
@@ -3753,9 +4001,9 @@
       saveGeminiApiKey(val);
       if (fb) {
         fb.className = 'text-xs p-2.5 rounded-xl bg-emerald-950/40 border border-emerald-500/40 text-emerald-300 block';
-        fb.innerText = '✅ تم حفظ المفتاح بنجاح! مخ الذكاء الاصطناعي (Gemini AI) مفعل وجاهز الآن.';
+        fb.innerText = '✅ تم حفظ المفتاح بنجاح! محرك التحليل الذكي (Gemini AI) مفعل وجاهز الآن.';
       }
-      alert('✅ تم تفعيل وربط مخ Google Gemini بنجاح! سيتم إرسال أي سؤال له مباشرة ليفكر فيه.');
+      alert('✅ تم تفعيل وربط محرك Google Gemini بنجاح! أصبح جاهزاً لتحليل بيانات واستفسارات المحفظة.');
     }
 
     function saveInlineGeminiKey() {
@@ -3766,7 +4014,7 @@
         return;
       }
       saveGeminiApiKey(val);
-      alert('✅ تم حفظ المفتاح وتفعيل مخ Google Gemini بنجاح! يمكنك الآن طرح سؤالك وسيفكر فيه مباشرة.');
+      alert('✅ تم حفظ المفتاح وتفعيل محرك Google Gemini بنجاح! يمكنك الآن طرح استفساراتك وسيقوم بتحليلها فورياً.');
       const chatContainer = document.getElementById('chat-messages');
       const successBubble = document.createElement('div');
       successBubble.className = 'flex items-start gap-3';
@@ -3775,7 +4023,7 @@
           AI
         </div>
         <div class="bg-gray-800 border border-emerald-500/40 rounded-2xl rounded-tr-none p-3.5 text-xs text-emerald-300 leading-relaxed max-w-xl shadow-sm">
-          🎉 ممتاز! تم تفعيل مخ الذكاء الاصطناعي (Google Gemini). اسألني الآن عن أي سهم في محفظتك أو في البورصة وسأقوم بتحليله لك فورياً!
+          🎉 ممتاز! تم تفعيل محرك التحليل الذكي (Google Gemini). يمكنك الآن طلب أي تحليل مالي أو فني لأسهم المحفظة أو البورصة المصرية.
         </div>
       `;
       chatContainer.appendChild(successBubble);
@@ -3835,7 +4083,7 @@
       saveGeminiApiKey(val);
       if (fb) {
         fb.className = 'text-xs p-3 rounded-xl bg-emerald-950/40 border border-emerald-500/40 text-emerald-300 block font-bold';
-        fb.innerText = '✅ تم حفظ وتفعيل المفتاح بنجاح! مخ الذكاء الاصطناعي (Gemini AI) متصل الآن.';
+        fb.innerText = '✅ تم حفظ وتفعيل المفتاح بنجاح! محرك التحليل الذكي (Gemini AI) متصل وجاهز للعمل.';
       }
       setTimeout(() => {
         closeGeminiModal();
@@ -3901,7 +4149,7 @@
       }
 
       if (key) {
-        if (statusText) statusText.innerText = 'مخ Google Gemini AI متصل وجاهز للتفكير الحي 🟢';
+        if (statusText) statusText.innerText = 'محرك Google Gemini AI متصل وجاهز للتحليل 🟢';
         if (statusDot) {
           statusDot.className = 'w-2 h-2 rounded-full bg-emerald-400 animate-pulse';
         }
@@ -3910,7 +4158,7 @@
         }
         if (btnLabel) btnLabel.innerText = 'المفتاح مفعل ومتصل (تعديل)';
       } else {
-        if (statusText) statusText.innerText = 'مخ الذكاء الاصطناعي غير متصل (اضغط لإدخال المفتاح) ⚪';
+        if (statusText) statusText.innerText = 'محرك التحليل الذكي غير متصل (اضغط لإدخال المفتاح) ⚪';
         if (statusDot) {
           statusDot.className = 'w-2 h-2 rounded-full bg-amber-400 animate-pulse';
         }
@@ -4022,10 +4270,10 @@
           <div class="bg-gray-800 border border-amber-500/40 rounded-2xl rounded-tr-none p-4 text-xs text-gray-200 leading-relaxed max-w-xl shadow-sm space-y-3">
             <div class="flex items-center gap-2 text-amber-400 font-bold">
               <i data-lucide="key" class="w-4 h-4"></i>
-              <span>مخ الذكاء الاصطناعي (Google Gemini) بحاجة لمفتاح التشغيل</span>
+              <span>محرك التحليل الذكي (Google Gemini) بحاجة لمفتاح التشغيل</span>
             </div>
             <p class="text-gray-300">
-              لكي يقوم موديل الذكاء الاصطناعي الفعلي من جوجل بالتفكير والرد على سؤالك بناءً على محفظتك وقواعد الاستثمار، يلزم إدخال <strong>Google Gemini API Key</strong> (مجاني 100%):
+              لتمكين التحليل المالي والآلي التفاعلي المباشر لبيانات محفظتك وأسهم السوق عبر جوجل، يلزم إدخال <strong>Google Gemini API Key</strong> (مجاني 100%):
             </p>
             <div class="p-3 bg-gray-900 rounded-xl border border-gray-700 flex flex-col sm:flex-row gap-2">
               <input type="password" id="inline-gemini-key" placeholder="الصق المفتاح هنا (AIzaSy...)" class="flex-1 bg-gray-950 border border-gray-600 rounded-lg px-3 py-1.5 text-xs text-white font-mono focus:outline-none focus:border-emerald-500">
@@ -4058,7 +4306,7 @@
         </div>
         <div class="bg-gray-800 border border-gray-700 rounded-2xl rounded-tr-none p-3.5 text-xs text-gray-300 leading-relaxed max-w-xl shadow-sm flex items-center gap-2">
           <div class="w-4 h-4 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
-          <span>جاري استدعاء مخ الذكاء الاصطناعي الحقيقي (Google Gemini 1.5 Flash) وتحليل السؤال...</span>
+          <span>جاري معالجة الاستفسار وتحليل بيانات السوق عبر محرك (Google Gemini 1.5 Flash)...</span>
         </div>
       `;
       chatContainer.appendChild(thinkingBubble);
@@ -4072,14 +4320,14 @@
         const longTermVal = document.getElementById('strategy-longterm-val')?.innerText || '70%';
         const tacticalVal = document.getElementById('strategy-tactical-val')?.innerText || '30%';
 
-        const systemPrompt = `أنت "مستشار البورصة المصرية الذكي" (EGX AI Copilot).
+        const systemPrompt = `أنت "مستشار البورصة المصرية الذكي" (EGX Pro Copilot).
 المستخدم مستثمر في البورصة المصرية ولديه المحفظة التالية في تطبيق ثندر (Thndr):
 - إجمالي قيمة المحفظة: حوالي 200 ألف جنيه مصري.
 - تفاصيل الأسهم في محفظته الحالية:
 ${portfolioSummary}
 - صندوق الذهب/السيولة NCS: 2,750 وثيقة بسعر 15.00 ج.
 
-دستور وقواعد الاستثمار الصارمة للمستخدم:
+قواعد وسياسة إدارة المحفظة الصارمة للمستخدم:
 1. المستخدم مستثمر طويل الأجل (Long-Term Investor)، ممنوع المضاربة اليومية (Day Trading) نهائياً.
 2. نسبة التوزيع: ${longTermVal} أسهم قيادية آمنة طويلة الأجل (النواة Core)، و ${tacticalVal} مضاربة تكتيكية لفرص الطفرات السريعة (الأقمار Satellite).
 3. استراتيجية الخروج: لا نبيع بدافع الخوف عند القيعان. الخروج يكون فقط في حالتين: خسارة هيكلية تستوجب وقف خسارة صارم (Max 4% للصفقات التكتيكية)، أو جني أرباح طفرة (+20% إلى +30% أو أكثر) لإعادة تدوير السيولة.
@@ -4131,7 +4379,7 @@ ${portfolioSummary}
           <div class="bg-gray-800 border border-emerald-500/30 rounded-2xl rounded-tr-none p-4 text-xs text-gray-200 leading-relaxed max-w-xl shadow-sm space-y-2">
             <div class="flex items-center justify-between text-[10px] text-emerald-400 font-bold border-b border-gray-700/60 pb-1.5 mb-1.5">
               <span class="flex items-center gap-1"><i data-lucide="sparkles" class="w-3 h-3"></i> تحليل حي وفوري بواسطة Google Gemini AI</span>
-              <span class="text-gray-400">مباشر • وفق محفظتك ودستورك</span>
+              <span class="text-gray-400">مباشر • وفق محفظتك وقواعد الاستثمار</span>
             </div>
             <div class="leading-relaxed">${formattedReply}</div>
           </div>
