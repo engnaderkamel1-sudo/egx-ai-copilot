@@ -883,6 +883,22 @@
           </button>
         </div>
 
+        <!-- Gemini API Key Status & Live AI Connection Bar -->
+        <div class="px-4 py-2.5 bg-gray-950/95 border-b border-gray-800 flex items-center justify-between flex-wrap gap-2 text-xs">
+          <div class="flex items-center gap-2">
+            <div id="gemini-status-indicator" class="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20">
+              <span id="gemini-status-dot" class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+              <span id="gemini-status-text">جاري فحص حالة مفتاح Google Gemini AI...</span>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="switchTab('settings')" class="px-3 py-1 rounded-lg bg-emerald-600/90 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1.5 transition shadow-sm">
+              <i data-lucide="key" class="w-3.5 h-3.5"></i>
+              <span id="gemini-btn-label">إعدادات مفتاح الذكاء الاصطناعي (API)</span>
+            </button>
+          </div>
+        </div>
+
         <!-- Chat Messages Area -->
         <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-4">
           <!-- Welcome message -->
@@ -1379,6 +1395,40 @@
             </select>
             <p class="text-[11px] text-gray-400">يرفض السيستم أي صفقة لا تضمن ضعف العائد المتوقع مقارنة بالخسارة.</p>
           </div>
+        </div>
+
+        <!-- Gemini AI Model Configuration (Live Brain Activation) -->
+        <div class="bg-gradient-to-r from-emerald-950/40 via-gray-900 to-cyan-950/30 p-5 rounded-2xl border border-emerald-500/40 space-y-4 shadow-lg">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <div class="flex items-center gap-2 text-emerald-400 text-xs font-bold uppercase tracking-wider mb-1">
+                <i data-lucide="cpu" class="w-4 h-4"></i>
+                <span>ربط مخ الذكاء الاصطناعي الحي (Google Gemini AI Model API)</span>
+              </div>
+              <h3 class="text-base font-bold text-white">تفعيل التفكير الحي لموديل الذكاء الاصطناعي الحقيقي</h3>
+              <p class="text-xs text-gray-300 mt-1">يتم حفظ المفتاح بأمان وسرية تامة في متصفحك الشخصي فقط (Local Storage) ولا يُرفع على سيرفر أو كود عام.</p>
+            </div>
+            <a href="https://aistudio.google.com/app/apikey" target="_blank" class="px-3.5 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs flex items-center gap-1.5 transition self-start sm:self-auto shadow shrink-0">
+              <span>احصل على مفتاح مجاني في 30 ثانية من Google AI Studio</span>
+              <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+            </a>
+          </div>
+
+          <div class="flex flex-col sm:flex-row gap-2">
+            <input type="password" id="setting-gemini-key" placeholder="الصق مفتاح Google Gemini API هنا (مثال: AIzaSy...)" class="flex-1 bg-gray-950 border border-gray-700 rounded-xl px-4 py-2.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500 font-mono">
+            <button onclick="saveGeminiApiKeyFromInput()" class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition shrink-0">
+              <i data-lucide="check-circle" class="w-4 h-4"></i>
+              <span>حفظ وتفعيل</span>
+            </button>
+            <button onclick="testGeminiConnection()" class="px-4 py-2.5 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-200 font-bold text-xs flex items-center justify-center gap-1.5 transition shrink-0">
+              <i data-lucide="zap" class="w-4 h-4 text-amber-400"></i>
+              <span>اختبار الاتصال ⚡</span>
+            </button>
+            <button onclick="removeGeminiApiKey()" class="px-3 py-2.5 rounded-xl bg-gray-800 hover:bg-rose-900/40 text-gray-400 hover:text-rose-300 font-bold text-xs flex items-center justify-center transition shrink-0" title="حذف المفتاح">
+              <i data-lucide="trash-2" class="w-4 h-4"></i>
+            </button>
+          </div>
+          <div id="gemini-key-feedback" class="text-xs hidden p-2.5 rounded-xl"></div>
         </div>
 
         <!-- Cloud Schedule Status & Info -->
@@ -2564,6 +2614,19 @@
             </button>
           </div>
         </div>
+
+        <!-- Live Gemini AI Synthesis Bar -->
+        <div class="bg-gradient-to-r from-emerald-950/40 to-teal-950/40 p-3.5 rounded-xl border border-emerald-500/30 flex items-center justify-between flex-wrap gap-2 text-xs">
+          <div class="flex items-center gap-2">
+            <i data-lucide="sparkles" class="w-4 h-4 text-emerald-400"></i>
+            <span class="text-white font-bold">استشارة حية للسهم عبر الذكاء الاصطناعي:</span>
+            <span class="text-gray-300">حلل وضع السهم مع Gemini AI المباشر وفق أرقام محفظتك ودستور الاستثمار.</span>
+          </div>
+          <button onclick="closeAuditModal(); askCopilot('حلل لي سهم ${stock.name} (${stock.ticker}) وفقاً لمحفظتي وقواعد الاستثمار وهل سعره الحالي مناسب؟');" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1 transition shadow">
+            <i data-lucide="message-square" class="w-3.5 h-3.5"></i>
+            <span>فتح استشارة فورية مع الذكاء الاصطناعي</span>
+          </button>
+        </div>
       `;
 
       const modal = document.getElementById('audit-modal');
@@ -3358,6 +3421,167 @@
       });
     }
 
+    // ==============================================
+    // GEMINI AI INTEGRATION & LIVE BRAIN ENGINE
+    // ==============================================
+    function getGeminiApiKey() {
+      return (localStorage.getItem('egx_gemini_api_key') || '').trim();
+    }
+
+    function saveGeminiApiKey(key) {
+      if (!key) return;
+      localStorage.setItem('egx_gemini_api_key', key.trim());
+      updateGeminiStatusUI();
+    }
+
+    function saveGeminiApiKeyFromInput() {
+      const input = document.getElementById('setting-gemini-key');
+      const val = (input?.value || '').trim();
+      const fb = document.getElementById('gemini-key-feedback');
+      if (!val) {
+        if (fb) {
+          fb.className = 'text-xs p-2.5 rounded-xl bg-rose-950/40 border border-rose-500/40 text-rose-300 block';
+          fb.innerText = '⚠️ يرجى لصق مفتاح Google Gemini API أولاً.';
+        }
+        return;
+      }
+      saveGeminiApiKey(val);
+      if (fb) {
+        fb.className = 'text-xs p-2.5 rounded-xl bg-emerald-950/40 border border-emerald-500/40 text-emerald-300 block';
+        fb.innerText = '✅ تم حفظ المفتاح بنجاح! مخ الذكاء الاصطناعي (Gemini AI) مفعل وجاهز الآن.';
+      }
+      alert('✅ تم تفعيل وربط مخ Google Gemini بنجاح! سيتم إرسال أي سؤال له مباشرة ليفكر فيه.');
+    }
+
+    function saveInlineGeminiKey() {
+      const input = document.getElementById('inline-gemini-key');
+      const val = (input?.value || '').trim();
+      if (!val) {
+        alert('يرجى لصق المفتاح أولاً');
+        return;
+      }
+      saveGeminiApiKey(val);
+      alert('✅ تم حفظ المفتاح وتفعيل مخ Google Gemini بنجاح! يمكنك الآن طرح سؤالك وسيفكر فيه مباشرة.');
+      const chatContainer = document.getElementById('chat-messages');
+      const successBubble = document.createElement('div');
+      successBubble.className = 'flex items-start gap-3';
+      successBubble.innerHTML = `
+        <div class="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center text-white shrink-0 text-xs font-bold">
+          AI
+        </div>
+        <div class="bg-gray-800 border border-emerald-500/40 rounded-2xl rounded-tr-none p-3.5 text-xs text-emerald-300 leading-relaxed max-w-xl shadow-sm">
+          🎉 ممتاز! تم تفعيل مخ الذكاء الاصطناعي (Google Gemini). اسألني الآن عن أي سهم في محفظتك أو في البورصة وسأقوم بتحليله لك فورياً!
+        </div>
+      `;
+      chatContainer.appendChild(successBubble);
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+      lucide.createIcons();
+    }
+
+    function removeGeminiApiKey() {
+      if (confirm('هل أنت متأكد من حذف مفتاح الذكاء الاصطناعي من هذا الجهاز؟')) {
+        localStorage.removeItem('egx_gemini_api_key');
+        const input = document.getElementById('setting-gemini-key');
+        if (input) input.value = '';
+        const fb = document.getElementById('gemini-key-feedback');
+        if (fb) {
+          fb.className = 'text-xs p-2.5 rounded-xl bg-gray-800 text-gray-300 block';
+          fb.innerText = 'تم مسح المفتاح بنجاح.';
+        }
+        updateGeminiStatusUI();
+      }
+    }
+
+    function updateGeminiStatusUI() {
+      const key = getGeminiApiKey();
+      const statusText = document.getElementById('gemini-status-text');
+      const statusDot = document.getElementById('gemini-status-dot');
+      const statusInd = document.getElementById('gemini-status-indicator');
+      const btnLabel = document.getElementById('gemini-btn-label');
+      const settingInput = document.getElementById('setting-gemini-key');
+
+      if (settingInput && key) {
+        settingInput.value = key;
+      }
+
+      if (key) {
+        if (statusText) statusText.innerText = 'مخ Google Gemini AI متصل وجاهز للتفكير الحي 🟢';
+        if (statusDot) {
+          statusDot.className = 'w-2 h-2 rounded-full bg-emerald-400 animate-pulse';
+        }
+        if (statusInd) {
+          statusInd.className = 'flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20';
+        }
+        if (btnLabel) btnLabel.innerText = 'المفتاح مفعل (تعديل/فحص)';
+      } else {
+        if (statusText) statusText.innerText = 'مخ الذكاء الاصطناعي غير متصل (أدخل المفتاح للربط المباشر) ⚪';
+        if (statusDot) {
+          statusDot.className = 'w-2 h-2 rounded-full bg-amber-400 animate-pulse';
+        }
+        if (statusInd) {
+          statusInd.className = 'flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20';
+        }
+        if (btnLabel) btnLabel.innerText = 'ربط مفتاح Google Gemini';
+      }
+    }
+
+    async function testGeminiConnection() {
+      const key = getGeminiApiKey() || (document.getElementById('setting-gemini-key')?.value || '').trim();
+      const fb = document.getElementById('gemini-key-feedback');
+      if (!key) {
+        alert('يرجى إدخال المفتاح أولاً لاختبار الاتصال.');
+        return;
+      }
+      if (fb) {
+        fb.className = 'text-xs p-2.5 rounded-xl bg-cyan-950/40 border border-cyan-500/40 text-cyan-300 block flex items-center gap-2';
+        fb.innerHTML = '<div class="w-3.5 h-3.5 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin"></div> جاري اختبار الاتصال بسيرفر Google Gemini AI...';
+      }
+
+      try {
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ role: 'user', parts: [{ text: 'اختبار سريع: أجب بكلمة واحدة "متصل"' }] }]
+          })
+        });
+
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.error?.message || `HTTP ${res.status}`);
+        }
+
+        const data = await res.json();
+        const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+        if (fb) {
+          fb.className = 'text-xs p-2.5 rounded-xl bg-emerald-950/40 border border-emerald-500/40 text-emerald-300 block';
+          fb.innerHTML = `⚡ <strong>الاتصال ناجح 100%!</strong> رد السيرفر: "${reply.trim()}". يمكنك الآن استخدام الشات بكامل قدرات الذكاء الاصطناعي.`;
+        }
+        saveGeminiApiKey(key);
+      } catch (err) {
+        if (fb) {
+          fb.className = 'text-xs p-2.5 rounded-xl bg-rose-950/40 border border-rose-500/40 text-rose-300 block';
+          fb.innerHTML = `❌ <strong>فشل الاتصال:</strong> ${err.message}. يرجى التحقق من المفتاح من Google AI Studio.`;
+        }
+      }
+    }
+
+    function formatMarkdownReply(text) {
+      if (!text) return '';
+      let s = text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+
+      s = s.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+      s = s.replace(/\*(.*?)\*/g, '<em>$1</em>');
+      s = s.replace(/^[\s]*[-•*][\s]+(.*)$/gm, '<li class="mr-3 list-disc">$1</li>');
+      s = s.replace(/^[\s]*([0-9]+)\.[\s]+(.*)$/gm, '<div class="mr-2 font-semibold text-emerald-400 mt-1">$1. <span class="text-gray-200 font-normal">$2</span></div>');
+      s = s.replace(/\n\n+/g, '<br><br>');
+      s = s.replace(/\n/g, '<br>');
+      return s;
+    }
+
     // AI Copilot Chat Handling
     function askCopilot(question) {
       switchTab('advisor');
@@ -3366,7 +3590,7 @@
       document.getElementById('chat-form').dispatchEvent(new Event('submit'));
     }
 
-    function handleChatSubmit(e) {
+    async function handleChatSubmit(e) {
       e.preventDefault();
       const input = document.getElementById('chat-input');
       const text = input.value.trim();
@@ -3374,12 +3598,12 @@
 
       const chatContainer = document.getElementById('chat-messages');
 
-      // User Message
+      // User Message Bubble
       const userBubble = document.createElement('div');
       userBubble.className = 'flex items-start justify-end gap-3';
       userBubble.innerHTML = `
         <div class="bg-emerald-600 rounded-2xl rounded-tl-none p-3.5 text-xs text-white leading-relaxed max-w-xl shadow-sm">
-          ${text}
+          ${text.replace(/</g, "&lt;").replace(/>/g, "&gt;")}
         </div>
         <div class="w-8 h-8 rounded-full bg-emerald-800 flex items-center justify-center text-white shrink-0 text-xs font-bold">
           أنت
@@ -3387,60 +3611,158 @@
       `;
       chatContainer.appendChild(userBubble);
       input.value = '';
+      chatContainer.scrollTop = chatContainer.scrollHeight;
 
-      // AI Response Logic (Incorporating user's specific context & rules)
-      const aiBubble = document.createElement('div');
-      aiBubble.className = 'flex items-start gap-3';
-      
-      let reply = "";
-      if (text.includes('كليوباترا') || text.includes('CLHO')) {
-        reply = `
-          <strong>تحليل سهم مستشفيات كليوباترا (CLHO) - دراسة مسببة:</strong><br>
-          • <strong>1. التحليل المالي والأساسي:</strong> السهم يعاني من ضعف السيولة وتراجع العائد على حقوق الملكية مقارنة بالقطاعات التصديرية، وخسارتك فيه غير متحققة (-20.89%).<br>
-          • <strong>2. التحليل الفني والدعوم:</strong> السهم يقترب من دعم تاريخي صلب (4.80 - 5.00 ج). البيع عند القاع خطأ استثماري فادح.<br>
-          • <strong>3. المحفز الإخباري وقرار المستشار:</strong> <strong>انتظر ارتداداً فنياً قادماً</strong> لتقليص الخسارة، ثم قم بتدوير السيولة بالتدريج نحو أسهم أسرع نمواً مثل CIB أو السويدي.
+      const apiKey = getGeminiApiKey();
+
+      // If no API key, prompt user with an honest, direct input box
+      if (!apiKey) {
+        const promptBubble = document.createElement('div');
+        promptBubble.className = 'flex items-start gap-3';
+        promptBubble.innerHTML = `
+          <div class="w-8 h-8 rounded-full bg-amber-600 flex items-center justify-center text-white shrink-0 text-xs font-bold">
+            AI
+          </div>
+          <div class="bg-gray-800 border border-amber-500/40 rounded-2xl rounded-tr-none p-4 text-xs text-gray-200 leading-relaxed max-w-xl shadow-sm space-y-3">
+            <div class="flex items-center gap-2 text-amber-400 font-bold">
+              <i data-lucide="key" class="w-4 h-4"></i>
+              <span>مخ الذكاء الاصطناعي (Google Gemini) بحاجة لمفتاح التشغيل</span>
+            </div>
+            <p class="text-gray-300">
+              لكي يقوم موديل الذكاء الاصطناعي الفعلي من جوجل بالتفكير والرد على سؤالك بناءً على محفظتك وقواعد الاستثمار، يلزم إدخال <strong>Google Gemini API Key</strong> (مجاني 100%):
+            </p>
+            <div class="p-3 bg-gray-900 rounded-xl border border-gray-700 flex flex-col sm:flex-row gap-2">
+              <input type="password" id="inline-gemini-key" placeholder="الصق المفتاح هنا (AIzaSy...)" class="flex-1 bg-gray-950 border border-gray-600 rounded-lg px-3 py-1.5 text-xs text-white font-mono focus:outline-none focus:border-emerald-500">
+              <button onclick="saveInlineGeminiKey()" class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg font-bold text-xs transition">
+                حفظ وتفعيل
+              </button>
+            </div>
+            <div class="flex items-center justify-between text-[11px] text-gray-400 pt-1">
+              <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-cyan-400 hover:underline flex items-center gap-1 font-bold">
+                <span>احصل على مفتاحك المجاني في 30 ثانية من Google AI Studio</span>
+                <i data-lucide="external-link" class="w-3 h-3"></i>
+              </a>
+              <span class="text-gray-500">لا يتم رفع المفتاح على كود عام أبداً</span>
+            </div>
+          </div>
         `;
-      } else if (text.includes('التجاري الدولي') || text.includes('COMI') || text.includes('CIB')) {
-        reply = `
-          <strong>تحليل سهم البنك التجاري الدولي (COMI) - دراسة مسببة:</strong><br>
-          • <strong>1. التحليل المالي والأساسي:</strong> صافي أرباح تاريخية غير مسبوقة وهوامش فائدة قياسية، وهو السهم الأكثر جذباً للاستثمار المؤسسي الأجنبي.<br>
-          • <strong>2. التحليل الفني والدعوم:</strong> السهم يرتكز على دعم رئيسي قوي عند 77.80 ج، ومؤشر القوة النسبية RSI عند مستويات تشبع بيعي تدعم الارتداد نحو الهدف 88.00 ج.<br>
-          • <strong>3. قرار المستشار النهائي:</strong> <strong>فرصة تعزيز ذهبية (Accumulate)</strong>. تراجع السعر 11% في محفظتك هو فرصة للمستثمر طويل الأجل لخفض متوسط التكلفة ومضاعفة الأرباح عند صعود المؤشر.
-        `;
-      } else if (text.includes('السويدي') || text.includes('SWDY')) {
-        reply = `
-          <strong>تحليل سهم السويدي إليكتريك (SWDY) - دراسة مسببة:</strong><br>
-          • <strong>1. التحليل المالي والأساسي:</strong> عملاق التصدير وصاحب أكبر إيرادات دولارية في قطاع الطاقة والكابلات مع توسعات استثنائية بالخليج.<br>
-          • <strong>2. التحليل الفني والدعوم:</strong> قناة صاعدة قوية جداً فوق المتوسطات المتحركة، الدعم عند 48.50 ج، والهدف القادم 58.00 ج.<br>
-          • <strong>3. قرار المستشار:</strong> <strong>احتفاظ كامل بالمركز (Hold)</strong>؛ أرباحك الحالية (+20.47%) ممتازة ولا نبيع إلا مع ظهور علامات تشبع تاريخي (+40% إلى +50%).
-        `;
-      } else if (text.includes('AMOC') || text.includes('أموك')) {
-        reply = `
-          <strong>دراسة سهم أموك (AMOC) - طفرة EGX70:</strong><br>
-          • <strong>1. الأساسي والمالي:</strong> عوائد تصدير بالعملة الصعبة واستفادة مباشرة من تحسن أسعار المشتقات البترولية.<br>
-          • <strong>2. الفني والدعوم:</strong> انفجار في حجم التداول بمعدل 3.4x أضعاف المتوسط التاريخي واختراق للمقاومة 10.80 ج، مستهدف 12.40 ج.<br>
-          • <strong>3. شروط الأمان:</strong> وقف خسارة صارم عند 9.30 ج، ونسبة المخاطرة للعائد ممتازة (1:2.4).
-        `;
-      } else {
-        reply = `
-          <strong>رأي المستشار المالي وفق أرقام محفظتك ودستور الاستثمار:</strong><br>
-          • <strong>1. حالة المحفظة:</strong> محفظتك متماسكة جداً (إجمالي التغير شبه متعادل) بفضل الأرباح الكبيرة في أوراسكوم (+25%) وبنك الإسكان (+25%) والسويدي (+20%).<br>
-          • <strong>2. استراتيجية المستثمر طويل الأجل:</strong> لا تتأثر بالتذبذبات اليومية. صفقاتك مبنية على شركات حقيقية تكسب مليارات.<br>
-          • <strong>3. خطة العمل:</strong> الاحتفاظ بالخيول الرابحة، تعزيز CIB عند توفر سيولة، واستخدام منصة التداول التجريبي لاختبار أي فرصة طفرة جديدة قبل وضع أموال حقيقية!
-        `;
+        chatContainer.appendChild(promptBubble);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+        lucide.createIcons();
+        return;
       }
 
-      aiBubble.innerHTML = `
-        <div class="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center text-white shrink-0 text-xs font-bold">
+      // Thinking Bubble
+      const thinkingBubble = document.createElement('div');
+      thinkingBubble.className = 'flex items-start gap-3';
+      thinkingBubble.id = 'chat-thinking-bubble';
+      thinkingBubble.innerHTML = `
+        <div class="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center text-white shrink-0 text-xs font-bold animate-pulse">
           AI
         </div>
-        <div class="bg-gray-800 border border-gray-700 rounded-2xl rounded-tr-none p-3.5 text-xs text-gray-200 leading-relaxed max-w-xl shadow-sm">
-          ${reply}
+        <div class="bg-gray-800 border border-gray-700 rounded-2xl rounded-tr-none p-3.5 text-xs text-gray-300 leading-relaxed max-w-xl shadow-sm flex items-center gap-2">
+          <div class="w-4 h-4 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+          <span>جاري استدعاء مخ الذكاء الاصطناعي الحقيقي (Google Gemini 1.5 Flash) وتحليل السؤال...</span>
         </div>
       `;
-      chatContainer.appendChild(aiBubble);
+      chatContainer.appendChild(thinkingBubble);
       chatContainer.scrollTop = chatContainer.scrollHeight;
-      lucide.createIcons();
+
+      try {
+        const portfolioSummary = portfolioData.map(p => 
+          `- سهم ${p.name} (${p.ticker}): عدد ${p.shares} سهم، تكلفة الشراء ${p.costPrice} ج، السعر السوقي الحالي ${p.currentPrice} ج، التغير الإجمالي: ${(((p.currentPrice - p.costPrice)/p.costPrice)*100).toFixed(1)}%`
+        ).join('\n');
+
+        const longTermVal = document.getElementById('strategy-longterm-val')?.innerText || '70%';
+        const tacticalVal = document.getElementById('strategy-tactical-val')?.innerText || '30%';
+
+        const systemPrompt = `أنت "مستشار البورصة المصرية الذكي" (EGX AI Copilot).
+المستخدم مستثمر في البورصة المصرية ولديه المحفظة التالية في تطبيق ثندر (Thndr):
+- إجمالي قيمة المحفظة: حوالي 200 ألف جنيه مصري.
+- تفاصيل الأسهم في محفظته الحالية:
+${portfolioSummary}
+- صندوق الذهب/السيولة NCS: 2,750 وثيقة بسعر 15.00 ج.
+
+دستور وقواعد الاستثمار الصارمة للمستخدم:
+1. المستخدم مستثمر طويل الأجل (Long-Term Investor)، ممنوع المضاربة اليومية (Day Trading) نهائياً.
+2. نسبة التوزيع: ${longTermVal} أسهم قيادية آمنة طويلة الأجل (النواة Core)، و ${tacticalVal} مضاربة تكتيكية لفرص الطفرات السريعة (الأقمار Satellite).
+3. استراتيجية الخروج: لا نبيع بدافع الخوف عند القيعان. الخروج يكون فقط في حالتين: خسارة هيكلية تستوجب وقف خسارة صارم (Max 4% للصفقات التكتيكية)، أو جني أرباح طفرة (+20% إلى +30% أو أكثر) لإعادة تدوير السيولة.
+4. نسبة العائد للمخاطرة (R/R) للصفقات التكتيكية يجب ألا تقل عن 1:2.0.
+
+دورك: أجب عن سؤال المستخدم بأسلوب استثماري رصين وصريح ومدعوم بالأرقام والمستويات الفنية (الدعوم والمقاومات) والأساسية. نسق إجابتك بنقاط واضحة وخط عريض للعناوين الرئيسية.`;
+
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [
+              {
+                role: 'user',
+                parts: [
+                  { text: `${systemPrompt}\n\nسؤال واستشارة المستخدم:\n${text}` }
+                ]
+              }
+            ],
+            generationConfig: {
+              temperature: 0.3,
+              maxOutputTokens: 1200
+            }
+          })
+        });
+
+        thinkingBubble.remove();
+
+        if (!response.ok) {
+          const errData = await response.json().catch(() => ({}));
+          throw new Error(errData.error?.message || `HTTP ${response.status}`);
+        }
+
+        const data = await response.json();
+        const candidateText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        
+        if (!candidateText) {
+          throw new Error('لم يتم استلام أي نص من نموذج Gemini.');
+        }
+
+        const formattedReply = formatMarkdownReply(candidateText);
+
+        const aiBubble = document.createElement('div');
+        aiBubble.className = 'flex items-start gap-3';
+        aiBubble.innerHTML = `
+          <div class="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center text-white shrink-0 text-xs font-bold">
+            AI
+          </div>
+          <div class="bg-gray-800 border border-emerald-500/30 rounded-2xl rounded-tr-none p-4 text-xs text-gray-200 leading-relaxed max-w-xl shadow-sm space-y-2">
+            <div class="flex items-center justify-between text-[10px] text-emerald-400 font-bold border-b border-gray-700/60 pb-1.5 mb-1.5">
+              <span class="flex items-center gap-1"><i data-lucide="sparkles" class="w-3 h-3"></i> تحليل حي وفوري بواسطة Google Gemini AI</span>
+              <span class="text-gray-400">مباشر • وفق محفظتك ودستورك</span>
+            </div>
+            <div class="leading-relaxed">${formattedReply}</div>
+          </div>
+        `;
+        chatContainer.appendChild(aiBubble);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+        lucide.createIcons();
+
+      } catch (err) {
+        if (document.getElementById('chat-thinking-bubble')) {
+          document.getElementById('chat-thinking-bubble').remove();
+        }
+        const errBubble = document.createElement('div');
+        errBubble.className = 'flex items-start gap-3';
+        errBubble.innerHTML = `
+          <div class="w-8 h-8 rounded-full bg-rose-600 flex items-center justify-center text-white shrink-0 text-xs font-bold">
+            !
+          </div>
+          <div class="bg-gray-800 border border-rose-500/40 rounded-2xl rounded-tr-none p-3.5 text-xs text-rose-300 leading-relaxed max-w-xl shadow-sm space-y-2">
+            <strong>حدث خطأ أثناء التواصل مع سيرفر الذكاء الاصطناعي (Google Gemini):</strong><br>
+            <p class="text-gray-300 font-mono text-[11px]">${err.message}</p>
+            <p class="text-gray-400 text-[11px]">يرجى التحقق من صحة المفتاح في صفحة الإعدادات أو الحصول على مفتاح جديد من Google AI Studio.</p>
+          </div>
+        `;
+        chatContainer.appendChild(errBubble);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+      }
     }
 
     function clearChat() {
@@ -3519,6 +3841,7 @@
       renderAutonomousLedger();
       loadStrategySettings();
       updateSimPriceFromSelect();
+      updateGeminiStatusUI();
       lucide.createIcons();
     });
   </script>
