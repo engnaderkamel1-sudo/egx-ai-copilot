@@ -298,7 +298,7 @@ function Simulate-VerifyAiResponse {
                 if ($Text -match "$ticker[^\d]{1,30}(\d+(?:\.\d+)?)\s*(?:EGP)") {
                     $citedPrice = [double]$Matches[1]
                     $diffPct = [Math]::Abs(($citedPrice - $livePrice) / $livePrice) * 100
-                    if ($diffPct -gt 6.0) {
+                    if ($diffPct -gt 1.5) {
                         $warnings += "Ticker $ticker cited price ($citedPrice EGP) deviates from live price ($livePrice EGP)"
                     } else {
                         $verifiedPills += "$ticker`: $livePrice EGP verified"
@@ -328,14 +328,14 @@ $mockRadar = @(
 )
 
 # Test 3.1: Accurate AI Reply (Accurate Price)
-$cleanReply = "The stock COMI trades at 125.00 EGP and maintains a strong healthy bullish trend."
+$cleanReply = "The stock COMI trades at 130.00 EGP and maintains a strong healthy bullish trend."
 $v1 = Simulate-VerifyAiResponse -Text $cleanReply -Portfolio $portfolio -Radar $mockRadar
 Assert-Test -Suite 'Guardrail' -TestName 'Clean response with accurate price passes verification' -Condition ($v1.IsClean) -Expected 'Clean' -Actual ($v1.Warnings -join ' | ')
 
 # Test 3.2: Hallucinated Price (Model hallucinates COMI @ 95 EGP vs 124.97 EGP)
 $hallucinatedReply = "The stock COMI trades currently around 95.00 EGP representing an oversold entry."
 $v2 = Simulate-VerifyAiResponse -Text $hallucinatedReply -Portfolio $portfolio -Radar $mockRadar
-Assert-Test -Suite 'Guardrail' -TestName 'Guardrail catches price hallucination with greater than 6 pct discrepancy' -Condition (-not $v2.IsClean -and ($v2.Warnings[0] -match 'COMI')) -Expected 'Warning on COMI' -Actual ($v2.Warnings[0])
+Assert-Test -Suite 'Guardrail' -TestName 'Guardrail catches price hallucination with greater than 1.5 pct discrepancy' -Condition (-not $v2.IsClean -and ($v2.Warnings[0] -match 'COMI')) -Expected 'Warning on COMI' -Actual ($v2.Warnings[0])
 
 # Test 3.3: Day Trading Policy Violation
 $dayTradingReply = "You can initiate a quick day-trading scalp today on SWDY to capture 2 pct before session close."

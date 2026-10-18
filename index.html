@@ -7448,85 +7448,6 @@
       const input = document.getElementById('chat-input');
       input.value = question;
       document.getElementById('chat-form').dispatchEvent(new Event('submit'));
-    }
-
-    async function handleChatSubmit(e) {
-      e.preventDefault();
-      const input = document.getElementById('chat-input');
-      const text = input.value.trim();
-      if (!text) return;
-
-      const chatContainer = document.getElementById('chat-messages');
-
-      // User Message Bubble
-      const userBubble = document.createElement('div');
-      userBubble.className = 'flex items-start justify-end gap-3';
-      userBubble.innerHTML = `
-        <div class="bg-emerald-600 rounded-2xl rounded-tl-none p-3.5 text-xs text-white leading-relaxed max-w-xl shadow-sm">
-          ${text.replace(/</g, "&lt;").replace(/>/g, "&gt;")}
-        </div>
-        <div class="w-8 h-8 rounded-full bg-emerald-800 flex items-center justify-center text-white shrink-0 text-xs font-bold">
-          أنت
-        </div>
-      `;
-      chatContainer.appendChild(userBubble);
-      input.value = '';
-      chatContainer.scrollTop = chatContainer.scrollHeight;
-
-      const apiKey = getGeminiApiKey();
-
-      // If no API key, prompt user with an honest, direct input box
-      if (!apiKey) {
-        const promptBubble = document.createElement('div');
-        promptBubble.className = 'flex items-start gap-3';
-        promptBubble.innerHTML = `
-          <div class="w-8 h-8 rounded-full bg-amber-600 flex items-center justify-center text-white shrink-0 text-xs font-bold">
-            AI
-          </div>
-          <div class="bg-gray-800 border border-amber-500/40 rounded-2xl rounded-tr-none p-4 text-xs text-gray-200 leading-relaxed max-w-xl shadow-sm space-y-3">
-            <div class="flex items-center gap-2 text-amber-400 font-bold">
-              <i data-lucide="key" class="w-4 h-4"></i>
-              <span>محرك التحليل الذكي (Google Gemini) بحاجة لمفتاح التشغيل</span>
-            </div>
-            <p class="text-gray-300">
-              لتمكين التحليل المالي والآلي التفاعلي المباشر لبيانات محفظتك وأسهم السوق عبر جوجل، يلزم إدخال <strong>Google Gemini API Key</strong> (مجاني 100%):
-            </p>
-            <div class="p-3 bg-gray-900 rounded-xl border border-gray-700 flex flex-col sm:flex-row gap-2">
-              <input type="password" id="inline-gemini-key" placeholder="الصق المفتاح هنا (AIzaSy...)" class="flex-1 bg-gray-950 border border-gray-600 rounded-lg px-3 py-1.5 text-xs text-white font-mono focus:outline-none focus:border-emerald-500">
-              <button onclick="saveInlineGeminiKey()" class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg font-bold text-xs transition">
-                حفظ وتفعيل
-              </button>
-            </div>
-            <div class="flex items-center justify-between text-[11px] text-gray-400 pt-1">
-              <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-cyan-400 hover:underline flex items-center gap-1 font-bold">
-                <span>احصل على مفتاحك المجاني في 30 ثانية من Google AI Studio</span>
-                <i data-lucide="external-link" class="w-3 h-3"></i>
-              </a>
-              <span class="text-gray-500">لا يتم رفع المفتاح على كود عام أبداً</span>
-            </div>
-          </div>
-        `;
-        chatContainer.appendChild(promptBubble);
-        chatContainer.scrollTop = chatContainer.scrollHeight;
-        lucide.createIcons();
-        return;
-      }
-
-      // Thinking Bubble
-      const thinkingBubble = document.createElement('div');
-      thinkingBubble.className = 'flex items-start gap-3';
-      thinkingBubble.id = 'chat-thinking-bubble';
-      thinkingBubble.innerHTML = `
-        <div class="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center text-white shrink-0 text-xs font-bold animate-pulse">
-          AI
-        </div>
-        <div class="bg-gray-800 border border-emerald-500/30 rounded-2xl rounded-tr-none p-3.5 text-xs text-gray-300 leading-relaxed max-w-xl shadow-sm flex items-center gap-2">
-          <div class="w-4 h-4 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
-          <span>جاري تدقيق الإفصاحات وتحليل المستويات الفنية الحقيقية عبر (Google Search Grounded AI)...</span>
-        </div>
-      `;
-      chatContainer.appendChild(thinkingBubble);
-      chatContainer.scrollTop = chatContainer.scrollHeight;
 
     // Multi-turn Conversation Memory
     let geminiChatHistory = [];
@@ -7553,7 +7474,7 @@
             if (priceMatch && priceMatch[1]) {
               const citedPrice = parseFloat(priceMatch[1]);
               const diffPct = Math.abs((citedPrice - livePrice) / livePrice) * 100;
-              if (diffPct > 6.0) {
+              if (diffPct > 1.5) {
                 warnings.push(`سعر سهم <strong>${item.name} (${item.ticker})</strong> المذكور (${citedPrice} ج) يختلف عن سعر البورصة اللحظي الرسمي (${livePrice.toFixed(2)} ج) بنسبة ${diffPct.toFixed(1)}%.`);
               } else {
                 verifiedPills.push(`${item.ticker}: ${livePrice.toFixed(2)} ج`);
@@ -7698,8 +7619,8 @@ ${topRadarSummary}
 ${userLessonsSummary}
 
 قواعد وميثاق الحوكمة ومنع الهلوسة الصارم (Strict Zero-Hallucination Policy):
-1. **استخدم أداة البحث في جوجل (Google Search)** لفحص أحدث إفصاحات البورصة المصرية، وقرارات البنك المركزي، والنتائج المالية الربع سنوية الصادرة مؤخراً للشركات المستفسر عنها.
-2. **استشهد بالمصادر والتواريخ:** اذكر تاريخ الإفصاح الرسمي أو الخبر وكن محدداً. لا تخمن أي معلومة غير مثبتة.
+1. **استخدم أداة البحث في جوجل (Google Search) بحصر صارم:** اعتمد فقط على المصادر الموثوقة المعتمدة (موقع البورصة المصرية الرسمي EGX، موقع البنك المركزي CBE، إفصاحات علاقات المستثمرين الرسمية للشركات، مباشر مصر Mubasher، وجريدتي المال والبورصة نيوز). ممنوع منعاً باتاً الاستشهاد بمنتديات أو جروبات تواصل اجتماعي.
+2. **شرط التاريخ والحداثة الصارم (Recency Rule):** اذكر تاريخ الإفصاح الرسمي بالسنة والشهر واليوم، ويشترط ألا يتجاوز تاريخ الخبر آخر 7 أيام ما لم يكن تقريراً مالياً ربع سنوي معتمد رسمياً. إذا كان الخبر شائعة غير مؤكدة بإفصاح في البورصة، ضع تنبيهاً صريحاً: "⚠️ شائعة سوقية غير مؤكدة بإفصاح رسمي".
 3. **التزم بالمستويات الفنية الرقمية الحقيقية المرفقة أعلاه:**
    - مستوى المقاومة R1 يمثل الهدف الأول لجني الأرباح الجزئي.
    - مستوى الدعم S1 يمثل خط الأمان ووقف الخسارة في حال الكسر.
