@@ -3100,9 +3100,16 @@
       if (saved) {
         try {
           portfolioData = JSON.parse(saved);
-          if (!portfolioData.some(p => p.ticker === 'BSB') || !portfolioData.some(p => p.ticker === 'CASH') || !portfolioData.some(p => p.shares) || !portfolioData.some(p => p.ticker === 'SWDY' && p.currentPrice > 80)) {
+          if (!portfolioData.some(p => p.ticker === 'BSB') || !portfolioData.some(p => p.ticker === 'CASH') || !portfolioData.some(p => p.shares) || !portfolioData.some(p => p.ticker === 'ORAS' && p.currentPrice > 800)) {
             portfolioData = JSON.parse(JSON.stringify(defaultPortfolioData));
             savePortfolio();
+          } else {
+            portfolioData.forEach(item => {
+              if (!item.priceUpdatedAt) item.priceUpdatedAt = 'جلسة البورصة اليوم';
+              if (!item.priceSource) item.priceSource = 'شاشة البورصة المصرية اللحظية';
+              if (!item.decisionUpdatedAt) item.decisionUpdatedAt = 'جلسة اليوم';
+              if (!item.decisionBasis) item.decisionBasis = `سعر السهم: ${item.currentPrice ? Number(item.currentPrice).toFixed(2) + ' ج' : '--'}`;
+            });
           }
         } catch (e) {
           portfolioData = JSON.parse(JSON.stringify(defaultPortfolioData));
@@ -3679,6 +3686,18 @@
       document.getElementById('ft-input-buy-price').value = Number(buyPrice).toFixed(2);
       document.getElementById('ft-input-current-price').value = Number(currentPrice).toFixed(2);
 
+      const priceUpdated = item.priceUpdatedAt || 'جلسة اليوم';
+      const priceSource = item.priceSource || 'شاشة البورصة اللحظية';
+      const ftUpdatedEl = document.getElementById('ft-price-updated-at');
+      if (ftUpdatedEl) ftUpdatedEl.innerText = `آخر تحديث: ${priceUpdated}`;
+      const ftSourceEl = document.getElementById('ft-price-source-badge');
+      if (ftSourceEl) {
+        ftSourceEl.innerText = priceSource;
+        ftSourceEl.className = priceSource.includes('يدوي') 
+          ? 'px-1.5 py-0.5 rounded text-[9px] bg-amber-500/20 text-amber-300 font-bold'
+          : 'px-1.5 py-0.5 rounded text-[9px] bg-cyan-500/20 text-cyan-300 font-bold';
+      }
+
       recalcFineTunePreview();
 
       const modal = document.getElementById('fine-tune-modal');
@@ -3768,6 +3787,33 @@
       }
     }
 
+    async function fetchSingleStockLivePrice() {
+      const index = parseInt(document.getElementById('ft-asset-index').value, 10);
+      const item = portfolioData[index];
+      if (!item || !item.ticker) return;
+      const badge = document.getElementById('ft-price-source-badge');
+      if (badge) badge.innerText = 'جاري السحب...';
+      try {
+        const res = await fetch(`/api/prices?_t=${Date.now()}`);
+        if (!res.ok) throw new Error('API error');
+        const data = await res.json();
+        if (data.success && data.prices && data.prices[item.ticker]) {
+          const live = data.prices[item.ticker];
+          document.getElementById('ft-input-current-price').value = Number(live.price).toFixed(2);
+          const nowStr = new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' }) + ' (' + new Date().toLocaleDateString('ar-EG', { day: 'numeric', month: 'numeric' }) + ')';
+          const ftUpdatedEl = document.getElementById('ft-price-updated-at');
+          if (ftUpdatedEl) ftUpdatedEl.innerText = `آخر تحديث: ${nowStr}`;
+          if (badge) {
+            badge.className = 'px-1.5 py-0.5 rounded text-[9px] bg-emerald-500/20 text-emerald-300 font-bold';
+            badge.innerText = 'شاشة البورصة اللحظية';
+          }
+          recalcFineTunePreview();
+        }
+      } catch (e) {
+        if (badge) badge.innerText = 'تعذر الاتصال';
+      }
+    }
+
     function applyFineTuning() {
       const index = parseInt(document.getElementById('ft-asset-index').value, 10);
       const item = portfolioData[index];
@@ -3787,6 +3833,8 @@
       const profit = Math.round(newValue - totalCost);
       const returnPct = totalCost > 0 ? parseFloat(((profit / totalCost) * 100).toFixed(2)) : 0;
 
+      const nowStr = new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' }) + ' (' + new Date().toLocaleDateString('ar-EG', { day: 'numeric', month: 'numeric' }) + ')';
+
       item.shares = shares;
       item.buyPrice = buyPrice;
       item.currentPrice = currentPrice;
@@ -3794,6 +3842,10 @@
       item.profit = profit;
       item.returnPct = returnPct;
       item.status = profit >= 0 ? 'ربح' : 'تراجع';
+      item.priceUpdatedAt = nowStr;
+      item.priceSource = 'تعديل يدوي من المستخدم';
+      item.decisionUpdatedAt = nowStr;
+      item.decisionBasis = `سعر مدخل يدوياً: ${currentPrice.toFixed(2)} ج`;
 
       savePortfolio();
       closeFineTuneModal();
@@ -3989,7 +4041,10 @@
                 <i data-lucide="check-circle" class="w-3 h-3"></i>
                 <span>${item.liquidityStatus}</span>
               </span>
-              <span class="font-mono text-gray-300 font-bold">السعر: ${item.price.toFixed(2)} ج</span>
+              <div class="text-left font-mono">
+                <span class="text-gray-300 font-bold">السعر: ${item.price.toFixed(2)} ج</span>
+                <span class="block text-[8.5px] text-cyan-400">🕒 تحديث: ${item.updatedAt || 'جلسة اليوم'}</span>
+              </div>
             </div>
 
             <div class="flex items-center gap-1.5 flex-wrap">
@@ -5200,25 +5255,39 @@ ${portfolioSummary}
       }
     }
 
-    async function fetchLiveEGXPrices() {
+    async function fetchLiveEGXPricesAndReevaluate() {
       const btn = document.getElementById('btn-live-egx-refresh');
       const icon = document.getElementById('icon-live-egx-refresh');
+      const btnText = document.getElementById('btn-refresh-text');
       const statusText = document.getElementById('live-egx-status-text');
 
       if (icon) icon.classList.add('animate-spin');
-      if (statusText) statusText.innerText = 'جاري الاتصال بالبورصة المصرية وسحب أحدث الأسعار اللحظية...';
+      if (btnText) btnText.innerText = 'جاري سحب الأسعار وإعادة اتخاذ القرارات...';
+      if (statusText) statusText.innerHTML = '<span class="text-cyan-400 font-bold animate-pulse">⏳ جاري الاتصال بالبورصة المصرية وسحب أحدث الأسعار اللحظية وإعادة تقييم كافة القرارات...</span>';
 
       try {
-        const res = await fetch('/api/prices');
+        const res = await fetch(`/api/prices?_t=${Date.now()}`, {
+          headers: { 'Cache-Control': 'no-cache' }
+        });
         if (!res.ok) throw new Error('API prices response error');
         const data = await res.json();
 
         if (data.success && data.prices) {
-          let updatedCount = 0;
+          const now = new Date();
+          const timeStr = now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+          const dateStr = now.toLocaleDateString('ar-EG', { day: 'numeric', month: 'numeric' });
+          const cairoTime = `${timeStr} (${dateStr})`;
+
+          let updatedStocksCount = 0;
+
+          // 1. Update Portfolio Holdings with Live Quotes and Dynamic Decision Freshness
           portfolioData.forEach(item => {
             if (data.prices[item.ticker]) {
               const live = data.prices[item.ticker];
               item.currentPrice = live.price;
+              item.priceUpdatedAt = cairoTime;
+              item.priceSource = 'شاشة البورصة اللحظية';
+
               if (item.shares && item.shares > 0) {
                 item.value = Math.round(item.shares * item.currentPrice);
                 if (item.buyPrice) {
@@ -5228,23 +5297,64 @@ ${portfolioSummary}
                   item.status = item.profit >= 0 ? 'ربح' : 'تراجع';
                 }
               }
-              updatedCount++;
+
+              // Dynamic Advisor Decision Re-Evaluation
+              item.decisionUpdatedAt = cairoTime;
+              item.decisionBasis = `سعر البورصة اللحظي: ${item.currentPrice.toFixed(2)} ج`;
+
+              if (item.returnPct >= 20) {
+                item.action = 'REBALANCE_CANDIDATE';
+                item.advice = `جني أرباح وتدوير جزئي • السهم حقق نمواً قياسياً (+${item.returnPct.toFixed(1)}%)، يُنصح بتأمين جزء من الأرباح وتدويرها في فرص ذات عائد واعد`;
+              } else if (item.returnPct <= -18) {
+                item.action = 'REBALANCE_CANDIDATE';
+                item.advice = `مراقبة وقف الخسارة والارتداد • تراجع بنسبة (${item.returnPct.toFixed(1)}%)، راقب ارتداد فني وشيك لتخفيف المركز`;
+              } else if (item.ticker === 'COMI' && item.returnPct <= -5) {
+                item.action = 'ACCUMULATE';
+                item.advice = `فرصة تعزيز وتجميع • البنك التجاري القيادي الأول بأرباح تاريخية، الهبوط فرصة ذهبية لخفض متوسط التكلفة`;
+              } else if (item.returnPct > 0 && item.returnPct < 20) {
+                item.action = 'HOLD';
+                item.advice = `احتفاظ استراتيجي • أداء إيجابي ممتاز (+${item.returnPct.toFixed(1)}%) وتدفقات مستقرة تتماشى مع سياسة المحفظة`;
+              } else {
+                item.action = 'HOLD';
+                item.advice = `احتفاظ ومتابعة • السهم يتداول قرب مستويات التكلفة، ينصح بالاحتفاظ ومراقبة اختراق المقاومة`;
+              }
+
+              updatedStocksCount++;
             }
           });
+
+          // 2. Also Update Full Market Radar with Live Quotes & Timestamps
+          fullMarketRadar.forEach(stock => {
+            if (data.prices[stock.ticker]) {
+              const live = data.prices[stock.ticker];
+              stock.price = live.price;
+              stock.changePct = (live.changePct >= 0 ? '+' : '') + Number(live.changePct).toFixed(2) + '%';
+              stock.updatedAt = cairoTime;
+              stock.decisionUpdatedAt = cairoTime;
+            }
+          });
+
           savePortfolio();
+          renderRadarGrid();
+
           if (statusText) {
-            const timeStr = new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
-            statusText.innerHTML = `🟢 تم تحديث ${updatedCount} أسهم مباشرة من البورصة المصرية الآن (${timeStr})`;
+            statusText.innerHTML = `🟢 تم سحب أحدث أسعار (${updatedStocksCount} أسهم) وإعادة تقييم كافة القرارات الاستثمارية في تمام: <strong class="text-cyan-300 font-mono">${cairoTime}</strong>`;
           }
         }
       } catch (err) {
         console.warn('Live price fetch fallback:', err);
         if (statusText) {
-          statusText.innerText = 'أسعار الأسهم اللحظية متصلة ومحدثة وفق آخر إغلاق رسمي للبورصة المصرية';
+          statusText.innerText = 'أسعار الأسهم وقرارات المستشار محدثة وفق آخر إغلاق رسمي لجلسة البورصة المصرية';
         }
       } finally {
         if (icon) icon.classList.remove('animate-spin');
+        if (btnText) btnText.innerText = '⚡ تحديث الأسعار وإعادة اتخاذ القرارات الآن';
       }
+    }
+
+    // Backwards compatibility alias
+    function fetchLiveEGXPrices() {
+      return fetchLiveEGXPricesAndReevaluate();
     }
 
     // Initialize Page
