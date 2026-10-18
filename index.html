@@ -3903,60 +3903,22 @@
         thndrUrl: 'https://app.thndr.app'
       },
       {
-        ticker: 'NCS',
-        name: 'صندوق إن آي كابيتال (صناديق)',
-        category: 'صناديق استثمارية • إدارة أصول',
-        shares: 59666,
-        buyPrice: 62593,
-        currentPrice: 59666,
-        value: 59666,
-        profit: -2927,
-        returnPct: -4.68,
-        status: 'صندوق سيولة/أسهم',
-        advice: 'مراجعة نوع الصندوق لمعرفة سرعة استرداد الكاش وإعادة توجيهه',
-        action: 'REVIEW',
-        priceUpdatedAt: 'تقييم الوثيقة الأخير',
-        priceSource: 'بيانات الصندوق المعتمدة',
-        decisionUpdatedAt: 'جلسة اليوم',
-        decisionBasis: 'سعر الوثيقة الرسمي',
-        thndrUrl: 'https://app.thndr.app'
-      },
-      {
-        ticker: 'BSB',
-        name: 'صندوق بلتون للأسهم (BSB)',
-        category: 'صناديق استثمارية • بلتون',
-        shares: 268,
-        buyPrice: 294.16,
-        currentPrice: 268,
-        value: 268,
-        profit: -26.16,
-        returnPct: -8.89,
-        status: 'صندوق استثماري',
-        advice: 'احتفاظ ومراقبة وثائق الصندوق والتحوط من تقلبات المؤشر',
-        action: 'HOLD',
-        priceUpdatedAt: 'تقييم الوثيقة الأخير',
-        priceSource: 'بيانات الصندوق المعتمدة',
-        decisionUpdatedAt: 'جلسة اليوم',
-        decisionBasis: 'سعر الوثيقة الرسمي',
-        thndrUrl: 'https://app.thndr.app'
-      },
-      {
         ticker: 'CASH',
         name: 'المحفظة (الرصيد النقدي والسيولة)',
-        category: 'محفظة نقدية • سيولة واكتتابات',
-        shares: 20010,
-        buyPrice: 20010,
-        currentPrice: 20010,
-        value: 20010,
+        category: 'محفظة نقدية • سيولة حرة',
+        shares: 18200,
+        buyPrice: 18200,
+        currentPrice: 18200,
+        value: 18200,
         profit: 0,
         returnPct: 0.00,
-        status: 'طلبات اكتتاب قيد التنفيذ',
-        advice: 'سيولة محجوزة لاكتتاب سهم حالاً (HALN) وقوة شرائية متاحة 10.79 ج',
+        status: 'سيولة نقدية جاهزة',
+        advice: 'رصيد كاش حر في حساب ثندر متاح لاقتناص الفرص وتعزيز المراكز',
         action: 'HOLD',
-        priceUpdatedAt: 'لحظي مباشر',
+        priceUpdatedAt: 'محفظة ثندر الرسمية',
         priceSource: 'حساب ثندر الرسمي',
         decisionUpdatedAt: 'جلسة اليوم',
-        decisionBasis: 'الرصيد النقدي الفعلي',
+        decisionBasis: 'الرصيد النقدي الفعلي 18,200 ج',
         thndrUrl: 'https://app.thndr.app'
       }
     ];
@@ -4345,7 +4307,7 @@
 
     // Load from LocalStorage or use default
     const PORTFOLIO_VERSION_KEY = 'egx_copilot_portfolio_ver';
-    const CURRENT_PORTFOLIO_VER = '2026_10_thndr_exact_verified';
+    const CURRENT_PORTFOLIO_VER = '2026_10_thndr_exact_cash_18200';
     let portfolioData = [];
 
     function loadPortfolio() {
