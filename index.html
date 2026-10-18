@@ -892,9 +892,9 @@
             </div>
           </div>
           <div class="flex items-center gap-2">
-            <button onclick="switchTab('settings')" class="px-3 py-1 rounded-lg bg-emerald-600/90 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1.5 transition shadow-sm">
+            <button onclick="openGeminiModal()" class="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1.5 transition shadow-sm">
               <i data-lucide="key" class="w-3.5 h-3.5"></i>
-              <span id="gemini-btn-label">إعدادات مفتاح الذكاء الاصطناعي (API)</span>
+              <span id="gemini-btn-label">ربط / إدخال مفتاح الذكاء الاصطناعي (API Key)</span>
             </button>
           </div>
         </div>
@@ -1306,6 +1306,40 @@
           </button>
         </div>
 
+        <!-- Gemini AI Model Configuration (Live Brain Activation - Primary Top Position) -->
+        <div class="bg-gradient-to-r from-emerald-950/50 via-gray-900 to-cyan-950/40 p-5 rounded-2xl border-2 border-emerald-500/50 space-y-4 shadow-xl">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <div class="flex items-center gap-2 text-emerald-400 text-xs font-bold uppercase tracking-wider mb-1">
+                <i data-lucide="cpu" class="w-4 h-4"></i>
+                <span>ربط مخ الذكاء الاصطناعي الحي (Google Gemini AI Model API)</span>
+              </div>
+              <h3 class="text-base font-bold text-white">تفعيل التفكير الحي لموديل الذكاء الاصطناعي الحقيقي</h3>
+              <p class="text-xs text-gray-300 mt-1">يتم حفظ المفتاح بأمان وسرية تامة في متصفحك الشخصي فقط (Local Storage) ولا يُرفع على سيرفر أو كود عام.</p>
+            </div>
+            <a href="https://aistudio.google.com/app/apikey" target="_blank" class="px-3.5 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs flex items-center gap-1.5 transition self-start sm:self-auto shadow shrink-0">
+              <span>احصل على مفتاح مجاني في 30 ثانية من Google AI Studio</span>
+              <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+            </a>
+          </div>
+
+          <div class="flex flex-col sm:flex-row gap-2">
+            <input type="password" id="setting-gemini-key" placeholder="الصق مفتاح Google Gemini API هنا (مثال: AIzaSy...)" class="flex-1 bg-gray-950 border border-gray-700 rounded-xl px-4 py-2.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500 font-mono">
+            <button onclick="saveGeminiApiKeyFromInput()" class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition shrink-0">
+              <i data-lucide="check-circle" class="w-4 h-4"></i>
+              <span>حفظ وتفعيل</span>
+            </button>
+            <button onclick="testGeminiConnection()" class="px-4 py-2.5 rounded-xl bg-gray-800 hover:bg-gray-700 text-amber-300 font-bold text-xs flex items-center justify-center gap-1.5 transition shrink-0">
+              <i data-lucide="zap" class="w-4 h-4"></i>
+              <span>اختبار الاتصال ⚡</span>
+            </button>
+            <button onclick="removeGeminiApiKey()" class="px-3 py-2.5 rounded-xl bg-gray-800 hover:bg-rose-900/40 text-gray-400 hover:text-rose-300 font-bold text-xs flex items-center justify-center transition shrink-0" title="حذف المفتاح">
+              <i data-lucide="trash-2" class="w-4 h-4"></i>
+            </button>
+          </div>
+          <div id="gemini-key-feedback" class="text-xs hidden p-2.5 rounded-xl"></div>
+        </div>
+
         <!-- Strategy Allocation Slider (Core vs Satellite) -->
         <div class="bg-gray-950 p-5 rounded-2xl border border-gray-800 space-y-5">
           <div class="flex items-center justify-between flex-wrap gap-2">
@@ -1397,39 +1431,6 @@
           </div>
         </div>
 
-        <!-- Gemini AI Model Configuration (Live Brain Activation) -->
-        <div class="bg-gradient-to-r from-emerald-950/40 via-gray-900 to-cyan-950/30 p-5 rounded-2xl border border-emerald-500/40 space-y-4 shadow-lg">
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div>
-              <div class="flex items-center gap-2 text-emerald-400 text-xs font-bold uppercase tracking-wider mb-1">
-                <i data-lucide="cpu" class="w-4 h-4"></i>
-                <span>ربط مخ الذكاء الاصطناعي الحي (Google Gemini AI Model API)</span>
-              </div>
-              <h3 class="text-base font-bold text-white">تفعيل التفكير الحي لموديل الذكاء الاصطناعي الحقيقي</h3>
-              <p class="text-xs text-gray-300 mt-1">يتم حفظ المفتاح بأمان وسرية تامة في متصفحك الشخصي فقط (Local Storage) ولا يُرفع على سيرفر أو كود عام.</p>
-            </div>
-            <a href="https://aistudio.google.com/app/apikey" target="_blank" class="px-3.5 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs flex items-center gap-1.5 transition self-start sm:self-auto shadow shrink-0">
-              <span>احصل على مفتاح مجاني في 30 ثانية من Google AI Studio</span>
-              <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
-            </a>
-          </div>
-
-          <div class="flex flex-col sm:flex-row gap-2">
-            <input type="password" id="setting-gemini-key" placeholder="الصق مفتاح Google Gemini API هنا (مثال: AIzaSy...)" class="flex-1 bg-gray-950 border border-gray-700 rounded-xl px-4 py-2.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500 font-mono">
-            <button onclick="saveGeminiApiKeyFromInput()" class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition shrink-0">
-              <i data-lucide="check-circle" class="w-4 h-4"></i>
-              <span>حفظ وتفعيل</span>
-            </button>
-            <button onclick="testGeminiConnection()" class="px-4 py-2.5 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-200 font-bold text-xs flex items-center justify-center gap-1.5 transition shrink-0">
-              <i data-lucide="zap" class="w-4 h-4 text-amber-400"></i>
-              <span>اختبار الاتصال ⚡</span>
-            </button>
-            <button onclick="removeGeminiApiKey()" class="px-3 py-2.5 rounded-xl bg-gray-800 hover:bg-rose-900/40 text-gray-400 hover:text-rose-300 font-bold text-xs flex items-center justify-center transition shrink-0" title="حذف المفتاح">
-              <i data-lucide="trash-2" class="w-4 h-4"></i>
-            </button>
-          </div>
-          <div id="gemini-key-feedback" class="text-xs hidden p-2.5 rounded-xl"></div>
-        </div>
 
         <!-- Cloud Schedule Status & Info -->
         <div class="bg-emerald-950/20 border border-emerald-500/30 p-4 rounded-xl flex items-center justify-between flex-wrap gap-3 text-xs">
@@ -1680,6 +1681,64 @@
           </button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- Dedicated Google Gemini API Key Setup Modal -->
+  <div id="gemini-modal" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-gray-900 border-2 border-emerald-500/50 rounded-2xl max-w-lg w-full p-6 space-y-5 shadow-2xl relative">
+      <div class="flex items-center justify-between border-b border-gray-800 pb-3">
+        <div class="flex items-center gap-2.5">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 flex items-center justify-center text-white shadow-md">
+            <i data-lucide="key" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-white text-base">ربط مفتاح Google Gemini AI</h3>
+            <p class="text-xs text-gray-400">تفعيل التفكير اللحظي لموديل الذكاء الاصطناعي</p>
+          </div>
+        </div>
+        <button onclick="closeGeminiModal()" class="text-gray-400 hover:text-white p-1 rounded-lg hover:bg-gray-800 transition">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="space-y-4 text-xs">
+        <!-- Step 1 banner -->
+        <div class="p-3.5 rounded-xl bg-cyan-950/30 border border-cyan-500/30 flex items-center justify-between gap-3">
+          <div>
+            <div class="font-bold text-cyan-300">الخطوة 1: احصل على مفتاحك المجاني (30 ثانية)</div>
+            <div class="text-[11px] text-gray-300 mt-0.5">منصة Google AI Studio الرسمية مجانية 100% ولا تطلب فيزا.</div>
+          </div>
+          <a href="https://aistudio.google.com/app/apikey" target="_blank" class="px-3 py-1.5 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs flex items-center gap-1 shrink-0 transition shadow">
+            <span>فتح Google Studio</span>
+            <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+          </a>
+        </div>
+
+        <!-- Step 2 Input -->
+        <div class="space-y-2">
+          <label class="block font-bold text-white text-xs">الخطوة 2: الصق المفتاح هنا (يبدأ بـ AIzaSy...):</label>
+          <div class="relative">
+            <input type="text" id="modal-gemini-key-input" placeholder="AIzaSy..." class="w-full bg-gray-950 border border-gray-700 rounded-xl px-4 py-3 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500 font-mono tracking-wider">
+          </div>
+          <p class="text-[11px] text-gray-400">🔒 أمان تام: يتم حفظ المفتاح داخل متصفحك الحالي فقط (Local Storage) ولا يُرسل لأي طرف خارجي.</p>
+        </div>
+
+        <!-- Feedback alert box -->
+        <div id="modal-gemini-feedback" class="text-xs hidden p-3 rounded-xl"></div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex items-center gap-2 pt-2 border-t border-gray-800">
+        <button onclick="saveGeminiKeyFromModal()" class="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition shadow">
+          <i data-lucide="check-circle" class="w-4 h-4"></i>
+          <span>حفظ وتفعيل المخ الذكي ✅</span>
+        </button>
+        <button onclick="testGeminiConnectionFromModal()" class="px-4 py-2.5 rounded-xl bg-gray-800 hover:bg-gray-700 text-amber-300 font-bold text-xs flex items-center justify-center gap-1.5 transition">
+          <i data-lucide="zap" class="w-4 h-4"></i>
+          <span>اختبار الاتصال ⚡</span>
+        </button>
+      </div>
     </div>
   </div>
 
@@ -3492,6 +3551,93 @@
       }
     }
 
+    function openGeminiModal() {
+      const modal = document.getElementById('gemini-modal');
+      const input = document.getElementById('modal-gemini-key-input');
+      const key = getGeminiApiKey();
+      if (input && key) {
+        input.value = key;
+      }
+      const fb = document.getElementById('modal-gemini-feedback');
+      if (fb) fb.className = 'text-xs hidden p-3 rounded-xl';
+      if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      }
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function closeGeminiModal() {
+      const modal = document.getElementById('gemini-modal');
+      if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+    }
+
+    function saveGeminiKeyFromModal() {
+      const input = document.getElementById('modal-gemini-key-input');
+      const val = (input?.value || '').trim();
+      const fb = document.getElementById('modal-gemini-feedback');
+      if (!val) {
+        if (fb) {
+          fb.className = 'text-xs p-3 rounded-xl bg-rose-950/40 border border-rose-500/40 text-rose-300 block';
+          fb.innerText = '⚠️ يرجى لصق مفتاح Google Gemini API أولاً.';
+        }
+        return;
+      }
+      saveGeminiApiKey(val);
+      if (fb) {
+        fb.className = 'text-xs p-3 rounded-xl bg-emerald-950/40 border border-emerald-500/40 text-emerald-300 block font-bold';
+        fb.innerText = '✅ تم حفظ وتفعيل المفتاح بنجاح! مخ الذكاء الاصطناعي (Gemini AI) متصل الآن.';
+      }
+      setTimeout(() => {
+        closeGeminiModal();
+      }, 1200);
+    }
+
+    async function testGeminiConnectionFromModal() {
+      const input = document.getElementById('modal-gemini-key-input');
+      const key = (input?.value || '').trim() || getGeminiApiKey();
+      const fb = document.getElementById('modal-gemini-feedback');
+      if (!key) {
+        if (fb) {
+          fb.className = 'text-xs p-3 rounded-xl bg-rose-950/40 border border-rose-500/40 text-rose-300 block';
+          fb.innerText = '⚠️ يرجى لصق المفتاح أولاً للاختبار.';
+        }
+        return;
+      }
+      if (fb) {
+        fb.className = 'text-xs p-3 rounded-xl bg-cyan-950/40 border border-cyan-500/40 text-cyan-300 block flex items-center gap-2';
+        fb.innerHTML = '<div class="w-3.5 h-3.5 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin"></div> جاري اختبار الاتصال بسيرفر Google Gemini AI...';
+      }
+      try {
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ role: 'user', parts: [{ text: 'اختبار سريع: أجب بكلمة واحدة "متصل"' }] }]
+          })
+        });
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.error?.message || `HTTP ${res.status}`);
+        }
+        const data = await res.json();
+        const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+        if (fb) {
+          fb.className = 'text-xs p-3 rounded-xl bg-emerald-950/40 border border-emerald-500/40 text-emerald-300 block font-bold';
+          fb.innerHTML = `⚡ <strong>الاتصال ناجح 100%!</strong> رد السيرفر: "${reply.trim()}".`;
+        }
+        saveGeminiApiKey(key);
+      } catch (err) {
+        if (fb) {
+          fb.className = 'text-xs p-3 rounded-xl bg-rose-950/40 border border-rose-500/40 text-rose-300 block';
+          fb.innerHTML = `❌ <strong>فشل الاتصال:</strong> ${err.message}.`;
+        }
+      }
+    }
+
     function updateGeminiStatusUI() {
       const key = getGeminiApiKey();
       const statusText = document.getElementById('gemini-status-text');
@@ -3499,9 +3645,13 @@
       const statusInd = document.getElementById('gemini-status-indicator');
       const btnLabel = document.getElementById('gemini-btn-label');
       const settingInput = document.getElementById('setting-gemini-key');
+      const modalInput = document.getElementById('modal-gemini-key-input');
 
       if (settingInput && key) {
         settingInput.value = key;
+      }
+      if (modalInput && key) {
+        modalInput.value = key;
       }
 
       if (key) {
@@ -3512,16 +3662,16 @@
         if (statusInd) {
           statusInd.className = 'flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20';
         }
-        if (btnLabel) btnLabel.innerText = 'المفتاح مفعل (تعديل/فحص)';
+        if (btnLabel) btnLabel.innerText = 'المفتاح مفعل ومتصل (تعديل)';
       } else {
-        if (statusText) statusText.innerText = 'مخ الذكاء الاصطناعي غير متصل (أدخل المفتاح للربط المباشر) ⚪';
+        if (statusText) statusText.innerText = 'مخ الذكاء الاصطناعي غير متصل (اضغط لإدخال المفتاح) ⚪';
         if (statusDot) {
           statusDot.className = 'w-2 h-2 rounded-full bg-amber-400 animate-pulse';
         }
         if (statusInd) {
           statusInd.className = 'flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20';
         }
-        if (btnLabel) btnLabel.innerText = 'ربط مفتاح Google Gemini';
+        if (btnLabel) btnLabel.innerText = 'ربط / إدخال مفتاح الذكاء الاصطناعي';
       }
     }
 
