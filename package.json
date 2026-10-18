@@ -1,0 +1,9 @@
+{
+  "name": "egx-ai-copilot",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Autonomous EGX AI Copilot running 24/7 on Vercel Cloud Serverless",
+  "scripts": {
+    "start": "serve ."
+  }
+}
