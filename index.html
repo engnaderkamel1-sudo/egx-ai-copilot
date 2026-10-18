@@ -704,7 +704,7 @@
             <thead class="bg-gray-950/60 text-gray-400 text-xs font-semibold border-b border-gray-800">
               <tr>
                 <th class="py-3 px-4">السهم / الأصل</th>
-                <th class="py-3 px-4">القيمة الحالية (وأصل الشراء)</th>
+                <th class="py-3 px-4">إجمالي قيمة أسهمك (وأصل الشراء)</th>
                 <th class="py-3 px-4">التطور والأرباح (المكسب / التراجع)</th>
                 <th class="py-3 px-4">الوزن النسبي</th>
                 <th class="py-3 px-4">توجيه المستشار</th>
@@ -2147,9 +2147,9 @@
         ticker: 'ORAS',
         name: 'أوراسكوم كونستراكشون',
         category: 'EGX30 • بنية تحتية ومقاولات دولارية',
-        shares: 50,
-        buyPrice: 243.10,
-        currentPrice: 304.30,
+        shares: 17,
+        buyPrice: 715.00,
+        currentPrice: 895.00,
         value: 15215,
         profit: 3060,
         returnPct: 25.17,
@@ -2729,7 +2729,7 @@
       if (saved) {
         try {
           portfolioData = JSON.parse(saved);
-          if (!portfolioData.some(p => p.ticker === 'BSB') || !portfolioData.some(p => p.ticker === 'CASH') || !portfolioData.some(p => p.shares)) {
+          if (!portfolioData.some(p => p.ticker === 'BSB') || !portfolioData.some(p => p.ticker === 'CASH') || !portfolioData.some(p => p.shares) || portfolioData.some(p => p.ticker === 'ORAS' && p.shares === 50)) {
             portfolioData = JSON.parse(JSON.stringify(defaultPortfolioData));
             savePortfolio();
           }
