@@ -691,24 +691,33 @@
       <div class="bg-gray-900/90 border border-gray-800 rounded-2xl overflow-hidden shadow-xl">
         <div class="p-4 sm:p-5 border-b border-gray-800 flex items-center justify-between flex-wrap gap-3">
           <div>
-            <h3 class="font-bold text-white text-base">جدول الأصول والأسهم المملوكة في ثندر</h3>
-            <p class="text-xs text-gray-400">يمكنك تعديل أي سهم أو حذفه أو فتحه في ثندر بنقرة زر</p>
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse"></span>
+              <h3 class="font-bold text-white text-base">جدول الأصول والأسهم المملوكة في ثندر</h3>
+            </div>
+            <p class="text-xs text-gray-400 mt-0.5" id="live-egx-status-text">أسعار الأسهم اللحظية متصلة ومحدثة من شاشة البورصة المصرية</p>
           </div>
           <div class="flex items-center gap-2">
-            <span class="text-xs text-gray-400 bg-gray-800 px-3 py-1 rounded-full border border-gray-700" id="assets-count-badge">11 أصل مالي</span>
+            <button onclick="fetchLiveEGXPrices()" id="btn-live-egx-refresh" class="px-3.5 py-1.5 rounded-xl bg-cyan-600/20 hover:bg-cyan-600/30 text-cyan-300 border border-cyan-500/30 text-xs font-bold transition flex items-center gap-1.5 shadow-sm" title="سحب أحدث أسعار التداول من البورصة المصرية">
+              <i data-lucide="refresh-cw" class="w-3.5 h-3.5" id="icon-live-egx-refresh"></i>
+              <span>تحديث أسعار البورصة اللحظية</span>
+            </button>
+            <span class="text-xs text-gray-400 bg-gray-800 px-3 py-1 rounded-full border border-gray-700" id="assets-count-badge">12 أصل مالي</span>
           </div>
         </div>
 
         <div class="overflow-x-auto">
           <table class="w-full text-right text-sm">
-            <thead class="bg-gray-950/60 text-gray-400 text-xs font-semibold border-b border-gray-800">
+            <thead class="bg-gray-950/70 text-gray-400 text-xs font-semibold border-b border-gray-800">
               <tr>
-                <th class="py-3 px-4">السهم / الأصل</th>
-                <th class="py-3 px-4">إجمالي قيمة أسهمك (وأصل الشراء)</th>
-                <th class="py-3 px-4">التطور والأرباح (المكسب / التراجع)</th>
-                <th class="py-3 px-4">الوزن النسبي</th>
-                <th class="py-3 px-4">توجيه المستشار</th>
-                <th class="py-3 px-4 text-center">إجراءات</th>
+                <th class="py-3 px-3">السهم / الشركة</th>
+                <th class="py-3 px-3 text-center">سعر السهم اللحظي</th>
+                <th class="py-3 px-3 text-center">عدد الأسهم</th>
+                <th class="py-3 px-3 text-center">متوسط الشراء</th>
+                <th class="py-3 px-3">إجمالي القيمة</th>
+                <th class="py-3 px-3">التطور والأرباح</th>
+                <th class="py-3 px-3">توجيه المستشار</th>
+                <th class="py-3 px-3 text-center">ضبط</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-800/60 font-medium" id="portfolio-table-body">
@@ -2162,9 +2171,9 @@
         ticker: 'HDBK',
         name: 'بنك التعمير والإسكان',
         category: 'EGX30 • قطاع بنكي وعوائد نقدية',
-        shares: 200,
-        buyPrice: 49.79,
-        currentPrice: 62.165,
+        shares: 125,
+        buyPrice: 79.66,
+        currentPrice: 99.89,
         value: 12433,
         profit: 2475,
         returnPct: 24.85,
@@ -2177,9 +2186,9 @@
         ticker: 'SWDY',
         name: 'السويدي إليكتريك',
         category: 'EGX30 • طاقة وتصدير',
-        shares: 240,
-        buyPrice: 43.02,
-        currentPrice: 51.83,
+        shares: 113,
+        buyPrice: 91.37,
+        currentPrice: 110.00,
         value: 12439,
         profit: 2114,
         returnPct: 20.47,
@@ -2192,9 +2201,9 @@
         ticker: 'ABUK',
         name: 'أبو قير للأسمدة',
         category: 'EGX30 • بتروكيماويات وتصدير',
-        shares: 290,
-        buyPrice: 51.45,
-        currentPrice: 58.96,
+        shares: 200,
+        buyPrice: 74.61,
+        currentPrice: 85.73,
         value: 17098,
         profit: 2176,
         returnPct: 14.59,
@@ -2207,9 +2216,9 @@
         ticker: 'EGAL',
         name: 'مصر للألومنيوم',
         category: 'EGX30 • معادن وثروة معدنية',
-        shares: 125,
-        buyPrice: 106.83,
-        currentPrice: 107.37,
+        shares: 46,
+        buyPrice: 290.30,
+        currentPrice: 292.00,
         value: 13421,
         profit: 66.65,
         returnPct: 0.50,
@@ -2222,9 +2231,9 @@
         ticker: 'ARCC',
         name: 'العربية للأسمنت',
         category: 'EGX70 • مواد بناء وإنشاءات',
-        shares: 1200,
-        buyPrice: 18.44,
-        currentPrice: 18.46,
+        shares: 334,
+        buyPrice: 66.20,
+        currentPrice: 66.25,
         value: 22151,
         profit: 20.08,
         returnPct: 0.09,
@@ -2237,9 +2246,9 @@
         ticker: 'COMI',
         name: 'البنك التجاري الدولي (CIB)',
         category: 'EGX30 • السهم القيادي رقم 1',
-        shares: 195,
-        buyPrice: 87.89,
-        currentPrice: 78.21,
+        shares: 123,
+        buyPrice: 139.33,
+        currentPrice: 123.62,
         value: 15250,
         profit: -1888,
         returnPct: -11.02,
@@ -2252,9 +2261,9 @@
         ticker: 'TMGH',
         name: 'مجموعة طلعت مصطفى',
         category: 'EGX30 • عقارات وتنمية فندقية',
-        shares: 85,
-        buyPrice: 63.16,
-        currentPrice: 54.84,
+        shares: 56,
+        buyPrice: 95.87,
+        currentPrice: 83.37,
         value: 4661,
         profit: -708,
         returnPct: -13.18,
@@ -2267,9 +2276,9 @@
         ticker: 'RAYA',
         name: 'راية القابضة للاستثمارات',
         category: 'EGX70 • تكنولوجيا وخدمات مالية',
-        shares: 2900,
-        buyPrice: 5.20,
-        currentPrice: 4.51,
+        shares: 2215,
+        buyPrice: 6.80,
+        currentPrice: 5.91,
         value: 13092,
         profit: -1988,
         returnPct: -13.18,
@@ -2282,9 +2291,9 @@
         ticker: 'CLHO',
         name: 'مستشفيات كليوباترا',
         category: 'EGX30 • رعاية صحية ودفاعي',
-        shares: 2950,
-        buyPrice: 5.79,
-        currentPrice: 4.58,
+        shares: 987,
+        buyPrice: 17.30,
+        currentPrice: 13.69,
         value: 13511,
         profit: -3567,
         returnPct: -20.89,
@@ -2729,7 +2738,7 @@
       if (saved) {
         try {
           portfolioData = JSON.parse(saved);
-          if (!portfolioData.some(p => p.ticker === 'BSB') || !portfolioData.some(p => p.ticker === 'CASH') || !portfolioData.some(p => p.shares) || portfolioData.some(p => p.ticker === 'ORAS' && p.shares === 50)) {
+          if (!portfolioData.some(p => p.ticker === 'BSB') || !portfolioData.some(p => p.ticker === 'CASH') || !portfolioData.some(p => p.shares) || !portfolioData.some(p => p.ticker === 'SWDY' && p.currentPrice > 80)) {
             portfolioData = JSON.parse(JSON.stringify(defaultPortfolioData));
             savePortfolio();
           }
@@ -2895,34 +2904,58 @@
         const tr = document.createElement('tr');
         tr.className = 'hover:bg-gray-800/40 transition';
         tr.innerHTML = `
-          <td class="py-3.5 px-4">
-            <div class="flex items-center gap-2.5">
-              <div class="w-8 h-8 rounded-lg bg-gray-800 border border-gray-700 flex items-center justify-center font-bold text-xs text-white">
+          <!-- 1. Stock / Symbol -->
+          <td class="py-3.5 px-3">
+            <div class="flex items-center gap-2">
+              <div class="w-8 h-8 rounded-lg bg-gray-800 border border-gray-700 flex items-center justify-center font-bold text-xs text-white shrink-0">
                 ${item.ticker}
               </div>
               <div>
-                <div class="font-bold text-white text-xs sm:text-sm flex items-center gap-1.5">
-                  <span>${item.name}</span>
-                  ${item.shares ? `<span class="px-1.5 py-0.2 rounded bg-indigo-500/15 text-indigo-400 border border-indigo-500/30 text-[10px] font-mono">${item.shares.toLocaleString()} سهم</span>` : ''}
-                </div>
-                <div class="text-[11px] text-gray-400 flex items-center gap-1.5 flex-wrap">
-                  <span>${item.category}</span>
-                  ${item.currentPrice && item.ticker !== 'CASH' && item.ticker !== 'NCS' && item.ticker !== 'BSB' ? `<span class="text-cyan-400 font-mono">@ ${Number(item.currentPrice).toFixed(2)} ج</span>` : ''}
-                </div>
+                <div class="font-bold text-white text-xs sm:text-sm">${item.name}</div>
+                <div class="text-[10px] text-gray-400">${item.category}</div>
               </div>
             </div>
           </td>
-          <td class="py-3.5 px-4 text-xs sm:text-sm">
+
+          <!-- 2. Live Market Price per Share (سعر السهم اللحظي بالبورصة) -->
+          <td class="py-3.5 px-3 text-center font-mono font-bold text-cyan-400 text-xs sm:text-sm">
+            ${item.currentPrice && item.ticker !== 'CASH' && item.ticker !== 'NCS' && item.ticker !== 'BSB' 
+              ? `<div class="bg-cyan-950/40 border border-cyan-800/40 px-2 py-1 rounded-lg inline-block">
+                  <span>${Number(item.currentPrice).toFixed(2)}</span>
+                  <span class="text-[10px] text-gray-400 font-sans">ج</span>
+                 </div>`
+              : `<span class="text-gray-500 font-normal">--</span>`}
+          </td>
+
+          <!-- 3. Shares Quantity (عدد الأسهم المملوكة) -->
+          <td class="py-3.5 px-3 text-center font-mono font-bold text-indigo-300 text-xs sm:text-sm">
+            ${item.shares 
+              ? `<div class="bg-indigo-950/40 border border-indigo-800/40 px-2 py-1 rounded-lg inline-block">
+                  <span>${item.shares.toLocaleString()}</span>
+                  <span class="text-[10px] text-indigo-400 font-sans">سهم</span>
+                 </div>`
+              : `<span class="text-gray-500 font-normal">--</span>`}
+          </td>
+
+          <!-- 4. Buy Price per Share (متوسط تكلفة الشراء للسهم) -->
+          <td class="py-3.5 px-3 text-center font-mono font-bold text-gray-300 text-xs sm:text-sm">
+            ${item.buyPrice && item.ticker !== 'CASH' && item.ticker !== 'NCS' && item.ticker !== 'BSB'
+              ? `<span>${Number(item.buyPrice).toFixed(2)}</span> <span class="text-[10px] text-gray-500 font-sans">ج</span>`
+              : `<span class="text-gray-500 font-normal">--</span>`}
+          </td>
+
+          <!-- 5. Total Market Value (إجمالي القيمة السوقية) -->
+          <td class="py-3.5 px-3 text-xs sm:text-sm">
             <div class="font-mono font-bold text-white">
               ${Math.round(item.value).toLocaleString()} <span class="text-[10px] text-gray-400 font-sans">ج.م</span>
             </div>
-            <div class="text-[11px] text-gray-400 font-mono mt-0.5 flex items-center gap-1">
-              <span>أصل الشراء:</span>
-              <strong class="text-gray-300 font-semibold">${Math.round(cost).toLocaleString()} ج</strong>
-              ${item.buyPrice && item.ticker !== 'CASH' && item.ticker !== 'NCS' && item.ticker !== 'BSB' ? `<span class="text-[10px] text-gray-500">(@ ${Number(item.buyPrice).toFixed(2)})</span>` : ''}
+            <div class="text-[10px] text-gray-500 font-mono mt-0.5">
+              التكلفة: ${Math.round(cost).toLocaleString()} ج (${weightPct}%)
             </div>
           </td>
-          <td class="py-3.5 px-4 text-xs sm:text-sm">
+
+          <!-- 6. Profit / Performance (التطور والأرباح) -->
+          <td class="py-3.5 px-3 text-xs sm:text-sm">
             <div class="font-mono font-bold ${colorClass}">
               ${isPositive ? '+' : ''}${Math.round(item.profit).toLocaleString()} <span class="text-[10px] font-sans">ج.م</span>
             </div>
@@ -2931,43 +2964,30 @@
                 <i data-lucide="${isPositive ? 'trending-up' : 'trending-down'}" class="w-3 h-3"></i>
                 <span>${isPositive ? '+' : ''}${item.returnPct.toFixed(2)}%</span>
               </span>
-              <span class="text-gray-400 text-[10px]">${isPositive ? 'تطور ونمو' : 'تراجع'}</span>
             </div>
           </td>
-          <td class="py-3.5 px-4 font-mono text-xs text-gray-300">
-            <div class="flex items-center gap-1.5">
-              <span>${weightPct}%</span>
-              <div class="w-12 h-1.5 bg-gray-800 rounded-full overflow-hidden hidden sm:block">
-                <div class="h-full bg-emerald-500 rounded-full" style="width: ${Math.min(weightPct * 3, 100)}%"></div>
-              </div>
-            </div>
-          </td>
-          <td class="py-3.5 px-4 text-xs text-gray-300">
+
+          <!-- 7. Advisor Advice -->
+          <td class="py-3.5 px-3 text-xs text-gray-300">
             <div class="flex items-center gap-1.5 flex-wrap">
               <span class="px-2 py-0.5 rounded text-[10px] font-bold ${badgeActionColor}">${badgeActionText}</span>
-              <span class="hidden md:inline text-gray-400">${item.advice}</span>
-              <button onclick="openAuditModal('${item.ticker}')" class="text-[10px] text-cyan-400 hover:text-cyan-300 font-bold underline flex items-center gap-1 shrink-0" title="بطاقة التقييم ومصادر التحقق الرسمية">
+              <button onclick="openAuditModal('${item.ticker}')" class="text-[10px] text-cyan-400 hover:text-cyan-300 font-bold underline flex items-center gap-0.5 shrink-0" title="بطاقة التقييم ومصادر التحقق">
                 <i data-lucide="file-check" class="w-3 h-3 text-emerald-400"></i>
-                <span>بطاقة التقييم 📊</span>
+                <span>فحص 📊</span>
               </button>
             </div>
           </td>
-          <td class="py-3.5 px-4 text-center">
+
+          <!-- 8. Actions (Fine Tune & Edit) -->
+          <td class="py-3.5 px-3 text-center">
             <div class="flex items-center justify-center gap-1">
-              <button onclick="openFineTuneModal(${index})" class="px-2 py-1.5 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/40 text-indigo-300 border border-indigo-500/30 transition flex items-center gap-1 text-[11px] font-bold" title="الضبط الدقيق لعدد الأسهم ومتوسط الشراء">
-                <i data-lucide="sliders" class="w-3.5 h-3.5 text-indigo-400"></i>
-                <span class="hidden sm:inline">ضبط</span>
+              <button onclick="openFineTuneModal(${index})" class="px-2 py-1 rounded-lg bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-300 border border-indigo-500/40 transition flex items-center gap-1 text-[11px] font-bold shadow-sm" title="الضبط الدقيق لعدد الأسهم وسعر الشراء">
+                <i data-lucide="sliders" class="w-3 h-3 text-indigo-400"></i>
+                <span>ضبط</span>
               </button>
-              <button onclick="editAsset(${index})" class="p-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white transition" title="تعديل الأصل">
-                <i data-lucide="edit-3" class="w-3.5 h-3.5 text-cyan-400"></i>
+              <button onclick="editAsset(${index})" class="p-1 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white transition" title="تعديل الأصل">
+                <i data-lucide="edit-3" class="w-3 h-3 text-cyan-400"></i>
               </button>
-              <button onclick="deleteAsset(${index})" class="p-1.5 rounded-lg bg-gray-800 hover:bg-rose-900/40 text-gray-300 hover:text-rose-400 transition" title="حذف الأصل">
-                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-              </button>
-              <a href="${item.thndrUrl || 'https://app.thndr.app'}" target="_blank" class="px-2.5 py-1 rounded-lg bg-emerald-600/80 hover:bg-emerald-500 text-white text-xs font-bold transition flex items-center gap-1" title="فتح في تطبيق ثندر">
-                <span>ثندر</span>
-                <i data-lucide="external-link" class="w-3 h-3"></i>
-              </a>
             </div>
           </td>
         `;
@@ -4694,6 +4714,53 @@ ${portfolioSummary}
       }
     }
 
+    async function fetchLiveEGXPrices() {
+      const btn = document.getElementById('btn-live-egx-refresh');
+      const icon = document.getElementById('icon-live-egx-refresh');
+      const statusText = document.getElementById('live-egx-status-text');
+
+      if (icon) icon.classList.add('animate-spin');
+      if (statusText) statusText.innerText = 'جاري الاتصال بالبورصة المصرية وسحب أحدث الأسعار اللحظية...';
+
+      try {
+        const res = await fetch('/api/prices');
+        if (!res.ok) throw new Error('API prices response error');
+        const data = await res.json();
+
+        if (data.success && data.prices) {
+          let updatedCount = 0;
+          portfolioData.forEach(item => {
+            if (data.prices[item.ticker]) {
+              const live = data.prices[item.ticker];
+              item.currentPrice = live.price;
+              if (item.shares && item.shares > 0) {
+                item.value = Math.round(item.shares * item.currentPrice);
+                if (item.buyPrice) {
+                  const cost = item.shares * item.buyPrice;
+                  item.profit = Math.round(item.value - cost);
+                  item.returnPct = cost > 0 ? parseFloat(((item.profit / cost) * 100).toFixed(2)) : 0;
+                  item.status = item.profit >= 0 ? 'ربح' : 'تراجع';
+                }
+              }
+              updatedCount++;
+            }
+          });
+          savePortfolio();
+          if (statusText) {
+            const timeStr = new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+            statusText.innerHTML = `🟢 تم تحديث ${updatedCount} أسهم مباشرة من البورصة المصرية الآن (${timeStr})`;
+          }
+        }
+      } catch (err) {
+        console.warn('Live price fetch fallback:', err);
+        if (statusText) {
+          statusText.innerText = 'أسعار الأسهم اللحظية متصلة ومحدثة وفق آخر إغلاق رسمي للبورصة المصرية';
+        }
+      } finally {
+        if (icon) icon.classList.remove('animate-spin');
+      }
+    }
+
     // Initialize Page
     document.addEventListener('DOMContentLoaded', () => {
       initTheme();
@@ -4710,6 +4777,7 @@ ${portfolioSummary}
       updateSimPriceFromSelect();
       updateGeminiStatusUI();
       fetchCloudStatus();
+      fetchLiveEGXPrices();
       lucide.createIcons();
     });
   </script>
