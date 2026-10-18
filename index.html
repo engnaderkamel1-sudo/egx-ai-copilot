@@ -150,6 +150,20 @@
     #sidebar-backdrop {
       transition: opacity 0.25s ease-in-out;
     }
+    #sidebar-toggle-btn {
+      transition: all 0.2s ease;
+    }
+    body.sidebar-closed #sidebar-toggle-btn {
+      background-color: rgba(16, 185, 129, 0.15) !important;
+      border-color: rgba(16, 185, 129, 0.5) !important;
+      color: #34d399 !important;
+    }
+    html.light body.sidebar-closed #sidebar-toggle-btn,
+    html:not(.dark) body.sidebar-closed #sidebar-toggle-btn {
+      background-color: #ecfdf5 !important;
+      border-color: #059669 !important;
+      color: #047857 !important;
+    }
 
     /* Cards & Containers in Light Mode */
     html.light .bg-gray-900,
