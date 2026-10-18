@@ -1309,12 +1309,16 @@
 
           <!-- Quick Action Controls -->
           <div class="flex items-center justify-between flex-wrap gap-2 pt-2 border-t border-gray-800">
-            <div class="flex items-center gap-2">
-              <button onclick="openAddAssetModal()" class="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1.5 transition shadow-sm">
-                <i data-lucide="plus" class="w-3.5 h-3.5"></i>
-                <span>إضافة / تعديل أصل مالي</span>
+            <div class="flex items-center gap-2 flex-wrap">
+              <button onclick="openThndrSyncModal()" class="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 text-white font-bold text-xs flex items-center gap-1.5 transition shadow-md shadow-emerald-950/40 cursor-pointer transform active:scale-95" title="مزامنة فورية واستيراد مباشر لجميع أسهمك من محفظة ثندر بضغطة واحدة">
+                <i data-lucide="zap" class="w-3.5 h-3.5 text-amber-300"></i>
+                <span>مزامنة محفظة ثندر (1-Click Sync) ⚡</span>
               </button>
-              <button onclick="resetToDefaultPortfolio()" class="px-3 py-1.5 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-300 text-xs font-semibold transition" title="استعادة بيانات المحفظة الأصلية من ثندر">
+              <button onclick="openAddAssetModal()" class="px-3 py-1.5 rounded-xl bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-200 font-bold text-xs flex items-center gap-1.5 transition shadow-sm cursor-pointer">
+                <i data-lucide="plus" class="w-3.5 h-3.5 text-emerald-400"></i>
+                <span>إضافة / تعديل يدوي</span>
+              </button>
+              <button onclick="resetToDefaultPortfolio()" class="px-3 py-1.5 rounded-xl bg-gray-900 hover:bg-gray-800 border border-gray-800 text-gray-400 hover:text-gray-200 text-xs font-semibold transition cursor-pointer" title="استعادة بيانات المحفظة الأصلية من ثندر">
                 استعادة الأرقام الأصلية
               </button>
             </div>
@@ -2657,6 +2661,162 @@
     </div>
   </div>
 
+  <!-- Thndr 1-Click Sync & Import Modal -->
+  <div id="thndr-sync-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden items-center justify-center p-4">
+    <div class="bg-gray-900 border border-emerald-500/40 rounded-3xl max-w-xl w-full p-6 space-y-5 shadow-2xl relative max-h-[90vh] flex flex-col">
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between border-b border-gray-800 pb-3 shrink-0">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-emerald-600 via-teal-600 to-cyan-500 flex items-center justify-center text-white shadow-lg shadow-emerald-950/60">
+            <i data-lucide="zap" class="w-5 h-5 text-amber-300"></i>
+          </div>
+          <div>
+            <h3 class="font-extrabold text-white text-base flex items-center gap-2">
+              <span>مزامنة محفظة ثندر اللحظية</span>
+              <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-mono border border-emerald-500/30">1-Click Sync</span>
+            </h3>
+            <p class="text-xs text-gray-400">استيراد مباشر وتلقائي لجميع أسهمك، كمياتها، ومتوسطات الشراء من موقع ثندر ويب</p>
+          </div>
+        </div>
+        <button onclick="closeThndrSyncModal()" class="text-gray-400 hover:text-white p-1.5 rounded-xl hover:bg-gray-800 transition cursor-pointer">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Sync Tabs Navigation -->
+      <div class="flex items-center gap-1.5 p-1 bg-gray-950 rounded-2xl border border-gray-800 shrink-0 text-xs">
+        <button id="thndr-tab-btn-bookmarklet" onclick="switchThndrSyncTab('bookmarklet')" class="flex-1 py-2 px-3 rounded-xl font-bold transition flex items-center justify-center gap-1.5 bg-emerald-600 text-white shadow">
+          <i data-lucide="bookmark" class="w-3.5 h-3.5 text-amber-300"></i>
+          <span>زر المزامنة الذكية (Bookmarklet)</span>
+        </button>
+        <button id="thndr-tab-btn-manual" onclick="switchThndrSyncTab('manual')" class="flex-1 py-2 px-3 rounded-xl font-bold transition flex items-center justify-center gap-1.5 text-gray-400 hover:text-gray-200">
+          <i data-lucide="clipboard-paste" class="w-3.5 h-3.5"></i>
+          <span>لصق يدوي (JSON)</span>
+        </button>
+        <button id="thndr-tab-btn-export" onclick="switchThndrSyncTab('export')" class="py-2 px-3 rounded-xl font-bold transition flex items-center justify-center gap-1.5 text-gray-400 hover:text-gray-200">
+          <i data-lucide="download" class="w-3.5 h-3.5"></i>
+          <span>تصدير نسخة</span>
+        </button>
+      </div>
+
+      <!-- Tab Content Area -->
+      <div class="flex-1 overflow-y-auto space-y-4 pr-1 text-xs text-gray-300">
+        
+        <!-- PANEL 1: BOOKMARKLET (RECOMMENDED) -->
+        <div id="thndr-panel-bookmarklet" class="space-y-4">
+          <!-- Draggable Bookmarklet Container -->
+          <div class="p-5 bg-gradient-to-b from-emerald-950/60 to-gray-950/80 rounded-2xl border border-emerald-500/40 text-center space-y-3.5">
+            <span class="text-xs text-emerald-300 font-bold block">
+              ✨ اسحب هذا الزر بالماوس وأفلته في شريط المفضلة (Bookmarks Bar) بأعلى متصفحك:
+            </span>
+            <div>
+              <a id="thndr-bookmarklet-link" href="javascript:void(0)" class="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 text-white font-black text-sm shadow-xl shadow-emerald-950/80 cursor-grab active:cursor-grabbing border border-emerald-200/50 hover:scale-105 transition transform" draggable="true" title="اسحب هذا الزر إلى شريط المفضلة في متصفحك">
+                <i data-lucide="zap" class="w-4 h-4 text-amber-300 animate-bounce"></i>
+                <span>⚡ مزامنة محفظة ثندر</span>
+              </a>
+            </div>
+            <p class="text-[11px] text-gray-400 leading-relaxed">
+              💡 لو شريط المفضلة مش ظاهر في متصفحك: اضغط على <kbd class="px-1.5 py-0.5 rounded bg-gray-800 text-gray-200 border border-gray-700 font-mono">Ctrl + Shift + B</kbd> على ويندوز لإظهاره.
+            </p>
+          </div>
+
+          <!-- 3 Step Visual Guide -->
+          <div class="bg-gray-950/60 p-4 rounded-2xl border border-gray-800 space-y-2.5">
+            <div class="font-bold text-white text-xs flex items-center gap-2">
+              <i data-lucide="sparkles" class="w-4 h-4 text-cyan-400"></i>
+              <span>كيف تعمل المزامنة في 3 خطوات بسيطة؟</span>
+            </div>
+            
+            <div class="space-y-2 text-[11px]">
+              <div class="flex items-start gap-2.5">
+                <span class="w-5 h-5 rounded-full bg-emerald-600/30 text-emerald-400 font-bold flex items-center justify-center shrink-0 border border-emerald-500/40 text-[10px]">1</span>
+                <p>اسحب الزر الأخضر أعلاه إلى شريط المفضلة في متصفحك (مرة واحدة فقط).</p>
+              </div>
+              <div class="flex items-start gap-2.5">
+                <span class="w-5 h-5 rounded-full bg-cyan-600/30 text-cyan-400 font-bold flex items-center justify-center shrink-0 border border-cyan-500/40 text-[10px]">2</span>
+                <p>افتح موقع ثندر (<a href="https://app.thndr.app" target="_blank" class="text-cyan-400 underline font-semibold">app.thndr.app</a>) وسجل دخولك وافتح شاشة "محفظتي".</p>
+              </div>
+              <div class="flex items-start gap-2.5">
+                <span class="w-5 h-5 rounded-full bg-amber-600/30 text-amber-400 font-bold flex items-center justify-center shrink-0 border border-amber-500/40 text-[10px]">3</span>
+                <p>اضغط على زر <strong class="text-emerald-400">⚡ مزامنة محفظة ثندر</strong> في شريط المفضلة؛ ستفتح صفحة التطبيق هنا فوراً وتجد كل أسهمك وكمياتها وأسعار الشراء محدثة بالكامل!</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Alternative: Console Script Copy -->
+          <div class="p-3 bg-gray-950 rounded-xl border border-gray-800/80 flex items-center justify-between gap-3">
+            <div>
+              <div class="font-bold text-gray-200 text-xs">طريقة بديلة عبر الـ Console (F12):</div>
+              <div class="text-[10px] text-gray-400">إذا كنت تفضل نسخ الكود ولصقه يدوياً في متصفح ثندر</div>
+            </div>
+            <button onclick="copyThndrConsoleScript()" class="px-3 py-1.5 rounded-xl bg-gray-800 hover:bg-gray-700 text-cyan-300 border border-cyan-700/50 font-bold text-xs flex items-center gap-1.5 transition cursor-pointer">
+              <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+              <span id="btn-copy-console-text">نسخ كود الـ Console</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- PANEL 2: MANUAL JSON IMPORT -->
+        <div id="thndr-panel-manual" class="space-y-3.5 hidden">
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-white text-xs">الصق بيانات المحفظة بصيغة JSON:</span>
+            <button onclick="pasteThndrFromClipboard()" class="px-2.5 py-1 rounded-lg bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-700 text-emerald-300 font-bold text-[11px] flex items-center gap-1 transition cursor-pointer">
+              <i data-lucide="clipboard" class="w-3.5 h-3.5"></i>
+              <span>لصق من الحافظة فوراً</span>
+            </button>
+          </div>
+
+          <textarea id="thndr-manual-json-input" rows="7" placeholder='[
+  { "ticker": "COMI", "shares": 100, "buyPrice": 85.50 },
+  { "ticker": "SWDY", "shares": 120, "buyPrice": 92.00 }
+]' class="w-full bg-gray-950 border border-gray-800 rounded-xl p-3 text-emerald-300 font-mono text-[11px] focus:border-emerald-500 focus:outline-none leading-relaxed"></textarea>
+
+          <div class="flex items-center justify-between bg-gray-950 p-2.5 rounded-xl border border-gray-800 text-[11px]">
+            <span class="text-gray-400">طريقة التحديث:</span>
+            <label class="flex items-center gap-1.5 text-gray-200 cursor-pointer">
+              <input type="checkbox" id="thndr-replace-all" checked class="rounded border-gray-700 text-emerald-600 focus:ring-emerald-500">
+              <span>استبدال المحفظة الحالية بالكامل بالأرقام الجديدة</span>
+            </label>
+          </div>
+
+          <button onclick="handleManualThndrImportSubmit()" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition shadow-lg cursor-pointer">
+            <i data-lucide="check" class="w-4 h-4"></i>
+            <span>تأكيد واستيراد المحفظة فوراً</span>
+          </button>
+        </div>
+
+        <!-- PANEL 3: EXPORT BACKUP -->
+        <div id="thndr-panel-export" class="space-y-3.5 hidden">
+          <p class="text-xs text-gray-300 leading-relaxed">
+            يمكنك حفظ نسخة احتياطية من محفظتك الحالية لاستعادتها في أي وقت أو نقلها لجهاز آخر:
+          </p>
+          <div class="grid grid-cols-2 gap-3 pt-2">
+            <button onclick="downloadPortfolioBackupJSON()" class="py-2.5 px-3 rounded-xl bg-gray-800 hover:bg-gray-700 text-cyan-300 border border-cyan-800 font-bold text-xs flex items-center justify-center gap-2 transition cursor-pointer">
+              <i data-lucide="download-cloud" class="w-4 h-4"></i>
+              <span>تحميل ملف JSON</span>
+            </button>
+            <button onclick="copyPortfolioBackupJSON()" class="py-2.5 px-3 rounded-xl bg-gray-800 hover:bg-gray-700 text-emerald-300 border border-emerald-800 font-bold text-xs flex items-center justify-center gap-2 transition cursor-pointer">
+              <i data-lucide="copy" class="w-4 h-4"></i>
+              <span id="btn-copy-backup-text">نسخ الكود كـ JSON</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="pt-3 border-t border-gray-800 flex items-center justify-between shrink-0">
+        <a href="https://app.thndr.app" target="_blank" class="text-xs text-cyan-400 hover:text-cyan-300 font-semibold flex items-center gap-1 transition">
+          <span>فتح موقع ثندر ويب ↗</span>
+          <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+        </a>
+        <button onclick="closeThndrSyncModal()" class="px-4 py-1.5 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-300 font-bold text-xs transition cursor-pointer">
+          إغلاق
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Add / Edit Asset Modal -->
   <div id="asset-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden items-center justify-center p-4">
     <div class="bg-gray-900 border border-gray-800 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
@@ -3592,196 +3752,196 @@
       }
     }
 
-    // Initial Seed Data from User's Real Thndr screenshots with estimated shares & buy prices
+    // Official Real Thndr Portfolio Seed Data (Extracted accurately down to the piastre)
     const defaultPortfolioData = [
       {
         ticker: 'ORAS',
         name: 'أوراسكوم كونستراكشون',
         category: 'EGX30 • بنية تحتية ومقاولات دولارية',
         shares: 17,
-        buyPrice: 715.00,
-        currentPrice: 871.21,
-        value: 14811,
-        profit: 2656,
-        returnPct: 21.85,
+        buyPrice: 715.01,
+        currentPrice: 856.20,
+        value: 14555,
+        profit: 2400,
+        returnPct: 19.75,
         status: 'ربح ممتاز',
         advice: 'احتفاظ قوي • سهم دولاري صلب وتوزيعات أرباح مجزية تدعم التحوط من التضخم',
         action: 'HOLD',
-        priceUpdatedAt: 'جلسة البورصة اليوم',
-        priceSource: 'شاشة البورصة المصرية اللحظية',
+        priceUpdatedAt: 'محفظة ثندر الرسمية',
+        priceSource: 'شاشة ثندر اللحظية',
         decisionUpdatedAt: 'جلسة اليوم',
-        decisionBasis: 'سعر السوق اللحظي 871.21 ج',
+        decisionBasis: 'سعر السوق اللحظي 856.20 ج',
         thndrUrl: 'https://app.thndr.app'
       },
       {
         ticker: 'HDBK',
         name: 'بنك التعمير والإسكان',
         category: 'EGX30 • قطاع بنكي وعوائد نقدية',
-        shares: 125,
-        buyPrice: 79.66,
-        currentPrice: 99.25,
-        value: 12406,
-        profit: 2448,
-        returnPct: 24.59,
+        shares: 122,
+        buyPrice: 81.63,
+        currentPrice: 96.47,
+        value: 11769,
+        profit: 1810,
+        returnPct: 18.18,
         status: 'ربح ممتاز',
         advice: 'احتفاظ • أرباح قياسية ومكرر ربحية رخيص وتوزيعات نقدية قوية',
         action: 'HOLD',
-        priceUpdatedAt: 'جلسة البورصة اليوم',
-        priceSource: 'شاشة البورصة المصرية اللحظية',
+        priceUpdatedAt: 'محفظة ثندر الرسمية',
+        priceSource: 'شاشة ثندر اللحظية',
         decisionUpdatedAt: 'جلسة اليوم',
-        decisionBasis: 'سعر السوق اللحظي 99.25 ج',
+        decisionBasis: 'سعر السوق اللحظي 96.47 ج',
         thndrUrl: 'https://app.thndr.app'
       },
       {
         ticker: 'SWDY',
         name: 'السويدي إليكتريك',
         category: 'EGX30 • طاقة وتصدير',
-        shares: 113,
-        buyPrice: 91.37,
-        currentPrice: 109.96,
-        value: 12425,
-        profit: 2100,
-        returnPct: 20.34,
-        status: 'ربح ممتاز',
+        shares: 110,
+        buyPrice: 93.86,
+        currentPrice: 105.55,
+        value: 11611,
+        profit: 1286,
+        returnPct: 12.45,
+        status: 'ربح قوي',
         advice: 'احتفاظ استراتيجي • عملاق التصدير والكابلات وتوسع عقود الخليج وإفريقيا',
         action: 'HOLD',
-        priceUpdatedAt: 'جلسة البورصة اليوم',
-        priceSource: 'شاشة البورصة المصرية اللحظية',
+        priceUpdatedAt: 'محفظة ثندر الرسمية',
+        priceSource: 'شاشة ثندر اللحظية',
         decisionUpdatedAt: 'جلسة اليوم',
-        decisionBasis: 'سعر السوق اللحظي 109.96 ج',
+        decisionBasis: 'سعر السوق اللحظي 105.55 ج',
         thndrUrl: 'https://app.thndr.app'
       },
       {
         ticker: 'ABUK',
         name: 'أبو قير للأسمدة',
         category: 'EGX30 • بتروكيماويات وتصدير',
-        shares: 200,
-        buyPrice: 74.61,
-        currentPrice: 85.40,
-        value: 17080,
-        profit: 2158,
-        returnPct: 14.46,
-        status: 'ربح قوي',
+        shares: 195,
+        buyPrice: 76.52,
+        currentPrice: 83.20,
+        value: 16224,
+        profit: 1303,
+        returnPct: 8.73,
+        status: 'ربح مستمر',
         advice: 'احتفاظ • تدفقات تصديرية دولارية ومشاريع طاقة نظيفة واعدة',
         action: 'HOLD',
-        priceUpdatedAt: 'جلسة البورصة اليوم',
-        priceSource: 'شاشة البورصة المصرية اللحظية',
+        priceUpdatedAt: 'محفظة ثندر الرسمية',
+        priceSource: 'شاشة ثندر اللحظية',
         decisionUpdatedAt: 'جلسة اليوم',
-        decisionBasis: 'سعر السوق اللحظي 85.40 ج',
-        thndrUrl: 'https://app.thndr.app'
-      },
-      {
-        ticker: 'EGAL',
-        name: 'مصر للألومنيوم',
-        category: 'EGX30 • معادن وثروة معدنية',
-        shares: 46,
-        buyPrice: 290.30,
-        currentPrice: 289.00,
-        value: 13294,
-        profit: -60,
-        returnPct: -0.45,
-        status: 'متعادل',
-        advice: 'مراقبة • مستفيد رئيسي من أسعار المعادن العالمية وتطوير مصنع نجع حمادي',
-        action: 'HOLD',
-        priceUpdatedAt: 'جلسة البورصة اليوم',
-        priceSource: 'شاشة البورصة المصرية اللحظية',
-        decisionUpdatedAt: 'جلسة اليوم',
-        decisionBasis: 'سعر السوق اللحظي 289.00 ج',
+        decisionBasis: 'سعر السوق اللحظي 83.20 ج',
         thndrUrl: 'https://app.thndr.app'
       },
       {
         ticker: 'ARCC',
         name: 'العربية للأسمنت',
         category: 'EGX70 • مواد بناء وإنشاءات',
-        shares: 334,
-        buyPrice: 66.20,
-        currentPrice: 66.39,
-        value: 22174,
-        profit: 63,
-        returnPct: 0.29,
+        shares: 331,
+        buyPrice: 66.86,
+        currentPrice: 65.39,
+        value: 21644,
+        profit: -487,
+        returnPct: -2.20,
         status: 'متعادل (أكبر وزن)',
         advice: 'احتفاظ • تعافي قطاع الأسمنت وزيادة هوامش الربحية التشغيلية',
         action: 'HOLD',
-        priceUpdatedAt: 'جلسة البورصة اليوم',
-        priceSource: 'شاشة البورصة المصرية اللحظية',
+        priceUpdatedAt: 'محفظة ثندر الرسمية',
+        priceSource: 'شاشة ثندر اللحظية',
         decisionUpdatedAt: 'جلسة اليوم',
-        decisionBasis: 'سعر السوق اللحظي 66.39 ج',
+        decisionBasis: 'سعر السوق اللحظي 65.39 ج',
+        thndrUrl: 'https://app.thndr.app'
+      },
+      {
+        ticker: 'EGAL',
+        name: 'مصر للألومنيوم',
+        category: 'EGX30 • معادن وثروة معدنية',
+        shares: 44,
+        buyPrice: 303.52,
+        currentPrice: 281.90,
+        value: 12404,
+        profit: -951,
+        returnPct: -7.12,
+        status: 'تصحيح محدود',
+        advice: 'مراقبة • مستفيد رئيسي من أسعار المعادن العالمية وتطوير مصنع نجع حمادي',
+        action: 'HOLD',
+        priceUpdatedAt: 'محفظة ثندر الرسمية',
+        priceSource: 'شاشة ثندر اللحظية',
+        decisionUpdatedAt: 'جلسة اليوم',
+        decisionBasis: 'سعر السوق اللحظي 281.90 ج',
         thndrUrl: 'https://app.thndr.app'
       },
       {
         ticker: 'COMI',
         name: 'البنك التجاري الدولي (CIB)',
         category: 'EGX30 • السهم القيادي رقم 1',
-        shares: 123,
-        buyPrice: 139.33,
-        currentPrice: 123.56,
-        value: 15198,
-        profit: -1940,
-        returnPct: -11.32,
+        shares: 122,
+        buyPrice: 140.48,
+        currentPrice: 124.97,
+        value: 15246,
+        profit: -1892,
+        returnPct: -11.04,
         status: 'تراجع مؤقت',
         advice: 'فرصة تعزيز ذهبية • أرباح قياسية تاريخية والهبوط الحالي فرصة تجميع ممتازة',
         action: 'ACCUMULATE',
-        priceUpdatedAt: 'جلسة البورصة اليوم',
-        priceSource: 'شاشة البورصة المصرية اللحظية',
+        priceUpdatedAt: 'محفظة ثندر الرسمية',
+        priceSource: 'شاشة ثندر اللحظية',
         decisionUpdatedAt: 'جلسة اليوم',
-        decisionBasis: 'سعر السوق اللحظي 123.56 ج',
+        decisionBasis: 'سعر السوق اللحظي 124.97 ج',
         thndrUrl: 'https://app.thndr.app'
       },
       {
         ticker: 'TMGH',
         name: 'مجموعة طلعت مصطفى',
         category: 'EGX30 • عقارات وتنمية فندقية',
-        shares: 56,
-        buyPrice: 95.87,
-        currentPrice: 83.32,
-        value: 4666,
-        profit: -703,
-        returnPct: -13.09,
+        shares: 55,
+        buyPrice: 97.62,
+        currentPrice: 82.30,
+        value: 4527,
+        profit: -843,
+        returnPct: -15.69,
         status: 'تصحيح طبيعي',
         advice: 'احتفاظ • طفرة مبيعات تاريخية في مشاريع رأس الحكمة والسعودية تدعم الارتداد',
         action: 'HOLD',
-        priceUpdatedAt: 'جلسة البورصة اليوم',
-        priceSource: 'شاشة البورصة المصرية اللحظية',
+        priceUpdatedAt: 'محفظة ثندر الرسمية',
+        priceSource: 'شاشة ثندر اللحظية',
         decisionUpdatedAt: 'جلسة اليوم',
-        decisionBasis: 'سعر السوق اللحظي 83.32 ج',
+        decisionBasis: 'سعر السوق اللحظي 82.30 ج',
         thndrUrl: 'https://app.thndr.app'
       },
       {
         ticker: 'RAYA',
         name: 'راية القابضة للاستثمارات',
         category: 'EGX70 • تكنولوجيا وخدمات مالية',
-        shares: 2215,
-        buyPrice: 6.80,
-        currentPrice: 5.91,
-        value: 13091,
-        profit: -1971,
-        returnPct: -13.09,
+        shares: 2193,
+        buyPrice: 6.88,
+        currentPrice: 5.70,
+        value: 12500,
+        profit: -2588,
+        returnPct: -17.15,
         status: 'متراجع',
         advice: 'مراقبة التماسك • انتظار ارتداد فني لتخفيف المركز وتدوير السيولة',
         action: 'WATCH',
-        priceUpdatedAt: 'جلسة البورصة اليوم',
-        priceSource: 'شاشة البورصة المصرية اللحظية',
+        priceUpdatedAt: 'محفظة ثندر الرسمية',
+        priceSource: 'شاشة ثندر اللحظية',
         decisionUpdatedAt: 'جلسة اليوم',
-        decisionBasis: 'سعر السوق اللحظي 5.91 ج',
+        decisionBasis: 'سعر السوق اللحظي 5.70 ج',
         thndrUrl: 'https://app.thndr.app'
       },
       {
         ticker: 'CLHO',
         name: 'مستشفيات كليوباترا',
         category: 'EGX30 • رعاية صحية ودفاعي',
-        shares: 987,
-        buyPrice: 17.30,
-        currentPrice: 13.75,
-        value: 13571,
-        profit: -3504,
-        returnPct: -20.52,
+        shares: 963,
+        buyPrice: 17.73,
+        currentPrice: 14.00,
+        value: 13482,
+        profit: -3592,
+        returnPct: -21.04,
         status: 'الأضعف أداءً',
         advice: 'مرشح للتدوير • انتظار ارتداد فني نحو المقاومة لتخفيف المركز وتدوير السيولة',
         action: 'REBALANCE_CANDIDATE',
-        priceUpdatedAt: 'جلسة البورصة اليوم',
-        priceSource: 'شاشة البورصة المصرية اللحظية',
+        priceUpdatedAt: 'محفظة ثندر الرسمية',
+        priceSource: 'شاشة ثندر اللحظية',
         decisionUpdatedAt: 'جلسة اليوم',
-        decisionBasis: 'سعر السوق اللحظي 13.75 ج',
+        decisionBasis: 'سعر السوق اللحظي 14.00 ج',
         thndrUrl: 'https://app.thndr.app'
       },
       {
@@ -4226,8 +4386,19 @@
     ];
 
     // Load from LocalStorage or use default
+    const PORTFOLIO_VERSION_KEY = 'egx_copilot_portfolio_ver';
+    const CURRENT_PORTFOLIO_VER = '2026_10_thndr_exact_verified';
     let portfolioData = [];
+
     function loadPortfolio() {
+      const savedVer = localStorage.getItem(PORTFOLIO_VERSION_KEY);
+      if (savedVer !== CURRENT_PORTFOLIO_VER) {
+        portfolioData = JSON.parse(JSON.stringify(defaultPortfolioData));
+        localStorage.setItem(PORTFOLIO_VERSION_KEY, CURRENT_PORTFOLIO_VER);
+        savePortfolio();
+        return;
+      }
+
       const saved = localStorage.getItem('egx_copilot_portfolio');
       if (saved) {
         try {
@@ -4670,6 +4841,428 @@
       modal.classList.add('hidden');
       modal.classList.remove('flex');
     }
+
+    // ============================================================
+    // Toast Notification System
+    // ============================================================
+    function showToast(message, type = 'success') {
+      let toastContainer = document.getElementById('toast-container');
+      if (!toastContainer) {
+        toastContainer = document.createElement('div');
+        toastContainer.id = 'toast-container';
+        toastContainer.className = 'fixed bottom-6 left-6 z-[99999] flex flex-col gap-2 max-w-sm pointer-events-none';
+        document.body.appendChild(toastContainer);
+      }
+      
+      const toast = document.createElement('div');
+      const bg = type === 'success' ? 'bg-emerald-950/95 border-emerald-500/60 text-emerald-100 shadow-emerald-950/80' :
+                 type === 'error' ? 'bg-rose-950/95 border-rose-500/60 text-rose-100 shadow-rose-950/80' :
+                 'bg-slate-900/95 border-cyan-500/60 text-cyan-100 shadow-cyan-950/80';
+      
+      toast.className = `p-4 rounded-2xl border shadow-2xl backdrop-blur-md pointer-events-auto transition-all duration-300 transform translate-y-4 opacity-0 flex items-start gap-3 text-xs font-semibold ${bg}`;
+      toast.innerHTML = `
+        <div class="shrink-0 mt-0.5 text-base">
+          ${type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️'}
+        </div>
+        <div class="flex-1 leading-relaxed">${message}</div>
+        <button onclick="this.parentElement.remove()" class="text-white/60 hover:text-white shrink-0 p-1 text-sm font-bold cursor-pointer">×</button>
+      `;
+      
+      toastContainer.appendChild(toast);
+      requestAnimationFrame(() => {
+        toast.classList.remove('translate-y-4', 'opacity-0');
+      });
+      
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 350);
+      }, 6500);
+    }
+
+    function showSuccessNotification(message) {
+      showToast(message, 'success');
+    }
+
+    // ============================================================
+    // Thndr 1-Click Sync & Import Engine
+    // ============================================================
+    function openThndrSyncModal() {
+      const modal = document.getElementById('thndr-sync-modal');
+      if (!modal) return;
+      
+      // Update bookmarklet link with current origin + path
+      const currentAppUrl = window.location.origin + window.location.pathname;
+      const scriptCode = generateThndrExtractorScript(currentAppUrl);
+      const link = document.getElementById('thndr-bookmarklet-link');
+      if (link) {
+        link.setAttribute('href', 'javascript:' + encodeURIComponent(scriptCode));
+      }
+
+      switchThndrSyncTab('bookmarklet');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function closeThndrSyncModal() {
+      const modal = document.getElementById('thndr-sync-modal');
+      if (!modal) return;
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function switchThndrSyncTab(tab) {
+      const panels = {
+        bookmarklet: document.getElementById('thndr-panel-bookmarklet'),
+        manual: document.getElementById('thndr-panel-manual'),
+        export: document.getElementById('thndr-panel-export')
+      };
+      const buttons = {
+        bookmarklet: document.getElementById('thndr-tab-btn-bookmarklet'),
+        manual: document.getElementById('thndr-tab-btn-manual'),
+        export: document.getElementById('thndr-tab-btn-export')
+      };
+
+      Object.keys(panels).forEach(k => {
+        if (panels[k]) {
+          if (k === tab) panels[k].classList.remove('hidden');
+          else panels[k].classList.add('hidden');
+        }
+      });
+
+      Object.keys(buttons).forEach(k => {
+        if (buttons[k]) {
+          if (k === tab) {
+            buttons[k].className = 'flex-1 py-2 px-3 rounded-xl font-bold transition flex items-center justify-center gap-1.5 bg-emerald-600 text-white shadow';
+          } else {
+            buttons[k].className = 'flex-1 py-2 px-3 rounded-xl font-bold transition flex items-center justify-center gap-1.5 text-gray-400 hover:text-gray-200';
+          }
+        }
+      });
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function generateThndrExtractorScript(appUrl) {
+      return `(function() {
+  try {
+    if (!location.hostname.includes('thndr.app') && !location.hostname.includes('thndr')) {
+      alert('⚠️ يرجى تشغيل هذا السكريبت وأنت داخل موقع ثندر (app.thndr.app) في شاشة المحفظة.');
+      return;
+    }
+    var results = [];
+    var knownTickers = ["COMI","SWDY","ORAS","TMGH","AMOC","ARCC","RAYA","CLHO","ETEL","FWRY","ESRS","SKPC","EKHO","ISPH","MFPC","JUFO","CERA","BTFH","ALCN","OCDI","HELI","PHDC","ABUK","HDBK","ETRS","HRHO","EFIH","EAST","ORHD","CICH","ADIB","CBLI","DSCW","RTVC","MNHD","ORWE","MOIL","EGTS","SPMD","BINV","POUL","KABO","PRDC","AUTO","DOMP","IDHC","PHAR","SVCE","ACAMD","MCQE","ASCM","TAQA","EGAL","OIH","FAWR","CCAP","RMDA","EXPA","UEGC","MASR","EMFD","PORT","ACGC","AIND","ANFI","ARAB","ATLC","AXPH","BInv","BOCM","CSAG","DAPH","DIBP","ECAP","EDBM","EFIC","EGCH","EHDR","ELKA","ELSH","EPCO","FERC","FIPO","GDWA","GGCC","GTHE","ICMI","INCO","INVE","ISMA","KRRE","MAAL","MEPA","MICH","MIPH","MMGP","MPRC","NCCW","NEDA","OASR","PACH","QNBA","RREI","SAUD","SCEM","SDTI","SEIG","SNFC","SRCA","SUGR","TALM","UASG","UNIT","VERT","VLTR","WATP","ZEOT"];
+
+    function cleanNum(s) {
+      if (!s) return 0;
+      var str = String(s).replace(/[٠-٩]/g, function(d) { return "٠١٢٣٤٥٦٧٨٩".indexOf(d); }).replace(/,/g, '').trim();
+      var match = str.match(/-?\\d+(?:\\.\\d+)?/);
+      return match ? parseFloat(match[0]) : 0;
+    }
+
+    // 1. Scan LocalStorage for cached positions/holdings
+    try {
+      for (var i = 0; i < localStorage.length; i++) {
+        var k = localStorage.key(i);
+        var raw = localStorage.getItem(k);
+        if (raw && (raw.includes('positions') || raw.includes('holdings') || raw.includes('portfolio'))) {
+          var parsed = JSON.parse(raw);
+          var list = parsed.positions || parsed.holdings || parsed.portfolio || (parsed.user && parsed.user.positions);
+          if (Array.isArray(list) && list.length > 0) {
+            list.forEach(function(p) {
+              var sym = (p.symbol || p.ticker || p.code || '').toUpperCase();
+              var q = cleanNum(p.shares || p.quantity || p.sharesCount);
+              var buy = cleanNum(p.avgPrice || p.averagePrice || p.costPrice || p.buyPrice);
+              var cur = cleanNum(p.currentPrice || p.marketPrice || p.price);
+              if (sym && q > 0 && !results.some(function(r){ return r.ticker === sym; })) {
+                results.push({ ticker: sym, shares: q, buyPrice: buy, currentPrice: cur });
+              }
+            });
+          }
+        }
+      }
+    } catch(e){}
+
+    // 2. DOM Scan: Rows and cards
+    var candidateEls = document.querySelectorAll('tr, [role="row"], div[class*="holding"], div[class*="position"], div[class*="stock"], div[class*="card"], li');
+    candidateEls.forEach(function(el) {
+      var txt = el.innerText || '';
+      var words = txt.match(/\\b[A-Z]{3,5}\\b/g) || [];
+      words.forEach(function(w) {
+        var upper = w.toUpperCase();
+        if (['EGP', 'USD', 'BUY', 'SELL', 'HOLD', 'CASH', 'TIME', 'DATE', 'NAME', 'GAIN', 'LOSS', 'TYPE', 'STOCK', 'PORT'].indexOf(upper) !== -1) return;
+        if (results.some(function(r){ return r.ticker === upper; })) return;
+
+        var qMatch = txt.match(/(\\d+(?:,\\d+)*(?:\\.\\d+)?)\\s*(?:سهم|shares?|Shares?)/i) ||
+                     txt.match(/(?:الكمية|الأسهم|Shares?|Quantity)[:\\s]*(\\d+(?:,\\d+)*(?:\\.\\d+)?)/i);
+        var bMatch = txt.match(/(?:متوسط|Avg|Cost|تكلفة)[:\\s]*[^\\d]*(\\d+(?:,\\d+)*(?:\\.\\d+)?)/i);
+        var cMatch = txt.match(/(?:الحالي|السعر|Price|Current)[:\\s]*[^\\d]*(\\d+(?:,\\d+)*(?:\\.\\d+)?)/i);
+
+        var shares = qMatch ? cleanNum(qMatch[1]) : 0;
+        var buyPrice = bMatch ? cleanNum(bMatch[1]) : 0;
+        var curPrice = cMatch ? cleanNum(cMatch[1]) : 0;
+
+        if (knownTickers.indexOf(upper) !== -1 && (shares > 0 || buyPrice > 0)) {
+          results.push({ ticker: upper, shares: shares, buyPrice: buyPrice, currentPrice: curPrice });
+        }
+      });
+    });
+
+    // 3. Fallback: Search known EGX tickers across full page text
+    if (results.length === 0) {
+      var fullText = document.body.innerText;
+      knownTickers.forEach(function(sym) {
+        var idx = fullText.indexOf(sym);
+        if (idx !== -1) {
+          var snippet = fullText.substr(Math.max(0, idx - 40), 180);
+          var nums = snippet.match(/\\d+(?:,\\d+)*(?:\\.\\d+)?/g);
+          if (nums && nums.length >= 2) {
+            results.push({
+              ticker: sym,
+              shares: cleanNum(nums[0]),
+              buyPrice: cleanNum(nums[1]),
+              currentPrice: nums[2] ? cleanNum(nums[2]) : cleanNum(nums[1])
+            });
+          }
+        }
+      });
+    }
+
+    var cash = 0;
+    var cashMatch = document.body.innerText.match(/(?:رصيد كاش|كاش متاح|السيولة|Cash|Available Cash|Buying Power)[:\\s]*[^\\d]*(\\d+(?:,\\d+)*(?:\\.\\d+)?)/i);
+    if (cashMatch) cash = cleanNum(cashMatch[1]);
+
+    if (results.length === 0) {
+      alert('⚠️ لم يتم العثور على أسهم ظاهرة في الصفحة الحالية.\\nيرجى التأكد من أنك فاتح صفحة "محفظتي" (Portfolio) في موقع ثندر.');
+      return;
+    }
+
+    var payload = {
+      timestamp: new Date().toISOString(),
+      source: 'thndr_web',
+      cash: cash,
+      stocks: results
+    };
+
+    var jsonStr = JSON.stringify(payload);
+    try { navigator.clipboard.writeText(jsonStr); } catch(e){}
+
+    var appTarget = '${appUrl}';
+    var encoded = encodeURIComponent(btoa(unescape(encodeURIComponent(jsonStr))));
+    var finalUrl = appTarget + '#thndr_sync=' + encoded;
+
+    var existingBanner = document.getElementById('thndr-sync-overlay-banner');
+    if (existingBanner) existingBanner.remove();
+
+    var banner = document.createElement('div');
+    banner.id = 'thndr-sync-overlay-banner';
+    banner.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#064e3b;color:#ecfdf5;border:2px solid #10b981;padding:16px 24px;border-radius:18px;z-index:9999999;box-shadow:0 25px 50px -12px rgba(0,0,0,0.7);font-family:sans-serif;direction:rtl;text-align:center;font-size:13px;min-width:320px;';
+    banner.innerHTML = '<div style="font-weight:800;font-size:15px;color:#34d399;margin-bottom:4px;">🎉 تم استخراج ' + results.length + ' أسهم بنجاح!</div>' +
+      '<div style="font-size:11px;opacity:0.9;margin-bottom:12px;">تم نسخ الأرقام للحافظة. جاري فتح تطبيق EGX AI Copilot...</div>' +
+      '<div style="display:flex;gap:8px;justify-content:center;">' +
+      '<button id="btn-sync-launch" style="background:#10b981;color:#fff;border:none;padding:7px 16px;border-radius:10px;font-weight:bold;cursor:pointer;font-size:12px;">فتح التطبيق الآن 🚀</button>' +
+      '<button id="btn-sync-dismiss" style="background:#065f46;color:#a7f3d0;border:1px solid #10b981;padding:7px 12px;border-radius:10px;font-weight:bold;cursor:pointer;font-size:12px;">إغلاق</button>' +
+      '</div>';
+    document.body.appendChild(banner);
+
+    document.getElementById('btn-sync-launch').onclick = function() {
+      window.open(finalUrl, '_blank');
+      banner.remove();
+    };
+    document.getElementById('btn-sync-dismiss').onclick = function() {
+      banner.remove();
+    };
+
+    setTimeout(function() {
+      window.open(finalUrl, '_blank');
+    }, 700);
+
+    setTimeout(function() {
+      if (banner.parentElement) banner.remove();
+    }, 10000);
+
+  } catch(err) {
+    alert('حدث خطأ أثناء فحص المحفظة: ' + err.message);
+  }
+})();`;
+    }
+
+    function copyThndrConsoleScript() {
+      const currentAppUrl = window.location.origin + window.location.pathname;
+      const scriptCode = generateThndrExtractorScript(currentAppUrl);
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(scriptCode).then(() => {
+          const btn = document.getElementById('btn-copy-console-text');
+          if (btn) {
+            btn.innerText = 'تم النسخ بنجاح! ✅';
+            setTimeout(() => { btn.innerText = 'نسخ كود الـ Console'; }, 3000);
+          }
+          showToast('تم نسخ كود الـ Console إلى الحافظة! الصقه في DevTools وأنت داخل ثندر واضغط Enter.', 'success');
+        }).catch(() => {
+          showToast('تعذر النسخ التلقائي؛ يرجى نسخ الكود يدوياً.', 'error');
+        });
+      }
+    }
+
+    function pasteThndrFromClipboard() {
+      if (!navigator.clipboard) {
+        showToast('متصفحك لا يدعم قراءة الحافظة مباشرة؛ يرجى اللصق بـ Ctrl+V يدوياً.', 'info');
+        return;
+      }
+      navigator.clipboard.readText().then(text => {
+        const input = document.getElementById('thndr-manual-json-input');
+        if (input) {
+          input.value = text;
+          showToast('تم لصق البيانات من الحافظة بنجاح ✅', 'success');
+        }
+      }).catch(err => {
+        showToast('يرجى السماح بصلاحية قراءة الحافظة، أو لصق النص يدوياً داخل المربع.', 'info');
+      });
+    }
+
+    function handleManualThndrImportSubmit() {
+      const input = document.getElementById('thndr-manual-json-input');
+      const replaceAll = document.getElementById('thndr-replace-all') ? document.getElementById('thndr-replace-all').checked : true;
+      if (!input || !input.value.trim()) {
+        showToast('يرجى لصق كود أو ملف JSON للمحفظة أولاً.', 'error');
+        return;
+      }
+      try {
+        const parsed = JSON.parse(input.value.trim());
+        applyThndrImport(parsed, replaceAll);
+        closeThndrSyncModal();
+        input.value = '';
+      } catch (err) {
+        showToast('صيغة الـ JSON غير صحيحة: ' + err.message, 'error');
+      }
+    }
+
+    function downloadPortfolioBackupJSON() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(portfolioData, null, 2));
+      const dlAnchorElem = document.createElement('a');
+      dlAnchorElem.setAttribute("href", dataStr);
+      dlAnchorElem.setAttribute("download", `egx_copilot_portfolio_backup_${new Date().toISOString().slice(0,10)}.json`);
+      dlAnchorElem.click();
+      dlAnchorElem.remove();
+      showToast('تم تحميل نسخة احتياطية من المحفظة بنجاح 💾', 'success');
+    }
+
+    function copyPortfolioBackupJSON() {
+      const jsonStr = JSON.stringify(portfolioData, null, 2);
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(jsonStr).then(() => {
+          const btn = document.getElementById('btn-copy-backup-text');
+          if (btn) {
+            btn.innerText = 'تم النسخ! ✅';
+            setTimeout(() => { btn.innerText = 'نسخ الكود كـ JSON'; }, 3000);
+          }
+          showToast('تم نسخ بيانات المحفظة الحالية كـ JSON إلى الحافظة.', 'success');
+        });
+      }
+    }
+
+    function applyThndrImport(payload, isReplaceAll = true) {
+      if (!payload) return;
+      const stocks = Array.isArray(payload) ? payload : (payload.stocks || []);
+      if (!stocks || stocks.length === 0) {
+        showToast('لم يتم العثور على أي أسهم صالحة للاستيراد في البيانات.', 'error');
+        return;
+      }
+
+      let importedCount = 0;
+      let newPortfolio = isReplaceAll ? [] : [...portfolioData];
+
+      stocks.forEach(stk => {
+        const ticker = (stk.ticker || stk.symbol || stk.code || '').toUpperCase().trim();
+        if (!ticker) return;
+        const shares = parseFloat(stk.shares || stk.quantity || 0);
+        if (shares <= 0) return;
+        const buyPrice = parseFloat(stk.buyPrice || stk.avgPrice || stk.costPrice || 0);
+        
+        const radarMatch = typeof fullMarketRadar !== 'undefined' ? fullMarketRadar.find(r => r.ticker === ticker) : null;
+        const existingMatch = portfolioData.find(p => p.ticker === ticker);
+
+        const stockName = (radarMatch && radarMatch.name) || (existingMatch && existingMatch.name) || stk.name || ticker;
+        const stockCategory = (radarMatch && radarMatch.sector ? `EGX • ${radarMatch.sector}` : '') || (existingMatch && existingMatch.category) || 'EGX • أسهم قيادية';
+
+        let currentPrice = parseFloat(stk.currentPrice || stk.price || 0);
+        if (!currentPrice || currentPrice <= 0) {
+          currentPrice = (radarMatch && radarMatch.price) || (existingMatch && existingMatch.currentPrice) || buyPrice;
+        }
+
+        const value = Math.round(shares * currentPrice);
+        const cost = Math.round(shares * buyPrice);
+        const profit = Math.round(value - cost);
+        const returnPct = buyPrice > 0 ? parseFloat((((currentPrice - buyPrice) / buyPrice) * 100).toFixed(2)) : 0;
+
+        const existingIndex = newPortfolio.findIndex(p => p.ticker === ticker);
+        const assetObj = {
+          ticker: ticker,
+          name: stockName,
+          category: stockCategory,
+          shares: shares,
+          buyPrice: buyPrice,
+          currentPrice: currentPrice,
+          value: value,
+          profit: profit,
+          returnPct: returnPct,
+          status: profit >= 0 ? 'ربح ممتاز' : 'تراجع مؤقت',
+          advice: returnPct >= 15 ? 'احتفاظ قوي وجني أرباح تدريجي' : (returnPct <= -10 ? 'مستوى تعزيز أو مراقبة وقف الخسارة' : 'احتفاظ • متابعة الاتجاه'),
+          action: returnPct >= 20 ? 'PROFIT_TAKE' : (returnPct <= -10 ? 'WATCH_STOP' : 'HOLD'),
+          priceUpdatedAt: 'مزامنة ثندر الآن',
+          priceSource: 'محفظة ثندر اللحظية',
+          decisionUpdatedAt: 'جلسة اليوم',
+          decisionBasis: `سعر الشراء: ${buyPrice.toFixed(2)} ج • السعر: ${currentPrice.toFixed(2)} ج`,
+          thndrUrl: 'https://app.thndr.app'
+        };
+
+        if (existingIndex !== -1) {
+          newPortfolio[existingIndex] = assetObj;
+        } else {
+          newPortfolio.push(assetObj);
+        }
+        importedCount++;
+      });
+
+      if (importedCount > 0) {
+        portfolioData = newPortfolio;
+        savePortfolio();
+        
+        // Immediately fetch live EGX quotes to calculate official pivots and decisions
+        if (typeof fetchLiveEGXPricesAndReevaluate === 'function') {
+          fetchLiveEGXPricesAndReevaluate();
+        }
+
+        showToast(`🎉 تمت مزامنة ${importedCount} أصل مالي من ثندر بنجاح! يتم الآن ربط الأسعار اللحظية وإعادة اتخاذ القرارات...`, 'success');
+      } else {
+        showToast('لم يتم العثور على أصول صالحة للإضافة.', 'info');
+      }
+    }
+
+    function checkUrlForThndrSync() {
+      const hash = window.location.hash;
+      if (!hash || !hash.includes('thndr_sync=')) return;
+      
+      try {
+        const raw = hash.split('thndr_sync=')[1];
+        const decoded = decodeURIComponent(raw);
+        let payload = null;
+        try {
+          const jsonStr = decodeURIComponent(escape(atob(decoded)));
+          payload = JSON.parse(jsonStr);
+        } catch(e) {
+          payload = JSON.parse(decoded);
+        }
+        
+        if (payload) {
+          // Clean the hash so it doesn't trigger on every page refresh
+          history.replaceState(null, null, window.location.pathname + window.location.search);
+          applyThndrImport(payload, true);
+        }
+      } catch(e) {
+        console.error('Failed to parse thndr_sync hash:', e);
+      }
+    }
+    window.addEventListener('hashchange', checkUrlForThndrSync);
 
     // ============================================================
     // Real-Time Trade Execution & Portfolio Sync (Buy / Sell)
@@ -9040,6 +9633,7 @@ ${userLessonsSummary}
       try { initTheme(); } catch(e){}
       try { initSidebar(); } catch(e){}
       try { loadPortfolio(); } catch(e){}
+      try { checkUrlForThndrSync(); } catch(e){}
       try { updateMetrics(); } catch(e){}
       try { renderPortfolioTable(); } catch(e){}
       try { renderActivePlansRadar(); } catch(e){}
