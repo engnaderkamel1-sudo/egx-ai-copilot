@@ -320,7 +320,7 @@
     },
 
     /**
-     * Compute clean, integer-based Rebalance details
+     * Compute clean, integer-based Rebalance details with EGX brokerage commission deduction
      */
     calculateRebalance: function (totalShares, currentPrice, buyPrice, ratio, supportPrice) {
       totalShares = parseInt(totalShares, 10) || 0;
@@ -332,17 +332,22 @@
       let sellShares = Math.max(1, Math.round(totalShares * ratio));
       if (sellShares >= totalShares && totalShares > 1) sellShares = totalShares - 1;
 
-      const sellCash = Math.round(sellShares * currentPrice);
-      const realizedProfit = Math.round(sellShares * (currentPrice - buyPrice));
+      const grossSellCash = Math.round(sellShares * currentPrice);
+      const estCommission = Math.round(grossSellCash * 0.00175); // EGX standard fee (~0.175%)
+      const sellCash = Math.max(0, grossSellCash - estCommission);
+      const realizedProfit = Math.round(sellShares * (currentPrice - buyPrice)) - estCommission;
       const remainingShares = totalShares - sellShares;
       const remainingValue = Math.round(remainingShares * currentPrice);
 
-      const rebuyShares = supportPrice > 0 ? Math.floor(sellCash / supportPrice) : 0;
+      // Rebuy factoring buy commission
+      const rebuyShares = supportPrice > 0 ? Math.floor(sellCash / (supportPrice * 1.00175)) : 0;
       const netGainShares = rebuyShares - sellShares;
       const newTotalShares = remainingShares + rebuyShares;
 
       return {
         sellShares,
+        grossSellCash,
+        estCommission,
         sellCash,
         realizedProfit,
         remainingShares,

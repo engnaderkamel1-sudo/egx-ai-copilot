@@ -7,7 +7,7 @@
   'use strict';
 
   const PORTFOLIO_VERSION_KEY = 'egx_copilot_portfolio_ver';
-  const CURRENT_PORTFOLIO_VER = '2026_10_clean_modular_v3_production';
+  const CURRENT_PORTFOLIO_VER = '2026_10_clean_modular_v4_institutional';
 
   const defaultPortfolioData = [
     {
@@ -240,21 +240,22 @@
     },
     {
       ticker: 'CASH',
-      name: 'المحفظة (الرصيد النقدي المتاح)',
-      category: 'محفظة نقدية جاهزة للاقتناص',
+      name: 'المحفظة (الرصيد النقدي والسيولة)',
+      category: 'محفظة نقدية • سيولة حرة',
       shares: 1,
-      buyPrice: 1391,
-      currentPrice: 1391,
-      value: 1391,
-      profit: 0,
-      returnPct: 0.0,
-      status: 'كاش متاح',
-      advice: 'سيولة نقدية جاهزة لاقتناص الفرص عند ارتداد الأسهم من مناطق الدعم',
+      buyPrice: 18196.79,
+      currentPrice: 18196.79,
+      value: 18196.79,
+      profit: 0.00,
+      returnPct: 0.00,
+      isCashReserve: true,
+      status: 'سيولة نقدية جاهزة',
+      advice: 'رصيد كاش حر في حساب ثندر متاح لاقتناص الفرص وتعزيز المراكز',
       action: 'HOLD',
       priceUpdatedAt: 'محفظة ثندر الرسمية',
-      priceSource: 'شاشة ثندر اللحظية',
+      priceSource: 'حساب ثندر الرسمي',
       decisionUpdatedAt: 'جلسة اليوم',
-      decisionBasis: 'رصيد كاش محفظة ثندر',
+      decisionBasis: 'الرصيد النقدي الفعلي 18,196.79 ج',
       thndrUrl: 'https://app.thndr.app'
     }
   ];
@@ -328,6 +329,12 @@
         totalProfit: Math.round(totalProfit),
         totalReturnPct
       };
+    },
+
+    getCashBalance: function (portfolioData) {
+      if (!Array.isArray(portfolioData)) return 0;
+      const cashItem = portfolioData.find(p => p.ticker === 'CASH' || p.isCashReserve);
+      return cashItem ? Number(cashItem.value) || 0 : 0;
     }
   };
 

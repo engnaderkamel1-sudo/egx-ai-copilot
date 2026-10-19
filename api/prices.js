@@ -145,8 +145,8 @@ function parseTechnicalRecord(item) {
     stopLossVal = Number((Math.min(price, supportVal) * 0.97).toFixed(2));
   }
 
-  // Safety invariant: Stop loss must strictly be below current market price
-  if (stopLossVal != null && stopLossVal >= price) {
+  // Safety invariant: Stop loss must strictly be below current market price by at least 1.5%
+  if (stopLossVal != null && (stopLossVal >= price || (price - stopLossVal) < 0.01)) {
     stopLossVal = Number((price * 0.96).toFixed(2));
   }
 
@@ -172,13 +172,16 @@ function parseTechnicalRecord(item) {
     target2Val = Number((target1Val + fibSpread).toFixed(2));
   }
 
-  // Risk/Reward Ratio Calculation (Strict & Robust)
+  // Risk/Reward Ratio Calculation (Strict & Robust with Penny-Stock scaling)
   let potentialGain = target1Val > price ? Number((target1Val - price).toFixed(2)) : 0;
   let potentialLoss = price > stopLossVal ? Number((price - stopLossVal).toFixed(2)) : 0;
   let rrRatio = 0;
   let rrDisplay = 'غير مؤهل (كسر دعم)';
 
-  if (!isSupportBroken && potentialLoss >= 0.05 && potentialGain > 0) {
+  // Scale down minimum loss threshold for penny stocks trading under 2 EGP
+  const minLossThreshold = price < 2.0 ? Math.max(0.005, price * 0.005) : 0.05;
+
+  if (!isSupportBroken && potentialLoss >= minLossThreshold && potentialGain > 0) {
     rrRatio = Number((potentialGain / potentialLoss).toFixed(2));
     rrDisplay = `1 : ${rrRatio}`;
   } else if (isSupportBroken) {
@@ -263,22 +266,25 @@ function parseTechnicalRecord(item) {
 
   if (tradedValue > 100000000) {
     type = 'سيولة مليارية فائقة • أمان مؤسسي رقم 1';
-    catalyst = `${qualityDesc} • تداول مؤسسي نشط (${turnoverMillions} مليون ج)`;
+    const flowType = changePct >= 0 ? 'تجميع مؤسسي قوي وتدفقات سيولة قيادية' : 'امتصاص بيعي مؤسسي وتثبيت سعري';
+    catalyst = `${qualityDesc} • ${flowType} (تنفيذات ${turnoverMillions} مليون ج)`;
     safetyTag = 'volume_surge';
   } else if (changePct > 3.0 && tradedValue > 10000000) {
     type = 'طفرة صعودية وزخم فني قوي';
-    catalyst = `${qualityDesc} • اختراق بزخم شرائي (تداول ${turnoverMillions}M ج)`;
+    catalyst = `${qualityDesc} • اختراق بزخم شرائي صاعد (تداول ${turnoverMillions}M ج)`;
     safetyTag = 'momentum';
   } else if (rsi < 36) {
     type = 'فرصة ارتداد من تشبع بيعي (Dip Buy)';
-    catalyst = `${qualityDesc} • تشبع بيعي (RSI: ${rsi}) قرب الدعم ${supportVal} ج`;
+    catalyst = `${qualityDesc} • تشبع بيعي حاد (RSI: ${rsi}) عند مشارف الدعم ${supportVal} ج`;
     safetyTag = 'oversold_bounce';
   } else if (dict.index === 'egx30') {
     type = 'شركة قيادية كبرى (EGX30)';
-    catalyst = `${qualityDesc} • استقرار فني وسيولة ${turnoverMillions}M ج`;
+    const egx30Trend = changePct >= 0 ? 'تداول إيجابي متوازن' : 'تهدئة سعرية وتماسك';
+    catalyst = `${qualityDesc} • ${egx30Trend} (سيولة ${turnoverMillions}M ج)`;
     safetyTag = 'low_risk';
   } else {
-    catalyst = `${qualityDesc} • تداول ${turnoverMillions}M ج`;
+    const egx70Trend = changePct >= 0 ? 'نشاط مضاربي مدروس' : 'حركة تصحيحية هادئة';
+    catalyst = `${qualityDesc} • ${egx70Trend} (تداول ${turnoverMillions}M ج)`;
   }
 
   return {
