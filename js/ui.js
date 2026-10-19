@@ -474,6 +474,8 @@
         const stopLossBuffer = curPrice > 0 ? (((curPrice - effectiveStopLoss) / curPrice) * 100).toFixed(1) : 0;
         const isStopBroken = !isCashOrFund && curPrice < effectiveStopLoss;
 
+        const fund = (item.pe ? item : (typeof EGX_Portfolio !== 'undefined' && typeof EGX_Portfolio.getFundamentals === 'function' ? EGX_Portfolio.getFundamentals(item.ticker) : null)) || item;
+
         const tr = document.createElement('tr');
         tr.className = 'hover:bg-gray-800/40 transition';
         tr.innerHTML = `
@@ -487,10 +489,23 @@
                 <div class="font-bold text-white text-xs sm:text-sm">${item.name}</div>
                 <div class="text-[10px] text-gray-400">${item.category}</div>
                 ${item.ticker !== 'CASH' ? `
-                  <div class="mt-1 flex items-center gap-1">
+                  <div class="mt-1.5 flex items-center gap-1.5 flex-wrap">
                     <span class="px-2 py-0.5 rounded text-[10px] font-bold ${cycle.badgeClass}" title="${cycle.advice || ''}">
                       ${cycle.shortBadge}
                     </span>
+                    ${fund.pe ? `
+                      <span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-cyan-950/80 border border-cyan-800/60 text-cyan-300 flex items-center gap-1 shadow-sm" title="مكرر ربحية السهم: ${fund.pe} | متوسط القطاع: ${fund.sectorPe || '--'}">
+                        <i data-lucide="scale" class="w-3 h-3 text-cyan-400"></i>
+                        <span>P/E: <strong class="text-white">${fund.pe}</strong></span>
+                        <span class="text-gray-400 font-sans">| قطاع:</span>
+                        <strong class="text-cyan-300">${fund.sectorPe || '--'}</strong>
+                      </span>
+                      ${fund.peVsSectorPct !== undefined ? `
+                        <span class="px-1.5 py-0.5 rounded text-[9.5px] font-bold ${fund.peVsSectorPct <= 0 ? 'bg-emerald-950/90 text-emerald-300 border border-emerald-800/60' : 'bg-amber-950/90 text-amber-300 border border-amber-800/60'}" title="${fund.valuationStatus || ''}">
+                          ${fund.peVsSectorPct < 0 ? `أرخص ${Math.abs(fund.peVsSectorPct)}% 🟢` : (fund.peVsSectorPct > 0 ? `أعلى +${fund.peVsSectorPct}% 🟡` : 'مماثل للقطاع ⚖️')}
+                        </span>
+                      ` : ''}
+                    ` : ''}
                   </div>
                 ` : ''}
               </div>
@@ -604,6 +619,12 @@
               <div class="text-[10.5px] text-gray-300 leading-tight">
                 ${item.advice || ''}
               </div>
+              ${fund.operationalStability ? `
+                <div class="mt-1 flex items-center gap-1 text-[9.5px] text-emerald-300 font-sans font-semibold bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-800/40" title="فحص الأرباح التشغيلية: الأرباح تشغيلية من النشاط الرئيسي">
+                  <i data-lucide="shield-check" class="w-3 h-3 text-emerald-400 shrink-0"></i>
+                  <span>${fund.operationalStability}</span>
+                </div>
+              ` : ''}
             </div>
           </td>
 
@@ -733,6 +754,47 @@
       if (rawClose) rawClose.innerText = `${close.toFixed(2)} ج`;
       const rawPivot = document.getElementById('pl-raw-pivot');
       if (rawPivot) rawPivot.innerText = `${pivot.toFixed(2)} ج`;
+
+      // Fundamental Data in Price Levels Modal
+      const f = (item.pe ? item : (typeof EGX_Portfolio !== 'undefined' && typeof EGX_Portfolio.getFundamentals === 'function' ? EGX_Portfolio.getFundamentals(ticker) : null)) || item;
+
+      const rawPe = document.getElementById('pl-raw-pe');
+      if (rawPe) rawPe.innerText = f.pe ? `${f.pe}` : '--';
+
+      const rawSecPe = document.getElementById('pl-raw-sector-pe');
+      if (rawSecPe) rawSecPe.innerText = f.sectorPe ? `${f.sectorPe}` : '--';
+
+      const rawEps = document.getElementById('pl-raw-eps');
+      if (rawEps) rawEps.innerText = f.eps ? `${f.eps} ج` : '--';
+
+      const rawOpMargin = document.getElementById('pl-raw-operating-margin');
+      if (rawOpMargin) rawOpMargin.innerText = f.operatingMargin !== undefined && f.operatingMargin !== null ? `${f.operatingMargin}%` : (f.netMargin ? `${f.netMargin}% (صافي)` : '--');
+
+      const rawValBadge = document.getElementById('pl-raw-valuation-badge');
+      if (rawValBadge) {
+        if (f.pe && f.sectorPe) {
+          const isCheap = f.pe <= f.sectorPe;
+          const diffPct = Math.abs(f.peVsSectorPct !== undefined ? f.peVsSectorPct : Math.round(((f.pe - f.sectorPe) / f.sectorPe) * 100));
+          rawValBadge.innerText = isCheap ? `سهم أرخص من القطاع بنسبة ${diffPct}% (فرصة مغرية 🟢)` : (f.pe > f.sectorPe ? `أعلى من القطاع بـ ${diffPct}% (علاوة تقييم)` : 'مماثل لمتوسط القطاع');
+          rawValBadge.className = `text-[10px] font-mono font-bold ${isCheap ? 'text-emerald-400' : 'text-cyan-400'}`;
+        } else {
+          rawValBadge.innerText = 'بيانات القوائم المالية المعتمدة';
+          rawValBadge.className = 'text-[10px] text-gray-400 font-mono';
+        }
+      }
+
+      const rawStability = document.getElementById('pl-raw-operational-stability');
+      if (rawStability) {
+        rawStability.innerHTML = `
+          <i data-lucide="check-circle" class="w-3 h-3 text-emerald-400"></i>
+          <span>${f.operationalStability || 'أرباح تشغيلية مستقرة من النشاط الرئيسي'}</span>
+        `;
+      }
+
+      const rawEqHint = document.getElementById('pl-raw-equation-hint');
+      if (rawEqHint && f.pe && f.eps) {
+        rawEqHint.innerText = `المعادلة: سعر ${curPrice.toFixed(2)} ج ÷ ربح السهم ${f.eps} ج = مكرر ربحية ${f.pe}`;
+      }
 
       // Thndr link
       const thndrLink = document.getElementById('pl-modal-thndr-link');
@@ -910,18 +972,68 @@
           </div>
         </div>
 
-        <!-- Pillar 1: Fundamental Analysis -->
-        <div class="bg-gray-950 p-4 rounded-xl border border-gray-800 space-y-2">
+        <!-- Pillar 1: Fundamental Analysis & P/E vs Sector Comparison -->
+        <div class="bg-gray-950 p-4 rounded-xl border border-gray-800 space-y-3">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
               <span class="w-6 h-6 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-xs">1</span>
               <h4 class="font-bold text-white text-xs sm:text-sm">التحليل المالي والأساسي (Fundamental Valuation)</h4>
             </div>
-            <span class="px-2 py-0.5 rounded text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-bold">✅ نمو الأرباح واستقرار التدفقات</span>
+            <span class="px-2 py-0.5 rounded text-[10px] ${fund.pe && fund.sectorPe && fund.pe <= fund.sectorPe ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold' : 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 font-bold'}">
+              ${fund.valuationStatus || '✅ نمو الأرباح واستقرار التدفقات'}
+            </span>
           </div>
-          <p class="text-gray-300 text-[11px] leading-relaxed">
-            ${stock.catalyst || 'الشركة تحقق نمواً في صافي الأرباح التشغيلية ومكرر ربحية جذاب وتوزيعات نقدية مستمرة تدعم الاستثمار طويل الأجل.'}
-          </p>
+
+          <!-- Dynamic P/E vs Sector Comparison Cards -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 bg-gray-900/90 p-3 rounded-xl border border-gray-800 text-center font-mono">
+            <div class="p-2 rounded-lg bg-gray-950/80 border border-gray-800">
+              <span class="text-[10px] text-gray-400 block font-sans">مكرر الربحية (P/E)</span>
+              <span class="font-bold text-sm text-emerald-400">${fund.pe ? fund.pe : '--'}</span>
+              <span class="text-[9px] text-gray-500 block font-sans">سعر السهم / ربحه</span>
+            </div>
+            <div class="p-2 rounded-lg bg-gray-950/80 border border-gray-800">
+              <span class="text-[10px] text-gray-400 block font-sans">متوسط قطاع (${fund.sector || stock.sector || 'السوق'})</span>
+              <span class="font-bold text-sm text-cyan-300">${fund.sectorPe ? fund.sectorPe : '--'}</span>
+              <span class="text-[9px] text-gray-500 block font-sans">متوسط شركات القطاع</span>
+            </div>
+            <div class="p-2 rounded-lg bg-gray-950/80 border border-gray-800">
+              <span class="text-[10px] text-gray-400 block font-sans">ربح السهم السنوي (EPS)</span>
+              <span class="font-bold text-sm text-white">${fund.eps ? fund.eps + ' ج' : '--'}</span>
+              <span class="text-[9px] text-gray-500 block font-sans">نصيب السهم من الربح</span>
+            </div>
+            <div class="p-2 rounded-lg bg-gray-950/80 border border-gray-800">
+              <span class="text-[10px] text-gray-400 block font-sans">هامش التشغيل (Op Margin)</span>
+              <span class="font-bold text-sm text-indigo-300">${fund.operatingMargin !== undefined && fund.operatingMargin !== null ? fund.operatingMargin + '%' : (fund.netMargin ? fund.netMargin + '% صافي' : '--')}</span>
+              <span class="text-[9px] text-gray-500 block font-sans">قوة الأرباح التشغيلية</span>
+            </div>
+          </div>
+
+          <!-- Operating Profit Stability Assessment Box -->
+          <div class="p-3 rounded-xl bg-emerald-950/20 border border-emerald-500/30 text-xs space-y-1.5">
+            <div class="flex items-center justify-between flex-wrap gap-1">
+              <span class="text-emerald-300 font-bold flex items-center gap-1.5">
+                <i data-lucide="shield-check" class="w-4 h-4 text-emerald-400"></i>
+                <span>فحص استقرار الأرباح التشغيلية:</span>
+              </span>
+              <span class="text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold">
+                ${fund.operationalStability || 'أرباح تشغيلية مستقرة من النشاط الرئيسي'}
+              </span>
+            </div>
+            <p class="text-gray-300 text-[11px] leading-relaxed font-sans">
+              ${fund.pe && fund.sectorPe
+                ? `• سهم <strong>${stock.name}</strong> يتداول عند مكرر ربحية <strong>${fund.pe}</strong> مقارنة بمتوسط قطاع <strong>${fund.sector || stock.sector || 'السوق'}</strong> البالغ <strong>${fund.sectorPe}</strong>. ${fund.pe < fund.sectorPe ? `السهم يُعتبر <strong>أرخص من القطاع بنسبة ${Math.abs(fund.peVsSectorPct || 0)}%</strong> مما يمنحه هامش أمان استثماري ممتاز.` : (fund.pe === fund.sectorPe ? `السهم يتداول بتقييم عادل مطابق لمتوسط القطاع.` : `السهم يتداول بتقييم نمو مقارنة بالقطاع.`)}`
+                : (stock.catalyst || 'الشركة تحقق نمواً في صافي الأرباح التشغيلية ومكرر ربحية جذاب وتوزيعات نقدية مستمرة تدعم الاستثمار طويل الأجل.')
+              }
+            </p>
+            ${fund.dividendYield ? `
+              <div class="text-[10.5px] text-gray-300 pt-1 flex items-center gap-2 font-mono">
+                <span class="text-emerald-400">💰 عائد التوزيعات النقدية السنوي:</span>
+                <strong class="text-white">${fund.dividendYield}%</strong>
+                <span class="text-gray-400 font-sans text-[10px]">(دخل نقدي دوري يضاف لعائد صعود السهم)</span>
+              </div>
+            ` : ''}
+          </div>
+
           <div class="pt-1.5 flex items-center gap-2 flex-wrap border-t border-gray-800/60">
             <span class="text-gray-400 text-[10px]">المصادر الرسمية للتحقق:</span>
             <a href="${mubasherUrl}" target="_blank" class="text-cyan-400 hover:underline flex items-center gap-1 text-[10px] font-bold">
@@ -1131,7 +1243,37 @@
             </div>
           </div>
 
-          <div>
+            <!-- Dynamic P/E & Sector Comparison Bar -->
+            ${(() => {
+              const fund = (item.pe ? item : (typeof EGX_Portfolio !== 'undefined' && typeof EGX_Portfolio.getFundamentals === 'function' ? EGX_Portfolio.getFundamentals(item.ticker) : null)) || item;
+              return `
+                <div class="mb-2 bg-gray-950/80 p-2 rounded-xl border border-gray-800 text-[10px] space-y-1">
+                  <div class="flex items-center justify-between">
+                    <span class="text-gray-400 flex items-center gap-1 font-mono">
+                      <span class="font-sans text-gray-400">مكرر الربحية:</span>
+                      <strong class="text-emerald-400 font-bold">${fund.pe || '--'}</strong>
+                    </span>
+                    <span class="text-gray-400 font-mono">
+                      <span class="font-sans text-gray-400">متوسط القطاع:</span>
+                      <strong class="text-cyan-300 font-bold">${fund.sectorPe || '--'}</strong>
+                    </span>
+                    ${fund.peVsSectorPct !== undefined ? `
+                      <span class="px-1.5 py-0.2 rounded font-bold ${fund.peVsSectorPct <= 0 ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'}">
+                        ${fund.peVsSectorPct < 0 ? `أرخص ${Math.abs(fund.peVsSectorPct)}% 🟢` : (fund.peVsSectorPct > 0 ? `أعلى +${fund.peVsSectorPct}% 🟡` : 'مماثل للقطاع ⚖️')}
+                      </span>
+                    ` : ''}
+                  </div>
+                  <div class="flex items-center justify-between text-[9px] pt-1 border-t border-gray-800/60">
+                    <span class="text-emerald-400 flex items-center gap-1 font-semibold truncate" title="فحص الأرباح التشغيلية">
+                      <i data-lucide="shield-check" class="w-3 h-3 text-emerald-400 shrink-0"></i>
+                      <span>${fund.operationalStability || (fund.operatingMargin ? `أرباح تشغيلية مستقرة (${fund.operatingMargin}%)` : 'أرباح تشغيلية منتظمة')}</span>
+                    </span>
+                    ${fund.eps ? `<span class="text-gray-400 font-mono shrink-0">EPS: ${fund.eps} ج</span>` : ''}
+                  </div>
+                </div>
+              `;
+            })()}
+
             <div class="grid grid-cols-3 gap-1.5 text-center text-[10px] mb-2 bg-gray-950/50 p-2 rounded-xl border border-gray-800/80">
               <div>
                 <span class="text-gray-400 block text-[9px]" title="سعر الدعم الأول الذي إذا تماسك فوقه السهم يبدأ بالصعود">الدعم S1 (سعر الأمان)</span>

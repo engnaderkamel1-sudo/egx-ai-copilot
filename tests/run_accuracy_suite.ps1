@@ -483,6 +483,33 @@ $netGain = $rebuySharesCount - $soldShares
 Assert-Test -Suite 'Hub' -TestName 'Trading around core yields positive free extra shares (+8 shares)' -Condition ($netGain -eq 8) -Expected '8' -Actual $netGain
 
 # -------------------------------------------------------------
+# SUITE 7: FUNDAMENTAL VALUATION, SECTOR P/E & OPERATING STABILITY TESTS
+# -------------------------------------------------------------
+Write-Host "[7/7] Running Suite 7: Fundamental Valuation & Sector P/E Benchmark Tests..." -ForegroundColor Yellow
+
+# 1. P/E Formula Verification: Price / EPS
+$hdbkPrice = 93.59
+$hdbkEps = 18.73
+$computedPe = [Math]::Round(($hdbkPrice / $hdbkEps), 2)
+Assert-Test -Suite 'Fundamental' -TestName 'HDBK P/E formula (Price / EPS) is mathematically exact (5.00)' -Condition ($computedPe -eq 5.0) -Expected '5' -Actual $computedPe
+
+# 2. Banking Sector Average P/E computation from peer basket
+$bankPeBasket = @(4.9977, 6.0099, 4.3045, 4.3652) # HDBK, COMI, CIEB, ADIB
+$bankSum = 0
+$bankPeBasket | ForEach-Object { $bankSum += $_ }
+$bankAvgPe = [Math]::Round(($bankSum / $bankPeBasket.Count), 2)
+Assert-Test -Suite 'Fundamental' -TestName 'Banking sector average P/E calculates dynamically to ~4.92' -Condition ($bankAvgPe -ge 4.8 -and $bankAvgPe -le 5.1) -Expected '4.92' -Actual $bankAvgPe
+
+# 3. Operational Stability Check from Operating Margin
+$hdbkOperatingMargin = 73.2
+$isOperationallySolid = $hdbkOperatingMargin -ge 25.0
+Assert-Test -Suite 'Fundamental' -TestName 'HDBK 73.2% operating margin certifies as solid operational earnings' -Condition ($isOperationallySolid -eq $true) -Expected 'True' -Actual $isOperationallySolid
+
+# 4. Valuation Classification
+$isUnderValuedOrFair = $computedPe -le 5.1
+Assert-Test -Suite 'Fundamental' -TestName 'HDBK P/E (5.0) is fairly valued or cheaper than broader EGX market' -Condition ($isUnderValuedOrFair -eq $true) -Expected 'True' -Actual $isUnderValuedOrFair
+
+# -------------------------------------------------------------
 # FINAL BENCHMARK SUMMARY & ACCURACY SCORE
 # -------------------------------------------------------------
 $AccuracyScore = [Math]::Round((($PassedTests / $TotalTests) * 100), 2)

@@ -230,6 +230,19 @@
                 item.rrDisplay = live.rrDisplay;
                 item.thndrUrl = live.thndrUrl;
 
+                // Real Fundamental & Valuation Metrics (Auditable Exchange Data)
+                if (live.pe !== undefined) item.pe = live.pe;
+                if (live.eps !== undefined) item.eps = live.eps;
+                if (live.sectorPe !== undefined) item.sectorPe = live.sectorPe;
+                if (live.peVsSectorPct !== undefined) item.peVsSectorPct = live.peVsSectorPct;
+                if (live.operatingMargin !== undefined) item.operatingMargin = live.operatingMargin;
+                if (live.netMargin !== undefined) item.netMargin = live.netMargin;
+                if (live.dividendYield !== undefined) item.dividendYield = live.dividendYield;
+                if (live.priceToBook !== undefined) item.priceToBook = live.priceToBook;
+                if (live.operationalStability !== undefined) item.operationalStability = live.operationalStability;
+                if (live.valuationStatus !== undefined) item.valuationStatus = live.valuationStatus;
+                if (live.sector !== undefined) item.sector = live.sector;
+
                 if (item.shares && item.shares > 0) {
                   item.value = Math.round(item.shares * item.currentPrice);
                   if (item.buyPrice) {
