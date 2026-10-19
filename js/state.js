@@ -549,6 +549,12 @@
       } else {
         localStorage.setItem('egx_copilot_portfolio', JSON.stringify(portfolioData));
       }
+
+      // Realtime synchronization to Firebase Cloud Firestore
+      if (typeof EGX_FirebaseSync !== 'undefined' && EGX_FirebaseSync.saveToCloud) {
+        EGX_FirebaseSync.saveToCloud(portfolioData);
+      }
+
       updateMetrics();
       renderPortfolioTable();
       renderAllocationChart();

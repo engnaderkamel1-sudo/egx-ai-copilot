@@ -17,6 +17,14 @@ const defaultPortfolioData = [
         "shares": 195,
         "buyPrice": 76.52,
         "currentPrice": 88.01,
+        "pivotR1": 94.48,
+        "pivotS1": 81.54,
+        "target1": 94.48,
+        "stopLoss": 81.54,
+        "high": 91.20,
+        "low": 86.80,
+        "close": 88.01,
+        "pivot": 88.67,
         "value": 17162,
         "profit": 2241,
         "returnPct": 15.02,
@@ -37,6 +45,14 @@ const defaultPortfolioData = [
         "shares": 331,
         "buyPrice": 66.86,
         "currentPrice": 65.54,
+        "pivotR1": 76.32,
+        "pivotS1": 54.48,
+        "target1": 76.32,
+        "stopLoss": 54.48,
+        "high": 68.00,
+        "low": 64.00,
+        "close": 65.54,
+        "pivot": 65.85,
         "value": 21694,
         "profit": -437,
         "returnPct": -1.97,
@@ -57,6 +73,14 @@ const defaultPortfolioData = [
         "shares": 161,
         "buyPrice": 1.83,
         "currentPrice": 1.69,
+        "pivotR1": 2.10,
+        "pivotS1": 1.55,
+        "target1": 2.10,
+        "stopLoss": 1.55,
+        "high": 1.72,
+        "low": 1.67,
+        "close": 1.69,
+        "pivot": 1.69,
         "value": 272.09,
         "profit": -22.54,
         "returnPct": -7.65,
@@ -77,6 +101,14 @@ const defaultPortfolioData = [
         "shares": 963,
         "buyPrice": 17.73,
         "currentPrice": 14,
+        "pivotR1": 15.80,
+        "pivotS1": 13.22,
+        "target1": 15.80,
+        "stopLoss": 13.22,
+        "high": 14.80,
+        "low": 13.60,
+        "close": 14.00,
+        "pivot": 14.13,
         "value": 13482,
         "profit": -3592,
         "returnPct": -21.04,
@@ -97,6 +129,14 @@ const defaultPortfolioData = [
         "shares": 122,
         "buyPrice": 140.48,
         "currentPrice": 124.97,
+        "pivotR1": 137.90,
+        "pivotS1": 119.60,
+        "target1": 137.90,
+        "stopLoss": 119.60,
+        "high": 128.50,
+        "low": 123.00,
+        "close": 124.97,
+        "pivot": 125.49,
         "value": 15246,
         "profit": -1893,
         "returnPct": -11.05,
@@ -117,6 +157,14 @@ const defaultPortfolioData = [
         "shares": 44,
         "buyPrice": 303.52,
         "currentPrice": 297.98,
+        "pivotR1": 330.00,
+        "pivotS1": 313.33,
+        "target1": 330.00,
+        "stopLoss": 313.33,
+        "high": 318.00,
+        "low": 295.00,
+        "close": 297.98,
+        "pivot": 303.66,
         "value": 13111,
         "profit": -244,
         "returnPct": -1.83,
@@ -137,6 +185,14 @@ const defaultPortfolioData = [
         "shares": 74,
         "buyPrice": 24.5,
         "currentPrice": 24.5,
+        "pivotR1": 28.00,
+        "pivotS1": 22.00,
+        "target1": 28.00,
+        "stopLoss": 22.00,
+        "high": 25.50,
+        "low": 23.80,
+        "close": 24.50,
+        "pivot": 24.60,
         "value": 1813,
         "profit": 0,
         "returnPct": 0,
@@ -157,6 +213,14 @@ const defaultPortfolioData = [
         "shares": 122,
         "buyPrice": 81.63,
         "currentPrice": 93.59,
+        "pivotR1": 104.50,
+        "pivotS1": 96.25,
+        "target1": 104.50,
+        "stopLoss": 96.25,
+        "high": 98.50,
+        "low": 92.00,
+        "close": 93.59,
+        "pivot": 94.70,
         "value": 11418,
         "profit": 1459,
         "returnPct": 14.65,
@@ -177,6 +241,14 @@ const defaultPortfolioData = [
         "shares": 3037,
         "buyPrice": 20.61,
         "currentPrice": 18.36,
+        "pivotR1": 21.50,
+        "pivotS1": 17.50,
+        "target1": 21.50,
+        "stopLoss": 17.50,
+        "high": 18.50,
+        "low": 18.20,
+        "close": 18.36,
+        "pivot": 18.36,
         "value": 55759.32,
         "profit": -6833.25,
         "returnPct": -10.92,
@@ -197,6 +269,14 @@ const defaultPortfolioData = [
         "shares": 17,
         "buyPrice": 715.01,
         "currentPrice": 850.6,
+        "pivotR1": 865.73,
+        "pivotS1": 810.00,
+        "target1": 865.73,
+        "stopLoss": 810.00,
+        "high": 860.00,
+        "low": 840.00,
+        "close": 850.60,
+        "pivot": 850.20,
         "value": 14460,
         "profit": 2305,
         "returnPct": 18.96,
@@ -217,6 +297,14 @@ const defaultPortfolioData = [
         "shares": 2193,
         "buyPrice": 6.88,
         "currentPrice": 5.83,
+        "pivotR1": 6.60,
+        "pivotS1": 5.37,
+        "target1": 6.60,
+        "stopLoss": 5.37,
+        "high": 6.10,
+        "low": 5.65,
+        "close": 5.83,
+        "pivot": 5.86,
         "value": 12785,
         "profit": -2303,
         "returnPct": -15.26,
@@ -237,6 +325,14 @@ const defaultPortfolioData = [
         "shares": 110,
         "buyPrice": 93.86,
         "currentPrice": 109.2,
+        "pivotR1": 129.03,
+        "pivotS1": 91.64,
+        "target1": 129.03,
+        "stopLoss": 91.64,
+        "high": 112.00,
+        "low": 106.50,
+        "close": 109.20,
+        "pivot": 109.23,
         "value": 12012,
         "profit": 1687,
         "returnPct": 16.34,
@@ -257,6 +353,14 @@ const defaultPortfolioData = [
         "shares": 55,
         "buyPrice": 97.62,
         "currentPrice": 81.4,
+        "pivotR1": 92.50,
+        "pivotS1": 80.62,
+        "target1": 92.50,
+        "stopLoss": 80.62,
+        "high": 84.00,
+        "low": 80.80,
+        "close": 81.40,
+        "pivot": 82.07,
         "value": 4477,
         "profit": -892,
         "returnPct": -16.61,
@@ -402,6 +506,47 @@ const defaultPortfolioData = [
       if (!Array.isArray(portfolioData)) return 0;
       const cashItem = portfolioData.find(p => p.ticker === 'CASH' || p.isCashReserve);
       return cashItem ? Number(cashItem.value) || 0 : 0;
+    },
+
+    // Custom User Price Levels (Overrides for Target 1 & Stop Loss)
+    getCustomLevels: function (ticker) {
+      try {
+        const raw = localStorage.getItem('egx_copilot_custom_levels');
+        const map = raw ? JSON.parse(raw) : {};
+        return map[ticker] || null;
+      } catch (e) {
+        return null;
+      }
+    },
+
+    setCustomLevels: function (ticker, levels) {
+      try {
+        const raw = localStorage.getItem('egx_copilot_custom_levels');
+        const map = raw ? JSON.parse(raw) : {};
+        if (!levels) {
+          delete map[ticker];
+        } else {
+          map[ticker] = {
+            customTarget1: (levels.customTarget1 !== null && levels.customTarget1 !== undefined && levels.customTarget1 !== '') ? Number(levels.customTarget1) : null,
+            customStopLoss: (levels.customStopLoss !== null && levels.customStopLoss !== undefined && levels.customStopLoss !== '') ? Number(levels.customStopLoss) : null,
+            updatedAt: new Date().toISOString()
+          };
+        }
+        localStorage.setItem('egx_copilot_custom_levels', JSON.stringify(map));
+        return map[ticker] || null;
+      } catch (e) {
+        console.warn('Failed to save custom price levels', e);
+        return null;
+      }
+    },
+
+    resetCustomLevels: function (ticker) {
+      try {
+        const raw = localStorage.getItem('egx_copilot_custom_levels');
+        const map = raw ? JSON.parse(raw) : {};
+        delete map[ticker];
+        localStorage.setItem('egx_copilot_custom_levels', JSON.stringify(map));
+      } catch (e) {}
     }
   };
 

@@ -746,6 +746,11 @@
       try { initTheme(); } catch(e){ console.warn('initTheme error:', e); }
       try { initSidebar(); } catch(e){ console.warn('initSidebar error:', e); }
       try { loadPortfolio(); } catch(e){ console.warn('loadPortfolio error:', e); }
+      try {
+        if (typeof EGX_FirebaseSync !== 'undefined' && EGX_FirebaseSync.init) {
+          EGX_FirebaseSync.init();
+        }
+      } catch(e) { console.warn('EGX_FirebaseSync init error:', e); }
       try { checkUrlForThndrSync(); } catch(e){ console.warn('checkUrlForThndrSync error:', e); }
       try { updateMetrics(); } catch(e){ console.warn('updateMetrics error:', e); }
       try { renderPortfolioTable(); } catch(e){ console.warn('renderPortfolioTable error:', e); }
