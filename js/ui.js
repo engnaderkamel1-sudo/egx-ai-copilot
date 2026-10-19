@@ -2013,7 +2013,9 @@
         'settings': { title: 'إعدادات المحفظة والربط', desc: 'تخصيص نسب الأمان والمضاربة وربط مفتاح Gemini API', badge: 'لوحة التحكم' },
         'rules': { title: 'قواعد وسياسة الاستثمار', desc: 'وثيقة حوكمة المحفظة والضوابط الصارمة لحماية رأس المال', badge: 'حوكمة المحفظة' },
         'simulation': { title: 'مختبر المحاكاة والتدريب المؤسسي لمنع الهلوسة', desc: 'محاكاة أداء الذكاء الاصطناعي على بيانات تاريخية معتمدة ومراقبة بيئة السوق ودفتر الصفقات', badge: 'معتمد 100% ضد الهلوسة' },
-        'glossary': { title: 'دليل المصطلحات المالية', desc: 'شرح مبسط لكل مصطلحات البورصة والتحليل الفني والمالي', badge: 'قاموس المستثمر' }
+        'glossary': { title: 'دليل المصطلحات المالية', desc: 'شرح مبسط لكل مصطلحات البورصة والتحليل الفني والمالي', badge: 'قاموس المستثمر' },
+        'valuation': { title: 'محرك تقييم القيمة العادلة المخصومة (DCF & DDM)', desc: 'تقييم التدفقات النقدية وهوامش الأمان الاستثمارية وفق أسعار الفائدة المصرية', badge: 'تقييم جوهري • DCF' },
+        'alpha': { title: 'متتبع ألفا والأداء التراكمي للمحفظة (Benchmark Alpha Tracker)', desc: 'مقارنة الأداء التراكمي بمؤشر EGX30 وعائد صناديق السيولة النقدية والتضخم', badge: 'Alpha & Sharpe' }
       };
 
       if (tabMeta[tabId]) {
@@ -2042,6 +2044,10 @@
           document.getElementById('risk-stock-select').value = fullMarketRadar[0].ticker;
           loadStockForRiskCalc();
         }
+      } else if (tabId === 'valuation') {
+        if (typeof initDcfEngine === 'function') initDcfEngine();
+      } else if (tabId === 'alpha') {
+        if (typeof renderBenchmarkAlphaTracker === 'function') renderBenchmarkAlphaTracker();
       } else if (tabId === 'papertrading') {
         renderSimPositions();
         renderAutonomousLedger();

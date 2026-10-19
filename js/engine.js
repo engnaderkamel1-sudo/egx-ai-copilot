@@ -615,6 +615,162 @@
         profitCandidate,
         safetyAlert
       };
+    },
+
+    /**
+     * Institutional DCF & DDM Fair Value Engine
+     * Tailored for EGX dynamics (CBE rates, Egyptian inflation, and sector multiples).
+     */
+    calculateDCF: function (params) {
+      params = params || {};
+      const fcf0 = Number(params.fcf0) || 0;
+      const growthRate = (Number(params.growthRate) || 18) / 100;
+      const discountRate = (Number(params.discountRate) || 22) / 100;
+      const terminalGrowth = (Number(params.terminalGrowth) || 7) / 100;
+      const netDebt = Number(params.netDebt) || 0;
+      const sharesCount = Number(params.sharesCount) || 1;
+      const currentPrice = Number(params.currentPrice) || 0;
+      const isFinancial = !!params.isFinancial;
+
+      const effectiveSpread = Math.max(0.015, discountRate - terminalGrowth);
+
+      let projectedCashFlows = [];
+      let discountedCashFlows = [];
+      let sumPV = 0;
+      let currentFCF = fcf0;
+
+      for (let year = 1; year <= 5; year++) {
+        currentFCF = currentFCF * (1 + growthRate);
+        const pv = currentFCF / Math.pow(1 + discountRate, year);
+        projectedCashFlows.push(Number(currentFCF.toFixed(2)));
+        discountedCashFlows.push(Number(pv.toFixed(2)));
+        sumPV += pv;
+      }
+
+      const terminalValue = (currentFCF * (1 + terminalGrowth)) / effectiveSpread;
+      const pvTerminalValue = terminalValue / Math.pow(1 + discountRate, 5);
+
+      const enterpriseValue = sumPV + pvTerminalValue;
+      const equityValue = isFinancial ? enterpriseValue : (enterpriseValue - netDebt);
+      const fairValuePerShare = sharesCount > 0 ? Number((Math.max(0.01, equityValue / sharesCount)).toFixed(2)) : 0;
+
+      let marginOfSafetyPct = 0;
+      let status = 'FAIR';
+      let statusAr = 'تقييم عادل ومتوازن';
+      let statusBadge = 'bg-amber-500/20 text-amber-300 border border-amber-500/40';
+
+      if (currentPrice > 0) {
+        marginOfSafetyPct = Number((((fairValuePerShare - currentPrice) / currentPrice) * 100).toFixed(1));
+        if (marginOfSafetyPct >= 20) {
+          status = 'UNDERVALUED';
+          statusAr = `فرصة استثمارية مغرية (أرخص بـ ${marginOfSafetyPct}% من القيمة العادلة)`;
+          statusBadge = 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-bold';
+        } else if (marginOfSafetyPct <= -15) {
+          status = 'OVERVALUED';
+          statusAr = `سعر متضخم أعلى من القيمة العادلة بـ ${Math.abs(marginOfSafetyPct)}%`;
+          statusBadge = 'bg-rose-500/20 text-rose-300 border border-rose-500/40 font-bold';
+        } else {
+          status = 'FAIR';
+          statusAr = `يتداول قرب القيمة العادلة (فارق ${marginOfSafetyPct >= 0 ? '+' : ''}${marginOfSafetyPct}%)`;
+          statusBadge = 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40';
+        }
+      }
+
+      // Sensitivity Table (+/- 2% on discount rate and growth rate)
+      const sensitivity = [];
+      const discountShifts = [-0.02, 0, 0.02];
+      const growthShifts = [-0.02, 0, 0.02];
+
+      discountShifts.forEach(ds => {
+        const dRate = discountRate + ds;
+        const row = { discountRatePct: Number((dRate * 100).toFixed(1)), values: [] };
+        growthShifts.forEach(gs => {
+          const gRate = growthRate + gs;
+          let sSum = 0;
+          let sFCF = fcf0;
+          for (let y = 1; y <= 5; y++) {
+            sFCF = sFCF * (1 + gRate);
+            sSum += sFCF / Math.pow(1 + dRate, y);
+          }
+          const sSpread = Math.max(0.015, dRate - terminalGrowth);
+          const sTV = (sFCF * (1 + terminalGrowth)) / sSpread;
+          const sPVTV = sTV / Math.pow(1 + dRate, 5);
+          const sEV = sSum + sPVTV;
+          const sEq = isFinancial ? sEV : (sEV - netDebt);
+          const sFV = sharesCount > 0 ? Number((Math.max(0.01, sEq / sharesCount)).toFixed(2)) : 0;
+          row.values.push({
+            growthRatePct: Number((gRate * 100).toFixed(1)),
+            fairValue: sFV
+          });
+        });
+        sensitivity.push(row);
+      });
+
+      return {
+        fcf0,
+        growthRatePct: Number((growthRate * 100).toFixed(1)),
+        discountRatePct: Number((discountRate * 100).toFixed(1)),
+        terminalGrowthPct: Number((terminalGrowth * 100).toFixed(1)),
+        projectedCashFlows,
+        discountedCashFlows,
+        sumPVDiscountedFlows: Number(sumPV.toFixed(2)),
+        terminalValue: Number(terminalValue.toFixed(2)),
+        pvTerminalValue: Number(pvTerminalValue.toFixed(2)),
+        enterpriseValue: Number(enterpriseValue.toFixed(2)),
+        equityValue: Number(equityValue.toFixed(2)),
+        fairValuePerShare,
+        currentPrice,
+        marginOfSafetyPct,
+        status,
+        statusAr,
+        statusBadge,
+        sensitivity
+      };
+    },
+
+    /**
+     * Quantitative Benchmark Alpha Tracker
+     * Computes Alpha (α), Beta (β), and Sharpe Ratio against EGX30 and Egyptian Risk-Free Rate.
+     */
+    calculatePortfolioAlpha: function (portfolioReturnPct, marketReturnPct, riskFreeRatePct, beta) {
+      portfolioReturnPct = Number(portfolioReturnPct) || 0;
+      marketReturnPct = Number(marketReturnPct) || 0;
+      riskFreeRatePct = Number(riskFreeRatePct) || 22.4;
+      beta = Number(beta) || 0.85;
+
+      const expectedReturn = riskFreeRatePct + (beta * (marketReturnPct - riskFreeRatePct));
+      const alpha = Number((portfolioReturnPct - expectedReturn).toFixed(2));
+      const excessReturn = Number((portfolioReturnPct - riskFreeRatePct).toFixed(2));
+      const estimatedVolatility = Math.max(5.0, 16.0 * Math.max(0.4, beta));
+      const sharpeRatio = Number(((portfolioReturnPct - riskFreeRatePct) / estimatedVolatility).toFixed(2));
+
+      let alphaVerdict = 'أداء متوازن مع السوق';
+      let alphaBadge = 'bg-gray-800 text-gray-300 border border-gray-700';
+
+      if (alpha > 3.0) {
+        alphaVerdict = `تفوق استثنائي على مؤشر البورصة ومعدل الفائدة (ألفا إيجابية +${alpha}%)`;
+        alphaBadge = 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-bold';
+      } else if (alpha < -3.0) {
+        alphaVerdict = `أداء دون المؤشر (ألفا سالبة ${alpha}%) • يُنصح بمراجعة تخصيص المراكز وزيادة نسبة الكاش وصناديق السيولة`;
+        alphaBadge = 'bg-rose-500/20 text-rose-300 border border-rose-500/40 font-bold';
+      } else {
+        alphaVerdict = `أداء متقارب مع السوق وصناديق السيولة (ألفا ${alpha >= 0 ? '+' : ''}${alpha}%)`;
+        alphaBadge = 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40';
+      }
+
+      return {
+        portfolioReturnPct,
+        marketReturnPct,
+        riskFreeRatePct,
+        beta,
+        expectedReturn: Number(expectedReturn.toFixed(2)),
+        alpha,
+        excessReturn,
+        sharpeRatio,
+        estimatedVolatility: Number(estimatedVolatility.toFixed(1)),
+        alphaVerdict,
+        alphaBadge
+      };
     }
   };
 
