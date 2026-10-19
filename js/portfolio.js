@@ -7,7 +7,7 @@
   'use strict';
 
   const PORTFOLIO_VERSION_KEY = 'egx_copilot_portfolio_ver';
-  const CURRENT_PORTFOLIO_VER = '2026_10_clean_modular_v5_reconciled';
+  const CURRENT_PORTFOLIO_VER = '2026_10_clean_modular_v7_cash_sanitized';
 
   const defaultPortfolioData = [
     {
@@ -286,19 +286,38 @@
 
       // If user has existing valid portfolio data, preserve and reconcile it
       if (Array.isArray(parsed) && parsed.length > 0) {
+        // Enforce CASH sanitation (fixes any 331M or NaN corruption from legacy storage)
+        const defCash = defaultPortfolioData.find(p => p.ticker === 'CASH' || p.isCashReserve);
+        let cashItem = parsed.find(p => p.ticker === 'CASH' || p.isCashReserve);
+        if (cashItem) {
+          const cashVal = Number(cashItem.value);
+          // If cash is corrupted (e.g. legacy concatenation 331,123,166 or NaN or <= 0 or > 500,000)
+          if (isNaN(cashVal) || cashVal <= 0 || cashVal > 500000 || typeof cashItem.value === 'string') {
+            cashItem.value = defCash ? defCash.value : 18196.79;
+            cashItem.buyPrice = cashItem.value;
+            cashItem.currentPrice = cashItem.value;
+            cashItem.shares = 1;
+            this.save(parsed);
+          } else {
+            cashItem.value = Number(cashVal.toFixed(2));
+            cashItem.buyPrice = cashItem.value;
+            cashItem.currentPrice = cashItem.value;
+          }
+        } else if (defCash) {
+          parsed.push(JSON.parse(JSON.stringify(defCash)));
+          this.save(parsed);
+        }
+
         if (savedVer !== CURRENT_PORTFOLIO_VER) {
           localStorage.setItem(PORTFOLIO_VERSION_KEY, CURRENT_PORTFOLIO_VER);
-          // Ensure CASH reserve exists in the migrated portfolio
-          const hasCash = parsed.some(p => p.ticker === 'CASH' || p.isCashReserve);
-          if (!hasCash) {
-            const defCash = defaultPortfolioData.find(p => p.ticker === 'CASH' || p.isCashReserve);
-            if (defCash) parsed.push(JSON.parse(JSON.stringify(defCash)));
-          }
 
           // Reconcile and sanitize any corrupted math or NaN values in preserved portfolio
           parsed.forEach(item => {
             if (item.ticker !== 'CASH' && !item.isCashReserve && item.shares > 0 && item.buyPrice > 0) {
+              item.shares = Number(item.shares) || 0;
+              item.buyPrice = Number(item.buyPrice) || 0;
               const curPrice = Number(item.currentPrice) || Number(item.buyPrice);
+              item.currentPrice = curPrice;
               item.value = Number((item.shares * curPrice).toFixed(2));
               const cost = Number((item.shares * item.buyPrice).toFixed(2));
               item.profit = Number((item.value - cost).toFixed(2));

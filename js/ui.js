@@ -81,16 +81,18 @@
       let stocksCount = 0;
 
       portfolioData.forEach(item => {
-        totalWealth += (item.value || 0);
-        totalProfit += (item.profit || 0);
-        if (item.ticker === 'CASH' || (item.category && item.category.includes('محفظة نقدية'))) {
-          cashWealth += (item.value || 0);
+        const val = Number(item.value) || 0;
+        const prof = Number(item.profit) || 0;
+        totalWealth += val;
+        totalProfit += prof;
+        if (item.ticker === 'CASH' || (item.category && item.category.includes('محفظة نقدية')) || item.isCashReserve) {
+          cashWealth += val;
         } else if (item.ticker === 'NCS' || item.ticker === 'BSB' || (item.category && item.category.includes('صناديق'))) {
-          fundsWealth += (item.value || 0);
-          fundsProfit += (item.profit || 0);
+          fundsWealth += val;
+          fundsProfit += prof;
         } else {
-          stocksWealth += (item.value || 0);
-          stocksProfit += (item.profit || 0);
+          stocksWealth += val;
+          stocksProfit += prof;
           stocksCount++;
         }
       });
@@ -99,9 +101,9 @@
       let calculatedTotalCost = 0;
       portfolioData.forEach(item => {
         if (item.ticker === 'CASH' || item.isCashReserve) {
-          calculatedTotalCost += (item.value || 0);
+          calculatedTotalCost += (Number(item.value) || 0);
         } else {
-          calculatedTotalCost += ((item.shares || 0) * (item.buyPrice || 0));
+          calculatedTotalCost += ((Number(item.shares) || 0) * (Number(item.buyPrice) || 0));
         }
       });
       const totalCost = calculatedTotalCost > 0 ? calculatedTotalCost : Math.max(0, totalWealth - totalProfit);
