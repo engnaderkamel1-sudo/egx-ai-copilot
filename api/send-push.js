@@ -35,8 +35,8 @@ export default async function handler(req, res) {
     const payload = JSON.stringify({
       title: title || 'تنبيه البورصة المصرية | EGX AI Copilot 🔔',
       body: body || 'فحص فوري: تغير في مستويات الدعم والمقاومة لأحد أسهم المحفظة.',
-      icon: 'https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/trending-up.svg',
-      badge: 'https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/shield-alert.svg',
+      icon: '/icon-192.png',
+      badge: '/badge-72.png',
       url: url || '/',
       tag: tag || 'egx-market-alert'
     });

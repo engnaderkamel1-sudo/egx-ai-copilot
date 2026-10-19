@@ -183,8 +183,8 @@
     if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
       const options = {
         body: body,
-        icon: 'https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/trending-up.svg',
-        badge: 'https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/shield-alert.svg',
+        icon: '/icon-192.png',
+        badge: '/badge-72.png',
         vibrate: [200, 100, 200],
         data: { url: url },
         tag: 'egx-market-alert'

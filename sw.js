@@ -1,5 +1,7 @@
 // sw.js - EGX AI Copilot Native Service Worker & Push Notification Handler
-// Enables background emergency notifications without Telegram or 3rd-party apps
+// Version: v3.1-mobile-robust (Compatible with Android Chrome, iOS Safari PWA, and Desktop)
+
+const SW_VERSION = 'v3.1-mobile-robust';
 
 self.addEventListener('install', (event) => {
   self.skipWaiting();
@@ -12,10 +14,10 @@ self.addEventListener('activate', (event) => {
 // Native Background Push Notification Receiver
 self.addEventListener('push', (event) => {
   let payload = {
-    title: 'تنبيه البورصة المصرية | EGX AI Copilot',
+    title: 'تنبيه البورصة المصرية | EGX AI Copilot 🔔',
     body: 'فحص فوري: تغير في مستويات الدعم والمقاومة لأحد أسهم المحفظة.',
-    icon: 'https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/trending-up.svg',
-    badge: 'https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/shield-alert.svg',
+    icon: '/icon-192.png',
+    badge: '/badge-72.png',
     url: '/'
   };
 
@@ -27,11 +29,12 @@ self.addEventListener('push', (event) => {
     }
   }
 
-  const options = {
-    body: payload.body,
-    icon: payload.icon || 'https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/trending-up.svg',
-    badge: payload.badge || 'https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/shield-alert.svg',
-    vibrate: [200, 100, 200],
+  // Full-featured options for modern Android & Desktop
+  const fullOptions = {
+    body: payload.body || '',
+    icon: '/icon-192.png',
+    badge: '/badge-72.png',
+    vibrate: [200, 100, 200, 100, 200],
     data: { url: payload.url || '/' },
     tag: payload.tag || 'egx-market-alert',
     renotify: true,
@@ -39,9 +42,16 @@ self.addEventListener('push', (event) => {
     lang: 'ar'
   };
 
-  event.waitUntil(
-    self.registration.showNotification(payload.title, options)
-  );
+  // Safe fallback to guarantee display on all Android versions
+  const showPromise = self.registration.showNotification(payload.title, fullOptions).catch((err) => {
+    console.warn('Initial showNotification failed, trying minimal options:', err);
+    return self.registration.showNotification(payload.title, {
+      body: payload.body || '',
+      data: { url: payload.url || '/' }
+    });
+  });
+
+  event.waitUntil(showPromise);
 });
 
 // Click Handler: brings app into focus or opens deep link
