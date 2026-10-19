@@ -529,7 +529,7 @@
     // Load from LocalStorage or use default
     // Load from LocalStorage or use default via EGX_Portfolio
     const PORTFOLIO_VERSION_KEY = 'egx_copilot_portfolio_ver';
-    const CURRENT_PORTFOLIO_VER = (typeof EGX_Portfolio !== 'undefined') ? EGX_Portfolio.version : '2026_10_clean_modular_v3_production';
+    const CURRENT_PORTFOLIO_VER = (typeof EGX_Portfolio !== 'undefined') ? EGX_Portfolio.version : '2026_10_thndr_official_real_v211k';
     let portfolioData = [];
 
     function loadPortfolio() {

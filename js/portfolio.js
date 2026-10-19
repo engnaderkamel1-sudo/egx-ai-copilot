@@ -7,258 +7,290 @@
   'use strict';
 
   const PORTFOLIO_VERSION_KEY = 'egx_copilot_portfolio_ver';
-  const CURRENT_PORTFOLIO_VER = '2026_10_clean_modular_v7_cash_sanitized';
+  const CURRENT_PORTFOLIO_VER = '2026_10_thndr_official_real_v211k';
 
-  const defaultPortfolioData = [
+const defaultPortfolioData = [
     {
-      ticker: 'ABUK',
-      name: 'أبو قير للأسمدة',
-      category: 'EGX30 • بتروكيماويات وتصدير',
-      shares: 195,
-      buyPrice: 76.52,
-      currentPrice: 83.20,
-      value: 16224,
-      profit: 1302.60,
-      returnPct: 8.73,
-      status: 'ربح مستمر',
-      advice: 'احتفاظ • تدفقات تصديرية دولارية ومشاريع طاقة نظيفة واعدة',
-      action: 'HOLD',
-      priceUpdatedAt: 'محفظة ثندر الرسمية',
-      priceSource: 'شاشة ثندر اللحظية',
-      decisionUpdatedAt: 'جلسة اليوم',
-      decisionBasis: 'سعر السوق اللحظي 83.20 ج',
-      thndrUrl: 'https://app.thndr.app/search?query=ABUK'
+        "ticker": "ABUK",
+        "name": "أبو قير للأسمدة",
+        "category": "EGX30 • بتروكيماويات وتصدير",
+        "shares": 195,
+        "buyPrice": 76.52,
+        "currentPrice": 88.01,
+        "value": 17162,
+        "profit": 2241,
+        "returnPct": 15.02,
+        "status": "ربح",
+        "advice": "📈 اتجاه صاعد صحي أعلى متوسط 50 يوم (85.29 ج) • نمو (+15.0%)، احتفاظ استثماري هادئ مستهدفاً المقاومة 94.48 ج.",
+        "action": "HOLD",
+        "priceUpdatedAt": "محفظة ثندر الرسمية",
+        "priceSource": "شاشة ثندر اللحظية",
+        "decisionUpdatedAt": "جلسة اليوم",
+        "decisionBasis": "سعر السوق اللحظي 88.01 ج",
+        "thndrUrl": "https://app.thndr.app/search?query=ABUK",
+        "isCashReserve": false
     },
     {
-      ticker: 'ARCC',
-      name: 'العربية للأسمنت',
-      category: 'EGX70 • مواد بناء وإنشاءات',
-      shares: 331,
-      buyPrice: 66.86,
-      currentPrice: 70.80,
-      value: 23434.80,
-      profit: 1304.14,
-      returnPct: 5.89,
-      status: 'ربح',
-      advice: 'احتفاظ • استقرار أسعار الأسمنت وهوامش ربحية تصديرية جيدة',
-      action: 'HOLD',
-      priceUpdatedAt: 'محفظة ثندر الرسمية',
-      priceSource: 'شاشة ثندر اللحظية',
-      decisionUpdatedAt: 'جلسة اليوم',
-      decisionBasis: 'سعر السوق اللحظي 70.80 ج',
-      thndrUrl: 'https://app.thndr.app/search?query=ARCC'
+        "ticker": "ARCC",
+        "name": "العربية للأسمنت",
+        "category": "EGX70 • مواد بناء وإنشاءات",
+        "shares": 331,
+        "buyPrice": 66.86,
+        "currentPrice": 65.54,
+        "value": 21694,
+        "profit": -437,
+        "returnPct": -1.97,
+        "status": "تراجع",
+        "advice": "احتفاظ ومتابعة • السهم يتحرك في نطاق الدعم 54.48 والمقاومة 76.32.",
+        "action": "HOLD",
+        "priceUpdatedAt": "محفظة ثندر الرسمية",
+        "priceSource": "شاشة ثندر اللحظية",
+        "decisionUpdatedAt": "جلسة اليوم",
+        "decisionBasis": "سعر السوق اللحظي 65.54 ج",
+        "thndrUrl": "https://app.thndr.app/search?query=ARCC",
+        "isCashReserve": false
     },
     {
-      ticker: 'BSB',
-      name: 'صندوق بلتون للسيولة النقدية (B-Safe Cash)',
-      category: 'صناديق نقدية وسيولة • B-Safe',
-      shares: 1222,
-      buyPrice: 16.37,
-      currentPrice: 16.73,
-      value: 20444.06,
-      profit: 439.92,
-      returnPct: 2.20,
-      status: 'ربح',
-      advice: 'وثيقة سيولة يومية • استثمار آمن منخفض المخاطر يدر عائداً تراكمياً يطابق ثندر',
-      action: 'HOLD',
-      priceUpdatedAt: 'محفظة ثندر الرسمية',
-      priceSource: 'شاشة ثندر اللحظية',
-      decisionUpdatedAt: 'جلسة اليوم',
-      decisionBasis: 'سعر الوثيقة المعلن 16.73 ج',
-      thndrUrl: 'https://app.thndr.app/search?query=BSB'
+        "ticker": "BSB",
+        "name": "صندوق بلتون للأسهم (BSB)",
+        "category": "صناديق استثمارية • بلتون إدخار",
+        "shares": 161,
+        "buyPrice": 1.83,
+        "currentPrice": 1.69,
+        "value": 272.09,
+        "profit": -22.54,
+        "returnPct": -7.65,
+        "status": "صندوق إدخار",
+        "advice": "مرجع وثيقة نمو • النمو السنوي الاسترشادي: 22%",
+        "action": "HOLD",
+        "priceUpdatedAt": "محفظة ثندر الرسمية",
+        "priceSource": "شاشة ثندر اللحظية",
+        "decisionUpdatedAt": "جلسة اليوم",
+        "decisionBasis": "سعر السوق اللحظي 1.69 ج",
+        "thndrUrl": "https://app.thndr.app",
+        "isCashReserve": false
     },
     {
-      ticker: 'CLHO',
-      name: 'مستشفيات كليوباترا',
-      category: 'EGX30 • رعاية صحية ودفاعي',
-      shares: 963,
-      buyPrice: 17.73,
-      currentPrice: 14.00,
-      value: 13482,
-      profit: -3592.01,
-      returnPct: -21.04,
-      status: 'تراجع',
-      advice: 'مرشح للتدوير • انتظار ارتداد فني نحو المقاومة لتخفيف المركز وتدوير السيولة',
-      action: 'REBALANCE_CANDIDATE',
-      priceUpdatedAt: 'محفظة ثندر الرسمية',
-      priceSource: 'شاشة ثندر اللحظية',
-      decisionUpdatedAt: 'جلسة اليوم',
-      decisionBasis: 'سعر السوق اللحظي 14.00 ج',
-      thndrUrl: 'https://app.thndr.app/search?query=CLHO'
+        "ticker": "CLHO",
+        "name": "مستشفيات كليوباترا",
+        "category": "EGX30 • رعاية صحية ودفاعي",
+        "shares": 963,
+        "buyPrice": 17.73,
+        "currentPrice": 14,
+        "value": 13482,
+        "profit": -3592,
+        "returnPct": -21.04,
+        "status": "تراجع",
+        "advice": "🟢 ارتداد من تشبع بيعي (RSI: 27.3) أعلى الدعم الفني S1 (13.22 ج) • فرصة تعزيز للمستثمر طويل الأجل لخفض متوسط التكلفة.",
+        "action": "ACCUMULATE",
+        "priceUpdatedAt": "محفظة ثندر الرسمية",
+        "priceSource": "شاشة ثندر اللحظية",
+        "decisionUpdatedAt": "جلسة اليوم",
+        "decisionBasis": "سعر السوق اللحظي 14 ج",
+        "thndrUrl": "https://app.thndr.app/search?query=CLHO",
+        "isCashReserve": false
     },
     {
-      ticker: 'COMI',
-      name: 'البنك التجاري الدولي (CIB)',
-      category: 'EGX30 • قطاع بنكي واستثمار مؤسسي',
-      shares: 147,
-      buyPrice: 139.32,
-      currentPrice: 123.56,
-      value: 18163.32,
-      profit: -2316.72,
-      returnPct: -11.31,
-      status: 'تراجع',
-      advice: 'تجميع تدريجي • مكرر ربحية مغرٍ وأكبر سهم قيادي وزناً في EGX30',
-      action: 'ACCUMULATE',
-      priceUpdatedAt: 'محفظة ثندر الرسمية',
-      priceSource: 'شاشة ثندر اللحظية',
-      decisionUpdatedAt: 'جلسة اليوم',
-      decisionBasis: 'سعر السوق اللحظي 123.56 ج',
-      thndrUrl: 'https://app.thndr.app/search?query=COMI'
+        "ticker": "COMI",
+        "name": "البنك التجاري الدولي (CIB)",
+        "category": "EGX30 • السهم القيادي رقم 1",
+        "shares": 122,
+        "buyPrice": 140.48,
+        "currentPrice": 124.97,
+        "value": 15246,
+        "profit": -1893,
+        "returnPct": -11.05,
+        "status": "تراجع",
+        "advice": "احتفاظ ومتابعة • السهم يتحرك في نطاق الدعم 119.6 والمقاومة 137.9.",
+        "action": "HOLD",
+        "priceUpdatedAt": "محفظة ثندر الرسمية",
+        "priceSource": "شاشة ثندر اللحظية",
+        "decisionUpdatedAt": "جلسة اليوم",
+        "decisionBasis": "سعر السوق اللحظي 124.97 ج",
+        "thndrUrl": "https://app.thndr.app/search?query=COMI",
+        "isCashReserve": false
     },
     {
-      ticker: 'EMFD',
-      name: 'إعمار مصر للتنمية',
-      category: 'EGX30 • عقارات وتطوير فندقي',
-      shares: 2638,
-      buyPrice: 8.95,
-      currentPrice: 8.65,
-      value: 22818.70,
-      profit: -791.40,
-      returnPct: -3.35,
-      status: 'تراجع',
-      advice: 'احتفاظ • محفظة أراضٍ ضخمة وتدفقات سياحية دولارية ممتازة',
-      action: 'HOLD',
-      priceUpdatedAt: 'محفظة ثندر الرسمية',
-      priceSource: 'شاشة ثندر اللحظية',
-      decisionUpdatedAt: 'جلسة اليوم',
-      decisionBasis: 'سعر السوق اللحظي 8.65 ج',
-      thndrUrl: 'https://app.thndr.app/search?query=EMFD'
+        "ticker": "EGAL",
+        "name": "مصر للألومنيوم",
+        "category": "EGX30 • معادن وثروة معدنية",
+        "shares": 44,
+        "buyPrice": 303.52,
+        "currentPrice": 297.98,
+        "value": 13111,
+        "profit": -244,
+        "returnPct": -1.83,
+        "status": "تراجع",
+        "advice": "⚠️ كسر مستوى الدعم الفني الرئيسي S1 (313.33 ج) • السعر الحالي 297.98 ج دون مستوى الأمان. راقب تفعيل خطة الحماية لتجنب انزلاق سعري.",
+        "action": "STOP_LOSS_WARNING",
+        "priceUpdatedAt": "محفظة ثندر الرسمية",
+        "priceSource": "شاشة ثندر اللحظية",
+        "decisionUpdatedAt": "جلسة اليوم",
+        "decisionBasis": "سعر السوق اللحظي 297.98 ج",
+        "thndrUrl": "https://app.thndr.app/search?query=EGAL",
+        "isCashReserve": false
     },
     {
-      ticker: 'ETRS',
-      name: 'المصرية للنقل والخدمات (إيجيترانس)',
-      category: 'EGX70 • نقل ولوجستيات',
-      shares: 2884,
-      buyPrice: 4.89,
-      currentPrice: 5.75,
-      value: 16583,
-      profit: 2480.24,
-      returnPct: 17.59,
-      status: 'ربح قوي',
-      advice: 'احتفاظ قوي وجني أرباح تدريجي عند ملامسة المقاومة',
-      action: 'HOLD',
-      priceUpdatedAt: 'محفظة ثندر الرسمية',
-      priceSource: 'شاشة ثندر اللحظية',
-      decisionUpdatedAt: 'جلسة اليوم',
-      decisionBasis: 'سعر السوق اللحظي 5.75 ج',
-      thndrUrl: 'https://app.thndr.app/search?query=ETRS'
+        "ticker": "HALN",
+        "name": "إم إن تي حالا (HALN)",
+        "category": "EGX • تكنولوجيا مالية وتمويل استهلاكي",
+        "shares": 74,
+        "buyPrice": 24.5,
+        "currentPrice": 24.5,
+        "value": 1813,
+        "profit": 0,
+        "returnPct": 0,
+        "status": "اكتتاب واستقرار",
+        "advice": "احتفاظ استثماري • نمو قياسي في قطاع التكنولوجيا المالية وحجم المعاملات",
+        "action": "HOLD",
+        "priceUpdatedAt": "محفظة ثندر الرسمية",
+        "priceSource": "شاشة ثندر اللحظية",
+        "decisionUpdatedAt": "جلسة اليوم",
+        "decisionBasis": "سعر السوق اللحظي 24.5 ج",
+        "thndrUrl": "https://app.thndr.app",
+        "isCashReserve": false
     },
     {
-      ticker: 'FWRY',
-      name: 'فوري لتكنولوجيا البنوك والمدفوعات',
-      category: 'EGX30 • تكنولوجيا مالية ومدفوعات',
-      shares: 1111,
-      buyPrice: 8.78,
-      currentPrice: 10.89,
-      value: 12098.79,
-      profit: 2344.21,
-      returnPct: 24.03,
-      status: 'طفرة ربحية',
-      advice: 'جني أرباح قمة جزئية • تأمين ثلث المكسب وإعادة تدوير السيولة',
-      action: 'REBALANCE_CANDIDATE',
-      priceUpdatedAt: 'محفظة ثندر الرسمية',
-      priceSource: 'شاشة ثندر اللحظية',
-      decisionUpdatedAt: 'جلسة اليوم',
-      decisionBasis: 'سعر السوق اللحظي 10.89 ج',
-      thndrUrl: 'https://app.thndr.app/search?query=FWRY'
+        "ticker": "HDBK",
+        "name": "بنك التعمير والإسكان",
+        "category": "EGX30 • قطاع بنكي وعوائد نقدية",
+        "shares": 122,
+        "buyPrice": 81.63,
+        "currentPrice": 93.59,
+        "value": 11418,
+        "profit": 1459,
+        "returnPct": 14.65,
+        "status": "ربح",
+        "advice": "⚠️ كسر مستوى الدعم الفني الرئيسي S1 (96.25 ج) • السعر الحالي 93.59 ج دون مستوى الأمان. راقب تفعيل خطة الحماية لتجنب انزلاق سعري.",
+        "action": "STOP_LOSS_WARNING",
+        "priceUpdatedAt": "محفظة ثندر الرسمية",
+        "priceSource": "شاشة ثندر اللحظية",
+        "decisionUpdatedAt": "جلسة اليوم",
+        "decisionBasis": "سعر السوق اللحظي 93.59 ج",
+        "thndrUrl": "https://app.thndr.app/search?query=HDBK",
+        "isCashReserve": false
     },
     {
-      ticker: 'NCS',
-      name: 'صندوق إن آي كابيتال (السيولة النقدية)',
-      category: 'صناديق استثمار نقدية • عوائد يومية',
-      shares: 1301,
-      buyPrice: 15.42,
-      currentPrice: 16.03,
-      value: 20855.03,
-      profit: 793.61,
-      returnPct: 3.96,
-      status: 'ربح آمن',
-      advice: 'مرجع وثيقة نقدية • عائد تراكمي آمن من أذون الخزانة وأدوات النقد',
-      action: 'HOLD',
-      priceUpdatedAt: 'محفظة ثندر الرسمية',
-      priceSource: 'شاشة ثندر اللحظية',
-      decisionUpdatedAt: 'جلسة اليوم',
-      decisionBasis: 'سعر الوثيقة المعلن 16.03 ج',
-      thndrUrl: 'https://app.thndr.app/search?query=NCS'
+        "ticker": "NCS",
+        "name": "صندوق إن آي كابيتال (NCS)",
+        "category": "صناديق استثمارية • إن آي إدخار",
+        "shares": 3037,
+        "buyPrice": 20.61,
+        "currentPrice": 18.36,
+        "value": 55759.32,
+        "profit": -6833.25,
+        "returnPct": -10.92,
+        "status": "أكبر مركز مالي",
+        "advice": "مرجع وثيقة نقدية • العائد السنوي الاسترشادي: 22.4%",
+        "action": "HOLD",
+        "priceUpdatedAt": "محفظة ثندر الرسمية",
+        "priceSource": "شاشة ثندر اللحظية",
+        "decisionUpdatedAt": "جلسة اليوم",
+        "decisionBasis": "سعر السوق اللحظي 18.36 ج",
+        "thndrUrl": "https://app.thndr.app",
+        "isCashReserve": false
     },
     {
-      ticker: 'ORAS',
-      name: 'أوراسكوم للإنشاءات (بي إل سي)',
-      category: 'EGX30 • مقاولات دولية وبنية تحتية',
-      shares: 55,
-      buyPrice: 284.44,
-      currentPrice: 355.00,
-      value: 19525,
-      profit: 3880.80,
-      returnPct: 24.81,
-      status: 'طفرة قياسية',
-      advice: 'جني أرباح جزئي • تأمين الأرباح بعد صعود قوي ورفع وقف الخسارة المتحرك',
-      action: 'REBALANCE_CANDIDATE',
-      priceUpdatedAt: 'محفظة ثندر الرسمية',
-      priceSource: 'شاشة ثندر اللحظية',
-      decisionUpdatedAt: 'جلسة اليوم',
-      decisionBasis: 'سعر السوق اللحظي 355.00 ج',
-      thndrUrl: 'https://app.thndr.app/search?query=ORAS'
+        "ticker": "ORAS",
+        "name": "أوراسكوم كونستراكشون",
+        "category": "EGX30 • بنية تحتية ومقاولات دولارية",
+        "shares": 17,
+        "buyPrice": 715.01,
+        "currentPrice": 850.6,
+        "value": 14460,
+        "profit": 2305,
+        "returnPct": 18.96,
+        "status": "ربح",
+        "advice": "📈 اتجاه صاعد صحي أعلى متوسط 50 يوم (821.77 ج) • نمو (+19.0%)، احتفاظ استثماري هادئ مستهدفاً المقاومة 865.73 ج.",
+        "action": "HOLD",
+        "priceUpdatedAt": "محفظة ثندر الرسمية",
+        "priceSource": "شاشة ثندر اللحظية",
+        "decisionUpdatedAt": "جلسة اليوم",
+        "decisionBasis": "سعر السوق اللحظي 850.6 ج",
+        "thndrUrl": "https://app.thndr.app/search?query=ORAS",
+        "isCashReserve": false
     },
     {
-      ticker: 'SWDY',
-      name: 'السويدي إليكتريك',
-      category: 'EGX30 • صناعة وطاقة وكابلات',
-      shares: 260,
-      buyPrice: 77.29,
-      currentPrice: 104.90,
-      value: 27274,
-      profit: 7178.60,
-      returnPct: 35.72,
-      status: 'نجم المحفظة',
-      advice: 'احتفاظ قوي • نمو تصديري دولاري ومشاريع ربط كهربائي عملاقة',
-      action: 'HOLD',
-      priceUpdatedAt: 'محفظة ثندر الرسمية',
-      priceSource: 'شاشة ثندر اللحظية',
-      decisionUpdatedAt: 'جلسة اليوم',
-      decisionBasis: 'سعر السوق اللحظي 104.90 ج',
-      thndrUrl: 'https://app.thndr.app/search?query=SWDY'
+        "ticker": "RAYA",
+        "name": "راية القابضة للاستثمارات",
+        "category": "EGX70 • تكنولوجيا وخدمات مالية",
+        "shares": 2193,
+        "buyPrice": 6.88,
+        "currentPrice": 5.83,
+        "value": 12785,
+        "profit": -2303,
+        "returnPct": -15.26,
+        "status": "تراجع",
+        "advice": "🟢 ارتداد من تشبع بيعي (RSI: 33.4) أعلى الدعم الفني S1 (5.37 ج) • فرصة تعزيز للمستثمر طويل الأجل لخفض متوسط التكلفة.",
+        "action": "ACCUMULATE",
+        "priceUpdatedAt": "محفظة ثندر الرسمية",
+        "priceSource": "شاشة ثندر اللحظية",
+        "decisionUpdatedAt": "جلسة اليوم",
+        "decisionBasis": "سعر السوق اللحظي 5.83 ج",
+        "thndrUrl": "https://app.thndr.app/search?query=RAYA",
+        "isCashReserve": false
     },
     {
-      ticker: 'TMGH',
-      name: 'مجموعة طلعت مصطفى القابضة',
-      category: 'EGX30 • تطوير عقاري وفنادق وسياحة',
-      shares: 310,
-      buyPrice: 65.45,
-      currentPrice: 83.00,
-      value: 25730,
-      profit: 5440.50,
-      returnPct: 26.81,
-      status: 'ربح استثنائي',
-      advice: 'احتفاظ قوي • إيرادات فندقية دولارية وتوسعات رأس الحكمة ومشروع ساوث ميد',
-      action: 'HOLD',
-      priceUpdatedAt: 'محفظة ثندر الرسمية',
-      priceSource: 'شاشة ثندر اللحظية',
-      decisionUpdatedAt: 'جلسة اليوم',
-      decisionBasis: 'سعر السوق اللحظي 83.00 ج',
-      thndrUrl: 'https://app.thndr.app/search?query=TMGH'
+        "ticker": "SWDY",
+        "name": "السويدي إليكتريك",
+        "category": "EGX30 • طاقة وتصدير",
+        "shares": 110,
+        "buyPrice": 93.86,
+        "currentPrice": 109.2,
+        "value": 12012,
+        "profit": 1687,
+        "returnPct": 16.34,
+        "status": "ربح",
+        "advice": "احتفاظ ومتابعة • السهم يتحرك في نطاق الدعم 91.64 والمقاومة 129.03.",
+        "action": "HOLD",
+        "priceUpdatedAt": "محفظة ثندر الرسمية",
+        "priceSource": "شاشة ثندر اللحظية",
+        "decisionUpdatedAt": "جلسة اليوم",
+        "decisionBasis": "سعر السوق اللحظي 109.2 ج",
+        "thndrUrl": "https://app.thndr.app/search?query=SWDY",
+        "isCashReserve": false
     },
     {
-      ticker: 'CASH',
-      name: 'المحفظة (الرصيد النقدي والسيولة)',
-      category: 'محفظة نقدية • سيولة حرة',
-      shares: 1,
-      buyPrice: 18196.79,
-      currentPrice: 18196.79,
-      value: 18196.79,
-      profit: 0.00,
-      returnPct: 0.00,
-      isCashReserve: true,
-      status: 'سيولة نقدية جاهزة',
-      advice: 'رصيد كاش حر في حساب ثندر متاح لاقتناص الفرص وتعزيز المراكز',
-      action: 'HOLD',
-      priceUpdatedAt: 'محفظة ثندر الرسمية',
-      priceSource: 'حساب ثندر الرسمي',
-      decisionUpdatedAt: 'جلسة اليوم',
-      decisionBasis: 'الرصيد النقدي الفعلي 18,196.79 ج',
-      thndrUrl: 'https://app.thndr.app'
+        "ticker": "TMGH",
+        "name": "مجموعة طلعت مصطفى",
+        "category": "EGX30 • عقارات وتنمية فندقية",
+        "shares": 55,
+        "buyPrice": 97.62,
+        "currentPrice": 81.4,
+        "value": 4477,
+        "profit": -892,
+        "returnPct": -16.61,
+        "status": "تراجع",
+        "advice": "🟢 ارتداد من تشبع بيعي (RSI: 20.5) أعلى الدعم الفني S1 (80.62 ج) • فرصة تعزيز للمستثمر طويل الأجل لخفض متوسط التكلفة.",
+        "action": "ACCUMULATE",
+        "priceUpdatedAt": "محفظة ثندر الرسمية",
+        "priceSource": "شاشة ثندر اللحظية",
+        "decisionUpdatedAt": "جلسة اليوم",
+        "decisionBasis": "سعر السوق اللحظي 81.4 ج",
+        "thndrUrl": "https://app.thndr.app/search?query=TMGH",
+        "isCashReserve": false
+    },
+    {
+        "ticker": "CASH",
+        "name": "المحفظة (الرصيد النقدي والسيولة)",
+        "category": "محفظة نقدية • سيولة حرة",
+        "shares": 1,
+        "buyPrice": 18196.79,
+        "currentPrice": 18196.79,
+        "value": 18196.79,
+        "profit": 0,
+        "returnPct": 0,
+        "status": "سيولة نقدية جاهزة",
+        "advice": "رصيد كاش حر في حساب ثندر متاح لاقتناص الفرص وتعزيز المراكز",
+        "action": "HOLD",
+        "priceUpdatedAt": "محفظة ثندر الرسمية",
+        "priceSource": "شاشة ثندر اللحظية",
+        "decisionUpdatedAt": "جلسة اليوم",
+        "decisionBasis": "سعر السوق اللحظي 18196.79 ج",
+        "thndrUrl": "https://app.thndr.app",
+        "isCashReserve": true
     }
-  ];
+];
 
   const EGX_Portfolio = {
     version: CURRENT_PORTFOLIO_VER,
@@ -284,67 +316,49 @@
         parsed = parsed.filter(item => item && typeof item === 'object' && typeof item.ticker === 'string' && item.ticker.trim() !== '');
       }
 
-      // If user has existing valid portfolio data, preserve and reconcile it
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        // Enforce CASH sanitation (fixes any 331M or NaN corruption from legacy storage)
-        const defCash = defaultPortfolioData.find(p => p.ticker === 'CASH' || p.isCashReserve);
-        let cashItem = parsed.find(p => p.ticker === 'CASH' || p.isCashReserve);
-        if (cashItem) {
-          const cashVal = Number(cashItem.value);
-          // If cash is corrupted (e.g. legacy concatenation 331,123,166 or NaN or <= 0 or > 500,000)
-          if (isNaN(cashVal) || cashVal <= 0 || cashVal > 500000 || typeof cashItem.value === 'string') {
-            cashItem.value = defCash ? defCash.value : 18196.79;
-            cashItem.buyPrice = cashItem.value;
-            cashItem.currentPrice = cashItem.value;
-            cashItem.shares = 1;
-            this.save(parsed);
-          } else {
-            cashItem.value = Number(cashVal.toFixed(2));
-            cashItem.buyPrice = cashItem.value;
-            cashItem.currentPrice = cashItem.value;
-          }
-        } else if (defCash) {
-          parsed.push(JSON.parse(JSON.stringify(defCash)));
-          this.save(parsed);
-        }
+      // Detect if stored data is legacy mock data (e.g. contains old demo tickers like EMFD, ETRS, FWRY or lacks user funds)
+      const isLegacyMockData = Array.isArray(parsed) && parsed.some(p =>
+        ['EMFD', 'ETRS', 'FWRY', 'ISPH', 'ORWE'].includes(p.ticker)
+      );
+      const isMissingRealHoldings = Array.isArray(parsed) && (
+        !parsed.some(p => p.ticker === 'BSB') ||
+        !parsed.some(p => p.ticker === 'NCS') ||
+        !parsed.some(p => p.ticker === 'ARCC')
+      );
 
-        if (savedVer !== CURRENT_PORTFOLIO_VER) {
-          localStorage.setItem(PORTFOLIO_VERSION_KEY, CURRENT_PORTFOLIO_VER);
-
-          // Reconcile and sanitize any corrupted math or NaN values in preserved portfolio
-          parsed.forEach(item => {
-            if (item.ticker !== 'CASH' && !item.isCashReserve && item.shares > 0 && item.buyPrice > 0) {
-              item.shares = Number(item.shares) || 0;
-              item.buyPrice = Number(item.buyPrice) || 0;
-              const curPrice = Number(item.currentPrice) || Number(item.buyPrice);
-              item.currentPrice = curPrice;
-              item.value = Number((item.shares * curPrice).toFixed(2));
-              const cost = Number((item.shares * item.buyPrice).toFixed(2));
-              item.profit = Number((item.value - cost).toFixed(2));
-              item.returnPct = cost > 0 ? Number(((item.profit / cost) * 100).toFixed(2)) : 0;
-            }
-          });
-
-          this.save(parsed);
-
-          // Clean legacy unversioned plans if corrupted
-          try {
-            const plans = localStorage.getItem('egx_copilot_active_plans');
-            if (plans && !Array.isArray(JSON.parse(plans))) {
-              localStorage.setItem('egx_copilot_active_plans', '[]');
-            }
-          } catch (e) {
-            localStorage.setItem('egx_copilot_active_plans', '[]');
-          }
-        }
+      // Universal migration: If version mismatch, empty storage, or legacy mock data detected, seed official real 211k baseline
+      if (savedVer !== CURRENT_PORTFOLIO_VER || !Array.isArray(parsed) || parsed.length === 0 || isLegacyMockData || isMissingRealHoldings) {
+        parsed = this.getDefaultData();
+        this.save(parsed);
+        localStorage.setItem(PORTFOLIO_VERSION_KEY, CURRENT_PORTFOLIO_VER);
+        try {
+          localStorage.setItem('egx_copilot_active_plans', '[]');
+        } catch (e) {}
         return parsed;
       }
 
-      // First run or empty/corrupted storage: seed with official baseline portfolio
-      const fresh = this.getDefaultData();
-      this.save(fresh);
-      localStorage.setItem(PORTFOLIO_VERSION_KEY, CURRENT_PORTFOLIO_VER);
-      return fresh;
+      // Enforce CASH sanitation (fixes any 331M or NaN corruption from legacy storage)
+      const defCash = defaultPortfolioData.find(p => p.ticker === 'CASH' || p.isCashReserve);
+      let cashItem = parsed.find(p => p.ticker === 'CASH' || p.isCashReserve);
+      if (cashItem) {
+        const cashVal = Number(cashItem.value);
+        if (isNaN(cashVal) || cashVal <= 0 || cashVal > 500000 || typeof cashItem.value === 'string') {
+          cashItem.value = defCash ? defCash.value : 18196.79;
+          cashItem.buyPrice = cashItem.value;
+          cashItem.currentPrice = cashItem.value;
+          cashItem.shares = 1;
+          this.save(parsed);
+        } else {
+          cashItem.value = Number(cashVal.toFixed(2));
+          cashItem.buyPrice = cashItem.value;
+          cashItem.currentPrice = cashItem.value;
+        }
+      } else if (defCash) {
+        parsed.push(JSON.parse(JSON.stringify(defCash)));
+        this.save(parsed);
+      }
+
+      return parsed;
     },
 
     save: function (data) {
