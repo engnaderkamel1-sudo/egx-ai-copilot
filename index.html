@@ -4364,7 +4364,7 @@
 
     // Load from LocalStorage or use default
     const PORTFOLIO_VERSION_KEY = 'egx_copilot_portfolio_ver';
-    const CURRENT_PORTFOLIO_VER = '2026_10_thndr_exact_14_assets_perfect';
+    const CURRENT_PORTFOLIO_VER = '2026_10_thndr_exact_14_assets_v2_sanitized';
     let portfolioData = [];
 
     function loadPortfolio() {
@@ -4595,16 +4595,28 @@
 
         let badgeActionText = 'احتفاظ';
         let badgeActionColor = 'bg-gray-800 text-gray-300';
-        if (item.action === 'ACCUMULATE') {
-          badgeActionText = 'تعزيز وشراء';
-          badgeActionColor = 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30';
-        } else if (item.action === 'REBALANCE_CANDIDATE') {
-          if (item.profit > 0 && item.returnPct >= 18) {
+
+        if (!isPositive) {
+          if (item.action === 'REBALANCE_CANDIDATE') {
+            badgeActionText = '🔄 تدوير وتخفيف (تراجع)';
+            badgeActionColor = 'bg-rose-500/20 text-rose-300 border border-rose-500/30';
+          } else if (item.action === 'ACCUMULATE') {
+            badgeActionText = 'تجميع لتخفيض المتوسط';
+            badgeActionColor = 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30';
+          } else {
+            badgeActionText = 'احتفاظ ومراقبة الارتداد';
+            badgeActionColor = 'bg-gray-800 text-gray-300';
+          }
+        } else {
+          if (item.action === 'ACCUMULATE') {
+            badgeActionText = 'تعزيز وشراء صاعد';
+            badgeActionColor = 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30';
+          } else if (item.action === 'REBALANCE_CANDIDATE' || item.returnPct >= 18) {
             badgeActionText = '🎯 جني أرباح قمة جزئية';
             badgeActionColor = 'bg-amber-500/20 text-amber-300 border border-amber-500/40 shadow-sm';
           } else {
-            badgeActionText = '🔄 مرشح للتدوير';
-            badgeActionColor = 'bg-amber-500/20 text-amber-300 border border-amber-500/30';
+            badgeActionText = 'احتفاظ بربح';
+            badgeActionColor = 'bg-emerald-950/40 text-emerald-300 border border-emerald-800/40';
           }
         }
 
@@ -6099,7 +6111,7 @@
         // Scenario A: Rotate into strong asset (COMI / CIB)
         if (scenATitle) scenATitle.innerText = 'الخيار الأول (الموصى به للتعويض): تدوير السيولة إلى سهم قيادي صاعد (CIB)';
         if (scenATag) scenATag.innerText = 'تعويض سريع للخسارة';
-        if (scenADesc) scenADesc.innerHTML = `بدلاً من حبس السيولة في سهم خامل ومتراجع (-19%)، تدوير الـ <strong class="text-white font-mono">${sellCash.toLocaleString('en-US')} ج</strong> لشراء سهم البنك التجاري الدولي (CIB) بسعر <strong class="text-white font-mono">${cibPrice.toFixed(2)} ج</strong>.`;
+        if (scenADesc) scenADesc.innerHTML = `بدلاً من حبس السيولة في سهم متراجع (${returnPct.toFixed(1)}%)، تدوير الـ <strong class="text-white font-mono">${sellCash.toLocaleString('en-US')} ج</strong> لشراء سهم البنك التجاري الدولي (CIB) بسعر <strong class="text-white font-mono">${cibPrice.toFixed(2)} ج</strong>.`;
         if (scenASubdesc) scenASubdesc.innerHTML = `شراء فوري في سهم CIB:`;
         if (scenAShares) scenAShares.innerText = `${cibSharesCanBuy} سهم جديد`;
         if (scenAOutcome) scenAOutcome.innerText = `النتيجة: تشغيل السيولة في محرك صعود سريع يعوض خسارة ${item.name}، مع بقاء ${remainingShares} سهم لديك كأصل للاستفادة في حال ارتداد السهم.`;
@@ -6118,7 +6130,7 @@
 
         // Lesson
         if (lessonTitle) lessonTitle.innerText = 'لماذا التدوير الجزئي أفضل من التمسك الكامل بسهم خاسر؟';
-        if (lessonDesc) lessonDesc.innerText = 'لأن تجميد رأس المال كاملاً في سهم متراجع وخامل (-19%) يضيع عليك فرص السوق الصاعدة (تكلفة الفرصة البديلة)؛ تحرير جزء من السيولة ونقله لأقوى أسهم السوق يعوض الخسارة بسرعة ويدافع عن إجمالي محفظتك.';
+        if (lessonDesc) lessonDesc.innerText = `لأن تجميد رأس المال كاملاً في سهم متراجع (${returnPct.toFixed(1)}%) يضيع عليك فرص السوق الصاعدة (تكلفة الفرصة البديلة)؛ تحرير جزء من السيولة ونقله لأقوى أسهم السوق يعوض الخسارة بسرعة ويدافع عن إجمالي محفظتك.`;
 
       } else {
         if (step1Title) step1Title.innerText = 'الخطوة 1: أمر البيع الجزئي المقترح في ثندر الآن (تأمين الكاش)';
@@ -6916,7 +6928,12 @@
                 <span class="text-[10px] font-bold px-2 py-0.5 rounded-full border ${badgeColor}">
                   ${item.index.toUpperCase()}
                 </span>
-                <span class="block text-[11px] font-mono font-bold text-emerald-400 mt-0.5">${item.changePct}</span>
+                ${(() => {
+                  const changeVal = parseFloat(item.changeNum !== undefined ? item.changeNum : (item.changePct || '0').replace('%', ''));
+                  const isNeg = changeVal < 0 || String(item.changePct).includes('-');
+                  const colorCls = isNeg ? 'text-rose-400' : 'text-emerald-400';
+                  return `<span class="block text-[11px] font-mono font-bold ${colorCls} mt-0.5">${item.changePct}</span>`;
+                })()}
               </div>
             </div>
 
@@ -6945,15 +6962,15 @@
           <div>
             <div class="grid grid-cols-3 gap-1.5 text-center text-[10px] mb-2 bg-gray-950/50 p-2 rounded-xl border border-gray-800/80">
               <div>
-                <span class="text-gray-400 block text-[9px]">الدعم S1 / الأمان</span>
+                <span class="text-gray-400 block text-[9px]" title="سعر الدعم الأول الذي إذا تماسك فوقه السهم يبدأ بالصعود">الدعم S1 (سعر الأمان)</span>
                 <span class="font-bold text-white font-mono">${item.support}</span>
               </div>
               <div>
-                <span class="text-gray-400 block text-[9px]">المقاومة R1 (هدف)</span>
+                <span class="text-gray-400 block text-[9px]" title="مستوى المقاومة والهدف السعري الأول المتوقع">المقاومة R1 (الهدف الأول)</span>
                 <span class="font-bold text-emerald-400 font-mono">${item.target1}</span>
               </div>
               <div>
-                <span class="text-gray-400 block text-[9px]">وقف الخسارة</span>
+                <span class="text-gray-400 block text-[9px]" title="سعر الخروج الحامي لرأس المال لو هبط السهم دونه">وقف الخسارة (حماية رأس المال)</span>
                 <span class="font-bold text-rose-400 font-mono">${item.stopLoss}</span>
               </div>
             </div>
@@ -8932,9 +8949,14 @@ ${userLessonsSummary}
 
                 // 1. Target 1 Reached (Pivot R1 Hit)
                 if (item.pivotR1 && item.currentPrice >= item.pivotR1) {
+                  const isLosing = (item.profit !== undefined && item.profit < 0) || (item.returnPct !== undefined && item.returnPct < 0);
                   item.action = 'REBALANCE_CANDIDATE';
-                  item.alertLevel = 'TARGET_HIT';
-                  item.advice = `🎯 وصول لمستوى المقاومة الفنية الأولى R1 (${item.pivotR1} ج) • سهم ${item.name} في منطقة جني أرباح القمة (+${item.returnPct.toFixed(1)}%). يُنصح بتأمين أرباح جزئية وإعادة تدوير السيولة.`;
+                  item.alertLevel = isLosing ? 'REBOUND_RESISTANCE' : 'TARGET_HIT';
+                  if (isLosing) {
+                    item.advice = `🔄 ارتداد فني لمستوى المقاومة R1 (${item.pivotR1} ج) • سهم ${item.name} يختبر المقاومة بتراجع (${item.returnPct.toFixed(1)}%). فرصة مناسبة لتخفيف المركز وتدوير السيولة لأصل أسرع نمواً.`;
+                  } else {
+                    item.advice = `🎯 وصول لمستوى المقاومة الفنية الأولى R1 (${item.pivotR1} ج) • سهم ${item.name} في منطقة جني أرباح القمة (+${item.returnPct.toFixed(1)}%). يُنصح بتأمين أرباح جزئية وإعادة تدوير السيولة.`;
+                  }
                 }
                 // 2. Critical Support Breakdown (Pivot S1 Broken - Stop Loss Trigger)
                 else if (item.pivotS1 && item.currentPrice < item.pivotS1) {
@@ -9071,17 +9093,22 @@ ${userLessonsSummary}
             highestPriorityAlert = alertObj;
           }
         }
-        // Check R1 Target Reached (Profit Taking)
+        // Check R1 Target Reached (Profit Taking or Rebound Rebalance)
         else if (item.pivotR1 && item.currentPrice >= item.pivotR1) {
+          const isLosing = (item.profit !== undefined && item.profit < 0) || (item.returnPct !== undefined && item.returnPct < 0);
           const alertObj = {
             id: `r1_${item.ticker}_${Math.round(item.currentPrice)}`,
             ticker: item.ticker,
             name: item.name,
-            type: 'TARGET_REACHED',
-            title: `🟢 وصول لهدف المقاومة R1: ${item.name} (${item.ticker})`,
-            desc: `السعر الحالي (${Number(item.currentPrice).toFixed(2)} ج) حقق مستهدف المقاومة R1 (${item.pivotR1} ج) مع عائد (+${item.returnPct.toFixed(1)}%). يُنصح بتأمين أرباح القمة.`,
-            badge: 'جني أرباح',
-            actionLabel: 'تأمين أرباح القمة 💰',
+            type: isLosing ? 'REBOUND_RESISTANCE' : 'TARGET_REACHED',
+            title: isLosing 
+              ? `🔄 ارتداد فني لمستوى المقاومة R1: ${item.name} (${item.ticker})`
+              : `🟢 وصول لهدف المقاومة R1: ${item.name} (${item.ticker})`,
+            desc: isLosing
+              ? `السعر الحالي (${Number(item.currentPrice).toFixed(2)} ج) وصل لمستوى المقاومة R1 (${item.pivotR1} ج) في موجة ارتدادية (تراجع المركز ${item.returnPct.toFixed(1)}%). يُنصح بتخفيف المركز وتدوير السيولة.`
+              : `السعر الحالي (${Number(item.currentPrice).toFixed(2)} ج) حقق مستهدف المقاومة R1 (${item.pivotR1} ج) مع عائد (+${item.returnPct.toFixed(1)}%). يُنصح بتأمين أرباح القمة.`,
+            badge: isLosing ? 'تخفيف ارتداد' : 'جني أرباح',
+            actionLabel: isLosing ? 'تخفيف وتدوير 🔄' : 'تأمين أرباح القمة 💰',
             actionType: 'ROTATION',
             time: formatCairoTime(new Date(), false, true)
           };
@@ -9424,9 +9451,16 @@ ${userLessonsSummary}
             item.action = 'REBALANCE_CANDIDATE';
             report.corrections.push('تصحيح الأمر تلقائياً إلى "مرشح للتدوير وتخفيف المركز"');
           }
-          if (item.status === 'قمة' || (typeof item.advice === 'string' && item.advice.includes('قمة'))) {
-            report.violations.push('وجود توصيف للقمة في سهم متراجع');
-            report.corrections.push('تعديل التوصيف إلى "مسار هابط / قاع سعري"');
+          if (item.status === 'قمة' || (typeof item.advice === 'string' && (item.advice.includes('قمة') || item.advice.includes('جني أرباح')))) {
+            report.violations.push('وجود توصيف للقمة أو جني أرباح في سهم متراجع');
+            report.corrections.push('تعديل التوصيف إلى "مسار هابط وتخفيف المركز"');
+            if (item.status === 'قمة') item.status = 'مسار هابط';
+            if (typeof item.advice === 'string') {
+              item.advice = item.advice
+                .replace(/جني أرباح القمة/g, 'تخفيف المركز بالارتداد')
+                .replace(/جني أرباح/g, 'تخفيف وتدوير')
+                .replace(/منطقة قمة/g, 'منطقة ارتداد فني');
+            }
           }
           report.verdictSummary = `السهم متراجع بنسبة (${returnPct.toFixed(1)}%). تم حظر مسميات القمم وجني الأرباح، واعتماد بروتوكول تدوير السيولة ومراقبة الارتداد بأمان.`;
         } else {

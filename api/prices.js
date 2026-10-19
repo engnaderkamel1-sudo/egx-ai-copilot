@@ -245,24 +245,28 @@ function parseTechnicalRecord(item) {
   let safetyTag = 'low_risk';
   let catalyst = dict.quality || 'سيولة نشطة وتداول منتظم في تطبيق ثندر';
 
+  const turnoverMillions = (tradedValue / 1000000).toFixed(1);
+  const qualityDesc = dict.quality || 'تداول نشط ومستمر في تطبيق ثندر';
+
   if (tradedValue > 100000000) {
     type = 'سيولة مليارية فائقة • أمان مؤسسي رقم 1';
-    catalyst = 'دخول سيولة مؤسسية ضخمة تزيد عن 100 مليون جنيه';
+    catalyst = `${qualityDesc} • تداول مؤسسي نشط (${turnoverMillions} مليون ج)`;
     safetyTag = 'volume_surge';
   } else if (changePct > 3.0 && tradedValue > 10000000) {
     type = 'طفرة صعودية وزخم فني قوي';
-    catalyst = `اختراق صاعد مع مؤشر MACD إيجابي (${macd != null ? macd : 'صاعد'})`;
+    catalyst = `${qualityDesc} • اختراق بزخم شرائي (تداول ${turnoverMillions}M ج)`;
     safetyTag = 'momentum';
   } else if (rsi < 36) {
     type = 'فرصة ارتداد من تشبع بيعي (Dip Buy)';
-    catalyst = `تشبع بيعي (RSI: ${rsi}) قرب مستوى الدعم الفني ${supportVal} ج`;
+    catalyst = `${qualityDesc} • تشبع بيعي (RSI: ${rsi}) قرب الدعم ${supportVal} ج`;
     safetyTag = 'oversold_bounce';
   } else if (dict.index === 'egx30') {
     type = 'شركة قيادية كبرى (EGX30)';
+    catalyst = `${qualityDesc} • استقرار فني وسيولة ${turnoverMillions}M ج`;
     safetyTag = 'low_risk';
+  } else {
+    catalyst = `${qualityDesc} • تداول ${turnoverMillions}M ج`;
   }
-
-  const turnoverMillions = (tradedValue / 1000000).toFixed(1);
 
   return {
     ticker: symbol,
