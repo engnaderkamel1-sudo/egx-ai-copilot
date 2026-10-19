@@ -1566,7 +1566,7 @@
             </button>
             <div id="live-auto-countdown-badge" class="px-3 py-2 rounded-xl bg-gray-950 border border-cyan-800/60 text-cyan-300 text-xs font-mono flex items-center gap-1.5 shadow-sm" title="العداد التنازلي لنبض التحديث التلقائي">
               <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-              <span>تحديث تلقائي خلال: <strong id="live-countdown-secs" class="text-white font-bold">30</strong> ث</span>
+              <span>تحديث تلقائي خلال: <strong id="live-countdown-secs" class="text-white font-bold">60</strong> ث</span>
             </div>
             <span class="text-xs text-gray-400 bg-gray-800 px-3 py-1 rounded-full border border-gray-700" id="assets-count-badge">12 أصل مالي</span>
           </div>
@@ -1618,38 +1618,38 @@
           <div>
             <div class="flex items-center gap-2 text-cyan-400 text-xs font-bold uppercase tracking-wider mb-1">
               <i data-lucide="trending-up" class="w-4 h-4"></i>
-              <span>Ù…ØªØªØ¨Ø¹ Ø£Ù„ÙØ§ ÙˆØ§Ù„Ø£Ø¯Ø§Ø¡ Ø§Ù„ØªØ±Ø§ÙƒÙ…ÙŠ (Benchmark Alpha Tracker)</span>
+              <span>متتبع ألفا والأداء التراكمي (Benchmark Alpha Tracker)</span>
             </div>
-            <h2 class="text-xl font-bold text-white">Ù…Ù‚Ø§Ø±Ù†Ø© Ø¹ÙˆØ§Ø¦Ø¯ Ø§Ù„Ù…Ø­ÙØ¸Ø© Ø¨Ù…Ø¤Ø´Ø± EGX30 ÙˆØµÙ†Ø§Ø¯ÙŠÙ‚ Ø§Ù„Ø³ÙŠÙˆÙ„Ø© ÙˆØ§Ù„ØªØ¶Ø®Ù…</h2>
-            <p class="text-xs text-gray-400 mt-1">Ù‚ÙŠØ§Ø³ ÙƒÙ…ÙŠ Ø¯Ù‚ÙŠÙ‚ Ù„Ø¹Ø§Ø¦Ø¯ Ø£Ù„ÙØ§ (Ø§Ù„Ù‚ÙŠÙ…Ø© Ø§Ù„Ù…Ø¶Ø§ÙØ©)ØŒ ÙˆØ¨ÙŠØªØ§ (Ø­Ø³Ø§Ø³ÙŠØ© Ø§Ù„Ø³ÙˆÙ‚)ØŒ ÙˆÙ…Ø¹Ø¯Ù„ Ø´Ø§Ø±Ø¨ Ù„Ø­Ø³Ø§Ø¨ ÙƒÙØ§Ø¡Ø© Ø§Ù„Ù…Ø®Ø§Ø·Ø±Ø©</p>
+            <h2 class="text-xl font-bold text-white">مقارنة عوائد المحفظة بمؤشر EGX30 وصناديق السيولة والتضخم</h2>
+            <p class="text-xs text-gray-400 mt-1">قياس كمي دقيق لعائد ألفا (القيمة المضافة)، وبيتا (حساسية السوق)، ومعدل شارب لحساب كفاءة المخاطرة</p>
           </div>
           <button onclick="renderBenchmarkAlphaTracker()" class="px-3.5 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs flex items-center gap-1.5 transition self-start shadow-md cursor-pointer">
             <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
-            <span>ØªØ­Ø¯ÙŠØ« Ø§Ù„Ù…Ø¤Ø´Ø±Ø§Øª Ø§Ù„ØªØ±Ø§ÙƒÙ…ÙŠØ©</span>
+            <span>تحديث المؤشرات التراكمية</span>
           </button>
         </div>
 
         <!-- Institutional KPI Grid -->
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
           <div class="p-3.5 rounded-xl bg-gray-950 border border-gray-800/80">
-            <span class="text-[11px] text-gray-400 block mb-1">Ù…Ø¤Ø´Ø± Ø£Ù„ÙØ§ (Jensen's Alpha Î±)</span>
+            <span class="text-[11px] text-gray-400 block mb-1">مؤشر ألفا (Jensen's Alpha α)</span>
             <div id="alpha-metric-val" class="font-mono text-xl font-bold text-emerald-400">--</div>
-            <span class="text-[9px] text-gray-400 block mt-0.5">Ø§Ù„Ù‚ÙŠÙ…Ø© Ø§Ù„Ù…Ø¶Ø§ÙØ© ÙÙˆÙ‚ Ø¹Ø§Ø¦Ø¯ Ø§Ù„Ø³ÙˆÙ‚</span>
+            <span class="text-[9px] text-gray-400 block mt-0.5">القيمة المضافة فوق عائد السوق</span>
           </div>
           <div class="p-3.5 rounded-xl bg-gray-950 border border-gray-800/80">
-            <span class="text-[11px] text-gray-400 block mb-1">Ù…Ø¤Ø´Ø± Ø¨ÙŠØªØ§ (Beta Î²)</span>
+            <span class="text-[11px] text-gray-400 block mb-1">مؤشر بيتا (Beta β)</span>
             <div id="beta-metric-val" class="font-mono text-xl font-bold text-white">0.82</div>
-            <span class="text-[9px] text-gray-400 block mt-0.5">Ø­Ø³Ø§Ø³ÙŠØ© Ø§Ù„Ù…Ø­ÙØ¸Ø© Ù„ØªØ°Ø¨Ø°Ø¨ EGX30</span>
+            <span class="text-[9px] text-gray-400 block mt-0.5">حساسية المحفظة لتذبذب EGX30</span>
           </div>
           <div class="p-3.5 rounded-xl bg-gray-950 border border-gray-800/80">
-            <span class="text-[11px] text-gray-400 block mb-1">Ù…Ø¹Ø¯Ù„ Ø´Ø§Ø±Ø¨ (Sharpe Ratio)</span>
+            <span class="text-[11px] text-gray-400 block mb-1">معدل شارب (Sharpe Ratio)</span>
             <div id="sharpe-metric-val" class="font-mono text-xl font-bold text-cyan-400">--</div>
-            <span class="text-[9px] text-gray-400 block mt-0.5">Ø¬ÙˆØ¯Ø© Ø§Ù„Ø¹Ø§Ø¦Ø¯ Ù„ÙƒÙ„ ÙˆØ­Ø¯Ø© Ù…Ø®Ø§Ø·Ø±Ø©</span>
+            <span class="text-[9px] text-gray-400 block mt-0.5">جودة العائد لكل وحدة مخاطرة</span>
           </div>
           <div class="p-3.5 rounded-xl bg-gray-950 border border-gray-800/80">
-            <span class="text-[11px] text-gray-400 block mb-1">Ø§Ù„Ù…Ø¹Ø¯Ù„ Ø§Ù„Ø®Ø§Ù„ÙŠ Ù…Ù† Ø§Ù„Ù…Ø®Ø§Ø·Ø± (NCS)</span>
+            <span class="text-[11px] text-gray-400 block mb-1">المعدل الخالي من المخاطر (NCS)</span>
             <div class="font-mono text-xl font-bold text-amber-400">22.4%</div>
-            <span class="text-[9px] text-gray-400 block mt-0.5">Ø¹Ø§Ø¦Ø¯ ÙˆØ«Ø§Ø¦Ù‚ Ø§Ù„Ø³ÙŠÙˆÙ„Ø© Ø§Ù„ÙŠÙˆÙ…ÙŠØ© Ø§Ù„Ù…Ø±ÙƒØ¨</span>
+            <span class="text-[9px] text-gray-400 block mt-0.5">عائد وثائق السيولة اليومية المركب</span>
           </div>
         </div>
 
@@ -1663,9 +1663,9 @@
           <div class="flex items-center justify-between flex-wrap gap-2">
             <div class="flex items-center gap-2">
               <i data-lucide="line-chart" class="w-4 h-4 text-emerald-400"></i>
-              <h3 class="font-bold text-white text-sm">Ù…Ù†Ø­Ù†Ù‰ Ø§Ù„Ø£Ø¯Ø§Ø¡ Ø§Ù„ØªØ±Ø§ÙƒÙ…ÙŠ Ø§Ù„Ù…Ù‚Ø§Ø±Ù† (Historical Relative Trajectory)</h3>
+              <h3 class="font-bold text-white text-sm">منحنى الأداء التراكمي المقارن (Historical Relative Trajectory)</h3>
             </div>
-            <span class="text-[11px] text-gray-400">Ù…Ø­Ø¯Ø« ÙˆÙÙ‚ Ø¢Ø®Ø± Ø£Ø³Ø¹Ø§Ø± Ù…Ø¹ØªÙ…Ø¯Ø© Ø¨Ø§Ù„Ø¨ÙˆØ±ØµØ© Ø§Ù„Ù…ØµØ±ÙŠØ©</span>
+            <span class="text-[11px] text-gray-400">محدث وفق آخر أسعار معتمدة بالبورصة المصرية</span>
           </div>
           <div class="h-72 sm:h-80 w-full relative">
             <canvas id="alpha-comparison-chart"></canvas>
@@ -1675,28 +1675,27 @@
         <!-- Explanatory Pillars of Portfolio Evaluation in Egypt -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
           <div class="p-3 rounded-xl bg-gray-950 border border-gray-800 space-y-1">
-            <span class="font-bold text-emerald-400 block">1. Ù„Ù…Ø§Ø°Ø§ Ù…Ø¤Ø´Ø± Ø£Ù„ÙØ§ (Alpha) Ù‡Ùˆ Ø§Ù„Ø£Ù‡Ù…ØŸ</span>
+            <span class="font-bold text-emerald-400 block">1. لماذا مؤشر ألفا (Alpha) هو الأهم؟</span>
             <p class="text-gray-300 text-[11px] leading-relaxed">
-              ÙŠÙ‚ÙŠØ³ Ù‡Ù„ Ù‚Ø±Ø§Ø±Ø§ØªÙƒ ÙˆØªØ¯ÙˆÙŠØ±Ùƒ Ù„Ø£Ù…ÙˆØ§Ù„Ùƒ Ø­Ù‚Ù‚ Ø¹Ø§Ø¦Ø¯Ø§Ù‹ Ø¥Ø¶Ø§ÙÙŠØ§Ù‹ ÙŠÙÙˆÙ‚ Ø´Ø±Ø§Ø¡ Ø§Ù„Ø³ÙˆÙ‚ Ø³Ù„Ø¨ÙŠØ§Ù‹ Ø£Ùˆ ØªØ±Ùƒ Ø§Ù„Ø£Ù…ÙˆØ§Ù„ ÙÙŠ ØµÙ†Ø¯ÙˆÙ‚ Ø§Ù„Ø³ÙŠÙˆÙ„Ø© NCS. Ø£Ù„ÙØ§ Ø§Ù„Ù…ÙˆØ¬Ø¨Ø© ØªØ¹Ù†ÙŠ Ø¨Ø±Ø§Ø¹Ø© ÙÙŠ Ø§Ù„ØªÙˆÙ‚ÙŠØª ÙˆØ­Ù…Ø§ÙŠØ© Ø±Ø£Ø³ Ø§Ù„Ù…Ø§Ù„.
+              يقيس هل قراراتك وتدويرك لأموالك حقق عائداً إضافياً يفوق شراء السوق سلبياً أو ترك الأموال في صندوق السيولة NCS. ألفا الموجبة تعني براعة في التوقيت وحماية رأس المال.
             </p>
           </div>
           <div class="p-3 rounded-xl bg-gray-950 border border-gray-800 space-y-1">
-            <span class="font-bold text-cyan-400 block">2. Ø£Ù‡Ù…ÙŠØ© Ø¨ÙŠØªØ§ Ø§Ù„Ù…Ù†Ø®ÙØ¶Ø© (Beta &lt; 1.0)</span>
+            <span class="font-bold text-cyan-400 block">2. أهمية بيتا المنخفضة (Beta &lt; 1.0)</span>
             <p class="text-gray-300 text-[11px] leading-relaxed">
-              Ù…Ø­ÙØ¸ØªÙƒ ØªØ¹ØªÙ…Ø¯ Ø§Ø³ØªØ±Ø§ØªÙŠØ¬ÙŠØ© Ø§Ù„Ù†ÙˆØ§Ø© ÙˆØ§Ù„Ø£Ù‚Ù…Ø§Ø± Ù…Ø¹ ÙƒØ§Ø´ ÙˆØµÙ†Ø§Ø¯ÙŠÙ‚ Ù†Ù‚Ø¯ÙŠØ©ØŒ Ù…Ù…Ø§ ÙŠØ¬Ø¹Ù„Ù‡Ø§ ØªÙ‡Ø¨Ø· Ø¨Ù†Ø³Ø¨Ø© Ø£Ù‚Ù„ Ø¨ÙƒØ«ÙŠØ± Ù…Ù† Ø§Ù„Ø³ÙˆÙ‚ ÙÙŠ Ø£ÙˆÙ‚Ø§Øª Ø§Ù„ØªØµØ­ÙŠØ­ ÙˆØªØµØ¹Ø¯ Ø¨Ù‡Ø¯ÙˆØ¡ Ø¯ÙˆÙ† Ù‡Ù„Ø¹.
+              محفظتك تعتمد استراتيجية النواة والأقمار مع كاش وصناديق نقدية، مما يجعلها تهبط بنسبة أقل بكثير من السوق في أوقات التصحيح وتصعد بهدوء دون هلع.
             </p>
           </div>
           <div class="p-3 rounded-xl bg-gray-950 border border-gray-800 space-y-1">
-            <span class="font-bold text-rose-400 block">3. Ø§Ù„ØªØºÙ„Ø¨ Ø¹Ù„Ù‰ Ø­Ø§Ø¬Ø² Ø§Ù„ØªØ¶Ø®Ù…</span>
+            <span class="font-bold text-rose-400 block">3. التغلب على حاجز التضخم</span>
             <p class="text-gray-300 text-[11px] leading-relaxed">
-              Ø§Ù„Ù‡Ø¯Ù Ø§Ù„Ù†Ù‡Ø§Ø¦ÙŠ Ù„Ù„Ù…Ø³ØªØ´Ø§Ø± Ù‡Ùˆ Ø£Ù„Ø§ ØªÙ†Ù…Ùˆ Ø£Ø±Ù‚Ø§Ù…Ùƒ ÙÙŠ ÙƒØ´Ù Ø§Ù„Ø­Ø³Ø§Ø¨ ÙÙ‚Ø·ØŒ Ø¨Ù„ Ø£Ù† ØªÙ†Ù…Ùˆ Ù‚ÙŠÙ…ØªÙƒ Ø§Ù„Ø´Ø±Ø§Ø¦ÙŠØ© Ø§Ù„Ø­Ù‚ÙŠÙ‚ÙŠØ© ÙˆØªØªÙÙˆÙ‚ Ø¹Ù„Ù‰ ÙˆØªÙŠØ±Ø© Ø§Ù„ØªØ¶Ø®Ù… ÙˆØ³Ø¹Ø± Ø§Ù„ÙØ§Ø¦Ø¯Ø© Ø§Ù„Ø³Ø§Ø¦Ø¯.
+              الهدف النهائي للمستشار هو ألا تنمو أرقامك في كشف الحساب فقط، بل أن تنمو قيمتك الشرائية الحقيقية وتتفوق على وتيرة التضخم وسعر الفائدة السائد.
             </p>
           </div>
         </div>
       </div>
 
     </div>
-
     <!-- ============================================== -->
     <!-- TAB 2: ADVANCED MARKET RADAR (EGX30 + EGX70) -->
     <!-- ============================================== -->
@@ -3078,13 +3077,13 @@
   <script src="js/push-notifications.js?v=2.3.0"></script>
   <script src="js/valuation.js?v=2.3.0"></script>
 
-  <script src="js/state.js?v=2.2.6"></script>
+  <script src="js/state.js?v=2.3.1"></script>
   <script src="js/ui.js?v=2.2.6"></script>
   <script src="js/trade.js?v=2.2.6"></script>
   <script src="js/rotation.js?v=2.2.6"></script>
   <script src="js/scenarios.js?v=2.2.6"></script>
   <script src="js/ai.js?v=2.2.6"></script>
-  <script src="js/app.js?v=2.2.6"></script>
+  <script src="js/app.js?v=2.3.1"></script>
   <script>
     if (typeof bootApp === 'function') { bootApp(); }
   </script>

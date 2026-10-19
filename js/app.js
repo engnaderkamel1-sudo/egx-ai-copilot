@@ -1,4 +1,4 @@
-﻿/**
+/**
  * EGX AI Copilot - Application Lifecycle & Services (js/app.js)
  * Live market polling, cloud engine sync, emergency alerts (OED TTMS), auto-refresh worker, and bootstrap.
  */
@@ -515,7 +515,7 @@
             banner.className = 'sticky top-14 z-40 bg-gradient-to-r from-emerald-950 via-teal-900 to-slate-900 text-white border-b-2 border-emerald-500 shadow-2xl px-4 py-2.5 transition-all animate-slide-down block';
           }
 
-          triggerBrowserNotification(highestPriorityAlert.title, highestPriorityAlert.desc);
+          triggerBrowserNotification(highestPriorityAlert.title, highestPriorityAlert.desc, highestPriorityAlert.id);
         }
       } else {
         activeEmergencyAlert = null;
@@ -662,10 +662,27 @@
       });
     }
 
-    function triggerBrowserNotification(title, body) {
+    let lastNotifiedAlertKey = null;
+    let lastNotifiedAlertTimestamp = 0;
+
+    function triggerBrowserNotification(title, body, alertId = 'default') {
+      const now = Date.now();
+      // Intelligent Throttling: If the same alert was sent in the last 45 minutes, suppress repeat
+      if (lastNotifiedAlertKey === alertId && (now - lastNotifiedAlertTimestamp < 2700000)) {
+        return;
+      }
+      lastNotifiedAlertKey = alertId;
+      lastNotifiedAlertTimestamp = now;
+
+      // Delegate to unified local push alert if present
+      if (typeof showLocalPushAlert === 'function') {
+        showLocalPushAlert(title, body);
+        return;
+      }
+
       if ('Notification' in window && Notification.permission === 'granted') {
         try {
-          new Notification(title, { body: body, icon: '/favicon.ico' });
+          new Notification(title, { body: body, icon: '/favicon.ico', tag: 'egx-market-alert' });
         } catch(e){}
       }
     }
@@ -673,20 +690,27 @@
 
     // ============================================================
     // Precision Auto-Refresh Engine (Web Worker + Visual Countdown + Instant Tab Wake-up)
+    // Runs every 60 seconds (1 minute) strictly during EGX trading session (Sun-Thu, 10:00 AM - 02:30 PM Cairo)
     // ============================================================
-    let autoRefreshSeconds = 30;
+    let autoRefreshSeconds = 60;
     let countdownTimerId = null;
 
     function startAutoRefreshEngine() {
       if (countdownTimerId) clearInterval(countdownTimerId);
-      autoRefreshSeconds = 30;
+      autoRefreshSeconds = 60;
       updateCountdownUI();
 
-      // 1. Foreground Visual Countdown (Ticks every 1 second)
+      // 1. Foreground Visual Countdown (Ticks every 1 second, active during EGX trading session)
       countdownTimerId = setInterval(() => {
+        const isOpen = (typeof isCairoSessionOpen === 'function') ? isCairoSessionOpen() : false;
+        if (!isOpen) {
+          updateCountdownUI();
+          return;
+        }
+
         autoRefreshSeconds--;
         if (autoRefreshSeconds <= 0) {
-          autoRefreshSeconds = 30;
+          autoRefreshSeconds = 60;
           fetchLiveEGXPricesAndReevaluate(true);
         }
         updateCountdownUI();
@@ -698,27 +722,58 @@
       // 3. Instant Wake-up on Tab Focus (fires the exact millisecond user returns to browser)
       document.addEventListener('visibilitychange', () => {
         if (document.visibilityState === 'visible') {
-          autoRefreshSeconds = 30;
-          updateCountdownUI();
-          fetchLiveEGXPricesAndReevaluate(false);
+          const isOpen = (typeof isCairoSessionOpen === 'function') ? isCairoSessionOpen() : false;
+          if (isOpen) {
+            autoRefreshSeconds = 60;
+            updateCountdownUI();
+            fetchLiveEGXPricesAndReevaluate(false);
+          } else {
+            updateCountdownUI();
+          }
         }
       });
 
       window.addEventListener('focus', () => {
-        autoRefreshSeconds = 30;
-        updateCountdownUI();
-        fetchLiveEGXPricesAndReevaluate(false);
+        const isOpen = (typeof isCairoSessionOpen === 'function') ? isCairoSessionOpen() : false;
+        if (isOpen) {
+          autoRefreshSeconds = 60;
+          updateCountdownUI();
+          fetchLiveEGXPricesAndReevaluate(false);
+        } else {
+          updateCountdownUI();
+        }
       });
     }
 
     function resetCountdownTimer() {
-      autoRefreshSeconds = 30;
+      autoRefreshSeconds = 60;
       updateCountdownUI();
     }
 
     function updateCountdownUI() {
+      const badge = document.getElementById('live-auto-countdown-badge');
       const el = document.getElementById('live-countdown-secs');
-      if (el) el.innerText = Math.max(0, autoRefreshSeconds);
+      const isOpen = (typeof isCairoSessionOpen === 'function') ? isCairoSessionOpen() : false;
+
+      if (badge) {
+        if (isOpen) {
+          badge.className = 'px-3 py-2 rounded-xl bg-gray-950 border border-cyan-800/60 text-cyan-300 text-xs font-mono flex items-center gap-1.5 shadow-sm';
+          badge.title = 'العداد التنازلي للتحديث التلقائي أثناء جلسة التداول الرسمية (كل دقيقة)';
+          badge.innerHTML = `
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span>تحديث تلقائي خلال: <strong id="live-countdown-secs" class="text-white font-bold">${Math.max(0, autoRefreshSeconds)}</strong> ث</span>
+          `;
+        } else {
+          badge.className = 'px-3 py-2 rounded-xl bg-slate-900/90 border border-amber-800/50 text-amber-300 text-xs font-sans flex items-center gap-1.5 shadow-sm';
+          badge.title = 'جلسة التداول الرسمية في البورصة المصرية مغلقة حالياً (مواعيد التداول: الأحد إلى الخميس من 10:00 ص إلى 02:30 م)';
+          badge.innerHTML = `
+            <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+            <span>الجلسة مغلقة <span class="text-gray-400 text-[11px]">(10:00 ص - 2:30 م)</span></span>
+          `;
+        }
+      } else if (el) {
+        el.innerText = Math.max(0, autoRefreshSeconds);
+      }
     }
 
     function initBackgroundHeartbeatWorker() {
@@ -730,7 +785,7 @@
               if (interval) clearInterval(interval);
               interval = setInterval(function() {
                 self.postMessage('TICK_FETCH');
-              }, 30000);
+              }, 60000);
             }
           };
         `;
@@ -738,8 +793,11 @@
         const worker = new Worker(URL.createObjectURL(blob));
         worker.onmessage = function(e) {
           if (e.data === 'TICK_FETCH') {
-            resetCountdownTimer();
-            fetchLiveEGXPricesAndReevaluate(true);
+            const isOpen = (typeof isCairoSessionOpen === 'function') ? isCairoSessionOpen() : false;
+            if (isOpen) {
+              resetCountdownTimer();
+              fetchLiveEGXPricesAndReevaluate(true);
+            }
           }
         };
         worker.postMessage('start');

@@ -46,6 +46,7 @@
       const timeInMinutes = hour * 60 + minute;
       return isTradingDay && (timeInMinutes >= 600 && timeInMinutes <= 870); // 10:00 AM to 02:30 PM Cairo
     }
+    window.isCairoSessionOpen = isCairoSessionOpen;
 
     function formatCairoDateOnly(date = new Date()) {
       const parts = getCairoParts(date);
