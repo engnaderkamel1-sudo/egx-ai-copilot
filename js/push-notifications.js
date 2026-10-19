@@ -78,10 +78,15 @@
     isPushSupported = true;
 
     try {
-      // Register root Service Worker
       swRegistration = await navigator.serviceWorker.register('/sw.js', { scope: '/' });
       await navigator.serviceWorker.ready;
-      console.log('✅ EGX Service Worker Registered:', swRegistration.scope);
+      try {
+        await swRegistration.update();
+        if (swRegistration.waiting) {
+          swRegistration.waiting.postMessage({ action: 'skipWaiting' });
+        }
+      } catch (updErr) {}
+      console.log('✅ EGX Service Worker Registered & Updated:', swRegistration.scope);
 
       // Check current subscription
       if ('PushManager' in window && swRegistration.pushManager) {

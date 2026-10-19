@@ -81,9 +81,14 @@ export default async function handler(req, res) {
       });
     }
 
-    // Send push to all devices concurrently
+    // Send push to all devices concurrently with high urgency for Android Doze wake-up
+    const pushOptions = {
+      TTL: 86400,
+      urgency: 'high'
+    };
+
     const results = await Promise.allSettled(
-      uniqueSubs.map(sub => webpush.sendNotification(sub, Buffer.from(payload, 'utf8')))
+      uniqueSubs.map(sub => webpush.sendNotification(sub, Buffer.from(payload, 'utf8'), pushOptions))
     );
 
     // Identify expired/invalid endpoints (HTTP 410 or 404) to clean up Firestore
