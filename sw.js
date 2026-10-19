@@ -29,15 +29,14 @@ self.addEventListener('push', (event) => {
 
   const options = {
     body: payload.body,
-    icon: payload.icon,
-    badge: payload.badge,
+    icon: payload.icon || 'https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/trending-up.svg',
+    badge: payload.badge || 'https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/shield-alert.svg',
     vibrate: [200, 100, 200],
     data: { url: payload.url || '/' },
-    tag: 'egx-market-alert',
+    tag: payload.tag || 'egx-market-alert',
     renotify: true,
-    actions: [
-      { action: 'open_app', title: 'فحص خطة الحماية والمحفظة 🛡️' }
-    ]
+    dir: 'rtl',
+    lang: 'ar'
   };
 
   event.waitUntil(

@@ -126,8 +126,28 @@ export default async function handler(req, res) {
         rsi: s.rsi,
         advice: advice,
         verified_source: 'شاشة ومؤشرات البورصة الفنية الحية'
-      });
     });
+
+    // Autonomous Background Push Alert Dispatch if critical breakdown is detected
+    const criticals = findings.filter(f => f.action === 'STOP_LOSS_WARNING' || f.alert_level === 'CRITICAL_RISK');
+    if (criticals.length > 0) {
+      try {
+        const firstCrit = criticals[0];
+        const host = req.headers?.['x-forwarded-host'] || req.headers?.host || 'localhost:3000';
+        const proto = req.headers?.['x-forwarded-proto'] || 'https';
+        fetch(`${proto}://${host}/api/send-push`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            title: `🚨 تنبيه كسر دعم فني في البورصة (${firstCrit.ticker})`,
+            body: `${firstCrit.advice} (السعر الحالي: ${firstCrit.price})`,
+            url: '/'
+          })
+        }).catch(() => {});
+      } catch (pushErr) {
+        console.warn('Autonomous push dispatch notice:', pushErr.message);
+      }
+    }
 
     const payload = {
       success: true,
