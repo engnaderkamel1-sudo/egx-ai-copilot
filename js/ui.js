@@ -285,9 +285,13 @@
                     </div>
                   </div>
                   <div class="pt-2 flex items-center gap-2 flex-wrap">
-                    <button onclick="openAuditModal('${buy.ticker}')" class="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold text-xs flex items-center justify-center gap-2 transition shadow-lg shadow-emerald-950/40 cursor-pointer">
-                      <i data-lucide="file-text" class="w-4 h-4 text-emerald-200"></i>
-                      <span>تقرير الاقتراح والمصادر 📊</span>
+                    <button onclick="openTradeModal('${buy.ticker}', 'BUY', ${buy.sharesToBuy}, ${buy.currentPrice})" class="flex-1 py-2 px-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold text-xs flex items-center justify-center gap-1.5 transition shadow-lg shadow-emerald-950/40 cursor-pointer">
+                      <i data-lucide="check-circle" class="w-3.5 h-3.5"></i>
+                      <span>سأنفذ الشراء الآن ⚡</span>
+                    </button>
+                    <button onclick="openAuditModal('${buy.ticker}')" class="py-2 px-3 rounded-xl bg-gray-900 hover:bg-gray-800 text-emerald-400 font-bold text-xs flex items-center justify-center gap-1 border border-emerald-500/30 cursor-pointer">
+                      <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+                      <span>تقرير الاقتراح 📊</span>
                     </button>
                   </div>
                 ` : `
@@ -325,13 +329,16 @@
                     </div>
                   </div>
                   <div class="pt-2 flex items-center gap-2 flex-wrap">
-                    <button onclick="openAuditModal('${profit.ticker}')" class="flex-1 py-2 px-3 rounded-xl bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition shadow cursor-pointer">
+                    <button onclick="openTradeModal('${profit.ticker}', 'SELL', ${profit.sellShares}, ${profit.currentPrice})" class="flex-1 py-2 px-3 rounded-xl bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white font-extrabold text-xs flex items-center justify-center gap-1.5 transition shadow-lg shadow-amber-950/40 cursor-pointer">
+                      <i data-lucide="check-circle" class="w-3.5 h-3.5"></i>
+                      <span>سأنفذ البيع الآن ⚡</span>
+                    </button>
+                    <button onclick="openAuditModal('${profit.ticker}')" class="py-2 px-3 rounded-xl bg-gray-900 hover:bg-gray-800 text-amber-300 font-bold text-xs flex items-center justify-center gap-1 border border-gray-700 cursor-pointer">
                       <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
                       <span>تقرير الاقتراح 📊</span>
                     </button>
-                    <button onclick="openRotationPlanModalByTicker('${profit.ticker}')" class="py-2 px-3 rounded-xl bg-gray-900 hover:bg-gray-800 text-amber-300 font-bold text-xs flex items-center justify-center gap-1 border border-gray-700 cursor-pointer">
+                    <button onclick="openRotationPlanModalByTicker('${profit.ticker}')" class="p-2 rounded-xl bg-gray-900 hover:bg-gray-800 text-gray-300 font-bold text-xs flex items-center justify-center gap-1 border border-gray-800 cursor-pointer" title="خطة زيادة الأسهم">
                       <i data-lucide="compass" class="w-3.5 h-3.5"></i>
-                      <span>خطة زيادة الأسهم 📋</span>
                     </button>
                   </div>
                 ` : `
@@ -365,13 +372,16 @@
                     </div>
                   </div>
                   <div class="pt-2 flex items-center gap-2 flex-wrap">
-                    <button onclick="openAuditModal('${safety.ticker}')" class="flex-1 py-2 px-3 rounded-xl bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition shadow cursor-pointer">
-                      <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
-                      <span>تقرير الاقتراح والمخاطر 📊</span>
+                    <button onclick="openTradeModal('${safety.ticker}', 'SELL', ${safety.shares || 0}, ${safety.currentPrice})" class="flex-1 py-2 px-3 rounded-xl bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 text-white font-extrabold text-xs flex items-center justify-center gap-1.5 transition shadow-lg shadow-rose-950/40 cursor-pointer">
+                      <i data-lucide="check-circle" class="w-3.5 h-3.5"></i>
+                      <span>سأنفذ الخروج/البيع ⚡</span>
                     </button>
-                    <button onclick="openRotationPlanModalByTicker('${safety.ticker}')" class="py-2 px-3 rounded-xl bg-gray-900 hover:bg-gray-800 text-rose-300 font-bold text-xs flex items-center justify-center gap-1 border border-rose-800/40 cursor-pointer">
+                    <button onclick="openAuditModal('${safety.ticker}')" class="py-2 px-3 rounded-xl bg-gray-900 hover:bg-gray-800 text-rose-300 font-bold text-xs flex items-center justify-center gap-1 border border-rose-800/40 cursor-pointer">
+                      <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+                      <span>تقرير المخاطر 📊</span>
+                    </button>
+                    <button onclick="openRotationPlanModalByTicker('${safety.ticker}')" class="p-2 rounded-xl bg-gray-900 hover:bg-gray-800 text-gray-300 font-bold text-xs flex items-center justify-center gap-1 border border-rose-900/40 cursor-pointer" title="خطة الحماية والتدوير">
                       <i data-lucide="shield-alert" class="w-3.5 h-3.5"></i>
-                      <span>خطة الحماية 🔄</span>
                     </button>
                   </div>
                 ` : `
@@ -1213,6 +1223,23 @@
               <i data-lucide="shield" class="w-3 h-3"></i>
             </button>
           </div>
+        </div>
+
+        <!-- Action Execution & Portfolio Sync Bar -->
+        <div class="p-3.5 rounded-xl bg-gradient-to-r from-emerald-950/60 via-gray-950 to-teal-950/60 border border-emerald-500/50 flex items-center justify-between flex-wrap gap-2 text-xs">
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-lg ${isStopBroken ? 'bg-rose-500/20 text-rose-400' : 'bg-emerald-500/20 text-emerald-400'} flex items-center justify-center shrink-0">
+              <i data-lucide="zap" class="w-4 h-4"></i>
+            </div>
+            <div>
+              <span class="text-white font-extrabold block text-xs sm:text-sm">هل قررت تنفيذ هذا القرار الآن؟</span>
+              <span class="text-gray-300 text-[11px]">اضغط لتسجيل العملية، وتعديل عدد الأسهم وسعر التنفيذ، وسيقوم النظام بتحديث محفظتك فوراً.</span>
+            </div>
+          </div>
+          <button onclick="closeAuditModal(); openTradeModal('${stock.ticker}', '${isStopBroken || isTargetReached ? 'SELL' : 'BUY'}', ${stock.sharesToBuy || stock.sellShares || stock.shares || 0}, ${currentQuote})" class="px-4 py-2.5 rounded-xl ${isStopBroken ? 'bg-rose-600 hover:bg-rose-500' : (isTargetReached ? 'bg-amber-600 hover:bg-amber-500' : 'bg-emerald-600 hover:bg-emerald-500')} text-white font-black text-xs flex items-center gap-1.5 transition shadow-lg cursor-pointer">
+            <i data-lucide="check-circle" class="w-4 h-4"></i>
+            <span>${isStopBroken ? 'سأنفذ الخروج ووقف الخسارة ⚡' : (isTargetReached ? 'سأنفذ البيع وتأمين الأرباح ⚡' : 'سأنفذ الشراء وتحديث المحفظة ⚡')}</span>
+          </button>
         </div>
 
         <!-- Live Analysis Synthesis Bar -->

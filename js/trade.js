@@ -1,4 +1,4 @@
-﻿/**
+/**
  * EGX AI Copilot - Trading & Execution Layer (js/trade.js)
  * Real-time buy/sell orders, Thndr sync/import, fine-tuning, position sizing, and paper trading.
  */
@@ -382,17 +382,39 @@
     // ============================================================
     let currentTradeMode = 'BUY'; // 'BUY' or 'SELL'
 
-    function openTradeModal(preSelectedTicker = null, defaultMode = 'BUY') {
+    function openTradeModal(preSelectedTicker = null, defaultMode = 'BUY', defaultShares = null, defaultPrice = null) {
       currentTradeMode = defaultMode;
       setTradeMode(defaultMode);
       populateTradeStockDropdown(preSelectedTicker);
-      document.getElementById('trade-shares-input').value = '';
-      document.getElementById('trade-price-input').value = '';
+
+      const sharesInput = document.getElementById('trade-shares-input');
+      const priceInput = document.getElementById('trade-price-input');
+
+      if (defaultShares !== null && defaultShares !== undefined && Number(defaultShares) > 0) {
+        sharesInput.value = Math.round(Number(defaultShares));
+      } else {
+        sharesInput.value = '';
+      }
+
+      if (defaultPrice !== null && defaultPrice !== undefined && Number(defaultPrice) > 0) {
+        priceInput.value = Number(defaultPrice).toFixed(2);
+      } else {
+        priceInput.value = '';
+      }
+
       document.getElementById('trade-custom-ticker').value = '';
       document.getElementById('trade-custom-ticker').classList.add('hidden');
       document.getElementById('trade-stock-select').classList.remove('hidden');
       document.getElementById('trade-toggle-custom-btn').innerText = 'سهم جديد غير موجود بالقائمة؟';
       onTradeStockSelected();
+
+      if (defaultShares !== null && defaultShares !== undefined && Number(defaultShares) > 0) {
+        sharesInput.value = Math.round(Number(defaultShares));
+      }
+      if (defaultPrice !== null && defaultPrice !== undefined && Number(defaultPrice) > 0) {
+        priceInput.value = Number(defaultPrice).toFixed(2);
+      }
+      recalcTradeSummary();
       
       const modal = document.getElementById('trade-modal');
       modal.classList.remove('hidden');
