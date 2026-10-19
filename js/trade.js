@@ -10,11 +10,11 @@
       const buyPrice = Math.max(0, parseFloat(document.getElementById('modal-buy-price').value) || 0);
 
       if (shares > 0 && currentPrice > 0) {
-        const value = Math.round(shares * currentPrice);
+        const value = parseFloat((shares * currentPrice).toFixed(2));
         document.getElementById('modal-value').value = value;
         if (buyPrice > 0) {
-          const cost = Math.round(shares * buyPrice);
-          const profit = value - cost;
+          const cost = parseFloat((shares * buyPrice).toFixed(2));
+          const profit = parseFloat((value - cost).toFixed(2));
           document.getElementById('modal-profit').value = profit;
         }
       }
@@ -738,10 +738,10 @@
         return;
       }
 
-      // Mathematically derive cost, value, profit, and returnPct to prevent NaN poisoning
-      const value = Math.round(shares * currentPrice);
-      const cost = Math.round(shares * buyPrice);
-      const profit = Math.round(value - cost);
+      // Mathematically derive cost, value, profit, and returnPct with exact 2-decimal piastre precision
+      const value = parseFloat((shares * currentPrice).toFixed(2));
+      const cost = parseFloat((shares * buyPrice).toFixed(2));
+      const profit = parseFloat((value - cost).toFixed(2));
       const returnPct = cost > 0 ? parseFloat((((value - cost) / cost) * 100).toFixed(2)) : 0;
       const advice = document.getElementById('modal-advice').value.trim() || existing.advice || 'احتفاظ ومتابعة';
 

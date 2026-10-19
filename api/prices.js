@@ -162,9 +162,12 @@ function parseTechnicalRecord(item) {
     stopLossVal = Number((Math.min(price, supportVal) * 0.97).toFixed(2));
   }
 
-  // Safety invariant: Stop loss must strictly be below current market price by at least 1.5%
-  if (stopLossVal != null && (stopLossVal >= price || (price - stopLossVal) < 0.01)) {
+  // Safety invariant: Stop loss must strictly be below current market price for valid positions,
+  // but if support is already broken, anchor to the confirmed invalidation point without trailing downward
+  if (!isSupportBroken && stopLossVal != null && (stopLossVal >= price || (price - stopLossVal) < 0.01)) {
     stopLossVal = Number((price * 0.96).toFixed(2));
+  } else if (isSupportBroken && pivotS1 != null) {
+    stopLossVal = Number((pivotS1 * 0.985).toFixed(2));
   }
 
   // Target determination: Structurally anchored to Resistance levels with Breakout & Fibonacci Extension
@@ -304,12 +307,12 @@ function parseTechnicalRecord(item) {
     safetyTag = 'broken_support';
   } else if (tradedValue >= 1000000000) {
     type = 'سيولة مليارية استثنائية • أمان مؤسسي فائق';
-    const flowType = changePct >= 0 ? 'تجميع مؤسسي قياسي وتدفقات سيولة ضخمة' : (changePct <= -3.0 ? 'ضغوط بيعية وتصريف مكثف عالي السيولة' : 'امتصاص بيعي مؤسسي وتثبيت سعري');
+    const flowType = changePct > 0 ? 'تجميع مؤسسي قياسي وتدفقات سيولة ضخمة' : (changePct < -2.0 ? 'ضغوط بيعية وتصريف مكثف عالي السيولة' : 'تداول عرضي متوازن وامتصاص مؤسسي');
     catalyst = `${qualityDesc} • ${flowType} (تنفيذات ${turnoverMillions} مليون ج)`;
     safetyTag = 'volume_surge';
   } else if (tradedValue >= 100000000) {
     type = 'سيولة مؤسسية كبرى تتجاوز 100 مليون ج';
-    const flowType = changePct >= 0 ? 'تجميع مؤسسي قوي وتدفقات سيولة قيادية' : (changePct <= -3.0 ? 'ضغوط بيعية وتصريف مكثف عالي السيولة' : 'امتصاص بيعي مؤسسي وتثبيت سعري');
+    const flowType = changePct > 0 ? 'تجميع مؤسسي قوي وتدفقات سيولة قيادية' : (changePct < -2.0 ? 'ضغوط بيعية وتصريف مكثف عالي السيولة' : 'تداول عرضي متوازن وامتصاص مؤسسي');
     catalyst = `${qualityDesc} • ${flowType} (تنفيذات ${turnoverMillions} مليون ج)`;
     safetyTag = 'volume_surge';
   } else if (changePct > 3.0 && tradedValue > 10000000) {
@@ -322,11 +325,11 @@ function parseTechnicalRecord(item) {
     safetyTag = 'oversold_bounce';
   } else if (dict.index === 'egx30') {
     type = 'شركة قيادية كبرى (EGX30)';
-    const egx30Trend = changePct >= 0 ? 'تداول إيجابي متوازن' : 'تهدئة سعرية وتماسك';
+    const egx30Trend = changePct > 0 ? 'تداول إيجابي متوازن' : (changePct < 0 ? 'تهدئة سعرية وتماسك' : 'استقرار سعري وتداول عرضي');
     catalyst = `${qualityDesc} • ${egx30Trend} (سيولة ${turnoverMillions}M ج)`;
     safetyTag = 'low_risk';
   } else {
-    const egx70Trend = changePct >= 0 ? 'نشاط مضاربي مدروس' : 'حركة تصحيحية هادئة';
+    const egx70Trend = changePct > 0 ? 'نشاط مضاربي مدروس' : (changePct < 0 ? 'حركة تصحيحية هادئة' : 'تداول عرضي هادئ');
     catalyst = `${qualityDesc} • ${egx70Trend} (تداول ${turnoverMillions}M ج)`;
   }
 
@@ -364,7 +367,7 @@ function parseTechnicalRecord(item) {
     support: supportVal != null ? `${supportVal} ج` : '--',
     target1: target1Val != null ? `${target1Val} ج` : '--',
     target2: target2Val != null ? `${target2Val} ج` : 'اكتشاف أسعار تاريخي',
-    stopLoss: stopLossVal != null ? `${stopLossVal} ج` : '--',
+    stopLoss: isSupportBroken ? `${stopLossVal} ج (مكسور)` : (stopLossVal != null ? `${stopLossVal} ج` : '--'),
     rrRatio: rrRatio,
     rrDisplay: rrDisplay,
     catalyst: catalyst,

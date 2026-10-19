@@ -371,15 +371,23 @@
       }
     }
 
-    // Force fresh sync & clear cached portfolio
+    // Force fresh live price sync without wiping stored portfolio data
     function forceFreshSync() {
-      localStorage.removeItem('egx_copilot_portfolio');
-      localStorage.removeItem('egx_copilot_portfolio_ver');
-      portfolioData = (typeof EGX_Portfolio !== 'undefined')
-        ? EGX_Portfolio.load()
-        : JSON.parse(JSON.stringify(defaultPortfolioData));
-      renderPortfolioTable();
+      // Refresh live prices from the EGX feed and recompute all technical metrics without data loss
       fetchLiveEGXPricesAndReevaluate(false);
+    }
+
+    // Explicit user-confirmed reset to baseline portfolio
+    function hardResetPortfolioToDefault() {
+      if (confirm('تحذير: هل أنت متأكد من رغبتك في إعادة ضبط المحفظة للقيم الافتراضية وحذف أي تعديلات يدوية؟')) {
+        localStorage.removeItem('egx_copilot_portfolio');
+        localStorage.removeItem('egx_copilot_portfolio_ver');
+        portfolioData = (typeof EGX_Portfolio !== 'undefined')
+          ? EGX_Portfolio.load()
+          : JSON.parse(JSON.stringify(defaultPortfolioData));
+        if (typeof renderPortfolioTable === 'function') renderPortfolioTable();
+        fetchLiveEGXPricesAndReevaluate(false);
+      }
     }
 
     // Backwards compatibility alias

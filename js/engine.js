@@ -405,6 +405,216 @@
         netGainShares,
         newTotalShares
       };
+    },
+
+    /**
+     * Determine Stock Market Cycle Stage (4 distinct stages)
+     */
+    determineStockCycle: function (item) {
+      if (!item || item.ticker === 'CASH' || item.isCashReserve) {
+        return {
+          stage: 0,
+          nameAr: 'سيولة نقدية',
+          shortBadge: 'كاش حر 💵',
+          badgeClass: 'bg-slate-800 text-slate-300 border border-slate-700',
+          advice: 'سيولة نقدية استراتيجية مخصصة للاقتناص.',
+          actionTag: 'سيولة جاهزة',
+          progressPct: 0
+        };
+      }
+
+      const clean = (val) => {
+        if (val == null) return null;
+        if (typeof val === 'number') return isNaN(val) ? null : val;
+        const cleaned = String(val).replace(/[^\d.-]/g, '');
+        const n = parseFloat(cleaned);
+        return isNaN(n) ? null : n;
+      };
+
+      const price = clean(item.currentPrice) || clean(item.price) || clean(item.buyPrice) || 0;
+      const buyPrice = clean(item.buyPrice) || price;
+      const pivotS1 = clean(item.pivotS1) || clean(item.support);
+      const pivotR1 = clean(item.pivotR1) || clean(item.target1);
+      const sma50 = clean(item.sma50);
+      const rsi = clean(item.rsi) || 50;
+      const returnPct = clean(item.returnPct) != null ? clean(item.returnPct) : (buyPrice > 0 ? ((price - buyPrice) / buyPrice) * 100 : 0);
+      const isSupportBroken = item.isSupportBroken || (pivotS1 != null && price < pivotS1);
+
+      // Stage 4: Downtrend / Broken Support
+      if (isSupportBroken || (returnPct <= -15 && pivotS1 != null && price < pivotS1)) {
+        return {
+          stage: 4,
+          nameAr: 'المرحلة 4: مسار هابط وكسر دعم',
+          shortBadge: 'كسر دعم / هبوط 🟣',
+          badgeClass: 'bg-purple-950/70 text-purple-300 border border-purple-500/50 shadow-sm font-bold',
+          bgHeaderClass: 'from-purple-950 to-slate-900',
+          advice: 'السهم كسر حد الأمان الفني. الشراء هنا محظور؛ انتظر ارتداداً للتخفيف أو تماسك قاع جديد.',
+          actionTag: 'تريث ومراقبة',
+          progressPct: 15
+        };
+      }
+
+      // Stage 3: Topping / Overextended (FOMO / Profit Taking zone)
+      if ((pivotR1 != null && price >= pivotR1) || returnPct >= 20 || rsi >= 72 || (sma50 != null && sma50 > 0 && ((price - sma50) / sma50) > 0.25)) {
+        return {
+          stage: 3,
+          nameAr: 'المرحلة 3: قمة خطرة وتشبع صاعد',
+          shortBadge: 'قمة وتشبع 🔴 (ممنوع الشراء)',
+          badgeClass: 'bg-rose-950/70 text-rose-300 border border-rose-500/50 shadow-sm font-bold',
+          bgHeaderClass: 'from-rose-950 to-slate-900',
+          advice: `السهم صعد بقوة (+${returnPct.toFixed(1)}%) ووصل لمنطقة تشبع ومقاومة. الشراء هنا مخاطرة عالية (مصيدة قمة). الأصل هو تأمين الأرباح ونقل الكاش لصناديق السيولة.`,
+          actionTag: 'جني أرباح وتأمين',
+          progressPct: 90
+        };
+      }
+
+      // Stage 1: Safe Bottom & Accumulation
+      const distFromS1Pct = (pivotS1 != null && pivotS1 > 0) ? ((price - pivotS1) / pivotS1) * 100 : 10;
+      if ((distFromS1Pct <= 5 && distFromS1Pct >= -0.5) || rsi < 38 || (returnPct < 0 && !isSupportBroken && (pivotS1 == null || price >= pivotS1))) {
+        return {
+          stage: 1,
+          nameAr: 'المرحلة 1: قاع آمن وتجميع',
+          shortBadge: 'قاع وتجميع 🟢 (فرصة شراء)',
+          badgeClass: 'bg-emerald-950/70 text-emerald-300 border border-emerald-500/50 shadow-sm font-bold',
+          bgHeaderClass: 'from-emerald-950 to-slate-900',
+          advice: 'السهم مستقر عند مستويات دعمه الرئيسية ولم يرتفع بعد. نسبة العائد للمخاطرة ممتازة وتوقيت مثالي للشراء أو تخفيض المتوسط.',
+          actionTag: 'فرصة شراء آمنة',
+          progressPct: 25
+        };
+      }
+
+      // Stage 2: Mid-Cycle Healthy Trend
+      return {
+        stage: 2,
+        nameAr: 'المرحلة 2: مسار صاعد معتدل',
+        shortBadge: 'مسار صاعد 🟡 (احتفاظ)',
+        badgeClass: 'bg-cyan-950/70 text-cyan-300 border border-cyan-500/50 shadow-sm font-bold',
+        bgHeaderClass: 'from-cyan-950 to-slate-900',
+        advice: 'السهم يتحرك في اتجاه إيجابي صحي، لكنه ابتعد عن القاع. مناسب للاحتفاظ إذا كنت تملكه، ولا يُنصح بالشراء بكميات كبيرة الآن.',
+        actionTag: 'احتفاظ بالمركز',
+        progressPct: 60
+      };
+    },
+
+    /**
+     * Generate Actionable Daily Hub Plan for Busy Investors
+     */
+    generateDailyActionHub: function (portfolioData, fullMarketRadar, cashBalance) {
+      portfolioData = Array.isArray(portfolioData) ? portfolioData : [];
+      fullMarketRadar = Array.isArray(fullMarketRadar) ? fullMarketRadar : [];
+      cashBalance = Number(cashBalance) || 0;
+
+      // Extract funds cash
+      const ncsItem = portfolioData.find(p => p.ticker === 'NCS');
+      const bsbItem = portfolioData.find(p => p.ticker === 'BSB');
+      const fundsTotal = (ncsItem ? Number(ncsItem.value || 0) : 0) + (bsbItem ? Number(bsbItem.value || 0) : 0);
+      const totalDryPowder = cashBalance + fundsTotal;
+
+      // 1. Identify Buy / Accumulation Candidate
+      let buyCandidate = null;
+      const accumPortfolio = portfolioData.filter(p => p.ticker !== 'CASH' && p.ticker !== 'NCS' && p.ticker !== 'BSB' && (p.profit < 0 || p.action === 'ACCUMULATE'));
+      const preferredDip = accumPortfolio.find(p => p.ticker === 'COMI') || accumPortfolio[0];
+      
+      if (preferredDip) {
+        const curPrice = Number(preferredDip.currentPrice) || Number(preferredDip.buyPrice) || 100;
+        const buyPrice = Number(preferredDip.buyPrice) || curPrice;
+        const currentShares = parseInt(preferredDip.shares, 10) || 0;
+        
+        const suggestedCash = Math.min(5000, Math.max(1500, Math.round(cashBalance * 0.25)));
+        const sharesToBuy = curPrice > 0 ? Math.floor(suggestedCash / curPrice) : 0;
+        const actualCashSpend = Math.round(sharesToBuy * curPrice);
+        
+        const totalOldCost = currentShares * buyPrice;
+        const totalNewCost = totalOldCost + actualCashSpend;
+        const totalNewShares = currentShares + sharesToBuy;
+        const newAvgCost = totalNewShares > 0 ? Number((totalNewCost / totalNewShares).toFixed(2)) : buyPrice;
+        const avgReductionEgp = Number((buyPrice - newAvgCost).toFixed(2));
+
+        const cycle = this.determineStockCycle(preferredDip);
+
+        buyCandidate = {
+          ticker: preferredDip.ticker,
+          name: preferredDip.name,
+          currentPrice: curPrice,
+          buyPrice: buyPrice,
+          returnPct: Number(preferredDip.returnPct) || 0,
+          currentShares: currentShares,
+          suggestedCash: actualCashSpend,
+          sharesToBuy: sharesToBuy,
+          newAvgCost: newAvgCost,
+          avgReductionEgp: avgReductionEgp,
+          cycle: cycle,
+          supportPrice: preferredDip.pivotS1 || Number((curPrice * 0.97).toFixed(2)),
+          targetPrice: preferredDip.pivotR1 || Number((curPrice * 1.15).toFixed(2)),
+          thndrUrl: preferredDip.thndrUrl || `https://app.thndr.app/search?query=${preferredDip.ticker}`
+        };
+      }
+
+      // 2. Identify Profit-Taking & Share Accumulation Candidate (Trading Around Core)
+      let profitCandidate = null;
+      const winningPortfolio = portfolioData.filter(p => p.ticker !== 'CASH' && p.ticker !== 'NCS' && p.ticker !== 'BSB' && (p.profit > 0 || p.returnPct > 0));
+      winningPortfolio.sort((a, b) => (Number(b.returnPct) || 0) - (Number(a.returnPct) || 0));
+      
+      const topWinner = winningPortfolio[0];
+      if (topWinner && (topWinner.returnPct >= 18 || topWinner.action === 'REBALANCE_CANDIDATE')) {
+        const curPrice = Number(topWinner.currentPrice) || Number(topWinner.buyPrice) || 100;
+        const buyPrice = Number(topWinner.buyPrice) || curPrice;
+        const totalShares = parseInt(topWinner.shares, 10) || 0;
+        
+        const rebalance = this.calculateRebalance(totalShares, curPrice, buyPrice, 0.30, Number(topWinner.pivotS1) || (curPrice * 0.90));
+        const cycle = this.determineStockCycle(topWinner);
+
+        profitCandidate = {
+          ticker: topWinner.ticker,
+          name: topWinner.name,
+          currentPrice: curPrice,
+          buyPrice: buyPrice,
+          returnPct: Number(topWinner.returnPct) || 0,
+          totalShares: totalShares,
+          sellShares: rebalance.sellShares,
+          sellCash: rebalance.sellCash,
+          realizedProfit: rebalance.realizedProfit,
+          remainingShares: rebalance.remainingShares,
+          rebuyPrice: Number(topWinner.pivotS1) || Number((curPrice * 0.90).toFixed(2)),
+          rebuyShares: rebalance.rebuyShares,
+          netGainShares: Math.max(1, rebalance.netGainShares),
+          cycle: cycle,
+          thndrUrl: topWinner.thndrUrl || `https://app.thndr.app/search?query=${topWinner.ticker}`
+        };
+      }
+
+      // 3. Identify Capital Protection / Risk Alert
+      let safetyAlert = null;
+      const brokenAssets = portfolioData.filter(p => p.ticker !== 'CASH' && (p.isSupportBroken || (p.pivotS1 && p.currentPrice < p.pivotS1)));
+      if (brokenAssets.length > 0) {
+        const risky = brokenAssets[0];
+        safetyAlert = {
+          hasRisk: true,
+          ticker: risky.ticker,
+          name: risky.name,
+          currentPrice: Number(risky.currentPrice) || 0,
+          supportPrice: Number(risky.pivotS1) || 0,
+          returnPct: Number(risky.returnPct) || 0,
+          text: `سهم ${risky.name} (${risky.ticker}) كسر مستوى الدعم المحوري S1 (${risky.pivotS1} ج). يُنصح بمتابعة خطة الحماية والتدوير لتفادي زيادة الخسارة.`
+        };
+      } else {
+        safetyAlert = {
+          hasRisk: false,
+          text: 'جميع أسهمك القيادية تتداول فوق خطوط الأمان والدعوم الفنية. لا توجد أي إشارات كسر دعم حرجة اليوم.'
+        };
+      }
+
+      return {
+        cashStatus: {
+          freeCash: cashBalance,
+          fundsTotal: fundsTotal,
+          totalDryPowder: totalDryPowder,
+          summaryText: `لديك ${Math.round(cashBalance).toLocaleString('en-US')} ج.م كاش حر + ${Math.round(fundsTotal).toLocaleString('en-US')} ج.م في صناديق السيولة اليومية (تدر عائد ~22% سنوياً). هذه السيولة مخصصة لاقتناص القيعان فقط.`
+        },
+        buyCandidate,
+        profitCandidate,
+        safetyAlert
+      };
     }
   };
 

@@ -609,10 +609,3 @@
     function showSuccessNotification(message) {
       showToast(message, 'success');
     }
-
-
-// Global UI / Filter State
-let chartInstance = null;
-let currentRadarFilter = 'all';
-let activeEmergencyAlert = null;
-let sessionNotificationHistory = [];

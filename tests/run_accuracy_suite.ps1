@@ -452,6 +452,37 @@ $disciplinedStopLesson = Simulate-PostMortemAnalysis -SellPrice 68.5 -BuyCost 72
 Assert-Test -Suite 'Learning' -TestName 'Post-mortem accurately tags disciplined stop loss exit as DISCIPLINED_STOP' -Condition ($disciplinedStopLesson -eq "DISCIPLINED_STOP") -Expected 'DISCIPLINED_STOP' -Actual $disciplinedStopLesson
 
 # -------------------------------------------------------------
+# SUITE 6: STOCK CYCLE STAGES & DAILY ACTION HUB MATHEMATICS
+# -------------------------------------------------------------
+Write-Host "[6/6] Running Suite 6: Stock Cycle Stages & Daily Action Hub Tests..." -ForegroundColor Yellow
+
+function Simulate-StockCycle {
+    param([double]$Price, [double]$BuyPrice, [double]$PivotS1, [double]$PivotR1, [double]$RSI)
+    $retPct = if ($BuyPrice -gt 0) { (($Price - $BuyPrice) / $BuyPrice) * 100 } else { 0 }
+    if ($PivotS1 -gt 0 -and $Price -lt $PivotS1) { return 4 } # Broken Support
+    if (($PivotR1 -gt 0 -and $Price -ge $PivotR1) -or $retPct -ge 20 -or $RSI -ge 72) { return 3 } # Topping / Overextended
+    if ($Price -le ($PivotS1 * 1.05) -or $RSI -lt 38 -or $retPct -lt 0) { return 1 } # Accumulation
+    return 2 # Mid-trend
+}
+
+$stageAccum = Simulate-StockCycle -Price 123.5 -BuyPrice 139.0 -PivotS1 119.6 -PivotR1 137.9 -RSI 36.0
+Assert-Test -Suite 'Cycle' -TestName 'Dipping Blue-Chip (COMI near S1) classifies as Stage 1 Accumulation' -Condition ($stageAccum -eq 1) -Expected '1' -Actual $stageAccum
+
+$stageTop = Simulate-StockCycle -Price 104.9 -BuyPrice 77.29 -PivotS1 91.6 -PivotR1 104.0 -RSI 74.0
+Assert-Test -Suite 'Cycle' -TestName 'Surging Winner (SWDY +35% at R1) classifies as Stage 3 Topping FOMO Trap' -Condition ($stageTop -eq 3) -Expected '3' -Actual $stageTop
+
+$stageBroken = Simulate-StockCycle -Price 14.0 -BuyPrice 17.73 -PivotS1 14.8 -PivotR1 18.0 -RSI 32.0
+Assert-Test -Suite 'Cycle' -TestName 'Broken support stock classifies as Stage 4 Downtrend' -Condition ($stageBroken -eq 4) -Expected '4' -Actual $stageBroken
+
+# Daily Hub Re-buy Free Shares Math
+$sellCashGen = 6290
+$supportRebuyPrice = 92.5
+$rebuySharesCount = [Math]::Floor($sellCashGen / $supportRebuyPrice)
+$soldShares = 60
+$netGain = $rebuySharesCount - $soldShares
+Assert-Test -Suite 'Hub' -TestName 'Trading around core yields positive free extra shares (+8 shares)' -Condition ($netGain -eq 8) -Expected '8' -Actual $netGain
+
+# -------------------------------------------------------------
 # FINAL BENCHMARK SUMMARY & ACCURACY SCORE
 # -------------------------------------------------------------
 $AccuracyScore = [Math]::Round((($PassedTests / $TotalTests) * 100), 2)

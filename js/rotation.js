@@ -193,7 +193,7 @@
 
       const step1Title = document.getElementById('rot-step1-title');
       const step1Note = document.getElementById('rot-step1-note');
-      const cashGenLabel = document.getElementById('rot-cash-generated-label');
+
 
       const scenATitle = document.getElementById('rot-scenario-a-title');
       const scenATag = document.getElementById('rot-scenario-a-tag');

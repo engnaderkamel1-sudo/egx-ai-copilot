@@ -7,7 +7,7 @@
   'use strict';
 
   const PORTFOLIO_VERSION_KEY = 'egx_copilot_portfolio_ver';
-  const CURRENT_PORTFOLIO_VER = '2026_10_clean_modular_v4_institutional';
+  const CURRENT_PORTFOLIO_VER = '2026_10_clean_modular_v5_reconciled';
 
   const defaultPortfolioData = [
     {
@@ -18,7 +18,7 @@
       buyPrice: 76.52,
       currentPrice: 83.20,
       value: 16224,
-      profit: 1302.79,
+      profit: 1302.60,
       returnPct: 8.73,
       status: 'ربح مستمر',
       advice: 'احتفاظ • تدفقات تصديرية دولارية ومشاريع طاقة نظيفة واعدة',
@@ -27,7 +27,7 @@
       priceSource: 'شاشة ثندر اللحظية',
       decisionUpdatedAt: 'جلسة اليوم',
       decisionBasis: 'سعر السوق اللحظي 83.20 ج',
-      thndrUrl: 'https://app.thndr.app'
+      thndrUrl: 'https://app.thndr.app/search?query=ABUK'
     },
     {
       ticker: 'ARCC',
@@ -36,9 +36,9 @@
       shares: 331,
       buyPrice: 66.86,
       currentPrice: 70.80,
-      value: 23435,
-      profit: 1305.15,
-      returnPct: 5.90,
+      value: 23434.80,
+      profit: 1304.14,
+      returnPct: 5.89,
       status: 'ربح',
       advice: 'احتفاظ • استقرار أسعار الأسمنت وهوامش ربحية تصديرية جيدة',
       action: 'HOLD',
@@ -46,7 +46,7 @@
       priceSource: 'شاشة ثندر اللحظية',
       decisionUpdatedAt: 'جلسة اليوم',
       decisionBasis: 'سعر السوق اللحظي 70.80 ج',
-      thndrUrl: 'https://app.thndr.app'
+      thndrUrl: 'https://app.thndr.app/search?query=ARCC'
     },
     {
       ticker: 'BSB',
@@ -55,7 +55,7 @@
       shares: 1222,
       buyPrice: 16.37,
       currentPrice: 16.73,
-      value: 20444,
+      value: 20444.06,
       profit: 439.92,
       returnPct: 2.20,
       status: 'ربح',
@@ -65,7 +65,7 @@
       priceSource: 'شاشة ثندر اللحظية',
       decisionUpdatedAt: 'جلسة اليوم',
       decisionBasis: 'سعر الوثيقة المعلن 16.73 ج',
-      thndrUrl: 'https://app.thndr.app'
+      thndrUrl: 'https://app.thndr.app/search?query=BSB'
     },
     {
       ticker: 'CLHO',
@@ -75,8 +75,8 @@
       buyPrice: 17.73,
       currentPrice: 14.00,
       value: 13482,
-      profit: -3595.92,
-      returnPct: -21.06,
+      profit: -3592.01,
+      returnPct: -21.04,
       status: 'تراجع',
       advice: 'مرشح للتدوير • انتظار ارتداد فني نحو المقاومة لتخفيف المركز وتدوير السيولة',
       action: 'REBALANCE_CANDIDATE',
@@ -84,7 +84,7 @@
       priceSource: 'شاشة ثندر اللحظية',
       decisionUpdatedAt: 'جلسة اليوم',
       decisionBasis: 'سعر السوق اللحظي 14.00 ج',
-      thndrUrl: 'https://app.thndr.app'
+      thndrUrl: 'https://app.thndr.app/search?query=CLHO'
     },
     {
       ticker: 'COMI',
@@ -93,8 +93,8 @@
       shares: 147,
       buyPrice: 139.32,
       currentPrice: 123.56,
-      value: 18163,
-      profit: -2317.04,
+      value: 18163.32,
+      profit: -2316.72,
       returnPct: -11.31,
       status: 'تراجع',
       advice: 'تجميع تدريجي • مكرر ربحية مغرٍ وأكبر سهم قيادي وزناً في EGX30',
@@ -103,7 +103,7 @@
       priceSource: 'شاشة ثندر اللحظية',
       decisionUpdatedAt: 'جلسة اليوم',
       decisionBasis: 'سعر السوق اللحظي 123.56 ج',
-      thndrUrl: 'https://app.thndr.app'
+      thndrUrl: 'https://app.thndr.app/search?query=COMI'
     },
     {
       ticker: 'EMFD',
@@ -112,7 +112,7 @@
       shares: 2638,
       buyPrice: 8.95,
       currentPrice: 8.65,
-      value: 22819,
+      value: 22818.70,
       profit: -791.40,
       returnPct: -3.35,
       status: 'تراجع',
@@ -122,7 +122,7 @@
       priceSource: 'شاشة ثندر اللحظية',
       decisionUpdatedAt: 'جلسة اليوم',
       decisionBasis: 'سعر السوق اللحظي 8.65 ج',
-      thndrUrl: 'https://app.thndr.app'
+      thndrUrl: 'https://app.thndr.app/search?query=EMFD'
     },
     {
       ticker: 'ETRS',
@@ -141,7 +141,7 @@
       priceSource: 'شاشة ثندر اللحظية',
       decisionUpdatedAt: 'جلسة اليوم',
       decisionBasis: 'سعر السوق اللحظي 5.75 ج',
-      thndrUrl: 'https://app.thndr.app'
+      thndrUrl: 'https://app.thndr.app/search?query=ETRS'
     },
     {
       ticker: 'FWRY',
@@ -150,7 +150,7 @@
       shares: 1111,
       buyPrice: 8.78,
       currentPrice: 10.89,
-      value: 12099,
+      value: 12098.79,
       profit: 2344.21,
       returnPct: 24.03,
       status: 'طفرة ربحية',
@@ -160,7 +160,7 @@
       priceSource: 'شاشة ثندر اللحظية',
       decisionUpdatedAt: 'جلسة اليوم',
       decisionBasis: 'سعر السوق اللحظي 10.89 ج',
-      thndrUrl: 'https://app.thndr.app'
+      thndrUrl: 'https://app.thndr.app/search?query=FWRY'
     },
     {
       ticker: 'NCS',
@@ -169,7 +169,7 @@
       shares: 1301,
       buyPrice: 15.42,
       currentPrice: 16.03,
-      value: 20855,
+      value: 20855.03,
       profit: 793.61,
       returnPct: 3.96,
       status: 'ربح آمن',
@@ -179,7 +179,7 @@
       priceSource: 'شاشة ثندر اللحظية',
       decisionUpdatedAt: 'جلسة اليوم',
       decisionBasis: 'سعر الوثيقة المعلن 16.03 ج',
-      thndrUrl: 'https://app.thndr.app'
+      thndrUrl: 'https://app.thndr.app/search?query=NCS'
     },
     {
       ticker: 'ORAS',
@@ -198,7 +198,7 @@
       priceSource: 'شاشة ثندر اللحظية',
       decisionUpdatedAt: 'جلسة اليوم',
       decisionBasis: 'سعر السوق اللحظي 355.00 ج',
-      thndrUrl: 'https://app.thndr.app'
+      thndrUrl: 'https://app.thndr.app/search?query=ORAS'
     },
     {
       ticker: 'SWDY',
@@ -217,7 +217,7 @@
       priceSource: 'شاشة ثندر اللحظية',
       decisionUpdatedAt: 'جلسة اليوم',
       decisionBasis: 'سعر السوق اللحظي 104.90 ج',
-      thndrUrl: 'https://app.thndr.app'
+      thndrUrl: 'https://app.thndr.app/search?query=SWDY'
     },
     {
       ticker: 'TMGH',
@@ -236,7 +236,7 @@
       priceSource: 'شاشة ثندر اللحظية',
       decisionUpdatedAt: 'جلسة اليوم',
       decisionBasis: 'سعر السوق اللحظي 83.00 ج',
-      thndrUrl: 'https://app.thndr.app'
+      thndrUrl: 'https://app.thndr.app/search?query=TMGH'
     },
     {
       ticker: 'CASH',
@@ -280,7 +280,7 @@
         }
       }
 
-      // If user has existing valid portfolio data, preserve it across version bumps
+      // If user has existing valid portfolio data, preserve and reconcile it
       if (Array.isArray(parsed) && parsed.length > 0) {
         if (savedVer !== CURRENT_PORTFOLIO_VER) {
           localStorage.setItem(PORTFOLIO_VERSION_KEY, CURRENT_PORTFOLIO_VER);
@@ -290,6 +290,18 @@
             const defCash = defaultPortfolioData.find(p => p.ticker === 'CASH' || p.isCashReserve);
             if (defCash) parsed.push(JSON.parse(JSON.stringify(defCash)));
           }
+
+          // Reconcile and sanitize any corrupted math or NaN values in preserved portfolio
+          parsed.forEach(item => {
+            if (item.ticker !== 'CASH' && !item.isCashReserve && item.shares > 0 && item.buyPrice > 0) {
+              const curPrice = Number(item.currentPrice) || Number(item.buyPrice);
+              item.value = Number((item.shares * curPrice).toFixed(2));
+              const cost = Number((item.shares * item.buyPrice).toFixed(2));
+              item.profit = Number((item.value - cost).toFixed(2));
+              item.returnPct = cost > 0 ? Number(((item.profit / cost) * 100).toFixed(2)) : 0;
+            }
+          });
+
           this.save(parsed);
 
           // Clean legacy unversioned plans if corrupted
@@ -328,18 +340,23 @@
 
       portfolioData.forEach(item => {
         const val = Number(item.value) || 0;
-        const profit = Number(item.profit) || 0;
+        const shares = Number(item.shares) || 0;
+        const buyPrice = Number(item.buyPrice) || 0;
         totalWealth += val;
-        totalCost += (val - profit);
+        if (item.ticker === 'CASH' || item.isCashReserve) {
+          totalCost += val;
+        } else {
+          totalCost += (shares * buyPrice);
+        }
       });
 
-      const totalProfit = totalWealth - totalCost;
+      const totalProfit = Number((totalWealth - totalCost).toFixed(2));
       const totalReturnPct = totalCost > 0 ? Number(((totalProfit / totalCost) * 100).toFixed(2)) : 0;
 
       return {
-        totalWealth: Math.round(totalWealth),
-        totalCost: Math.round(totalCost),
-        totalProfit: Math.round(totalProfit),
+        totalWealth: Number(totalWealth.toFixed(2)),
+        totalCost: Number(totalCost.toFixed(2)),
+        totalProfit,
         totalReturnPct
       };
     },
