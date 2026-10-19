@@ -5,9 +5,21 @@
 
     let chartInstance = null;
 
+    function safeCreateIcons() {
+      try {
+        if (typeof lucide !== 'undefined' && typeof lucide.createIcons === 'function') {
+          lucide.createIcons();
+        }
+      } catch (e) {
+        console.warn('Lucide icon render warning:', e);
+      }
+    }
+
     // Render Donut Chart (Asset Allocation)
     function renderAllocationChart() {
-      const ctx = document.getElementById('allocationChart').getContext('2d');
+      const canvas = document.getElementById('allocationChart');
+      if (!canvas || typeof Chart === 'undefined') return;
+      const ctx = canvas.getContext('2d');
       if (chartInstance) {
         chartInstance.destroy();
       }
@@ -590,7 +602,7 @@
         `;
         tbody.appendChild(tr);
       });
-      lucide.createIcons();
+      safeCreateIcons();
     }
 
 
@@ -803,7 +815,7 @@
         modal.classList.remove('hidden');
         modal.classList.add('flex');
       }
-      lucide.createIcons();
+      safeCreateIcons();
     }
 
 
@@ -874,7 +886,7 @@
             <p class="text-sm">لم يتم العثور على أي أسهم مطابقة لمعايير البحث الحالية.</p>
           </div>
         `;
-        lucide.createIcons();
+        safeCreateIcons();
         return;
       }
 
@@ -1010,7 +1022,7 @@
         `;
         container.appendChild(card);
       });
-      lucide.createIcons();
+      safeCreateIcons();
     }
 
 
@@ -1234,7 +1246,7 @@
           </p>
         `;
       }
-      lucide.createIcons();
+      safeCreateIcons();
     }
 
     // ==============================================
@@ -1276,7 +1288,7 @@
         </button>
       `;
       alertsContainer.prepend(alertDiv);
-      lucide.createIcons();
+      safeCreateIcons();
       alert('⚠️ تم إطلاق إشعار الطوارئ بنجاح لاختبار استجابة النظام!');
     }
 
@@ -1420,7 +1432,7 @@
       const scrollEl = document.getElementById('main-content-scroll');
       if (scrollEl) scrollEl.scrollTop = 0;
 
-      lucide.createIcons();
+      safeCreateIcons();
       if (tabId === 'portfolio') {
         renderAllocationChart();
       } else if (tabId === 'radar') {

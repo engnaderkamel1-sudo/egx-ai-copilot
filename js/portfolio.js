@@ -280,6 +280,10 @@
         }
       }
 
+      if (Array.isArray(parsed)) {
+        parsed = parsed.filter(item => item && typeof item === 'object' && typeof item.ticker === 'string' && item.ticker.trim() !== '');
+      }
+
       // If user has existing valid portfolio data, preserve and reconcile it
       if (Array.isArray(parsed) && parsed.length > 0) {
         if (savedVer !== CURRENT_PORTFOLIO_VER) {

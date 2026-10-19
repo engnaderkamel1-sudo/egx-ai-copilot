@@ -186,9 +186,7 @@
         const apiBase = (window.location.protocol === 'file:' || !window.location.host) 
           ? 'https://egx-ai-copilot.vercel.app' 
           : '';
-        const res = await fetch(`${apiBase}/api/prices?include_radar=true&_t=${Date.now()}`, {
-          headers: { 'Cache-Control': 'no-cache' }
-        });
+        const res = await fetch(`${apiBase}/api/prices?include_radar=true&_t=${Date.now()}`);
         if (!res.ok) throw new Error(`سيرفر البورصة رد برمز ${res.status}`);
         const data = await res.json();
 
@@ -386,6 +384,9 @@
           ? EGX_Portfolio.load()
           : JSON.parse(JSON.stringify(defaultPortfolioData));
         if (typeof renderPortfolioTable === 'function') renderPortfolioTable();
+        if (typeof updateMetrics === 'function') updateMetrics();
+        if (typeof renderAllocationChart === 'function') renderAllocationChart();
+        if (typeof savePortfolio === 'function') savePortfolio();
         fetchLiveEGXPricesAndReevaluate(false);
       }
     }
