@@ -253,7 +253,7 @@
             </div>
             <div class="bg-gray-950/90 border border-emerald-500/30 px-3.5 py-2 rounded-xl flex items-center gap-2 text-xs">
               <span class="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-ping"></span>
-              <span class="text-gray-300">السيولة المتاحة للاقتناص: <strong class="text-cyan-300 font-mono font-bold">${Math.round(cashStatus.totalDryPowder).toLocaleString('en-US')} ج.م</strong> (منها ${Math.round(cashStatus.freeCash).toLocaleString('en-US')} ج كاش حر)</span>
+              <span class="text-gray-300">السيولة النقدية الحرة (الكاش): <strong class="text-cyan-300 font-mono font-bold">${Math.round(cashStatus.freeCash).toLocaleString('en-US')} ج.م</strong></span>
             </div>
           </div>
 

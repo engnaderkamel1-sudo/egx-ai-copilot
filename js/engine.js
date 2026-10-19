@@ -504,11 +504,11 @@
       fullMarketRadar = Array.isArray(fullMarketRadar) ? fullMarketRadar : [];
       cashBalance = Number(cashBalance) || 0;
 
-      // Extract funds cash
+      // Extract funds cash (tracked separately from pure cash)
       const ncsItem = portfolioData.find(p => p.ticker === 'NCS');
       const bsbItem = portfolioData.find(p => p.ticker === 'BSB');
       const fundsTotal = (ncsItem ? Number(ncsItem.value || 0) : 0) + (bsbItem ? Number(bsbItem.value || 0) : 0);
-      const totalDryPowder = cashBalance + fundsTotal;
+      const totalDryPowder = cashBalance; // Pure cash only - investment funds excluded per user requirement
 
       // 1. Identify Buy / Accumulation Candidate
       let buyCandidate = null;
@@ -608,8 +608,8 @@
         cashStatus: {
           freeCash: cashBalance,
           fundsTotal: fundsTotal,
-          totalDryPowder: totalDryPowder,
-          summaryText: `لديك ${Math.round(cashBalance).toLocaleString('en-US')} ج.م كاش حر + ${Math.round(fundsTotal).toLocaleString('en-US')} ج.م في صناديق السيولة اليومية (تدر عائد ~22% سنوياً). هذه السيولة مخصصة لاقتناص القيعان فقط.`
+          totalDryPowder: cashBalance,
+          summaryText: `لديك ${Math.round(cashBalance).toLocaleString('en-US')} ج.م كاش حر متاح لاقتناص الفرص وتعزيز المراكز.`
         },
         buyCandidate,
         profitCandidate,
