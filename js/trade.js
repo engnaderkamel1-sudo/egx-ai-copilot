@@ -1061,6 +1061,7 @@
 
     function renderSimPositions() {
       const tbody = document.getElementById('sim-positions-body');
+      if (!tbody) return;
       tbody.innerHTML = '';
 
       let totalStocksValue = 0;

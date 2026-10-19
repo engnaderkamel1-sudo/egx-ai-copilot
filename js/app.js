@@ -1,4 +1,4 @@
-﻿/**
+/**
  * EGX AI Copilot - Application Lifecycle & Services (js/app.js)
  * Live market polling, cloud engine sync, emergency alerts (OED TTMS), auto-refresh worker, and bootstrap.
  */
@@ -19,10 +19,10 @@
       const ltVal = document.getElementById('setting-longterm-val');
       const tacVal = document.getElementById('setting-tactical-val');
 
-      if (ltLabel) ltLabel.innerText = `Ø§Ø³ØªØ«Ù…Ø§Ø± Ø·ÙˆÙŠÙ„: ${longTermPct}%`;
-      if (tacLabel) tacLabel.innerText = `Ø·ÙØ±Ø§Øª Ø³Ø±ÙŠØ¹Ø©: ${tacticalPct}%`;
-      if (ltVal) ltVal.innerText = `${longTermVal.toLocaleString('en-US')} Ø¬.Ù… (${longTermPct}%)`;
-      if (tacVal) tacVal.innerText = `${tacticalVal.toLocaleString('en-US')} Ø¬.Ù… (${tacticalPct}%)`;
+      if (ltLabel) ltLabel.innerText = `استثمار طويل: ${longTermPct}%`;
+      if (tacLabel) tacLabel.innerText = `طفرات سريعة: ${tacticalPct}%`;
+      if (ltVal) ltVal.innerText = `${longTermVal.toLocaleString('en-US')} ج.م (${longTermPct}%)`;
+      if (tacVal) tacVal.innerText = `${tacticalVal.toLocaleString('en-US')} ج.م (${tacticalPct}%)`;
     }
 
     const STRATEGY_SETTINGS_VER = '2026_10_v2';
@@ -43,7 +43,7 @@
       };
 
       localStorage.setItem('egx_strategy_settings', JSON.stringify(settings));
-      alert('âœ… ØªÙ… Ø­ÙØ¸ Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª Ø§Ù„Ù…Ø­ÙØ¸Ø© ÙˆÙ†Ø³Ø¨ Ø§Ù„Ø£Ù…Ø§Ù† Ø¨Ù†Ø¬Ø§Ø­! Ø³ÙŠØªÙ… ØªØ·Ø¨ÙŠÙ‚Ù‡Ø§ ÙÙŠ Ø¬Ù…ÙŠØ¹ Ø§Ù„ØªØ­Ù„ÙŠÙ„Ø§Øª ÙˆØ¥Ø¯Ø§Ø±Ø© Ø§Ù„Ù…Ø­ÙØ¸Ø©.');
+      alert('✅ تم حفظ إعدادات المحفظة ونسب الأمان بنجاح! سيتم تطبيقها في جميع التحليلات وإدارة المحفظة.');
     }
 
     function loadStrategySettings() {
@@ -79,10 +79,10 @@
           const timestampEl = document.getElementById('cloud-sync-timestamp');
           const modalTimeEl = document.getElementById('modal-cloud-exec-time');
           if (timestampEl) {
-            timestampEl.innerText = `${data.cairo_time} â€¢ Ø³ÙŠØ±ÙØ± Vercel Ø§Ù„Ø³Ø­Ø§Ø¨ÙŠ Ù†Ø´Ø·`;
+            timestampEl.innerText = `${data.cairo_time} • سيرفر Vercel السحابي نشط`;
           }
           if (modalTimeEl) {
-            modalTimeEl.innerText = `Ø¢Ø®Ø± ØªØ´ØºÙŠÙ„: ${data.cairo_time}`;
+            modalTimeEl.innerText = `آخر تشغيل: ${data.cairo_time}`;
           }
         } else {
           fallbackLocalTimestamp();
@@ -97,7 +97,7 @@
       const timeStr = formatCairoTime(now, false, true);
       const timestampEl = document.getElementById('cloud-sync-timestamp');
       if (timestampEl) {
-        timestampEl.innerText = `Ø§Ù„ÙŠÙˆÙ… ${timeStr} Ø¨ØªÙˆÙ‚ÙŠØª Ø§Ù„Ù‚Ø§Ù‡Ø±Ø© (Ø³ÙŠØ±ÙØ±Ø§Øª Vercel Edge)`;
+        timestampEl.innerText = `اليوم ${timeStr} بتوقيت القاهرة (سيرفرات Vercel Edge)`;
       }
     }
 
@@ -113,19 +113,19 @@
           const data = await res.json();
           const timestampEl = document.getElementById('cloud-sync-timestamp');
           if (timestampEl) {
-            timestampEl.innerText = `${data.cairo_time} â€¢ ÙØ­Øµ ÙÙˆØ±ÙŠ Ù…ÙƒØªÙ…Ù„`;
+            timestampEl.innerText = `${data.cairo_time} • فحص فوري مكتمل`;
           }
           if (data.autonomous_findings) {
             renderAutonomousFindings(data.autonomous_findings);
           }
-          alert('âœ… ØªÙ… ØªØ´ØºÙŠÙ„ Ø§Ù„ÙØ­Øµ Ø§Ù„Ø³Ø­Ø§Ø¨ÙŠ Ø¨Ù†Ø¬Ø§Ø­ ÙˆØªØ­Ø¯ÙŠØ« ÙƒØ§ÙØ© Ø§Ù„ØªÙˆØµÙŠØ§Øª Ø§Ù„Ø±Ù‚Ø§Ø¨ÙŠØ© ÙÙŠ Ø§Ù„Ø³Ø­Ø§Ø¨!');
+          alert('✅ تم تشغيل الفحص السحابي بنجاح وتحديث كافة التوصيات الرقابية في السحاب!');
         } else {
           fallbackLocalTimestamp();
-          alert('âœ… ØªÙ… Ø·Ù„Ø¨ Ø§Ù„ÙØ­Øµ Ø§Ù„Ø³Ø­Ø§Ø¨ÙŠ ÙˆØ¥Ø¹Ø§Ø¯Ø© Ø­Ø³Ø§Ø¨ Ø§Ù„Ù…Ø¤Ø´Ø±Ø§Øª Ø¨Ù†Ø¬Ø§Ø­.');
+          alert('✅ تم طلب الفحص السحابي وإعادة حساب المؤشرات بنجاح.');
         }
       } catch (err) {
         fallbackLocalTimestamp();
-        alert('âœ… ØªÙ… ØªØ­Ø¯ÙŠØ« Ø§Ù„ÙØ­Øµ Ø§Ù„Ø³Ø­Ø§Ø¨ÙŠ ÙˆÙ…Ø·Ø§Ø¨Ù‚Ø© Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ù…Ø­ÙØ¸Ø©.');
+        alert('✅ تم تحديث الفحص السحابي ومطابقة بيانات المحفظة.');
       } finally {
         if (icon) icon.classList.remove('animate-spin');
         if (btn) btn.disabled = false;
@@ -178,8 +178,8 @@
 
       if (!isSilent) {
         if (icon) icon.classList.add('animate-spin');
-        if (btnText) btnText.innerText = 'Ø¬Ø§Ø±ÙŠ Ø³Ø­Ø¨ Ø§Ù„Ø£Ø³Ø¹Ø§Ø± ÙˆØ¥Ø¹Ø§Ø¯Ø© Ø§ØªØ®Ø§Ø° Ø§Ù„Ù‚Ø±Ø§Ø±Ø§Øª...';
-        if (statusText) statusText.innerHTML = '<span class="text-cyan-400 font-bold animate-pulse">â³ Ø¬Ø§Ø±ÙŠ Ø§Ù„Ø§ØªØµØ§Ù„ Ø¨Ø§Ù„Ø¨ÙˆØ±ØµØ© Ø§Ù„Ù…ØµØ±ÙŠØ© ÙˆØ³Ø­Ø¨ Ø£Ø­Ø¯Ø« Ø§Ù„Ø£Ø³Ø¹Ø§Ø± Ø§Ù„Ù„Ø­Ø¸ÙŠØ© ÙˆØ¥Ø¹Ø§Ø¯Ø© ØªÙ‚ÙŠÙŠÙ… ÙƒØ§ÙØ© Ø§Ù„Ù‚Ø±Ø§Ø±Ø§Øª...</span>';
+        if (btnText) btnText.innerText = 'جاري سحب الأسعار وإعادة اتخاذ القرارات...';
+        if (statusText) statusText.innerHTML = '<span class="text-cyan-400 font-bold animate-pulse">⏳ جاري الاتصال بالبورصة المصرية وسحب أحدث الأسعار اللحظية وإعادة تقييم كافة القرارات...</span>';
       }
 
       try {
@@ -189,7 +189,7 @@
         const res = await fetch(`${apiBase}/api/prices?include_radar=true&_t=${Date.now()}`, {
           headers: { 'Cache-Control': 'no-cache' }
         });
-        if (!res.ok) throw new Error(`Ø³ÙŠØ±ÙØ± Ø§Ù„Ø¨ÙˆØ±ØµØ© Ø±Ø¯ Ø¨Ø±Ù…Ø² ${res.status}`);
+        if (!res.ok) throw new Error(`سيرفر البورصة رد برمز ${res.status}`);
         const data = await res.json();
 
         if (data.success) {
@@ -210,7 +210,7 @@
                 const live = data.prices[item.ticker];
                 item.currentPrice = live.price;
                 item.priceUpdatedAt = cairoTime;
-                item.priceSource = isSessionOpen ? 'Ø´Ø§Ø´Ø© Ø§Ù„Ø¨ÙˆØ±ØµØ© Ø§Ù„Ù„Ø­Ø¸ÙŠØ© (ØªØ¯Ø§ÙˆÙ„ Ù…Ø¨Ø§Ø´Ø±)' : 'Ø¢Ø®Ø± Ø¥ØºÙ„Ø§Ù‚ Ø±Ø³Ù…ÙŠ Ù„Ù„Ø¨ÙˆØ±ØµØ©';
+                item.priceSource = isSessionOpen ? 'شاشة البورصة اللحظية (تداول مباشر)' : 'آخر إغلاق رسمي للبورصة';
                 
                 // Real Technical Indicators & Levels
                 item.pivotR1 = live.pivotR1;
@@ -238,13 +238,13 @@
                     const cost = item.shares * item.buyPrice;
                     item.profit = Math.round(item.value - cost);
                     item.returnPct = cost > 0 ? parseFloat(((item.profit / cost) * 100).toFixed(2)) : 0;
-                    item.status = item.profit >= 0 ? 'Ø±Ø¨Ø­' : 'ØªØ±Ø§Ø¬Ø¹';
+                    item.status = item.profit >= 0 ? 'ربح' : 'تراجع';
                   }
                 }
 
                 // Mathematical Technical Decision Engine (Zero Fake Data)
                 item.decisionUpdatedAt = cairoTime;
-                item.decisionBasis = `Ø³Ø¹Ø± Ø§Ù„Ø¨ÙˆØ±ØµØ©: ${item.currentPrice.toFixed(2)} Ø¬ | Ù…Ù‚Ø§ÙˆÙ…Ø© R1: ${item.pivotR1 || '--'} Ø¬ | Ø¯Ø¹Ù… S1: ${item.pivotS1 || '--'} Ø¬`;
+                item.decisionBasis = `سعر البورصة: ${item.currentPrice.toFixed(2)} ج | مقاومة R1: ${item.pivotR1 || '--'} ج | دعم S1: ${item.pivotS1 || '--'} ج`;
 
                 // 1. Target 1 Reached (Pivot R1 Hit)
                 if (item.pivotR1 && item.currentPrice >= item.pivotR1) {
@@ -252,40 +252,40 @@
                   item.action = 'REBALANCE_CANDIDATE';
                   item.alertLevel = isLosing ? 'REBOUND_RESISTANCE' : 'TARGET_HIT';
                   if (isLosing) {
-                    item.advice = `ðŸ”„ Ø§Ø±ØªØ¯Ø§Ø¯ ÙÙ†ÙŠ Ù„Ù…Ø³ØªÙˆÙ‰ Ø§Ù„Ù…Ù‚Ø§ÙˆÙ…Ø© R1 (${item.pivotR1} Ø¬) â€¢ Ø³Ù‡Ù… ${item.name} ÙŠØ®ØªØ¨Ø± Ø§Ù„Ù…Ù‚Ø§ÙˆÙ…Ø© Ø¨ØªØ±Ø§Ø¬Ø¹ (${item.returnPct.toFixed(1)}%). ÙØ±ØµØ© Ù…Ù†Ø§Ø³Ø¨Ø© Ù„ØªØ®ÙÙŠÙ Ø§Ù„Ù…Ø±ÙƒØ² ÙˆØªØ¯ÙˆÙŠØ± Ø§Ù„Ø³ÙŠÙˆÙ„Ø© Ù„Ø£ØµÙ„ Ø£Ø³Ø±Ø¹ Ù†Ù…ÙˆØ§Ù‹.`;
+                    item.advice = `🔄 ارتداد فني لمستوى المقاومة R1 (${item.pivotR1} ج) • سهم ${item.name} يختبر المقاومة بتراجع (${item.returnPct.toFixed(1)}%). فرصة مناسبة لتخفيف المركز وتدوير السيولة لأصل أسرع نمواً.`;
                   } else {
-                    item.advice = `ðŸŽ¯ ÙˆØµÙˆÙ„ Ù„Ù…Ø³ØªÙˆÙ‰ Ø§Ù„Ù…Ù‚Ø§ÙˆÙ…Ø© Ø§Ù„ÙÙ†ÙŠØ© Ø§Ù„Ø£ÙˆÙ„Ù‰ R1 (${item.pivotR1} Ø¬) â€¢ Ø³Ù‡Ù… ${item.name} ÙÙŠ Ù…Ù†Ø·Ù‚Ø© Ø¬Ù†ÙŠ Ø£Ø±Ø¨Ø§Ø­ Ø§Ù„Ù‚Ù…Ø© (+${item.returnPct.toFixed(1)}%). ÙŠÙÙ†ØµØ­ Ø¨ØªØ£Ù…ÙŠÙ† Ø£Ø±Ø¨Ø§Ø­ Ø¬Ø²Ø¦ÙŠØ© ÙˆØ¥Ø¹Ø§Ø¯Ø© ØªØ¯ÙˆÙŠØ± Ø§Ù„Ø³ÙŠÙˆÙ„Ø©.`;
+                    item.advice = `🎯 وصول لمستوى المقاومة الفنية الأولى R1 (${item.pivotR1} ج) • سهم ${item.name} في منطقة جني أرباح القمة (+${item.returnPct.toFixed(1)}%). يُنصح بتأمين أرباح جزئية وإعادة تدوير السيولة.`;
                   }
                 }
                 // 2. Critical Support Breakdown (Pivot S1 Broken - Stop Loss Trigger)
                 else if (item.pivotS1 && item.currentPrice < item.pivotS1) {
                   item.action = 'STOP_LOSS_WARNING';
                   item.alertLevel = 'CRITICAL_RISK';
-                  item.advice = `âš ï¸ ÙƒØ³Ø± Ù…Ø³ØªÙˆÙ‰ Ø§Ù„Ø¯Ø¹Ù… Ø§Ù„ÙÙ†ÙŠ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠ S1 (${item.pivotS1} Ø¬) â€¢ Ø§Ù„Ø³Ø¹Ø± Ø§Ù„Ø­Ø§Ù„ÙŠ ${item.currentPrice.toFixed(2)} Ø¬ Ø¯ÙˆÙ† Ù…Ø³ØªÙˆÙ‰ Ø§Ù„Ø£Ù…Ø§Ù†. Ø±Ø§Ù‚Ø¨ ØªÙØ¹ÙŠÙ„ Ø®Ø·Ø© Ø§Ù„Ø­Ù…Ø§ÙŠØ© Ù„ØªØ¬Ù†Ø¨ Ø§Ù†Ø²Ù„Ø§Ù‚ Ø³Ø¹Ø±ÙŠ.`;
+                  item.advice = `⚠️ كسر مستوى الدعم الفني الرئيسي S1 (${item.pivotS1} ج) • السعر الحالي ${item.currentPrice.toFixed(2)} ج دون مستوى الأمان. راقب تفعيل خطة الحماية لتجنب انزلاق سعري.`;
                 }
                 // 3. Oversold Bounce on Support S1 (with mandatory Systemic Shock check)
                 else if (item.rsi < 36 && item.pivotS1 && item.currentPrice >= item.pivotS1) {
                   if (getMarketRegimeCode() === 'SYSTEMIC_SHOCK') {
                     item.action = 'HOLD';
                     item.alertLevel = 'WARNING';
-                    item.advice = `âš ï¸ ØªØ´Ø¨Ø¹ Ø¨ÙŠØ¹ÙŠ (RSI: ${item.rsi}) Ù„ÙƒÙ† Ø§Ù„Ø³ÙˆÙ‚ ÙÙŠ Ø­Ø§Ù„Ø© Ù‡Ø¨ÙˆØ· Ø°Ø¹Ø±ÙŠ Ø´Ø§Ù…Ù„Ø› ÙŠÙØ­Ø¸Ø± Ø§Ù„ØªØ¬Ù…ÙŠØ¹ Ø§Ù„Ø¢Ù† ÙˆÙŠÙÙØ¶Ù„ Ø§Ù„ØªØ±ÙŠØ« ÙˆØ§Ù„Ø§Ø­ØªÙØ§Ø¸ Ø¨Ø§Ù„ÙƒØ§Ø´.`;
+                    item.advice = `⚠️ تشبع بيعي (RSI: ${item.rsi}) لكن السوق في حالة هبوط ذعري شامل؛ يُحظر التجميع الآن ويُفضل التريث والاحتفاظ بالكاش.`;
                   } else {
                     item.action = 'ACCUMULATE';
                     item.alertLevel = 'ACCUMULATE';
-                    item.advice = `ðŸŸ¢ Ø§Ø±ØªØ¯Ø§Ø¯ Ù…Ù† ØªØ´Ø¨Ø¹ Ø¨ÙŠØ¹ÙŠ (RSI: ${item.rsi}) Ø£Ø¹Ù„Ù‰ Ø§Ù„Ø¯Ø¹Ù… Ø§Ù„ÙÙ†ÙŠ S1 (${item.pivotS1} Ø¬) â€¢ ÙØ±ØµØ© ØªØ¹Ø²ÙŠØ² Ù„Ù„Ù…Ø³ØªØ«Ù…Ø± Ø·ÙˆÙŠÙ„ Ø§Ù„Ø£Ø¬Ù„ Ù„Ø®ÙØ¶ Ù…ØªÙˆØ³Ø· Ø§Ù„ØªÙƒÙ„ÙØ©.`;
+                    item.advice = `🟢 ارتداد من تشبع بيعي (RSI: ${item.rsi}) أعلى الدعم الفني S1 (${item.pivotS1} ج) • فرصة تعزيز للمستثمر طويل الأجل لخفض متوسط التكلفة.`;
                   }
                 }
                 // 4. Bullish Trend Continuation (Above SMA 50)
                 else if (item.sma50 && item.currentPrice > item.sma50 && item.returnPct > 0) {
                   item.action = 'HOLD';
                   item.alertLevel = 'NORMAL';
-                  item.advice = `ðŸ“ˆ Ø§ØªØ¬Ø§Ù‡ ØµØ§Ø¹Ø¯ ØµØ­ÙŠ Ø£Ø¹Ù„Ù‰ Ù…ØªÙˆØ³Ø· 50 ÙŠÙˆÙ… (${item.sma50} Ø¬) â€¢ Ù†Ù…Ùˆ (+${item.returnPct.toFixed(1)}%)ØŒ Ø§Ø­ØªÙØ§Ø¸ Ø§Ø³ØªØ«Ù…Ø§Ø±ÙŠ Ù‡Ø§Ø¯Ø¦ Ù…Ø³ØªÙ‡Ø¯ÙØ§Ù‹ Ø§Ù„Ù…Ù‚Ø§ÙˆÙ…Ø© ${item.pivotR1 || item.target1} Ø¬.`;
+                  item.advice = `📈 اتجاه صاعد صحي أعلى متوسط 50 يوم (${item.sma50} ج) • نمو (+${item.returnPct.toFixed(1)}%)، احتفاظ استثماري هادئ مستهدفاً المقاومة ${item.pivotR1 || item.target1} ج.`;
                 }
                 // 5. Default Strategic Hold
                 else {
                   item.action = 'HOLD';
                   item.alertLevel = 'NORMAL';
-                  item.advice = `Ø§Ø­ØªÙØ§Ø¸ ÙˆÙ…ØªØ§Ø¨Ø¹Ø© â€¢ Ø§Ù„Ø³Ù‡Ù… ÙŠØªØ­Ø±Ùƒ ÙÙŠ Ù†Ø·Ø§Ù‚ Ø§Ù„Ø¯Ø¹Ù… ${item.pivotS1 || item.support} ÙˆØ§Ù„Ù…Ù‚Ø§ÙˆÙ…Ø© ${item.pivotR1 || item.target1}.`;
+                  item.advice = `احتفاظ ومتابعة • السهم يتحرك في نطاق الدعم ${item.pivotS1 || item.support} والمقاومة ${item.pivotR1 || item.target1}.`;
                 }
 
                 updatedStocksCount++;
@@ -297,10 +297,10 @@
           if (data.funds) {
             portfolioData.forEach(item => {
               if (item.ticker === 'NCS' && data.funds.NCS) {
-                item.advice = `Ù…Ø±Ø¬Ø¹ ÙˆØ«ÙŠÙ‚Ø© Ù†Ù‚Ø¯ÙŠØ© â€¢ Ø§Ù„Ø¹Ø§Ø¦Ø¯ Ø§Ù„Ø³Ù†ÙˆÙŠ Ø§Ù„Ø§Ø³ØªØ±Ø´Ø§Ø¯ÙŠ: ${data.funds.NCS.annualYieldPct}%`;
+                item.advice = `مرجع وثيقة نقدية • العائد السنوي الاسترشادي: ${data.funds.NCS.annualYieldPct}%`;
                 item.priceSource = data.funds.NCS.lastOfficialUpdate;
               } else if (item.ticker === 'BSB' && data.funds.BSB) {
-                item.advice = `Ù…Ø±Ø¬Ø¹ ÙˆØ«ÙŠÙ‚Ø© Ù†Ù…Ùˆ â€¢ Ø§Ù„Ù†Ù…Ùˆ Ø§Ù„Ø³Ù†ÙˆÙŠ Ø§Ù„Ø§Ø³ØªØ±Ø´Ø§Ø¯ÙŠ: ${data.funds.BSB.annualYieldPct}%`;
+                item.advice = `مرجع وثيقة نمو • النمو السنوي الاسترشادي: ${data.funds.BSB.annualYieldPct}%`;
                 item.priceSource = data.funds.BSB.lastOfficialUpdate;
               }
             });
@@ -328,7 +328,7 @@
           if (data.market_regime) {
             window.currentMarketRegime = typeof data.market_regime === 'object' ? data.market_regime : {
               regime: String(data.market_regime),
-              regimeArabic: data.market_regime_arabic || 'ØªØ¯Ø§ÙˆÙ„ Ù…ØªÙˆØ§Ø²Ù† ÙˆØ¹Ø±Ø¶ÙŠ',
+              regimeArabic: data.market_regime_arabic || 'تداول متوازن وعرضي',
               description: '',
               breadth: { advancingPct: 50, avgMarketChange: 0 }
             };
@@ -352,21 +352,21 @@
           // 5. Update Header Live Sync Indicator Badge
           if (statusText) {
             if (isSessionOpen) {
-              statusText.innerHTML = `ðŸŸ¢ Ù…ØªØµÙ„ Ø¨Ø§Ù„Ø¨ÙˆØ±ØµØ© Ø§Ù„Ù…ØµØ±ÙŠØ© Ù„Ø­Ø¸ÙŠØ§Ù‹ â€¢ ØªÙ… Ø§Ù„ØªØ­Ø¯ÙŠØ« Ø§Ù„Ø¢Ù†: <strong class="text-cyan-300 font-mono">${timeStr}</strong> â€¢ Ø§Ù„Ø£Ø³Ø¹Ø§Ø± Ù…Ø·Ø§Ø¨Ù‚Ø© Ù„Ø´Ø§Ø´Ø© Ø§Ù„ØªØ¯Ø§ÙˆÙ„ Ø§Ù„Ø±Ø³Ù…ÙŠØ© ÙÙŠ Ø«Ù†Ø¯Ø±`;
+              statusText.innerHTML = `🟢 متصل بالبورصة المصرية لحظياً • تم التحديث الآن: <strong class="text-cyan-300 font-mono">${timeStr}</strong> • الأسعار مطابقة لشاشة التداول الرسمية في ثندر`;
             } else {
-              statusText.innerHTML = `âšª Ø¬Ù„Ø³Ø© Ø§Ù„Ø¨ÙˆØ±ØµØ© Ù…ØºÙ„Ù‚Ø© Ø­Ø§Ù„ÙŠØ§Ù‹ â€¢ ØªÙ… Ø§Ù„ØªØ¯Ù‚ÙŠÙ‚ ÙÙŠ: <strong class="text-emerald-300 font-mono">${timeStr}</strong> â€¢ Ø§Ù„Ø£Ø³Ø¹Ø§Ø± Ø§Ù„Ù…Ø¹Ø±ÙˆØ¶Ø© Ù‡ÙŠ Ø£Ø³Ø¹Ø§Ø± Ø§Ù„Ø¥ØºÙ„Ø§Ù‚ Ø§Ù„Ø±Ø³Ù…ÙŠ Ù„Ø¢Ø®Ø± Ø¬Ù„Ø³Ø© (Ù…Ø·Ø§Ø¨Ù‚Ø© Ù„Ø«Ù†Ø¯Ø±)`;
+              statusText.innerHTML = `⚪ جلسة البورصة مغلقة حالياً • تم التدقيق في: <strong class="text-emerald-300 font-mono">${timeStr}</strong> • الأسعار المعروضة هي أسعار الإغلاق الرسمي لآخر جلسة (مطابقة لثندر)`;
             }
           }
         }
       } catch (err) {
         console.error('Live price fetch fallback:', err);
         if (statusText) {
-          statusText.innerHTML = `<span class="text-rose-400 font-bold">âš ï¸ ØªØ¹Ø°Ø± Ø§Ù„Ø§ØªØµØ§Ù„ Ø§Ù„Ù„Ø­Ø¸ÙŠ Ø¨Ø§Ù„Ø¨ÙˆØ±ØµØ© (${err.message}) â€¢ Ø§Ù†Ù‚Ø± "Ù…Ø²Ø§Ù…Ù†Ø© Ù†Ø¸ÙŠÙØ© ðŸ”„" Ù„Ø¥Ø¹Ø§Ø¯Ø© Ø§Ù„Ù…Ø­Ø§ÙˆÙ„Ø© ÙÙˆØ±Ø§Ù‹</span>`;
+          statusText.innerHTML = `<span class="text-rose-400 font-bold">⚠️ تعذر الاتصال اللحظي بالبورصة (${err.message}) • انقر "مزامنة نظيفة 🔄" لإعادة المحاولة فوراً</span>`;
         }
       } finally {
         if (!isSilent) {
           if (icon) icon.classList.remove('animate-spin');
-          if (btnText) btnText.innerText = 'âš¡ ØªØ­Ø¯ÙŠØ« Ø§Ù„Ø£Ø³Ø¹Ø§Ø± Ø§Ù„Ù„Ø­Ø¸ÙŠØ©';
+          if (btnText) btnText.innerText = '⚡ تحديث الأسعار اللحظية';
         }
       }
     }
@@ -379,7 +379,7 @@
 
     // Explicit user-confirmed reset to baseline portfolio
     function hardResetPortfolioToDefault() {
-      if (confirm('ØªØ­Ø°ÙŠØ±: Ù‡Ù„ Ø£Ù†Øª Ù…ØªØ£ÙƒØ¯ Ù…Ù† Ø±ØºØ¨ØªÙƒ ÙÙŠ Ø¥Ø¹Ø§Ø¯Ø© Ø¶Ø¨Ø· Ø§Ù„Ù…Ø­ÙØ¸Ø© Ù„Ù„Ù‚ÙŠÙ… Ø§Ù„Ø§ÙØªØ±Ø§Ø¶ÙŠØ© ÙˆØ­Ø°Ù Ø£ÙŠ ØªØ¹Ø¯ÙŠÙ„Ø§Øª ÙŠØ¯ÙˆÙŠØ©ØŸ')) {
+      if (confirm('تحذير: هل أنت متأكد من رغبتك في إعادة ضبط المحفظة للقيم الافتراضية وحذف أي تعديلات يدوية؟')) {
         localStorage.removeItem('egx_copilot_portfolio');
         localStorage.removeItem('egx_copilot_portfolio_ver');
         portfolioData = (typeof EGX_Portfolio !== 'undefined')
@@ -412,12 +412,12 @@
         const shockAlert = {
           id: `shock_systemic_alert`,
           ticker: 'EGX',
-          name: 'Ø³ÙˆÙ‚ Ø§Ù„Ø¨ÙˆØ±ØµØ© Ø§Ù„Ù…ØµØ±ÙŠØ©',
+          name: 'سوق البورصة المصرية',
           type: 'SYSTEMIC_SHOCK',
-          title: `âš ï¸ ØªØ­Ø°ÙŠØ± Ù‡Ø¨ÙˆØ· Ø°Ø¹Ø±ÙŠ Ø´Ø§Ù…Ù„ (Systemic Shock Alert)`,
-          desc: `Ø£ÙƒØ«Ø± Ù…Ù† 80% Ù…Ù† Ø£Ø³Ù‡Ù… Ø§Ù„Ø³ÙˆÙ‚ ÙÙŠ Ù…Ø³Ø§Ø± Ù‡Ø§Ø¨Ø· Ø£Ùˆ ØªØ±Ø§Ø¬Ø¹ Ø§Ù„Ù…Ø¤Ø´Ø± Ø¨Ø£ÙƒØ«Ø± Ù…Ù† -3.0%. ØªÙ… ØªØ¬Ù…ÙŠØ¯ Ø¥Ø´Ø§Ø±Ø§Øª Ø§Ù„Ø´Ø±Ø§Ø¡ Ø¹Ù†Ø¯ Ø§Ù„Ø¯Ø¹ÙˆÙ… ØªÙ„Ù‚Ø§Ø¦ÙŠØ§Ù‹ Ù„Ø­Ù…Ø§ÙŠØ© Ø§Ù„Ø³ÙŠÙˆÙ„Ø©.`,
-          badge: 'ØªØ¬Ù…ÙŠØ¯ Ø§Ù„Ø´Ø±Ø§Ø¡',
-          actionLabel: 'Ù…ØªØ§Ø¨Ø¹Ø© Ø§Ù„Ø±Ø§Ø¯Ø§Ø± ðŸ›¡ï¸',
+          title: `⚠️ تحذير هبوط ذعري شامل (Systemic Shock Alert)`,
+          desc: `أكثر من 80% من أسهم السوق في مسار هابط أو تراجع المؤشر بأكثر من -3.0%. تم تجميد إشارات الشراء عند الدعوم تلقائياً لحماية السيولة.`,
+          badge: 'تجميد الشراء',
+          actionLabel: 'متابعة الرادار 🛡️',
           actionType: 'RADAR',
           time: formatCairoTime(new Date(), false, true)
         };
@@ -437,10 +437,10 @@
             ticker: item.ticker,
             name: item.name,
             type: 'CRITICAL_RISK',
-            title: `ðŸ”´ ÙƒØ³Ø± Ù…Ø³ØªÙˆÙ‰ Ø§Ù„Ø¯Ø¹Ù… Ø§Ù„ÙÙ†ÙŠ S1: ${item.name} (${item.ticker})`,
-            desc: `Ø§Ù„Ø³Ø¹Ø± Ø§Ù„Ø­Ø§Ù„ÙŠ (${Number(item.currentPrice).toFixed(2)} Ø¬) ÙƒØ³Ø± Ù…Ø³ØªÙˆÙ‰ Ø§Ù„Ø¯Ø¹Ù… Ø§Ù„ÙÙ†ÙŠ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠ S1 (${item.pivotS1} Ø¬). ÙŠØ¬Ø¨ ÙØ­Øµ Ø®Ø·Ø© Ø§Ù„Ø­Ù…Ø§ÙŠØ© ÙÙˆØ±Ø§Ù‹.`,
-            badge: 'Ø­Ù…Ø§ÙŠØ© Ø¹Ø§Ø¬Ù„Ø©',
-            actionLabel: 'ÙØ­Øµ Ø®Ø·Ø© Ø§Ù„Ø­Ù…Ø§ÙŠØ© ðŸ›¡ï¸',
+            title: `🔴 كسر مستوى الدعم الفني S1: ${item.name} (${item.ticker})`,
+            desc: `السعر الحالي (${Number(item.currentPrice).toFixed(2)} ج) كسر مستوى الدعم الفني الرئيسي S1 (${item.pivotS1} ج). يجب فحص خطة الحماية فوراً.`,
+            badge: 'حماية عاجلة',
+            actionLabel: 'فحص خطة الحماية 🛡️',
             actionType: 'AUDIT',
             time: formatCairoTime(new Date(), false, true)
           };
@@ -458,13 +458,13 @@
             name: item.name,
             type: isLosing ? 'REBOUND_RESISTANCE' : 'TARGET_REACHED',
             title: isLosing 
-              ? `ðŸ”„ Ø§Ø±ØªØ¯Ø§Ø¯ ÙÙ†ÙŠ Ù„Ù…Ø³ØªÙˆÙ‰ Ø§Ù„Ù…Ù‚Ø§ÙˆÙ…Ø© R1: ${item.name} (${item.ticker})`
-              : `ðŸŸ¢ ÙˆØµÙˆÙ„ Ù„Ù‡Ø¯Ù Ø§Ù„Ù…Ù‚Ø§ÙˆÙ…Ø© R1: ${item.name} (${item.ticker})`,
+              ? `🔄 ارتداد فني لمستوى المقاومة R1: ${item.name} (${item.ticker})`
+              : `🟢 وصول لهدف المقاومة R1: ${item.name} (${item.ticker})`,
             desc: isLosing
-              ? `Ø§Ù„Ø³Ø¹Ø± Ø§Ù„Ø­Ø§Ù„ÙŠ (${Number(item.currentPrice).toFixed(2)} Ø¬) ÙˆØµÙ„ Ù„Ù…Ø³ØªÙˆÙ‰ Ø§Ù„Ù…Ù‚Ø§ÙˆÙ…Ø© R1 (${item.pivotR1} Ø¬) ÙÙŠ Ù…ÙˆØ¬Ø© Ø§Ø±ØªØ¯Ø§Ø¯ÙŠØ© (ØªØ±Ø§Ø¬Ø¹ Ø§Ù„Ù…Ø±ÙƒØ² ${item.returnPct.toFixed(1)}%). ÙŠÙÙ†ØµØ­ Ø¨ØªØ®ÙÙŠÙ Ø§Ù„Ù…Ø±ÙƒØ² ÙˆØªØ¯ÙˆÙŠØ± Ø§Ù„Ø³ÙŠÙˆÙ„Ø©.`
-              : `Ø§Ù„Ø³Ø¹Ø± Ø§Ù„Ø­Ø§Ù„ÙŠ (${Number(item.currentPrice).toFixed(2)} Ø¬) Ø­Ù‚Ù‚ Ù…Ø³ØªÙ‡Ø¯Ù Ø§Ù„Ù…Ù‚Ø§ÙˆÙ…Ø© R1 (${item.pivotR1} Ø¬) Ù…Ø¹ Ø¹Ø§Ø¦Ø¯ (+${item.returnPct.toFixed(1)}%). ÙŠÙÙ†ØµØ­ Ø¨ØªØ£Ù…ÙŠÙ† Ø£Ø±Ø¨Ø§Ø­ Ø§Ù„Ù‚Ù…Ø©.`,
-            badge: isLosing ? 'ØªØ®ÙÙŠÙ Ø§Ø±ØªØ¯Ø§Ø¯' : 'Ø¬Ù†ÙŠ Ø£Ø±Ø¨Ø§Ø­',
-            actionLabel: isLosing ? 'ØªØ®ÙÙŠÙ ÙˆØªØ¯ÙˆÙŠØ± ðŸ”„' : 'ØªØ£Ù…ÙŠÙ† Ø£Ø±Ø¨Ø§Ø­ Ø§Ù„Ù‚Ù…Ø© ðŸ’°',
+              ? `السعر الحالي (${Number(item.currentPrice).toFixed(2)} ج) وصل لمستوى المقاومة R1 (${item.pivotR1} ج) في موجة ارتدادية (تراجع المركز ${item.returnPct.toFixed(1)}%). يُنصح بتخفيف المركز وتدوير السيولة.`
+              : `السعر الحالي (${Number(item.currentPrice).toFixed(2)} ج) حقق مستهدف المقاومة R1 (${item.pivotR1} ج) مع عائد (+${item.returnPct.toFixed(1)}%). يُنصح بتأمين أرباح القمة.`,
+            badge: isLosing ? 'تخفيف ارتداد' : 'جني أرباح',
+            actionLabel: isLosing ? 'تخفيف وتدوير 🔄' : 'تأمين أرباح القمة 💰',
             actionType: 'ROTATION',
             time: formatCairoTime(new Date(), false, true)
           };
@@ -569,7 +569,7 @@
         listEl.innerHTML = `
           <div class="p-6 text-center text-gray-500 font-medium bg-gray-950/60 rounded-xl border border-gray-800">
             <i data-lucide="shield-check" class="w-8 h-8 text-emerald-500 mx-auto mb-2 opacity-60"></i>
-            <span>Ù„Ø§ ØªÙˆØ¬Ø¯ ØªÙ†Ø¨ÙŠÙ‡Ø§Øª Ø¹Ø§Ø¬Ù„Ø© Ø­ØªÙ‰ Ø§Ù„Ø¢Ù†. Ø£Ø³Ù‡Ù… Ø§Ù„Ù…Ø­ÙØ¸Ø© ØªØªØ­Ø±Ùƒ Ø£Ø¹Ù„Ù‰ Ù…Ø³ØªÙˆÙŠØ§Øª Ø§Ù„Ø¯Ø¹Ù… Ø§Ù„ÙÙ†ÙŠØ© Ø¨Ø£Ù…Ø§Ù†.</span>
+            <span>لا توجد تنبيهات عاجلة حتى الآن. أسهم المحفظة تتحرك أعلى مستويات الدعم الفنية بأمان.</span>
           </div>
         `;
         if (window.lucide) lucide.createIcons();
@@ -630,20 +630,20 @@
 
     function requestBrowserNotificationPermission() {
       if (!('Notification' in window)) {
-        alert('Ø§Ù„Ù…ØªØµÙØ­ Ø§Ù„Ø­Ø§Ù„ÙŠ Ù„Ø§ ÙŠØ¯Ø¹Ù… Ù…ÙŠØ²Ø© Ø¥Ø´Ø¹Ø§Ø±Ø§Øª Ø§Ù„ÙˆÙŠØ¨.');
+        alert('المتصفح الحالي لا يدعم ميزة إشعارات الويب.');
         return;
       }
       Notification.requestPermission().then(permission => {
         const btn = document.getElementById('btn-browser-perm');
         if (permission === 'granted') {
-          if (btn) btn.innerText = 'Ø§Ù„Ø¥Ø´Ø¹Ø§Ø±Ø§Øª Ù…ÙØ¹Ù„Ø© ðŸŸ¢';
+          if (btn) btn.innerText = 'الإشعارات مفعلة 🟢';
           new Notification('EGX AI Copilot', {
-            body: 'ØªÙ… ØªÙØ¹ÙŠÙ„ Ø¥Ø´Ø¹Ø§Ø±Ø§Øª Ø§Ù„Ù…ØªØµÙØ­ Ø¨Ù†Ø¬Ø§Ø­! Ø³ØªØµÙ„Ùƒ ØªÙ†Ø¨ÙŠÙ‡Ø§Øª ÙˆÙ‚Ù Ø§Ù„Ø®Ø³Ø§Ø±Ø© ÙˆØ¬Ù†ÙŠ Ø§Ù„Ø£Ø±Ø¨Ø§Ø­ Ù…Ø¨Ø§Ø´Ø±Ø©.',
+            body: 'تم تفعيل إشعارات المتصفح بنجاح! ستصلك تنبيهات وقف الخسارة وجني الأرباح مباشرة.',
             icon: '/favicon.ico'
           });
         } else {
-          if (btn) btn.innerText = 'Ø§Ù„Ø¥Ø´Ø¹Ø§Ø±Ø§Øª Ù…Ø­Ø¸ÙˆØ±Ø© âŒ';
-          alert('ÙŠØ±Ø¬Ù‰ Ø§Ù„Ø³Ù…Ø§Ø­ Ø¨Ø§Ù„Ø¥Ø´Ø¹Ø§Ø±Ø§Øª Ù…Ù† Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª Ø§Ù„Ù…ØªØµÙØ­.');
+          if (btn) btn.innerText = 'الإشعارات محظورة ❌';
+          alert('يرجى السماح بالإشعارات من إعدادات المتصفح.');
         }
       });
     }
