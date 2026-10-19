@@ -31,7 +31,8 @@ export default async function handler(req, res) {
     // Fetch real-time market data directly from TradingView Egypt Scanner
     const tickers = [
       "EGX:ORAS", "EGX:COMI", "EGX:SWDY", "EGX:ABUK", "EGX:HDBK",
-      "EGX:TMGH", "EGX:EGAL", "EGX:ARCC", "EGX:RAYA", "EGX:CLHO"
+      "EGX:TMGH", "EGX:EGAL", "EGX:ARCC", "EGX:RAYA", "EGX:CLHO",
+      "EGX:EMFD", "EGX:ETRS", "EGX:FWRY"
     ];
 
     const tvResponse = await fetch("https://scanner.tradingview.com/egypt/scan", {
@@ -89,12 +90,12 @@ export default async function handler(req, res) {
 
       // Evaluate against Pivot Resistance R1
       if (s.pivotR1 && s.price >= s.pivotR1) {
-        const isNegative = (s.changePct != null && s.changePct < 0);
-        action = isNegative ? 'REBOUND_RESISTANCE_REDUCE' : 'TAKE_PROFIT_R1';
-        alertLevel = isNegative ? 'REBOUND_REBALANCE' : 'POSITIVE_CATALYST';
-        advice = isNegative
-          ? `ارتداد فني لمستوى المقاومة R1 (${s.pivotR1} ج) لسهم متراجع • فرصة لتخفيف المركز وتدوير السيولة لحماية المحفظة.`
-          : `وصول لمستوى المقاومة الفنية الأولى R1 (${s.pivotR1} ج) • يُنصح بجني أرباح جزئي وتأمين الأرباح.`;
+        const isReboundUnderTrend = (s.sma200 != null && s.price < s.sma200) || (s.changePct != null && s.changePct < 0);
+        action = isReboundUnderTrend ? 'REBOUND_RESISTANCE_REDUCE' : 'TAKE_PROFIT_R1';
+        alertLevel = isReboundUnderTrend ? 'REBOUND_REBALANCE' : 'POSITIVE_CATALYST';
+        advice = isReboundUnderTrend
+          ? `ارتداد فني تصحيحي لاختبار المقاومة R1 (${s.pivotR1} ج) في مسار هابط • فرصة مناسبة لتخفيف المركز وتدوير السيولة لأصل صاعد.`
+          : `ملامسة المقاومة الفنية الأولى R1 (${s.pivotR1} ج) • للمراكز الرابحة: يُنصح بتأمين أرباح جزئية، وللمراكز المرتدة: تخفيف المركز وتدوير السيولة.`;
       } 
       // Evaluate against Pivot Support S1 Breakdown
       else if (s.pivotS1 && s.price < s.pivotS1) {

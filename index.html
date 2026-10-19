@@ -4269,6 +4269,14 @@
       if (window.lucide) lucide.createIcons();
     }
 
+    function getMarketRegimeCode() {
+      if (!window.currentMarketRegime) return 'NORMAL_CONSOLIDATION';
+      if (typeof window.currentMarketRegime === 'object') {
+        return window.currentMarketRegime.regime || 'NORMAL_CONSOLIDATION';
+      }
+      return String(window.currentMarketRegime);
+    }
+
     // Render Portfolio Table
     function renderPortfolioTable() {
       const tbody = document.getElementById('portfolio-table-body');
@@ -4276,7 +4284,7 @@
 
       const shockContainer = document.getElementById('systemic-shock-banner');
       if (shockContainer) {
-        if (window.currentMarketRegime === 'SYSTEMIC_SHOCK') {
+        if (getMarketRegimeCode() === 'SYSTEMIC_SHOCK') {
           shockContainer.classList.remove('hidden');
           shockContainer.innerHTML = `
             <div class="p-3 mb-3 rounded-xl bg-rose-950/40 border border-rose-500/40 text-rose-300 text-xs flex items-center justify-between gap-2 animate-pulse">
@@ -4298,12 +4306,16 @@
 
       portfolioData.forEach((item, index) => {
         const evalResult = (typeof EGX_Engine !== 'undefined') 
-          ? EGX_Engine.evaluateAsset(item) 
+          ? EGX_Engine.evaluateAsset(item, getMarketRegimeCode()) 
           : { isLosing: (item.profit || 0) < 0, badgeText: 'احتفاظ', badgeColor: 'bg-gray-800 text-gray-300' };
 
-        const isPositive = !evalResult.isLosing;
-        const colorClass = isPositive ? 'text-emerald-400' : 'text-rose-400';
-        const bgBadgeClass = isPositive ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border-rose-500/20';
+        const isCash = item.ticker === 'CASH' || item.isCashReserve;
+        const isNeutral = isCash || Math.abs(item.profit || 0) < 0.01;
+        const isPositive = !isNeutral && (item.profit > 0);
+        const colorClass = isNeutral ? 'text-gray-400' : (isPositive ? 'text-emerald-400' : 'text-rose-400');
+        const bgBadgeClass = isNeutral 
+          ? 'bg-gray-800/60 text-gray-400 border-gray-700/60' 
+          : (isPositive ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border-rose-500/20');
         const badgeActionText = evalResult.badgeText;
         const badgeActionColor = evalResult.badgeColor;
 
@@ -4373,13 +4385,16 @@
           <!-- 6. Profit / Performance (التطور والأرباح) -->
           <td class="py-3.5 px-3 text-xs sm:text-sm">
             <div class="font-mono font-bold ${colorClass}">
-              ${isPositive ? '+' : ''}${Math.round(item.profit).toLocaleString('en-US')} <span class="text-[10px] font-sans">ج.م</span>
+              ${isNeutral ? '0' : `${isPositive ? '+' : ''}${Math.round(item.profit).toLocaleString('en-US')}`} <span class="text-[10px] font-sans">ج.م</span>
             </div>
             <div class="mt-0.5 flex items-center gap-1 font-mono text-[10px]">
-              <span class="px-1.5 py-0.2 rounded border ${bgBadgeClass} flex items-center gap-0.5">
-                <i data-lucide="${isPositive ? 'trending-up' : 'trending-down'}" class="w-3 h-3"></i>
-                <span>${isPositive ? '+' : ''}${item.returnPct.toFixed(2)}%</span>
-              </span>
+              ${isNeutral
+                ? `<span class="px-1.5 py-0.2 rounded border ${bgBadgeClass} text-gray-400">سيولة حرة</span>`
+                : `<span class="px-1.5 py-0.2 rounded border ${bgBadgeClass} flex items-center gap-0.5">
+                     <i data-lucide="${isPositive ? 'trending-up' : 'trending-down'}" class="w-3 h-3"></i>
+                     <span>${isPositive ? '+' : ''}${item.returnPct.toFixed(2)}%</span>
+                   </span>`
+              }
             </div>
           </td>
 
@@ -4754,7 +4769,10 @@
       }
 
       let importedCount = 0;
-      let newPortfolio = isReplaceAll ? [] : [...portfolioData];
+      const existingCash = portfolioData.find(p => p.ticker === 'CASH' || p.isCashReserve);
+      let newPortfolio = isReplaceAll 
+        ? (existingCash ? [existingCash] : [{ ticker: 'CASH', name: 'المحفظة (الرصيد النقدي)', category: 'محفظة نقدية', value: 0, profit: 0, shares: 0, buyPrice: 0 }]) 
+        : [...portfolioData];
 
       stocks.forEach(stk => {
         const ticker = (stk.ticker || stk.symbol || stk.code || '').toUpperCase().trim();
@@ -5065,7 +5083,11 @@
         return;
       }
 
-      const totalValue = Math.round(shares * price);
+      const grossTradeValue = Math.round(shares * price);
+      const estCommission = Math.round(grossTradeValue * 0.00175);
+      const totalBuyValue = grossTradeValue + estCommission;
+      const netSellValue = Math.max(0, grossTradeValue - estCommission);
+
       let cashItem = portfolioData.find(p => p.ticker === 'CASH');
       if (!cashItem) {
         cashItem = { ticker: 'CASH', name: 'المحفظة (الرصيد النقدي)', category: 'محفظة نقدية', value: 0, profit: 0, shares: 0, buyPrice: 0 };
@@ -5076,8 +5098,8 @@
       const cairoTime = formatCairoTime(now);
 
       if (currentTradeMode === 'BUY') {
-        if (autoCash && cashItem.value < totalValue) {
-          alert(`⚠️ لا يمكن إتمام الشراء: الرصيد النقدي المتاح في المحفظة (${cashItem.value.toLocaleString('en-US')} ج) غير كافٍ لتغطية إجمالي الصفقة (${totalValue.toLocaleString('en-US')} ج).\nيرجى شحن المحفظة أو تقليل عدد الأسهم لحفظ توازن رأس المال.`);
+        if (autoCash && cashItem.value < totalBuyValue) {
+          alert(`⚠️ لا يمكن إتمام الشراء: الرصيد النقدي المتاح في المحفظة (${cashItem.value.toLocaleString('en-US')} ج) غير كافٍ لتغطية إجمالي الصفقة مع العمولة (${totalBuyValue.toLocaleString('en-US')} ج).\nيرجى شحن المحفظة أو تقليل عدد الأسهم لحفظ توازن رأس المال.`);
           return;
         }
 
@@ -5110,7 +5132,7 @@
             shares: shares,
             buyPrice: price,
             currentPrice: price,
-            value: totalValue,
+            value: grossTradeValue,
             profit: 0,
             returnPct: 0.0,
             status: 'متعادل',
@@ -5125,14 +5147,14 @@
         }
 
         if (autoCash) {
-          cashItem.value = Number((cashItem.value - totalValue).toFixed(2));
+          cashItem.value = Number((cashItem.value - totalBuyValue).toFixed(2));
           cashItem.shares = cashItem.value;
           cashItem.buyPrice = cashItem.value;
         }
 
         savePortfolio();
         closeTradeModal();
-        alert(`✅ تم بنجاح تسجيل شراء ${shares} سهم في (${ticker}) بسعر ${price.toFixed(2)} ج بإجمالي ${totalValue.toLocaleString('en-US')} ج.م.`);
+        alert(`✅ تم بنجاح تسجيل شراء ${shares} سهم في (${ticker}) بسعر ${price.toFixed(2)} ج بإجمالي ${totalBuyValue.toLocaleString('en-US')} ج.م (شامل عمولة البورصة وثندر: ${estCommission} ج).`);
       } else {
         // SELL Mode
         let stock = portfolioData.find(p => p.ticker === ticker);
@@ -5142,7 +5164,7 @@
         }
 
         const cost = stock.buyPrice || price;
-        const realizedProfit = Math.round((price - cost) * shares);
+        const realizedProfit = Math.round((price - cost) * shares) - estCommission;
         stock.shares -= shares;
 
         if (stock.shares === 0) {
@@ -5156,7 +5178,7 @@
         }
 
         if (autoCash) {
-          cashItem.value += totalValue;
+          cashItem.value += netSellValue;
           cashItem.shares = cashItem.value;
           cashItem.buyPrice = cashItem.value;
         }
@@ -5182,7 +5204,7 @@
 
         savePortfolio();
         closeTradeModal();
-        alert(`✅ تم بنجاح تسجيل بيع ${shares} سهم في (${ticker}) بسعر ${price.toFixed(2)} ج. عائد البيع: ${totalValue.toLocaleString('en-US')} ج تم إيداعه بالكاش. الأرباح المحققة: ${realizedProfit >= 0 ? '+' : ''}${realizedProfit.toLocaleString('en-US')} ج.م.`);
+        alert(`✅ تم بنجاح تسجيل بيع ${shares} سهم في (${ticker}) بسعر ${price.toFixed(2)} ج. صافي عائد البيع: ${netSellValue.toLocaleString('en-US')} ج تم إيداعه بالكاش (بعد خصم عمولة ${estCommission} ج). الأرباح المحققة: ${realizedProfit >= 0 ? '+' : ''}${realizedProfit.toLocaleString('en-US')} ج.م.`);
       }
 
       fetchLiveEGXPricesAndReevaluate();
@@ -5371,14 +5393,7 @@
       const ticker = document.getElementById('modal-ticker').value.trim().toUpperCase();
       const name = document.getElementById('modal-name').value.trim();
       const category = document.getElementById('modal-category').value.trim();
-      const value = parseFloat(document.getElementById('modal-value').value);
-      const profit = parseFloat(document.getElementById('modal-profit').value);
-      const advice = document.getElementById('modal-advice').value.trim();
-
-      const cost = value - profit;
-      const returnPct = cost > 0 ? (profit / cost) * 100 : 0;
       const existing = (index >= 0 && index < portfolioData.length) ? portfolioData[index] : {};
-
       const shares = parseInt(document.getElementById('modal-shares').value, 10) || existing.shares;
       const currentPrice = parseFloat(document.getElementById('modal-current-price').value) || existing.currentPrice;
       const buyPrice = parseFloat(document.getElementById('modal-buy-price').value) || existing.buyPrice;
@@ -5387,6 +5402,13 @@
         alert('⚠️ يرجى التأكد من إدخال أرقام صحيحة وموجبة لعدد الأسهم وسعر الشراء وسعر السوق اللحظي.');
         return;
       }
+
+      // Mathematically derive cost, value, profit, and returnPct to prevent NaN poisoning
+      const value = Math.round(shares * currentPrice);
+      const cost = Math.round(shares * buyPrice);
+      const profit = Math.round(value - cost);
+      const returnPct = cost > 0 ? parseFloat((((value - cost) / cost) * 100).toFixed(2)) : 0;
+      const advice = document.getElementById('modal-advice').value.trim() || existing.advice || 'احتفاظ ومتابعة';
 
       const nowStr = formatCairoTime(new Date());
       const newAsset = {
@@ -5423,6 +5445,10 @@
     function deleteAsset(index) {
       const item = portfolioData[index];
       if (!item) return;
+      if (item.ticker === 'CASH' || item.isCashReserve) {
+        alert('⚠️ لا يمكن حذف بند النقدية (CASH) لأنه وعاء السيولة الإلزامية للمحفظة. يمكنك تعديل رصيد الكاش بدلاً من حذفه.');
+        return;
+      }
       if (confirm(`هل أنت متأكد من حذف ${item.name} (${item.ticker}) من المحفظة؟`)) {
         portfolioData.splice(index, 1);
         savePortfolio();
@@ -5610,7 +5636,7 @@
 
       // Re-evaluate asset through core financial engine immediately
       if (typeof EGX_Engine !== 'undefined') {
-        const evalResult = EGX_Engine.evaluateAsset(item);
+        const evalResult = EGX_Engine.evaluateAsset(item, getMarketRegimeCode());
         item.advice = evalResult.advice;
         item.action = evalResult.action;
         item.alertLevel = evalResult.alertLevel;
@@ -5903,8 +5929,10 @@
       let sellShares = Math.max(1, Math.round(totalShares * currentRotationRatio));
       if (sellShares >= totalShares && totalShares > 1) sellShares = totalShares - 1;
 
-      const sellCash = Math.round(sellShares * currentPrice);
-      const realizedProfit = Math.round(sellShares * (currentPrice - buyPrice));
+      const grossSellCash = Math.round(sellShares * currentPrice);
+      const estCommission = Math.round(grossSellCash * 0.00175);
+      const sellCash = Math.max(0, grossSellCash - estCommission);
+      const realizedProfit = Math.round(sellShares * (currentPrice - buyPrice)) - estCommission;
       const remainingShares = totalShares - sellShares;
       // Technical support levels (S1 & S2) for disciplined re-entry zone
       const s1 = Number(item.pivotS1) || 0;
@@ -5966,13 +5994,26 @@
       item.profit = item.value - totalRemainingCost;
       item.returnPct = totalRemainingCost > 0 ? parseFloat(((item.profit / totalRemainingCost) * 100).toFixed(2)) : 0;
 
-      // 2. Deposit liberated sell cash into CASH reserve immediately
+      // 2. Deposit liberated sell cash into CASH reserve immediately (ensuring cash reserve exists)
       let cashItem = portfolioData.find(p => p.ticker === 'CASH' || p.isCashReserve);
-      if (cashItem) {
-        cashItem.value = Number((Number(cashItem.value || 0) + sellCash).toFixed(2));
-        cashItem.buyPrice = cashItem.value;
-        cashItem.currentPrice = cashItem.value;
+      if (!cashItem) {
+        cashItem = {
+          ticker: 'CASH',
+          name: 'المحفظة (الرصيد النقدي)',
+          category: 'محفظة نقدية • سيولة حرة',
+          shares: 1,
+          buyPrice: 0,
+          currentPrice: 0,
+          value: 0,
+          profit: 0,
+          returnPct: 0,
+          isCashReserve: true
+        };
+        portfolioData.push(cashItem);
       }
+      cashItem.value = Number((Number(cashItem.value || 0) + sellCash).toFixed(2));
+      cashItem.buyPrice = cashItem.value;
+      cashItem.currentPrice = cashItem.value;
       savePortfolio();
 
       try {
@@ -6022,9 +6063,14 @@
       const plan = activeRotationPlans.find(p => p.id === planId);
       if (!plan) return;
 
-      const sharesCanBuy = Math.max(1, Math.floor(plan.sellCash / executionPrice));
-      const actualUsedCash = sharesCanBuy * executionPrice;
-      const leftoverCash = plan.sellCash - actualUsedCash;
+      // Deduct Egyptian Exchange & brokerage commission buffer (0.175%) so purchase orders in Thndr succeed
+      const commissionRate = 0.00175;
+      const effectiveCash = plan.sellCash / (1 + commissionRate);
+      const sharesCanBuy = Math.max(1, Math.floor(effectiveCash / executionPrice));
+      const actualTradeCost = sharesCanBuy * executionPrice;
+      const commissionAmount = Math.round(actualTradeCost * commissionRate * 100) / 100;
+      const actualUsedCash = Math.min(plan.sellCash, actualTradeCost + commissionAmount);
+      const leftoverCash = Math.max(0, plan.sellCash - actualUsedCash);
 
       const confirmMsg = `هل قمت بالفعل بتنفيذ أمر الشراء في ثندر لسهم ${plan.name} بسعر ${executionPrice.toFixed(2)} ج؟\n\n` +
         `سيتم إضافة ${sharesCanBuy} سهم جديد إلى محفظتك تلقائياً وتحديث إجمالي الأسهم والأرباح.` +
@@ -6068,6 +6114,81 @@
       renderPortfolioTable();
 
       alert(`🎉 ألف مبروك! اكتملت الدورة بنجاح.\nتمت إضافة ${sharesCanBuy} سهم مجاني إلى رصيدك في (${plan.name}).\nإجمالي أسهمك الحالي: ${stock ? stock.shares : newShares} سهم!`);
+    }
+
+    function completeRotationPlanToCIB(planId, executionPrice) {
+      const plan = activeRotationPlans.find(p => p.id === planId);
+      if (!plan) return;
+
+      const commissionRate = 0.00175;
+      const effectiveCash = plan.sellCash / (1 + commissionRate);
+      const sharesCanBuy = Math.max(1, Math.floor(effectiveCash / executionPrice));
+      const actualTradeCost = sharesCanBuy * executionPrice;
+      const commissionAmount = Math.round(actualTradeCost * commissionRate * 100) / 100;
+      const actualUsedCash = Math.min(plan.sellCash, actualTradeCost + commissionAmount);
+      const leftoverCash = Math.max(0, plan.sellCash - actualUsedCash);
+
+      const confirmMsg = `هل قمت بالفعل بشراء ${sharesCanBuy} سهم في البنك التجاري الدولي (CIB) بسعر ${executionPrice.toFixed(2)} ج في ثندر؟\n\n` +
+        `سيتم تحديث رصيد CIB في محفظتك وخصم الكاش المستخدم (${actualUsedCash.toLocaleString('en-US')} ج) من الرصيد النقدي.` +
+        (leftoverCash > 0 ? `\n(فائض الكاش غير المستخدم: ${leftoverCash.toLocaleString('en-US')} ج سيبقى برصيدك النقدي).` : '');
+
+      if (!confirm(confirmMsg)) return;
+
+      let cibStock = portfolioData.find(s => s.ticker === 'COMI');
+      if (cibStock) {
+        const prevShares = parseInt(cibStock.shares, 10) || 0;
+        const newShares = prevShares + sharesCanBuy;
+        const prevCost = prevShares * (cibStock.buyPrice || 0);
+        const addedCost = actualUsedCash;
+        const newBuyPrice = newShares > 0 ? (prevCost + addedCost) / newShares : cibStock.buyPrice;
+
+        cibStock.shares = newShares;
+        cibStock.buyPrice = +newBuyPrice.toFixed(2);
+        cibStock.currentPrice = executionPrice;
+        cibStock.value = Math.round(newShares * executionPrice);
+        const totalCost = Math.round(newShares * cibStock.buyPrice);
+        cibStock.profit = cibStock.value - totalCost;
+        cibStock.returnPct = totalCost > 0 ? parseFloat(((cibStock.profit / totalCost) * 100).toFixed(2)) : 0;
+        cibStock.status = cibStock.profit >= 0 ? 'ربح' : 'تراجع';
+      } else {
+        const radarCib = typeof fullMarketRadar !== 'undefined' ? fullMarketRadar.find(r => r.ticker === 'COMI') : null;
+        cibStock = {
+          ticker: 'COMI',
+          name: (radarCib && radarCib.name) || 'البنك التجاري الدولي (CIB)',
+          category: 'EGX30 • بنوك وخدمات مالية',
+          shares: sharesCanBuy,
+          buyPrice: executionPrice,
+          currentPrice: executionPrice,
+          value: Math.round(sharesCanBuy * executionPrice),
+          profit: 0,
+          returnPct: 0.0,
+          status: 'متعادل',
+          advice: 'سهم دفاعي قيادي تم شراؤه بنجاح',
+          action: 'HOLD',
+          thndrUrl: 'https://app.thndr.app'
+        };
+        portfolioData.push(cibStock);
+      }
+
+      // Deduct actual used cash from cash reserve
+      const cashAsset = portfolioData.find(p => p.ticker === 'CASH' || p.isCashReserve);
+      if (cashAsset) {
+        cashAsset.value = Math.max(0, +(Number(cashAsset.value || 0) - actualUsedCash).toFixed(2));
+        cashAsset.buyPrice = cashAsset.value;
+        cashAsset.currentPrice = cashAsset.value;
+      }
+
+      savePortfolio();
+
+      activeRotationPlans = activeRotationPlans.filter(p => p.id !== planId);
+      try {
+        localStorage.setItem('egx_copilot_active_plans', JSON.stringify(activeRotationPlans));
+      } catch(e) {}
+
+      renderActivePlansRadar();
+      renderPortfolioTable();
+
+      alert(`🎉 تم بنجاح تعزيز وتحديث محفظتك لشراء ${sharesCanBuy} سهم في البنك التجاري الدولي (CIB)!\nإجمالي أسهم CIB الحالية: ${cibStock.shares} سهم.`);
     }
 
     function switchPlanToCIB(planId) {
@@ -6440,9 +6561,15 @@
                   <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
                   <span>فتح ثندر لشراء ${cibSharesCanBuy} سهم في CIB ⚡</span>
                 </a>
-                <button onclick="cancelRotationPlan('${plan.id}')" class="px-3 py-2 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-300 font-bold text-xs transition cursor-pointer">
-                  تم التنفيذ أو إلغاء الخطة
-                </button>
+                <div class="flex items-center gap-2">
+                  <button onclick="completeRotationPlanToCIB('${plan.id}', ${cibLivePrice})" class="px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1 transition cursor-pointer shadow-md">
+                    <i data-lucide="check-circle" class="w-3.5 h-3.5"></i>
+                    <span>تم الشراء في ثندر (تحديث المحفظة)</span>
+                  </button>
+                  <button onclick="cancelRotationPlan('${plan.id}')" class="px-3 py-2 rounded-xl bg-gray-900 hover:bg-gray-800 text-rose-400 border border-rose-900/50 font-bold text-xs transition cursor-pointer">
+                    إلغاء الخطة
+                  </button>
+                </div>
               </div>
             </div>
           `;
@@ -6511,6 +6638,32 @@
 
       if (amount <= 0) {
         container.innerHTML = '<p class="text-rose-400 font-bold p-3">يرجى إدخال مبلغ سيولة صحيح لحساب التوزيع.</p>';
+        return;
+      }
+
+      // Guardrail: Freeze equity allocation during systemic market crashes
+      if (typeof getMarketRegimeCode === 'function' && getMarketRegimeCode() === 'SYSTEMIC_SHOCK') {
+        container.innerHTML = `
+          <div class="p-4 rounded-xl bg-rose-950/40 border border-rose-500/50 space-y-3">
+            <div class="flex items-center gap-2">
+              <span class="w-3 h-3 rounded-full bg-rose-500 animate-pulse"></span>
+              <h4 class="font-bold text-rose-300 text-xs sm:text-sm">⚠️ وضع السوق الحالي: صدمة بيعية شاملة (Systemic Shock Alert)</h4>
+            </div>
+            <p class="text-xs text-gray-300 leading-relaxed">
+              وفقاً لقواعد إدارة المخاطر الصارمة، يُحظر توزيع أي سيولة جديدة لشراء أو تعزيز الأسهم أثناء موجات الهبوط الذعري الشامل لتجنب السكاكين الساقطة.
+            </p>
+            <div class="p-3 bg-gray-900/90 rounded-lg border border-gray-800 flex items-center justify-between flex-wrap gap-2">
+              <div class="text-xs">
+                <span class="text-white font-bold block">التوجيه الإلزامي للسيولة (100% كاش أمان):</span>
+                <span class="text-gray-400 text-[11px]">الاحتفاظ بكامل مبلغ ${amount.toLocaleString('en-US')} ج كسيولة نقدية حرة أو في صندوق اليوم بيوم (NCS) بعائد 22.4% حتى استقرار المؤشرات.</span>
+              </div>
+              <div class="text-right">
+                <span class="font-bold text-amber-400 font-mono text-base">${amount.toLocaleString('en-US')} ج</span>
+                <span class="block text-[10px] text-gray-400 font-mono">100% كاش محمي</span>
+              </div>
+            </div>
+          </div>
+        `;
         return;
       }
 
@@ -6901,6 +7054,32 @@
           </div>
           <p class="text-[11px] text-gray-300">
             ممنوع الشراء تماماً. كسر حد الأمان يعرض رأس المال لانزلاق سعري، التزم بالحماية وتجنب مطاردة السكين الساقطة.
+          </p>
+        `;
+        if (window.lucide) lucide.createIcons();
+        return;
+      }
+
+      if (close < s1) {
+        document.getElementById('out-pivot').innerText = `${pivot.toFixed(2)} ج`;
+        document.getElementById('out-r1').innerText = `${r1.toFixed(2)} ج`;
+        document.getElementById('out-r2').innerText = `${r2.toFixed(2)} ج`;
+        document.getElementById('out-s1').innerText = `${s1.toFixed(2)} ج (مكسور)`;
+        document.getElementById('out-s2').innerText = `${s2.toFixed(2)} ج`;
+        document.getElementById('out-stoploss').innerText = `${stopLoss.toFixed(2)} ج`;
+        document.getElementById('out-rr-ratio').innerText = `دعم مكسور S1`;
+        document.getElementById('out-reward-pct').innerText = `--`;
+        document.getElementById('out-risk-pct').innerText = `تحت الدعم`;
+
+        const verdictBox = document.getElementById('out-verdict-box');
+        verdictBox.className = 'p-3 rounded-xl border border-rose-500/30 bg-rose-950/20 text-xs text-gray-200';
+        verdictBox.innerHTML = `
+          <div class="font-bold text-rose-400 flex items-center gap-1 mb-1">
+            <i data-lucide="alert-octagon" class="w-3.5 h-3.5"></i>
+            <span>قرار المحرك: السعر الحالي (${close.toFixed(2)} ج) أدنى من الدعم الفني الرئيسي S1 (${s1.toFixed(2)} ج)</span>
+          </div>
+          <p class="text-[11px] text-gray-300">
+            ⚠️ الشراء محظور ومرفوض رقابياً حتى استعادة الدعم الفني والتأكيد بشمعة إيجابية، لتجنب استمرار الانزلاق نحو S2 (${s2.toFixed(2)} ج).
           </p>
         `;
         if (window.lucide) lucide.createIcons();
@@ -7392,8 +7571,8 @@
           </td>
           <td class="py-3 px-3 text-center">
             ${trade.status === 'OPEN' ? `
-              <button onclick="closeAutonomousTrade(${idx})" class="px-2.5 py-1 rounded-lg bg-emerald-700 hover:bg-emerald-600 text-white font-bold text-[10px] transition">
-                جني الربح
+              <button onclick="closeAutonomousTrade(${idx})" class="px-2.5 py-1 rounded-lg ${isPositiveGain ? 'bg-emerald-700 hover:bg-emerald-600' : 'bg-rose-700 hover:bg-rose-600'} text-white font-bold text-[10px] transition cursor-pointer shadow-sm">
+                ${isPositiveGain ? 'جني الربح 🎯' : 'وقف الخسارة 🛑'}
               </button>
             ` : `
               <span class="text-[10px] text-gray-500 font-bold">مغلقة ومسجلة</span>
@@ -7483,18 +7662,29 @@
       }
 
       if (winRateEl) {
-        const winRate = closedCount > 0 ? Math.round((winningCount / closedCount) * 100) : 100;
-        winRateEl.innerText = `${winRate}%`;
+        const winRate = closedCount > 0 ? `${Math.round((winningCount / closedCount) * 100)}%` : '--';
+        winRateEl.innerText = winRate;
       }
     }
 
     function closeAutonomousTrade(idx) {
       const trade = autonomousLedger[idx];
       if (!trade) return;
-      trade.status = 'PROFIT_TAKEN';
-      trade.currentPrice = trade.targetPrice;
+
+      const liveItem = (typeof fullMarketRadar !== 'undefined' && Array.isArray(fullMarketRadar))
+        ? fullMarketRadar.find(s => s.ticker === trade.ticker) : null;
+      const exitPrice = liveItem && liveItem.price ? Number(liveItem.price) : Number(trade.currentPrice);
+      trade.currentPrice = exitPrice;
+      trade.exitPrice = exitPrice;
+      const pnlPct = trade.entryPrice > 0 ? parseFloat((((exitPrice - trade.entryPrice) / trade.entryPrice) * 100).toFixed(2)) : 0;
+      trade.returnPct = pnlPct;
+      trade.status = pnlPct >= 0 ? 'PROFIT_TAKEN' : 'CLOSED';
+
       renderAutonomousLedger();
-      alert(`🎉 تم إغلاق صفقة ${trade.ticker} وتحقيق كامل الهدف بنجاح 100%!`);
+      const msg = pnlPct >= 0
+        ? `🎉 تم إغلاق صفقة ${trade.ticker} بسعر السوق اللحظي (${exitPrice.toFixed(2)} ج) محققة ربحاً (+${pnlPct}%)!`
+        : `⚠️ تم إغلاق صفقة ${trade.ticker} بسعر السوق اللحظي (${exitPrice.toFixed(2)} ج) مع تراجع (${pnlPct}%) لحماية رأس المال.`;
+      alert(msg);
     }
 
     function triggerSimulatedBotCycle() {
@@ -8015,11 +8205,13 @@
           `- سهم ${r.name} (${r.ticker}): سعر ${r.price} ج (${r.changePct})، سيولة ${r.volumeMultiplier}، مقاومة R1: ${r.pivotR1 || r.target1}، دعم S1: ${r.pivotS1 || r.support}، اتجاه: ${r.trend || r.type}، عائد/مخاطرة: ${r.rrDisplay}`
         ).join('\n');
 
-        const currentRegime = window.currentMarketRegime || {
-          regime: "NORMAL_CONSOLIDATION",
-          regimeArabic: "تداول متوازن وعرضي (Consolidation)",
-          description: "السوق يتحرك في نطاق متوازن مع استقرار الدعوم والمقاومات."
-        };
+        const currentRegime = (window.currentMarketRegime && typeof window.currentMarketRegime === 'object')
+          ? window.currentMarketRegime
+          : {
+              regime: typeof window.currentMarketRegime === 'string' ? window.currentMarketRegime : "NORMAL_CONSOLIDATION",
+              regimeArabic: window.currentMarketRegimeArabic || "تداول متوازن وعرضي (Consolidation)",
+              description: "السوق يتحرك في نطاق متوازن مع استقرار الدعوم والمقاومات."
+            };
 
         const userLessonsSummary = typeof getUserLearnedLessonsSummary === 'function' ? getUserLearnedLessonsSummary() : 'لا توجد دروس مسجلة بعد.';
 
@@ -8614,12 +8806,14 @@ ${userLessonsSummary}
 
     // 4. Update Real-Time Market Regime UI in Header and Lab
     function updateSimulationRegimeUI() {
-      const regime = window.currentMarketRegime || {
-        regime: "NORMAL_CONSOLIDATION",
-        regimeArabic: "تداول متوازن وعرضي (Consolidation)",
-        description: "السوق يتحرك في نطاق متوازن مع استقرار الدعوم والمقاومات.",
-        breadth: { advancing: 12, declining: 8, advancingPct: 60, avgMarketChange: 0.45 }
-      };
+      const regime = (window.currentMarketRegime && typeof window.currentMarketRegime === 'object')
+        ? window.currentMarketRegime
+        : {
+            regime: typeof window.currentMarketRegime === 'string' ? window.currentMarketRegime : "NORMAL_CONSOLIDATION",
+            regimeArabic: window.currentMarketRegimeArabic || "تداول متوازن وعرضي (Consolidation)",
+            description: "السوق يتحرك في نطاق متوازن مع استقرار الدعوم والمقاومات.",
+            breadth: { advancing: 12, declining: 8, advancingPct: 60, avgMarketChange: 0.45 }
+          };
 
       const headerText = document.getElementById('header-regime-text');
       if (headerText) {
@@ -8825,10 +9019,6 @@ ${userLessonsSummary}
         const data = await res.json();
 
         if (data.success) {
-          if (data.meta && data.meta.regime) {
-            window.currentMarketRegime = data.meta.regime;
-            window.currentMarketRegimeArabic = data.meta.regimeArabic;
-          }
 
           const now = new Date();
           const timeStr = formatCairoTime(now, true, true);
@@ -8901,7 +9091,7 @@ ${userLessonsSummary}
                 }
                 // 3. Oversold Bounce on Support S1 (with mandatory Systemic Shock check)
                 else if (item.rsi < 36 && item.pivotS1 && item.currentPrice >= item.pivotS1) {
-                  if (window.currentMarketRegime === 'SYSTEMIC_SHOCK') {
+                  if (getMarketRegimeCode() === 'SYSTEMIC_SHOCK') {
                     item.action = 'HOLD';
                     item.alertLevel = 'WARNING';
                     item.advice = `⚠️ تشبع بيعي (RSI: ${item.rsi}) لكن السوق في حالة هبوط ذعري شامل؛ يُحظر التجميع الآن ويُفضل التريث والاحتفاظ بالكاش.`;
@@ -8962,8 +9152,27 @@ ${userLessonsSummary}
 
           // 4b. Update Real-Time Market Regime & Breadth
           if (data.market_regime) {
-            window.currentMarketRegime = data.market_regime;
+            window.currentMarketRegime = typeof data.market_regime === 'object' ? data.market_regime : {
+              regime: String(data.market_regime),
+              regimeArabic: data.market_regime_arabic || 'تداول متوازن وعرضي',
+              description: '',
+              breadth: { advancingPct: 50, avgMarketChange: 0 }
+            };
+            window.currentMarketRegimeArabic = window.currentMarketRegime.regimeArabic;
             try { updateSimulationRegimeUI(); } catch(e){}
+          }
+
+          // 4c. Update Autonomous Forward Testing Ledger live quotes (D-09: Zero Stale Prices)
+          if (Array.isArray(autonomousLedger)) {
+            autonomousLedger.forEach(trade => {
+              if (trade.status === 'OPEN') {
+                const live = (data.prices && data.prices[trade.ticker]) || (data.radar && data.radar.find(r => r.ticker === trade.ticker));
+                if (live && live.price > 0) {
+                  trade.currentPrice = live.price;
+                }
+              }
+            });
+            try { renderAutonomousLedger(); } catch(e){}
           }
 
           // 5. Update Header Live Sync Indicator Badge
@@ -9016,7 +9225,7 @@ ${userLessonsSummary}
       let highestPriorityAlert = null;
 
       // 0. Check Systemic Market Shock Alert (Flash crash protection)
-      if (window.currentMarketRegime === 'SYSTEMIC_SHOCK') {
+      if (getMarketRegimeCode() === 'SYSTEMIC_SHOCK') {
         const shockAlert = {
           id: `shock_systemic_alert`,
           ticker: 'EGX',
@@ -9101,7 +9310,7 @@ ${userLessonsSummary}
           badgeEl.innerText = highestPriorityAlert.badge;
           if (actionTextEl) actionTextEl.innerText = highestPriorityAlert.actionLabel;
 
-          if (highestPriorityAlert.type === 'CRITICAL_RISK') {
+          if (highestPriorityAlert.type === 'CRITICAL_RISK' || highestPriorityAlert.type === 'SYSTEMIC_SHOCK') {
             banner.className = 'sticky top-14 z-40 bg-gradient-to-r from-rose-950 via-rose-900 to-amber-950 text-white border-b-2 border-rose-500 shadow-2xl px-4 py-2.5 transition-all animate-slide-down block';
           } else if (highestPriorityAlert.type === 'REBOUND_RESISTANCE') {
             banner.className = 'sticky top-14 z-40 bg-gradient-to-r from-amber-950 via-orange-950 to-slate-900 text-white border-b-2 border-amber-500 shadow-2xl px-4 py-2.5 transition-all animate-slide-down block';

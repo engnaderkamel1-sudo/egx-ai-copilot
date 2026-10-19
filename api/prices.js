@@ -42,7 +42,8 @@ const EGX_DICTIONARY = {
   "PHDC": { name: "بالم هيلز للتعمير", sector: "تطوير عقاري", index: "egx30", quality: "شراكات كبرى وتدفقات نقدية منتظمة" },
   "ETRS": { name: "إيجيترانس", sector: "شحن ولوجستيات", index: "egx70", quality: "لوجستيات طاقة الرياح والمشاريع الكبرى" },
   "CIEB": { name: "بنك كريدي أجريكول مصر", sector: "بنوك وخدمات مالية", index: "egx30", quality: "كفاية رأس مال عالية وتوزيع نقدي دوري" },
-  "ADIB": { name: "مصرف أبو ظبي الإسلامي مصر", sector: "بنوك وصيرفة إسلامية", index: "egx30", quality: "أسرع البنوك نمواً في الأرباح" }
+  "ADIB": { name: "مصرف أبو ظبي الإسلامي مصر", sector: "بنوك وصيرفة إسلامية", index: "egx30", quality: "أسرع البنوك نمواً في الأرباح" },
+  "EMFD": { name: "إعمار مصر للتنمية", sector: "تطوير عقاري وإنشاءات", index: "egx30", quality: "تدفقات دولارية ومشاريع عقارية فاخرة" }
 };
 
 // Official Mutual Funds Benchmark & Dynamic Daily Accrual NAV Engine
@@ -162,13 +163,13 @@ function parseTechnicalRecord(item) {
     stopLossVal = Number((price * 0.96).toFixed(2));
   }
 
-  // Target determination
+  // Target determination: Structurally anchored to Resistance 1 (R1)
   let target1Val = null;
   let target2Val = null;
 
-  if (pivotR1 != null && pivotR1 > price) {
+  if (pivotR1 != null) {
     target1Val = pivotR1;
-    target2Val = pivotR2 != null && pivotR2 > target1Val ? pivotR2 : (week52High != null && week52High > target1Val ? week52High : null);
+    target2Val = pivotR2 != null && pivotR2 > target1Val ? pivotR2 : (week52High != null && week52High > target1Val ? week52High : Number((target1Val * 1.05).toFixed(2)));
   } else if (pivotR2 != null && pivotR2 > price) {
     target1Val = pivotR2;
     target2Val = week52High != null && week52High > target1Val ? week52High : null;
@@ -202,8 +203,8 @@ function parseTechnicalRecord(item) {
     rrDisplay = 'تحذير (دون الدعم S1)';
   } else if (target1Val <= price) {
     rrRatio = 0;
-    const isPullback = changePct < 0;
-    rrDisplay = isPullback ? 'ارتداد مقاومة (تخفيف)' : 'تحقق الهدف (جني أرباح)';
+    const isPullback = changePct < 0 || (sma200 != null && price < sma200);
+    rrDisplay = isPullback ? 'ارتداد مقاومة (تخفيف)' : 'تحقق الهدف (تأمين أرباح)';
   }
 
   // Technical Trend & Momentum Classification
@@ -285,8 +286,23 @@ function parseTechnicalRecord(item) {
   const turnoverMillions = (tradedValue / 1000000).toFixed(1);
   const qualityDesc = dict.quality || 'تداول نشط ومستمر في تطبيق ثندر';
 
-  if (tradedValue > 100000000) {
-    type = 'سيولة مليارية فائقة • أمان مؤسسي رقم 1';
+  const isFomoTrap = trend && trend.includes('FOMO');
+
+  if (isFomoTrap) {
+    type = '⚠️ تحذير تمدد سعري ومضاربة أفراد (مصيدة سيولة)';
+    catalyst = `${qualityDesc} • تمدد سعري حاد ومضاربات أفراد محمومة؛ الشراء محظور لتجنب التعليق في القمة`;
+    safetyTag = 'fomo_danger';
+  } else if (isSupportBroken) {
+    type = '⚠️ سهم تحت ضغط بيعي وكسر دعم';
+    catalyst = `${qualityDesc} • كسر صريح لمستوى الدعم الفني ${supportVal} ج (وقف الخسارة مفعل)`;
+    safetyTag = 'broken_support';
+  } else if (tradedValue >= 1000000000) {
+    type = 'سيولة مليارية استثنائية • أمان مؤسسي فائق';
+    const flowType = changePct >= 0 ? 'تجميع مؤسسي قياسي وتدفقات سيولة ضخمة' : 'امتصاص بيعي مؤسسي وتثبيت سعري';
+    catalyst = `${qualityDesc} • ${flowType} (تنفيذات ${turnoverMillions} مليون ج)`;
+    safetyTag = 'volume_surge';
+  } else if (tradedValue >= 100000000) {
+    type = 'سيولة مؤسسية كبرى تتجاوز 100 مليون ج';
     const flowType = changePct >= 0 ? 'تجميع مؤسسي قوي وتدفقات سيولة قيادية' : 'امتصاص بيعي مؤسسي وتثبيت سعري';
     catalyst = `${qualityDesc} • ${flowType} (تنفيذات ${turnoverMillions} مليون ج)`;
     safetyTag = 'volume_surge';
@@ -294,7 +310,7 @@ function parseTechnicalRecord(item) {
     type = 'طفرة صعودية وزخم فني قوي';
     catalyst = `${qualityDesc} • اختراق بزخم شرائي صاعد (تداول ${turnoverMillions}M ج)`;
     safetyTag = 'momentum';
-  } else if (rsi < 36) {
+  } else if (!isSupportBroken && rsi < 36) {
     type = 'فرصة ارتداد من تشبع بيعي (Dip Buy)';
     catalyst = `${qualityDesc} • تشبع بيعي حاد (RSI: ${rsi}) عند مشارف الدعم ${supportVal} ج`;
     safetyTag = 'oversold_bounce';
@@ -383,7 +399,7 @@ export default async function handler(req, res) {
       "EGX:EKHO", "EGX:ISPH", "EGX:MFPC", "EGX:JUFO", "EGX:CERA",
       "EGX:BTFH", "EGX:ALCN", "EGX:OCDI", "EGX:HELI", "EGX:PHDC",
       "EGX:CCAP", "EGX:KORA", "EGX:ORHD", "EGX:UEGC", "EGX:ZMID",
-      "EGX:ORWE", "EGX:CIEB", "EGX:ADIB", "EGX:ETRS"
+      "EGX:ORWE", "EGX:CIEB", "EGX:ADIB", "EGX:ETRS", "EGX:EMFD"
     ];
 
     let tickersToFetch = [...defaultPortfolioTickers];

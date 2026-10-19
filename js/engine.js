@@ -185,14 +185,48 @@
      * Single Source of Truth for Asset Evaluation
      * Enforces the iron rule: A losing stock NEVER gets "جني أرباح" or "منطقة قمة".
      */
-    evaluateAsset: function (asset) {
+    evaluateAsset: function (asset, marketRegime) {
+      if (!asset) return null;
+
+      // Safe numeric cleaner for Egyptian piastre / currency strings (e.g. "83.20 ج")
+      const cleanNum = (val) => {
+        if (val == null) return null;
+        if (typeof val === 'number') return isNaN(val) ? null : val;
+        const cleaned = String(val).replace(/[^\d.-]/g, '');
+        const n = parseFloat(cleaned);
+        return isNaN(n) ? null : n;
+      };
+
+      // Dedicated Neutral Cash Handler (Never evaluate cash as a stock)
+      if (asset.ticker === 'CASH' || asset.isCash || asset.isCashReserve) {
+        const cashVal = cleanNum(asset.value) || 0;
+        return {
+          ticker: 'CASH',
+          name: asset.name || 'المحفظة (الرصيد النقدي)',
+          shares: 0,
+          buyPrice: 0,
+          currentPrice: 0,
+          totalCost: 0,
+          currentValue: cashVal,
+          profit: 0,
+          returnPct: 0,
+          isLosing: false,
+          status: 'سيولة حرة',
+          action: 'HOLD',
+          alertLevel: 'NORMAL',
+          badgeText: 'احتياطي كاش',
+          badgeColor: 'bg-slate-800 text-slate-300 border border-slate-700',
+          advice: 'سيولة نقدية جاهزة للاقتناص وحماية المحفظة.'
+        };
+      }
+
       const shares = parseInt(asset.shares, 10) || 0;
-      const buyPrice = Number(asset.buyPrice) || 0;
-      const currentPrice = Number(asset.currentPrice) || buyPrice;
-      const pivotR1 = Number(asset.pivotR1 || asset.target1) || null;
-      const pivotS1 = Number(asset.pivotS1 || asset.support) || null;
-      const sma50 = Number(asset.sma50) || null;
-      const rsi = Number(asset.rsi) || 50;
+      const buyPrice = cleanNum(asset.buyPrice) || 0;
+      const currentPrice = cleanNum(asset.currentPrice) || buyPrice;
+      const pivotR1 = cleanNum(asset.pivotR1 || asset.target1);
+      const pivotS1 = cleanNum(asset.pivotS1 || asset.support);
+      const sma50 = cleanNum(asset.sma50);
+      const rsi = cleanNum(asset.rsi) || 50;
 
       const totalCost = Math.round(shares * buyPrice);
       const currentValue = Math.round(shares * currentPrice);
@@ -220,6 +254,13 @@
           badgeText = '🔄 تدوير وتخفيف (ارتداد هابط)';
           badgeColor = 'bg-amber-500/20 text-amber-300 border border-amber-500/40';
           advice = `ارتداد فني لمستوى المقاومة R1 (${pivotR1.toFixed(2)} ج) لسهم متراجع (${returnPct.toFixed(1)}%). فرصة ممتازة لتخفيف المركز وتدوير السيولة في أصل أسرع نمواً.`;
+        } else if (marketRegime === 'SYSTEMIC_SHOCK') {
+          // Guardrail: Freeze accumulation during market-wide crashes
+          action = 'DEFENSIVE_HOLD';
+          alertLevel = 'CRITICAL_RISK';
+          badgeText = 'حذر / صدمة سوقية';
+          badgeColor = 'bg-rose-950/40 text-rose-300 border border-rose-800/40';
+          advice = `السوق يمر بمرحلة صدمة سوقية (Systemic Shock Alert). يُحظر تعزيز المراكز المتراجعة وتجميد الشراء لحين استقرار المؤشرات.`;
         } else if (rsi < 36 && pivotS1 && currentPrice >= pivotS1) {
           action = 'ACCUMULATE';
           alertLevel = 'ACCUMULATE';
