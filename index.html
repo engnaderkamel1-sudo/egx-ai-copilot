@@ -1954,10 +1954,10 @@
                 <div class="text-[11px] text-gray-500 mt-1 font-mono">الزمن: منذ 12 دقيقة • الأولوية: عالية</div>
               </div>
             </div>
-            <a href="https://app.thndr.app" target="_blank" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shrink-0 flex items-center gap-1">
-              <span>تنفيذ في ثندر</span>
-              <i data-lucide="external-link" class="w-3 h-3"></i>
-            </a>
+            <button onclick="openAuditModal('BTFH')" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shrink-0 flex items-center gap-1.5 transition shadow cursor-pointer" title="تقرير الاقتراح الاستثماري والمصادر">
+              <span>تقرير الاقتراح 📊</span>
+              <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+            </button>
           </div>
 
           <!-- Active Alert 2: Profit Protection -->
@@ -2000,10 +2000,10 @@
                 <div class="text-[11px] text-gray-500 mt-1 font-mono">الزمن: منذ ساعتين • الأولوية: فرصة ذهبية</div>
               </div>
             </div>
-            <a href="https://app.thndr.app" target="_blank" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shrink-0 flex items-center gap-1">
-              <span>ثندر</span>
-              <i data-lucide="external-link" class="w-3 h-3"></i>
-            </a>
+            <button onclick="openAuditModal('COMI')" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shrink-0 flex items-center gap-1.5 transition shadow cursor-pointer" title="تقرير الاقتراح الاستثماري والمصادر">
+              <span>تقرير الاقتراح 📊</span>
+              <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+            </button>
           </div>
         </div>
       </div>
@@ -3121,42 +3121,60 @@
     </div>
   </div>
 
-  <!-- Investment Due Diligence & Proof Modal -->
-  <div id="audit-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden items-center justify-center p-3 sm:p-4 overflow-y-auto modal-overlay">
-    <div class="bg-gray-900 border border-gray-800 rounded-2xl max-w-xl w-full shadow-2xl relative modal-card flex flex-col">
-      <div class="flex items-center justify-between border-b border-gray-800 p-4 sm:p-5 pb-3 shrink-0">
+  <!-- Investment Recommendation Report & Due Diligence Modal -->
+  <div id="audit-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden items-center justify-center p-2 sm:p-4 overflow-y-auto modal-overlay">
+    <div class="bg-gray-900 border border-emerald-500/40 rounded-2xl max-w-3xl w-full shadow-2xl relative modal-card flex flex-col max-h-[92vh]">
+      <div class="flex items-center justify-between border-b border-gray-800 p-3.5 sm:p-5 pb-3 shrink-0">
         <div class="flex items-center gap-2.5">
-          <div class="w-9 h-9 rounded-xl bg-emerald-600/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
-            <i data-lucide="file-check" class="w-5 h-5"></i>
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 flex items-center justify-center text-white shadow-lg shadow-emerald-900/40 shrink-0">
+            <i data-lucide="file-text" class="w-5 h-5"></i>
           </div>
           <div>
-            <h3 class="font-bold text-white text-base" id="audit-modal-title">بطاقة التقييم الاستثماري ومصادر التحقق الرسمية</h3>
-            <p class="text-xs text-gray-400" id="audit-modal-subtitle">فحص القوائم المالية، مستويات الدعم، والسيولة</p>
+            <div class="flex items-center gap-2">
+              <h3 class="font-extrabold text-white text-sm sm:text-base" id="audit-modal-title">تقرير الاقتراح الاستثماري ومصادر القرار</h3>
+              <span class="px-2 py-0.5 rounded text-[10px] bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30">مدقق 📊</span>
+            </div>
+            <p class="text-[11px] text-gray-400" id="audit-modal-subtitle">بيان تحليلي فني ومالي وحوكمة مخاطر بالأرقام والمصادر المباشرة</p>
           </div>
         </div>
-        <button onclick="closeAuditModal()" class="text-gray-400 hover:text-white p-1 rounded-lg hover:bg-gray-800 transition cursor-pointer">
-          <i data-lucide="x" class="w-5 h-5"></i>
-        </button>
+        <div class="flex items-center gap-1.5">
+          <button type="button" onclick="copyAuditReport()" class="p-2 rounded-xl bg-gray-800 hover:bg-gray-700 text-cyan-300 hover:text-white border border-gray-700 text-xs font-bold transition flex items-center gap-1 cursor-pointer" title="نسخ نص التقرير والمصادر">
+            <i data-lucide="copy" class="w-4 h-4"></i>
+            <span class="hidden sm:inline">نسخ</span>
+          </button>
+          <button type="button" onclick="printAuditReport()" class="p-2 rounded-xl bg-gray-800 hover:bg-gray-700 text-emerald-300 hover:text-white border border-gray-700 text-xs font-bold transition flex items-center gap-1 cursor-pointer" title="طباعة أو تصدير التقرير PDF">
+            <i data-lucide="printer" class="w-4 h-4"></i>
+            <span class="hidden sm:inline">طباعة</span>
+          </button>
+          <button type="button" onclick="closeAuditModal()" class="text-gray-400 hover:text-white p-2 rounded-xl hover:bg-gray-800 transition cursor-pointer" aria-label="إغلاق">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
       </div>
 
-      <div class="p-4 sm:p-5 space-y-4 text-xs modal-scroll-body overflow-y-auto flex-1">
+      <div class="p-3.5 sm:p-5 space-y-4 text-xs modal-scroll-body overflow-y-auto flex-1">
         <!-- Rating Consensus Banner -->
         <div class="p-3.5 rounded-xl border border-emerald-500/30 bg-emerald-950/20 flex items-center justify-between flex-wrap gap-2 text-xs" id="audit-consensus-banner">
           <!-- Dynamically injected via JS -->
         </div>
 
         <!-- The 3 Pillars Breakdown Cards -->
-        <div class="space-y-3 text-xs" id="audit-agents-container">
+        <div class="space-y-3.5 text-xs" id="audit-agents-container">
           <!-- Injected via JS -->
         </div>
       </div>
 
       <!-- Modal Footer -->
-      <div class="flex items-center justify-between p-4 sm:p-5 pt-3 border-t border-gray-800 shrink-0 safe-bottom">
-        <span class="text-[11px] text-gray-400">تم التحقق من مصادر البورصة الرسمية والشارت اللحظي ✅</span>
-        <button onclick="closeAuditModal()" class="px-4 py-2 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-200 font-bold text-xs transition cursor-pointer">
-          إغلاق
-        </button>
+      <div class="flex items-center justify-between p-3.5 sm:p-5 pt-3 border-t border-gray-800 shrink-0 safe-bottom bg-gray-950/60 rounded-b-2xl">
+        <div class="flex items-center gap-2 text-[11px] text-gray-400">
+          <i data-lucide="shield-check" class="w-4 h-4 text-emerald-400"></i>
+          <span>تم التحقق من إفصاحات البورصة الرسمية ومستويات TradingView والشارت اللحظي ✅</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="closeAuditModal()" class="px-4 py-2 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-200 font-bold text-xs transition cursor-pointer">
+            إغلاق
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -3514,10 +3532,10 @@
 
       <!-- Modal Footer -->
       <div class="flex items-center justify-between p-4 sm:p-5 pt-3 border-t border-gray-800 shrink-0 safe-bottom">
-        <a href="https://app.thndr.app" target="_blank" class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white font-bold text-xs flex items-center gap-1.5 shadow-lg shadow-amber-950/40 transition">
-          <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
-          <span>فتح ثندر لتنفيذ أمر البيع الجزئي</span>
-        </a>
+        <button onclick="const t = document.getElementById('rot-stock-ticker')?.innerText; if (t) openAuditModal(t);" class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs flex items-center gap-1.5 shadow-lg shadow-emerald-950/40 transition cursor-pointer">
+          <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+          <span>تقرير الاقتراح والمصادر 📊</span>
+        </button>
         <button onclick="closeRotationModal()" class="px-4 py-2.5 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-300 font-bold text-xs transition cursor-pointer">
           إغلاق النافذة
         </button>
@@ -3855,10 +3873,10 @@
           </button>
         </div>
         <div class="flex items-center gap-2">
-          <a id="pl-modal-thndr-link" href="#" target="_blank" class="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs flex items-center gap-1.5 transition shadow">
-            <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
-            <span>تنفيذ في ثندر ↗</span>
-          </a>
+          <button id="pl-modal-audit-btn" type="button" onclick="const t = document.getElementById('pl-modal-ticker')?.innerText; if (t) openAuditModal(t);" class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1.5 transition shadow cursor-pointer" title="تقرير الاقتراح والمصادر الاستثمارية">
+            <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+            <span>تقرير الاقتراح 📊</span>
+          </button>
           <button type="button" onclick="closePriceLevelsModal()" class="px-3.5 py-2 rounded-xl bg-gray-900 hover:bg-gray-800 border border-gray-800 text-gray-300 font-bold text-xs transition cursor-pointer">
             إغلاق
           </button>

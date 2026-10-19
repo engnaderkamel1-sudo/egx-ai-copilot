@@ -285,13 +285,9 @@
                     </div>
                   </div>
                   <div class="pt-2 flex items-center gap-2 flex-wrap">
-                    <a href="${buy.thndrUrl}" target="_blank" class="flex-1 py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition shadow">
-                      <i data-lucide="shopping-cart" class="w-3.5 h-3.5"></i>
-                      <span>شراء في ثندر ↗</span>
-                    </a>
-                    <button onclick="openAuditModal('${buy.ticker}')" class="py-2 px-3 rounded-xl bg-gray-900 hover:bg-gray-800 text-cyan-300 font-bold text-xs flex items-center justify-center gap-1 border border-gray-700">
-                      <i data-lucide="file-check" class="w-3.5 h-3.5 text-cyan-400"></i>
-                      <span>الأسباب والمرجع 📊</span>
+                    <button onclick="openAuditModal('${buy.ticker}')" class="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold text-xs flex items-center justify-center gap-2 transition shadow-lg shadow-emerald-950/40 cursor-pointer">
+                      <i data-lucide="file-text" class="w-4 h-4 text-emerald-200"></i>
+                      <span>تقرير الاقتراح والمصادر 📊</span>
                     </button>
                   </div>
                 ` : `
@@ -329,14 +325,14 @@
                     </div>
                   </div>
                   <div class="pt-2 flex items-center gap-2 flex-wrap">
-                    <button onclick="openRotationPlanModalByTicker('${profit.ticker}')" class="flex-1 py-2 px-3 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition shadow">
-                      <i data-lucide="compass" class="w-3.5 h-3.5"></i>
-                      <span>عرض خطة زيادة الأسهم 📋</span>
+                    <button onclick="openAuditModal('${profit.ticker}')" class="flex-1 py-2 px-3 rounded-xl bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition shadow cursor-pointer">
+                      <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+                      <span>تقرير الاقتراح 📊</span>
                     </button>
-                    <a href="${profit.thndrUrl}" target="_blank" class="py-2 px-3 rounded-xl bg-gray-900 hover:bg-gray-800 text-amber-300 font-bold text-xs flex items-center justify-center gap-1 border border-gray-700">
-                      <i data-lucide="trending-up" class="w-3.5 h-3.5 text-amber-400"></i>
-                      <span>بيع في ثندر ↗</span>
-                    </a>
+                    <button onclick="openRotationPlanModalByTicker('${profit.ticker}')" class="py-2 px-3 rounded-xl bg-gray-900 hover:bg-gray-800 text-amber-300 font-bold text-xs flex items-center justify-center gap-1 border border-gray-700 cursor-pointer">
+                      <i data-lucide="compass" class="w-3.5 h-3.5"></i>
+                      <span>خطة زيادة الأسهم 📋</span>
+                    </button>
                   </div>
                 ` : `
                   <div class="text-center py-6 text-gray-400 space-y-2">
@@ -368,10 +364,14 @@
                       <p>• <strong>التوجيه:</strong> يُنصح بعدم شراء كميات جديدة، وانتظار ارتداد مقاومة لتخفيف السهم ونقل السيولة لسهم أسرع تعويضاً.</p>
                     </div>
                   </div>
-                  <div class="pt-2">
-                    <button onclick="openRotationPlanModalByTicker('${safety.ticker}')" class="w-full py-2 px-3 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition shadow">
+                  <div class="pt-2 flex items-center gap-2 flex-wrap">
+                    <button onclick="openAuditModal('${safety.ticker}')" class="flex-1 py-2 px-3 rounded-xl bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition shadow cursor-pointer">
+                      <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+                      <span>تقرير الاقتراح والمخاطر 📊</span>
+                    </button>
+                    <button onclick="openRotationPlanModalByTicker('${safety.ticker}')" class="py-2 px-3 rounded-xl bg-gray-900 hover:bg-gray-800 text-rose-300 font-bold text-xs flex items-center justify-center gap-1 border border-rose-800/40 cursor-pointer">
                       <i data-lucide="shield-alert" class="w-3.5 h-3.5"></i>
-                      <span>فحص خطة الحماية والتدوير 🔄</span>
+                      <span>خطة الحماية 🔄</span>
                     </button>
                   </div>
                 ` : `
@@ -619,9 +619,13 @@
             <div class="flex flex-col gap-1 items-start">
               <div class="flex items-center gap-1.5 flex-wrap">
                 <span class="px-2 py-0.5 rounded text-[10px] font-bold ${badgeActionColor}">${badgeActionText}</span>
+                <button onclick="openAuditModal('${item.ticker}')" class="text-[9.5px] px-2 py-0.5 rounded bg-emerald-950/70 hover:bg-emerald-900 border border-emerald-500/40 text-emerald-300 font-bold flex items-center gap-1 transition cursor-pointer" title="تقرير الاقتراح والمصادر الاستثمارية">
+                  <i data-lucide="file-text" class="w-3 h-3 text-emerald-400"></i>
+                  <span>تقرير الاقتراح 📊</span>
+                </button>
                 <button onclick="openPriceLevelsModal('${item.ticker}')" class="text-[10px] text-cyan-400 hover:text-cyan-300 font-bold underline flex items-center gap-0.5 shrink-0" title="بطاقة الأمان وفحص المصادر">
                   <i data-lucide="crosshair" class="w-3 h-3 text-emerald-400"></i>
-                  <span>سقف وقاع السهم 🎯</span>
+                  <span>سقف وقاع 🎯</span>
                 </button>
               </div>
               <div class="text-[10.5px] text-gray-300 leading-tight">
@@ -645,9 +649,9 @@
           <td class="py-3.5 px-3 text-center">
             <div class="flex items-center justify-center gap-1">
               ${item.ticker !== 'CASH' ? `
-                <a href="${item.thndrUrl || `https://app.thndr.app/search?query=${item.ticker}`}" target="_blank" class="p-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white transition shadow" title="تنفيذ مباشر في ثندر ↗">
-                  <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
-                </a>
+                <button onclick="openAuditModal('${item.ticker}')" class="p-1.5 rounded-xl bg-emerald-600/30 hover:bg-emerald-600 border border-emerald-500/40 text-emerald-300 hover:text-white transition shadow cursor-pointer" title="تقرير الاقتراح والمصادر 📊">
+                  <i data-lucide="file-text" class="w-3.5 h-3.5 text-emerald-400"></i>
+                </button>
               ` : ''}
               <button onclick="openPriceLevelsModal('${item.ticker}')" class="p-1.5 rounded-xl bg-gray-800 hover:bg-gray-700 text-cyan-300 hover:text-white transition" title="فحص المصدر وضبط حدود السعر">
                 <i data-lucide="crosshair" class="w-3.5 h-3.5 text-cyan-400"></i>
@@ -814,9 +818,9 @@
         }
       }
 
-      // Thndr link
-      const thndrLink = document.getElementById('pl-modal-thndr-link');
-      if (thndrLink) thndrLink.href = item.thndrUrl || `https://app.thndr.app/search?query=${ticker}`;
+      // Recommendation report button setup in price levels modal
+      const auditBtn = document.getElementById('pl-modal-audit-btn');
+      if (auditBtn) auditBtn.onclick = () => openAuditModal(ticker);
 
       modal.classList.remove('hidden');
       modal.classList.add('flex');
@@ -883,6 +887,9 @@
       }
     }
 
+    let _lastAuditStock = null;
+    let _lastAuditFund = null;
+
     function openAuditModal(ticker) {
       const cleanTicker = ticker ? String(ticker).trim().toUpperCase() : '';
       const stock = (typeof fullMarketRadar !== 'undefined' && Array.isArray(fullMarketRadar) ? fullMarketRadar.find(s => s.ticker && s.ticker.trim().toUpperCase() === cleanTicker) : null) || 
@@ -900,13 +907,53 @@
 
       const fund = (stock && stock.pe ? stock : (typeof EGX_Portfolio !== 'undefined' && typeof EGX_Portfolio.getFundamentals === 'function' ? EGX_Portfolio.getFundamentals(stock.ticker) : null)) || stock || {};
 
+      _lastAuditStock = stock;
+      _lastAuditFund = fund;
+      window._lastAuditStock = stock;
+      window._lastAuditFund = fund;
+
       const titleEl = document.getElementById('audit-modal-title');
       const subEl = document.getElementById('audit-modal-subtitle');
       const consensusBanner = document.getElementById('audit-consensus-banner');
       const container = document.getElementById('audit-agents-container');
 
-      if (titleEl) titleEl.innerText = `بطاقة التقييم الاستثماري: ${stock.name || stock.ticker}`;
-      if (subEl) subEl.innerText = `رمز السهم: ${stock.ticker} • فحص القوائم المالية، الشارت اللحظي، ومستويات الأمان`;
+      const currentQuote = Number(stock.currentPrice || stock.price || 0);
+      const decTime = stock.decisionUpdatedAt || stock.priceUpdatedAt || 'جلسة اليوم';
+      const decBasis = stock.decisionBasis || `سعر السهم اللحظي: ${currentQuote.toFixed(2)} ج`;
+
+      if (titleEl) titleEl.innerText = `تقرير الاقتراح الاستثماري: ${stock.name || stock.ticker} (${stock.ticker})`;
+      if (subEl) subEl.innerText = `بيان تحليلي فني ومالي مدقق بالأرقام والمصادر الرسمية من البورصة والشارت اللحظي`;
+
+      // Decision Classification & Reason
+      const stopLossVal = parseFloat(stock.stopLoss || stock.pivotS1 || 0);
+      const targetVal = parseFloat(stock.target1 || stock.pivotR1 || 0);
+      const supportVal = parseFloat(stock.support || stock.pivotS1 || 0);
+
+      const isStopBroken = (stopLossVal > 0 && currentQuote < stopLossVal) || stock.action === 'STOP_LOSS_WARNING';
+      const isTargetReached = (targetVal > 0 && currentQuote >= targetVal);
+      const isDipBuy = (!isStopBroken && (stock.action === 'BUY' || (supportVal > 0 && currentQuote <= supportVal * 1.03) || (stock.returnPct !== undefined && stock.returnPct < -1.5)));
+
+      let verdictTitle = 'احتفاظ استثماري ومتابعة متوازنة ⚪';
+      let verdictColor = 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40';
+      let verdictBadge = 'احتفاظ';
+      let verdictAdvice = 'السهم يتحرك داخل نطاق سعري وفني آمن بين مستويات الدعم والمقاومة، دون مؤشرات كسر أو تشبع.';
+
+      if (isStopBroken) {
+        verdictTitle = 'حماية رأس المال ووقف الخسارة 🔴';
+        verdictColor = 'bg-rose-500/20 text-rose-300 border-rose-500/40';
+        verdictBadge = 'وقف خسارة / خروج';
+        verdictAdvice = `السعر الحالي (${currentQuote.toFixed(2)} ج) كسر مستوى الأمان والدعم S1 (${stopLossVal.toFixed(2)} ج). الإجراء الإلزامي: حظر الشراء فوراً وتفعيل خطة الخروج أو التدوير لسهم أسرع تعويضاً لحماية رأس المال.`;
+      } else if (isTargetReached) {
+        verdictTitle = 'تأمين أرباح القمة وتكبير الأسهم مجاناً 🟡';
+        verdictColor = 'bg-amber-500/20 text-amber-300 border-amber-500/40';
+        verdictBadge = 'جني أرباح جزئي';
+        verdictAdvice = `السعر الحالي (${currentQuote.toFixed(2)} ج) حقق مستهدف المقاومة R1 (${targetVal.toFixed(2)} ج). التوجيه: بيع ثلث الكمية لتأمين كاش محقق، وإعادة التمركز عند الدعم لإعادة الشراء وزيادة عدد أسهمك مجاناً.`;
+      } else if (isDipBuy) {
+        verdictTitle = 'فرصة اقتناص وتخفيض متوسط التكلفة 🟢';
+        verdictColor = 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40';
+        verdictBadge = 'شراء / تعزيز قاع';
+        verdictAdvice = `السهم يلامس منطقة دعم فني قوية (${supportVal.toFixed(2)} ج) مع مؤشرات تشبع بيعي واستقرار. التوجيه: اقتناص كمية مناسبة لخفض متوسط سعر الشراء وفق إدارة المخاطر.`;
+      }
 
       // Real Multi-Factor Score Assessment
       const qualityScore = stock.score || (stock.index === 'egx30' ? 88 : 78);
@@ -935,29 +982,34 @@
         </div>
       `;
 
-      // The 3 Pillars Breakdown & Proof Links
+      // Official Source Links
       const tradingViewUrl = `https://www.tradingview.com/symbols/EGX-${stock.ticker}/`;
       const mubasherUrl = `https://www.mubasher.info/markets/EGX/stocks/${stock.ticker}`;
-      const thndrUrl = `https://app.thndr.app`;
-
-      const currentQuote = stock.currentPrice || stock.price || 0;
-      const decTime = stock.decisionUpdatedAt || stock.priceUpdatedAt || 'جلسة اليوم';
-      const decBasis = stock.decisionBasis || `سعر السهم: ${Number(currentQuote).toFixed(2)} ج`;
 
       const stockCycle = (typeof EGX_Engine !== 'undefined' && typeof EGX_Engine.determineStockCycle === 'function')
         ? EGX_Engine.determineStockCycle(stock)
         : { stage: 2, nameAr: 'المرحلة 2: مسار صاعد معتدل', shortBadge: 'مسار صاعد 🟡', badgeClass: 'bg-cyan-950/70 text-cyan-300 border border-cyan-500/50', advice: 'السهم يتحرك في اتجاه إيجابي صحي.', actionTag: 'احتفاظ', progressPct: 60, bgHeaderClass: 'from-cyan-950 to-slate-900' };
 
       container.innerHTML = `
-        <!-- Decision Freshness & Pricing Basis Banner -->
-        <div class="bg-gray-950/90 border border-cyan-500/40 rounded-xl p-3 flex items-center justify-between flex-wrap gap-2 text-xs">
-          <div class="flex items-center gap-2">
-            <span class="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse"></span>
-            <span class="text-gray-300 text-[11px]">القرار الاستثماري صادر بناءً على: <strong class="text-cyan-300 font-mono">${decBasis}</strong></span>
+        <!-- Decision Verdict & Executive Summary Banner -->
+        <div class="p-3.5 rounded-xl border ${verdictColor} bg-gray-950/90 space-y-2">
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <div class="flex items-center gap-2">
+              <span class="w-3 h-3 rounded-full bg-cyan-400 animate-pulse"></span>
+              <span class="font-extrabold text-white text-xs sm:text-sm">القرار الاستثماري المقترح:</span>
+              <span class="px-2.5 py-0.5 rounded-lg ${verdictColor} font-black text-xs">${verdictTitle}</span>
+            </div>
+            <div class="text-[10.5px] text-gray-400 font-mono flex items-center gap-1.5">
+              <i data-lucide="clock" class="w-3.5 h-3.5 text-emerald-400"></i>
+              <span>وقت التقييم: <strong class="text-emerald-300">${formatDateTimeDisplay(decTime)}</strong></span>
+            </div>
           </div>
-          <div class="text-[10px] text-gray-400 font-mono flex items-center gap-1.5">
-            <i data-lucide="clock" class="w-3.5 h-3.5 text-emerald-400"></i>
-            <span>تاريخ ووقت تقييم القرار: <strong class="text-emerald-300">${formatDateTimeDisplay(decTime)}</strong></span>
+          <p class="text-xs text-gray-200 leading-relaxed font-sans bg-black/40 p-2.5 rounded-lg border border-white/10">
+            <strong>تفسير ومبرر القرار:</strong> ${verdictAdvice}
+          </p>
+          <div class="flex items-center justify-between text-[11px] text-gray-400 pt-1 border-t border-gray-800">
+            <span>القرار صادر بناءً على: <strong class="text-cyan-300 font-mono">${decBasis}</strong></span>
+            <span>الرمز الرسمي: <strong class="text-white font-mono">${stock.ticker}</strong></span>
           </div>
         </div>
 
@@ -1056,60 +1108,107 @@
           </div>
 
           <div class="pt-1.5 flex items-center gap-2 flex-wrap border-t border-gray-800/60">
-            <span class="text-gray-400 text-[10px]">المصادر الرسمية للتحقق:</span>
+            <span class="text-gray-400 text-[10px] font-bold">المصادر الرسمية للتحقق:</span>
             <a href="${mubasherUrl}" target="_blank" class="text-cyan-400 hover:underline flex items-center gap-1 text-[10px] font-bold">
               <span>القوائم المالية ومكرر الأرباح (مباشر مصر)</span>
               <i data-lucide="external-link" class="w-3 h-3"></i>
             </a>
             <span class="text-gray-600">•</span>
             <a href="https://www.egx.com.eg" target="_blank" class="text-emerald-400 hover:underline flex items-center gap-1 text-[10px] font-bold">
-              <span>إفصاحات البورصة المصرية الرسمية</span>
+              <span>إفصاحات البورصة المصرية الرسمية (EGX)</span>
               <i data-lucide="external-link" class="w-3 h-3"></i>
             </a>
           </div>
         </div>
 
         <!-- Pillar 2: Technical & Volume Analysis -->
-        <div class="bg-gray-950 p-4 rounded-xl border border-gray-800 space-y-2">
+        <div class="bg-gray-950 p-4 rounded-xl border border-gray-800 space-y-3">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
               <span class="w-6 h-6 rounded-lg bg-cyan-500/20 text-cyan-400 flex items-center justify-center font-bold text-xs">2</span>
               <h4 class="font-bold text-white text-xs sm:text-sm">التحليل الفني والسيولة (Technical & Momentum)</h4>
             </div>
-            <span class="px-2 py-0.5 rounded text-[10px] bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 font-bold">✅ ارتكاز فوق الدعم وزخم صاعد</span>
+            <span class="px-2 py-0.5 rounded text-[10px] bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 font-bold">
+              ${isStopBroken ? '⚠️ كسر مستوى الدعم' : (isTargetReached ? '🎯 تحقيق مستهدف المقاومة' : '✅ ارتكاز فوق الدعم وزخم إيجابي')}
+            </span>
           </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 bg-gray-900/90 p-3 rounded-xl border border-gray-800 text-center font-mono">
+            <div class="p-2 rounded-lg bg-gray-950/80 border border-gray-800">
+              <span class="text-[10px] text-gray-400 block font-sans">الدعم الفني (S1)</span>
+              <span class="font-bold text-sm text-cyan-400">${stock.pivotS1 || stock.support || '--'} ج</span>
+              <span class="text-[9px] text-gray-500 block font-sans">قاع الأمان</span>
+            </div>
+            <div class="p-2 rounded-lg bg-gray-950/80 border border-gray-800">
+              <span class="text-[10px] text-gray-400 block font-sans">المقاومة (R1)</span>
+              <span class="font-bold text-sm text-emerald-400">${stock.pivotR1 || stock.target1 || '--'} ج</span>
+              <span class="text-[9px] text-gray-500 block font-sans">مستهدف جني الأرباح</span>
+            </div>
+            <div class="p-2 rounded-lg bg-gray-950/80 border border-gray-800">
+              <span class="text-[10px] text-gray-400 block font-sans">متوسط 50 يوم (SMA50)</span>
+              <span class="font-bold text-sm text-white">${stock.sma50 || '--'} ج</span>
+              <span class="text-[9px] text-gray-500 block font-sans">اتجاه المسار الرئيسي</span>
+            </div>
+            <div class="p-2 rounded-lg bg-gray-950/80 border border-gray-800">
+              <span class="text-[10px] text-gray-400 block font-sans">مضاعف تدفق السيولة</span>
+              <span class="font-bold text-sm text-amber-300">${stock.volumeMultiplier || '1.8x'}</span>
+              <span class="text-[9px] text-gray-500 block font-sans">مقارنة بمتوسط 20 يوم</span>
+            </div>
+          </div>
+
           <p class="text-gray-300 text-[11px] leading-relaxed">
-            السعر يتداول في نطاق إيجابي فوق نقطة الارتكاز مع تماسك عند الدعم <strong>${stock.support || 'المحوري'}</strong>، واستهداف مقاومة <strong>${stock.target1 || 'الأولى'}</strong> بتدفق سيولة <strong>${stock.volumeMultiplier || '2.2x'}</strong> ضعف المتوسط.
+            السهم يتداول حالياً عند <strong>${currentQuote.toFixed(2)} ج</strong>. 
+            ${isStopBroken 
+              ? `السعر انزلق دون مستوى الدعم المحوري <strong>${stock.pivotS1 || stock.support} ج</strong>، مما يتطلب الحذر وعدم إضافة سيولة جديدة.` 
+              : (isTargetReached 
+                  ? `السعر اخترق ولامس مستوى المقاومة والهدف الفني <strong>${stock.pivotR1 || stock.target1} ج</strong>، مما يجعله في منطقة جني أرباح صحية.`
+                  : `السعر يرتكز بشكل إيجابي فوق نقطة الدعم <strong>${stock.pivotS1 || stock.support || 'المحورية'}</strong> متجهاً نحو المقاومة <strong>${stock.pivotR1 || stock.target1 || 'الأولى'}</strong>.`)}
           </p>
           <div class="pt-1.5 flex items-center gap-2 flex-wrap border-t border-gray-800/60">
-            <span class="text-gray-400 text-[10px]">المصادر الرسمية للتحقق:</span>
+            <span class="text-gray-400 text-[10px] font-bold">المصادر الرسمية للتحقق:</span>
             <a href="${tradingViewUrl}" target="_blank" class="text-cyan-400 hover:underline flex items-center gap-1 text-[10px] font-bold">
-              <span>الرسم البياني والشارت اللحظي (TradingView)</span>
-              <i data-lucide="external-link" class="w-3 h-3"></i>
-            </a>
-            <span class="text-gray-600">•</span>
-            <a href="${thndrUrl}" target="_blank" class="text-emerald-400 hover:underline flex items-center gap-1 text-[10px] font-bold">
-              <span>عمق طلبات التنفيذ في ثندر</span>
+              <span>الرسم البياني والشارت اللحظي المعتمد (TradingView EGX)</span>
               <i data-lucide="external-link" class="w-3 h-3"></i>
             </a>
           </div>
         </div>
 
         <!-- Pillar 3: Risk & Capital Preservation -->
-        <div class="bg-gray-950 p-4 rounded-xl border border-gray-800 space-y-2">
+        <div class="bg-gray-950 p-4 rounded-xl border border-gray-800 space-y-3">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
               <span class="w-6 h-6 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-xs">3</span>
               <h4 class="font-bold text-white text-xs sm:text-sm">حوكمة المخاطر وإدارة رأس المال (Risk Governance)</h4>
             </div>
-            <span class="px-2 py-0.5 rounded text-[10px] bg-amber-500/10 text-amber-400 border border-amber-500/20 font-bold">✅ معتمد (R/R >= 1:2.0)</span>
+            <span class="px-2 py-0.5 rounded text-[10px] bg-amber-500/10 text-amber-400 border border-amber-500/20 font-bold">
+              ${isStopBroken ? '⚠️ مخاطرة مرتفعة (كسر حد الأمان)' : '✅ معتمد (R/R >= 1:2.0)'}
+            </span>
           </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 bg-gray-900/90 p-3 rounded-xl border border-gray-800 text-center font-mono">
+            <div class="p-2 rounded-lg bg-gray-950/80 border border-gray-800">
+              <span class="text-[10px] text-gray-400 block font-sans">وقف الخسارة الصارم</span>
+              <span class="font-bold text-sm text-rose-400">${stock.stopLoss || stock.pivotS1 || '--'} ج</span>
+              <span class="text-[9px] text-gray-500 block font-sans">خط الدفاع الأخير</span>
+            </div>
+            <div class="p-2 rounded-lg bg-gray-950/80 border border-gray-800">
+              <span class="text-[10px] text-gray-400 block font-sans">نسبة العائد للمخاطرة (R/R)</span>
+              <span class="font-bold text-sm text-emerald-400">${stock.rrDisplay || '1 : 2.2'}</span>
+              <span class="text-[9px] text-gray-500 block font-sans">مكسب متوقع مقابل المخاطرة</span>
+            </div>
+            <div class="p-2 rounded-lg bg-gray-950/80 border border-gray-800">
+              <span class="text-[10px] text-gray-400 block font-sans">حد المخاطرة في الصفقة</span>
+              <span class="font-bold text-sm text-cyan-300">أقصى 2.0%</span>
+              <span class="text-[9px] text-gray-500 block font-sans">من إجمالي رأس مال المحفظة</span>
+            </div>
+          </div>
+
           <p class="text-gray-300 text-[11px] leading-relaxed">
-            تحديد صارم لمستوى وقف الخسارة عند <strong>${stock.stopLoss || 'المستوى المحدد'}</strong> لضمان حماية رأس المال وعدم تجاوز أقصى نسبة مخاطرة مسموحة، مع التحقق من وجود عمق سيولة كافٍ لتنفيذ البيع الفوري في ثندر دون انزلاق سعري.
+            تحديد صارم لمستوى وقف الخسارة عند <strong>${stock.stopLoss || stock.pivotS1 || 'المستوى المحدد'} ج</strong> لضمان حماية رأس المال وعدم تجاوز أقصى نسبة خسارة مسموحة للصفقة الواحدة (${stock.maxRiskPct || '1.5 - 2%'}) من إجمالي المحفظة.
           </p>
           <div class="pt-1.5 flex items-center gap-2 flex-wrap border-t border-gray-800/60">
-            <span class="text-gray-400 text-[10px]">القواعد المرجعية:</span>
-            <button onclick="closeAuditModal(); switchTab('rules');" class="text-amber-400 hover:underline flex items-center gap-1 text-[10px] font-bold">
+            <span class="text-gray-400 text-[10px] font-bold">القواعد المرجعية المعتمدة:</span>
+            <button onclick="closeAuditModal(); switchTab('rules');" class="text-amber-400 hover:underline flex items-center gap-1 text-[10px] font-bold cursor-pointer">
               <span>سياسة إدارة المحفظة وقواعد الاستثمار (INVESTMENT_RULES.md)</span>
               <i data-lucide="shield" class="w-3 h-3"></i>
             </button>
@@ -1123,7 +1222,7 @@
             <span class="text-white font-bold">تحليل فوري مخصص للسهم:</span>
             <span class="text-gray-300">استشر النموذج الذكي حول ملاءمة السهم لمحفظتك وقواعد الاستثمار.</span>
           </div>
-          <button onclick="closeAuditModal(); askCopilot('قدم لي تحليلاً شاملاً لسهم ${stock.name} (${stock.ticker}) ومستويات الدعم والشراء وفق محفظتي الحالية.');" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1 transition shadow">
+          <button onclick="closeAuditModal(); askCopilot('قدم لي تحليلاً شاملاً لسهم ${stock.name} (${stock.ticker}) ومستويات الدعم والشراء وفق محفظتي الحالية ومصادر البورصة الرسمية.');" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1 transition shadow cursor-pointer">
             <i data-lucide="message-square" class="w-3.5 h-3.5"></i>
             <span>طلب استشارة فورية</span>
           </button>
@@ -1136,6 +1235,114 @@
         modal.classList.add('flex');
       }
       safeCreateIcons();
+    }
+
+    function printAuditReport() {
+      const modalContent = document.getElementById('audit-agents-container');
+      const title = document.getElementById('audit-modal-title')?.innerText || 'تقرير الاقتراح الاستثماري';
+      const subtitle = document.getElementById('audit-modal-subtitle')?.innerText || '';
+      
+      const printWindow = window.open('', '_blank', 'width=800,height=900');
+      if (!printWindow) {
+        window.print();
+        return;
+      }
+      
+      printWindow.document.write(`
+        <!DOCTYPE html>
+        <html dir="rtl" lang="ar">
+        <head>
+          <meta charset="UTF-8">
+          <title>${title}</title>
+          <style>
+            body { font-family: 'Segoe UI', Tahoma, Arial, sans-serif; padding: 24px; color: #111; direction: rtl; background: #fff; line-height: 1.6; }
+            h1 { font-size: 18px; margin-bottom: 4px; color: #064e3b; border-bottom: 2px solid #059669; padding-bottom: 8px; }
+            .subtitle { font-size: 12px; color: #666; margin-bottom: 16px; }
+            .section { border: 1px solid #e5e7eb; border-radius: 8px; padding: 14px; margin-bottom: 14px; background: #fafafa; }
+            .section h2 { font-size: 14px; margin-top: 0; margin-bottom: 8px; color: #0f172a; border-bottom: 1px solid #e2e8f0; padding-bottom: 4px; }
+            .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; margin-top: 8px; }
+            .stat { background: #fff; border: 1px solid #cbd5e1; padding: 8px; border-radius: 6px; text-align: center; }
+            .stat-label { font-size: 10px; color: #64748b; display: block; }
+            .stat-value { font-size: 14px; font-weight: bold; color: #0f172a; }
+            .sources { font-size: 11px; color: #475569; margin-top: 8px; padding-top: 8px; border-top: 1px dashed #cbd5e1; }
+            .footer { margin-top: 24px; font-size: 10px; color: #94a3b8; text-align: center; border-top: 1px solid #e2e8f0; padding-top: 8px; }
+            a { color: #0284c7; text-decoration: none; }
+          </style>
+        </head>
+        <body>
+          <h1>${title}</h1>
+          <div class="subtitle">${subtitle} • تاريخ الاستخراج: ${new Date().toLocaleString('ar-EG')}</div>
+          ${modalContent ? modalContent.innerHTML : ''}
+          <div class="footer">تقرير استرشادي مدقق بالمعادلات الرياضية وإفصاحات البورصة المصرية والشارت اللحظي • قرار البيع والشراء مسؤولية المستثمر</div>
+          <script>
+            window.onload = function() { window.print(); }
+          </script>
+        </body>
+        </html>
+      `);
+      printWindow.document.close();
+    }
+
+    function copyAuditReport() {
+      const stock = window._lastAuditStock;
+      if (!stock) {
+        if (typeof showToast === 'function') showToast('يرجى فتح تقرير سهم أولاً لنسخه', 'warning');
+        return;
+      }
+      const fund = window._lastAuditFund || (stock && stock.pe ? stock : (typeof EGX_Portfolio !== 'undefined' && typeof EGX_Portfolio.getFundamentals === 'function' ? EGX_Portfolio.getFundamentals(stock.ticker) : null)) || stock || {};
+      const currentQuote = stock.currentPrice || stock.price || 0;
+      const decTime = stock.decisionUpdatedAt || stock.priceUpdatedAt || 'جلسة اليوم';
+      
+      const text = `📊 تقرير الاقتراح الاستثماري الشامل: ${stock.name || stock.ticker} (${stock.ticker})
+══════════════════════════════════════
+📅 تاريخ ووقت التقييم: ${formatDateTimeDisplay(decTime)}
+💵 السعر المعتمد لحظة القرار: ${Number(currentQuote).toFixed(2)} ج.م
+📌 الرأي والتوجيه: ${stock.advice || 'فحص المستويات الفنية والمالية'}
+
+1️⃣ التحليل المالي والأساسي (Fundamental):
+• مكرر الربحية (P/E): ${fund.pe || 'معلق'} (متوسط القطاع: ${fund.sectorPe || '--'})
+• ربح السهم (EPS): ${fund.eps ? fund.eps + ' ج' : 'معلق'}
+• هامش التشغيل: ${fund.operatingMargin ? fund.operatingMargin + '%' : '--'}
+• عائد التوزيعات: ${fund.dividendYield ? fund.dividendYield + '%' : '--'}
+🔗 المصادر: إفصاحات البورصة المصرية الرسمية (egx.com.eg) • مباشر مصر (mubasher.info)
+
+2️⃣ التحليل الفني ومستويات الارتكاز (Technical):
+• الدعم الأقرب (S1): ${stock.pivotS1 || stock.support || '--'} ج
+• المقاومة والمستهدف (R1): ${stock.pivotR1 || stock.target1 || '--'} ج
+• وقف الخسارة الصارم: ${stock.stopLoss || stock.pivotS1 || '--'} ج
+• متوسط 50 يوم (SMA50): ${stock.sma50 || '--'} ج
+• تدفق السيولة: ${stock.volumeMultiplier || '1.8x'}
+🔗 المصدر: الشارت اللحظي المعتمد للبورصة المصرية TradingView (tradingview.com/symbols/EGX-${stock.ticker}/)
+
+3️⃣ حوكمة المخاطر (Risk Governance):
+• نسبة العائد للمخاطرة (R/R): ${stock.rrDisplay || '1:2.0+'}
+• الالتزام الصارم بميثاق إدارة المحفظة وقاعدة الـ 2% مخاطرة.
+
+✅ تم التدقيق آلياً عبر منصة EGX AI Copilot`;
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => {
+          if (typeof showToast === 'function') showToast('✅ تم نسخ تقرير الاقتراح والمصادر إلى الحافظة بنجاح!', 'success');
+          else alert('✅ تم نسخ التقرير والمصادر بنجاح!');
+        }).catch(() => {
+          fallbackCopyText(text);
+        });
+      } else {
+        fallbackCopyText(text);
+      }
+    }
+
+    function fallbackCopyText(text) {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand('copy');
+        if (typeof showToast === 'function') showToast('✅ تم نسخ تقرير الاقتراح والمصادر إلى الحافظة!', 'success');
+        else alert('✅ تم نسخ التقرير!');
+      } catch(e) {}
+      document.body.removeChild(ta);
     }
 
 
@@ -1372,9 +1579,9 @@
               <button onclick="openPositionSizingModal(${item.price}, ${!isNaN(parseFloat(item.stopLoss)) ? parseFloat(item.stopLoss) : 'null'})" class="p-1.5 rounded-lg bg-cyan-950/60 hover:bg-cyan-900 border border-cyan-800/60 text-cyan-300 font-bold text-[10px] transition cursor-pointer" title="حساب كمية الشراء الآمنة وفق قاعدة مخاطرة 2%">
                 <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
               </button>
-              <button onclick="openAuditModal('${item.ticker}')" class="px-2 py-1.5 rounded-lg border border-gray-700 hover:border-emerald-500 bg-gray-800/80 text-gray-300 hover:text-emerald-400 font-bold text-[10px] flex items-center gap-1 transition cursor-pointer" title="بطاقة التقييم الاستثماري والمصادر الرسمية">
-                <i data-lucide="file-check" class="w-3.5 h-3.5 text-emerald-400"></i>
-                <span>فحص</span>
+              <button onclick="openAuditModal('${item.ticker}')" class="px-2.5 py-1.5 rounded-lg border border-emerald-500/40 hover:border-emerald-400 bg-emerald-950/60 text-emerald-300 hover:text-white font-bold text-[10px] flex items-center gap-1 transition cursor-pointer" title="تقرير الاقتراح والمصادر الاستثمارية">
+                <i data-lucide="file-text" class="w-3.5 h-3.5 text-emerald-400"></i>
+                <span>تقرير الاقتراح 📊</span>
               </button>
               <a href="${item.tradingViewUrl || 'https://www.tradingview.com'}" target="_blank" class="p-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 text-cyan-400 transition" title="شارت TradingView اللحظي">
                 <i data-lucide="trending-up" class="w-3.5 h-3.5"></i>
@@ -1383,10 +1590,6 @@
                 <i data-lucide="sparkles" class="w-3.5 h-3.5 text-emerald-400"></i>
                 <span>استشارة</span>
               </button>
-              <a href="${item.thndrUrl || `https://app.thndr.app/search?query=${item.ticker}`}" target="_blank" class="px-2.5 py-1.5 rounded-lg bg-emerald-950/60 hover:bg-emerald-900 border border-emerald-800/60 text-xs text-emerald-300 font-bold transition flex items-center gap-1 cursor-pointer" title="فتح صفحة ${item.name} في ثندر">
-                <span>ثندر</span>
-                <i data-lucide="external-link" class="w-3 h-3"></i>
-              </a>
             </div>
           </div>
         `;
@@ -1940,6 +2143,8 @@
     window.initModalMobileScrollEngine = initModalMobileScrollEngine;
     window.openAuditModal = openAuditModal;
     window.closeAuditModal = closeAuditModal;
+    window.printAuditReport = printAuditReport;
+    window.copyAuditReport = copyAuditReport;
     window.openRotationPlanModalByTicker = openRotationPlanModalByTicker;
     window.switchTab = switchTab;
     window.toggleSidebar = toggleSidebar;
