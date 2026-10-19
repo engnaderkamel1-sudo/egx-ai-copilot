@@ -855,16 +855,8 @@
       <span>متابعة تدفقات السوق:</span>
     </div>
     <div class="overflow-hidden flex-1 relative">
-      <div class="animate-marquee flex items-center gap-8 font-medium text-[11px]">
-        <span class="flex items-center gap-1">⚡ <strong>AMOC:</strong> اختراق مقاومة 10.80 ج مع سيولة غير معتادة 3.4x أضعاف المتوسط.</span>
-        <span class="flex items-center gap-1">🛡️ <strong>ORAS:</strong> حماية أرباح (+25%) - تم رفع وقف الخسارة المتحرك إلى 285.00 ج.</span>
-        <span class="flex items-center gap-1">💡 <strong>COMI (CIB):</strong> سهم قيادي عند دعم قوي 77.80 ج، فرصة ممتازة لتخفيض متوسط التكلفة.</span>
-        <span class="flex items-center gap-1">🚀 <strong>ETRS:</strong> حركة صاعدة مدعومة بتدفق مشتريات مؤسساتية قوية.</span>
-        <span class="flex items-center gap-1">📈 <strong>SWDY:</strong> اتجاه صاعد مستمر مستهدف 58.00 ج - احتفاظ كامل بالمركز.</span>
-        <!-- Duplicate for infinite scroll -->
-        <span class="flex items-center gap-1">⚡ <strong>AMOC:</strong> اختراق مقاومة 10.80 ج مع سيولة غير معتادة 3.4x أضعاف المتوسط.</span>
-        <span class="flex items-center gap-1">🛡️ <strong>ORAS:</strong> حماية أرباح (+25%) - تم رفع وقف الخسارة المتحرك إلى 285.00 ج.</span>
-        <span class="flex items-center gap-1">💡 <strong>COMI (CIB):</strong> سهم قيادي عند دعم قوي 77.80 ج، فرصة ممتازة لتخفيض متوسط التكلفة.</span>
+      <div id="live-ticker-marquee" class="animate-marquee flex items-center gap-8 font-medium text-[11px]">
+        <span class="flex items-center gap-1">📊 <strong>البورصة المصرية:</strong> جاري تحميل ومزامنة أسعار التداول والسيولة اللحظية...</span>
       </div>
     </div>
   </div>
@@ -1181,7 +1173,6 @@
             <i data-lucide="coins" class="w-4 h-4 text-emerald-400"></i>
           </div>
           <div class="text-2xl font-black text-white tracking-tight" id="metric-total-wealth">
-          <div class="text-2xl font-black text-white tracking-tight" id="metric-total-wealth">
             -- <span class="text-xs text-gray-400 font-normal">ج.م</span>
           </div>
           <div class="mt-2 flex flex-col gap-0.5 text-xs font-semibold" id="metric-total-return-container">
@@ -1240,27 +1231,7 @@
         </div>
       </div>
 
-      <!-- Pending Orders & Buying Power Banner (Directly from Thndr) -->
-      <div class="bg-cyan-950/40 border border-cyan-800/40 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
-        <div class="flex items-center gap-3">
-          <div class="w-9 h-9 rounded-xl bg-cyan-900/60 border border-cyan-700/50 flex items-center justify-center text-cyan-400 shrink-0">
-            <i data-lucide="clock" class="w-5 h-5"></i>
-          </div>
-          <div>
-            <div class="font-bold text-white text-sm flex items-center gap-2">
-              <span>لديك 2 طلبات قيد التنفيذ (اكتتاب سهم حالاً HALN)</span>
-              <span class="px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 text-[10px] font-bold">قيد التنفيذ في ثندر</span>
-            </div>
-            <div class="text-gray-300 text-[11px] mt-0.5">
-              طلب 1: <strong>59,804.50 ج.م</strong> • طلب 2: <strong>19,992.00 ج.م</strong> (سعر الاكتتاب 24.50 ج) • القوة الشرائية المتاحة: <strong>10.79 ج.م</strong>
-            </div>
-          </div>
-        </div>
-        <div class="text-right shrink-0">
-          <span class="text-gray-400">إجمالي قيمة طلبات الاكتتاب:</span>
-          <span class="font-bold text-cyan-300 font-mono text-sm mr-1">79,796.50 ج.م</span>
-        </div>
-      </div>
+
 
       <!-- Asset Allocation & Strategy Diagnostics -->
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -3573,6 +3544,10 @@
     </div>
   </div>
 
+  <!-- Modular Pure Engines (Single Source of Truth) -->
+  <script src="js/engine.js"></script>
+  <script src="js/portfolio.js"></script>
+
   <script>
     // ============================================================
     // Strict General Rule: All Numbers in English (0-9) - No Eastern Arabic Digits
@@ -4363,49 +4338,25 @@
     ];
 
     // Load from LocalStorage or use default
+    // Load from LocalStorage or use default via EGX_Portfolio
     const PORTFOLIO_VERSION_KEY = 'egx_copilot_portfolio_ver';
-    const CURRENT_PORTFOLIO_VER = '2026_10_thndr_exact_14_assets_v2_sanitized';
+    const CURRENT_PORTFOLIO_VER = (typeof EGX_Portfolio !== 'undefined') ? EGX_Portfolio.version : '2026_10_clean_modular_v3_production';
     let portfolioData = [];
 
     function loadPortfolio() {
-      const savedVer = localStorage.getItem(PORTFOLIO_VERSION_KEY);
-      if (savedVer !== CURRENT_PORTFOLIO_VER) {
-        portfolioData = JSON.parse(JSON.stringify(defaultPortfolioData));
-        localStorage.setItem(PORTFOLIO_VERSION_KEY, CURRENT_PORTFOLIO_VER);
-        savePortfolio();
-        return;
-      }
-
-      const saved = localStorage.getItem('egx_copilot_portfolio');
-      if (saved) {
-        try {
-          const parsed = JSON.parse(saved);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            portfolioData = parsed;
-            portfolioData.forEach(item => {
-              if (item.priceUpdatedAt) item.priceUpdatedAt = formatDateTimeDisplay(item.priceUpdatedAt);
-              if (item.decisionUpdatedAt) item.decisionUpdatedAt = formatDateTimeDisplay(item.decisionUpdatedAt);
-              if (item.decisionBasis) item.decisionBasis = toEnDigits(item.decisionBasis);
-              if (item.advice) item.advice = toEnDigits(item.advice);
-              if (!item.priceUpdatedAt) item.priceUpdatedAt = 'جلسة البورصة اليوم';
-              if (!item.priceSource) item.priceSource = 'شاشة البورصة المصرية اللحظية';
-              if (!item.decisionUpdatedAt) item.decisionUpdatedAt = 'جلسة اليوم';
-              if (!item.decisionBasis) item.decisionBasis = `سعر السهم: ${item.currentPrice ? Number(item.currentPrice).toFixed(2) + ' ج' : '--'}`;
-            });
-          } else {
-            portfolioData = JSON.parse(JSON.stringify(defaultPortfolioData));
-            savePortfolio();
-          }
-        } catch (e) {
-          portfolioData = JSON.parse(JSON.stringify(defaultPortfolioData));
-        }
+      if (typeof EGX_Portfolio !== 'undefined') {
+        portfolioData = EGX_Portfolio.load();
       } else {
         portfolioData = JSON.parse(JSON.stringify(defaultPortfolioData));
       }
     }
 
     function savePortfolio() {
-      localStorage.setItem('egx_copilot_portfolio', JSON.stringify(portfolioData));
+      if (typeof EGX_Portfolio !== 'undefined') {
+        EGX_Portfolio.save(portfolioData);
+      } else {
+        localStorage.setItem('egx_copilot_portfolio', JSON.stringify(portfolioData));
+      }
       updateMetrics();
       renderPortfolioTable();
       renderAllocationChart();
@@ -4413,7 +4364,9 @@
 
     function resetToDefaultPortfolio() {
       if (confirm('هل ترغب في استعادة أرقام المحفظة الأصلية من ثندر؟')) {
-        portfolioData = JSON.parse(JSON.stringify(defaultPortfolioData));
+        portfolioData = (typeof EGX_Portfolio !== 'undefined') 
+          ? EGX_Portfolio.getDefaultData() 
+          : JSON.parse(JSON.stringify(defaultPortfolioData));
         savePortfolio();
       }
     }
@@ -4589,36 +4542,15 @@
       const totalWealth = portfolioData.reduce((acc, cur) => acc + cur.value, 0);
 
       portfolioData.forEach((item, index) => {
-        const isPositive = item.profit >= 0;
+        const evalResult = (typeof EGX_Engine !== 'undefined') 
+          ? EGX_Engine.evaluateAsset(item) 
+          : { isLosing: (item.profit || 0) < 0, badgeText: 'احتفاظ', badgeColor: 'bg-gray-800 text-gray-300' };
+
+        const isPositive = !evalResult.isLosing;
         const colorClass = isPositive ? 'text-emerald-400' : 'text-rose-400';
         const bgBadgeClass = isPositive ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border-rose-500/20';
-
-        let badgeActionText = 'احتفاظ';
-        let badgeActionColor = 'bg-gray-800 text-gray-300';
-
-        if (!isPositive) {
-          if (item.action === 'REBALANCE_CANDIDATE') {
-            badgeActionText = '🔄 تدوير وتخفيف (تراجع)';
-            badgeActionColor = 'bg-rose-500/20 text-rose-300 border border-rose-500/30';
-          } else if (item.action === 'ACCUMULATE') {
-            badgeActionText = 'تجميع لتخفيض المتوسط';
-            badgeActionColor = 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30';
-          } else {
-            badgeActionText = 'احتفاظ ومراقبة الارتداد';
-            badgeActionColor = 'bg-gray-800 text-gray-300';
-          }
-        } else {
-          if (item.action === 'ACCUMULATE') {
-            badgeActionText = 'تعزيز وشراء صاعد';
-            badgeActionColor = 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30';
-          } else if (item.action === 'REBALANCE_CANDIDATE' || item.returnPct >= 18) {
-            badgeActionText = '🎯 جني أرباح قمة جزئية';
-            badgeActionColor = 'bg-amber-500/20 text-amber-300 border border-amber-500/40 shadow-sm';
-          } else {
-            badgeActionText = 'احتفاظ بربح';
-            badgeActionColor = 'bg-emerald-950/40 text-emerald-300 border border-emerald-800/40';
-          }
-        }
+        const badgeActionText = evalResult.badgeText;
+        const badgeActionColor = evalResult.badgeColor;
 
         const weightPct = totalWealth > 0 ? ((item.value / totalWealth) * 100).toFixed(1) : 0;
         const cost = item.value - item.profit;
@@ -4771,16 +4703,16 @@
 
     // Modal Operations
     function recalcAssetModal() {
-      const shares = parseInt(document.getElementById('modal-shares').value, 10) || 0;
-      const currentPrice = parseFloat(document.getElementById('modal-current-price').value) || 0;
-      const buyPrice = parseFloat(document.getElementById('modal-buy-price').value) || 0;
+      const shares = Math.max(0, parseInt(document.getElementById('modal-shares').value, 10) || 0);
+      const currentPrice = Math.max(0, parseFloat(document.getElementById('modal-current-price').value) || 0);
+      const buyPrice = Math.max(0, parseFloat(document.getElementById('modal-buy-price').value) || 0);
 
       if (shares > 0 && currentPrice > 0) {
         const value = Math.round(shares * currentPrice);
         document.getElementById('modal-value').value = value;
         if (buyPrice > 0) {
-          const cost = shares * buyPrice;
-          const profit = Math.round(value - cost);
+          const cost = Math.round(shares * buyPrice);
+          const profit = value - cost;
           document.getElementById('modal-profit').value = profit;
         }
       }
@@ -5696,6 +5628,11 @@
       const currentPrice = parseFloat(document.getElementById('modal-current-price').value) || existing.currentPrice;
       const buyPrice = parseFloat(document.getElementById('modal-buy-price').value) || existing.buyPrice;
 
+      if (shares <= 0 || currentPrice <= 0 || buyPrice <= 0 || isNaN(shares) || isNaN(currentPrice) || isNaN(buyPrice)) {
+        alert('⚠️ يرجى التأكد من إدخال أرقام صحيحة وموجبة لعدد الأسهم وسعر الشراء وسعر السوق اللحظي.');
+        return;
+      }
+
       const nowStr = formatCairoTime(new Date());
       const newAsset = {
         ...existing,
@@ -6042,10 +5979,11 @@
       let sellShares = Math.max(1, Math.round(totalShares * currentRotationRatio));
       if (sellShares >= totalShares && totalShares > 1) sellShares = totalShares - 1;
 
+      const totalOrigValue = Math.round(totalShares * currentPrice);
       const sellCash = Math.round(sellShares * currentPrice);
       const realizedProfit = Math.round(sellShares * (currentPrice - buyPrice));
       const remainingShares = totalShares - sellShares;
-      const remainingValue = Math.round(remainingShares * currentPrice);
+      const remainingValue = totalOrigValue - sellCash;
       const actualPct = Math.round((sellShares / totalShares) * 100);
 
       document.getElementById('rot-sell-shares-count').innerText = `${sellShares.toLocaleString('en-US')} أسهم`;
@@ -6876,7 +6814,26 @@
       renderRadarGrid();
     }
 
+    function updateLiveTickerMarquee() {
+      const marqueeEl = document.getElementById('live-ticker-marquee');
+      if (!marqueeEl || !Array.isArray(fullMarketRadar) || fullMarketRadar.length === 0) return;
+      const topStocks = fullMarketRadar.slice(0, 10);
+      const itemsHtml = topStocks.map(stock => {
+        const changeNum = stock.changeNum !== undefined ? stock.changeNum : parseFloat((stock.changePct || '0').replace('%', ''));
+        const isNeg = changeNum < 0;
+        const color = isNeg ? 'text-rose-400' : 'text-emerald-400';
+        return `<span class="flex items-center gap-1.5 shrink-0">
+          <strong class="text-white">${stock.ticker}</strong>: 
+          <span>${Number(stock.price).toFixed(2)} ج</span> 
+          <span class="${color} font-mono font-bold">${stock.changePct}</span> 
+          <span class="text-gray-400 text-[10px]">(${stock.type})</span>
+        </span>`;
+      }).join('<span class="text-gray-600 px-2">•</span>');
+      marqueeEl.innerHTML = `${itemsHtml}<span class="text-gray-600 px-2">•</span>${itemsHtml}`;
+    }
+
     function renderRadarGrid() {
+      updateLiveTickerMarquee();
       const container = document.getElementById('radar-grid');
       container.innerHTML = '';
 
@@ -7273,12 +7230,22 @@
       const pos = simPositions[index];
       if (!pos) return;
 
-      const simulatedProfit = pos.totalCost * 0.12; // Simulate a +12% target win
-      simCash += (pos.totalCost + simulatedProfit);
+      const radarItem = (typeof fullMarketRadar !== 'undefined' && Array.isArray(fullMarketRadar)) 
+        ? fullMarketRadar.find(p => p.ticker === pos.ticker) 
+        : null;
+      const currentPrice = radarItem && radarItem.price ? Number(radarItem.price) : Number(pos.buyPrice);
+      const exitValue = Math.round(pos.shares * currentPrice);
+      const realProfit = exitValue - pos.totalCost;
+      const returnPct = pos.totalCost > 0 ? ((realProfit / pos.totalCost) * 100).toFixed(1) : '0';
+
+      simCash += exitValue;
       simPositions.splice(index, 1);
 
       renderSimPositions();
-      alert(`🎉 تم إغلاق الصفقة الافتراضية بنجاح وتحقيق ربح تجريبي قدره +${simulatedProfit.toFixed(0)} ج!`);
+      const profitMsg = realProfit >= 0 
+        ? `🎉 تم إغلاق الصفقة بسعر السوق اللحظي (${currentPrice.toFixed(2)} ج) محققة ربحاً قدره +${realProfit.toLocaleString('en-US')} ج (+${returnPct}%)!`
+        : `⚠️ تم إغلاق الصفقة بسعر السوق اللحظي (${currentPrice.toFixed(2)} ج) مع تراجع قدره ${realProfit.toLocaleString('en-US')} ج (${returnPct}%)!`;
+      alert(profitMsg);
     }
 
     function renderSimPositions() {
@@ -7298,8 +7265,8 @@
           <td class="py-2.5 px-3 font-mono text-rose-400 font-bold">${pos.stopLoss}</td>
           <td class="py-2.5 px-3 font-mono text-emerald-400 font-bold">${pos.target}</td>
           <td class="py-2.5 px-3 text-center">
-            <button onclick="closeSimPosition(${idx})" class="px-2 py-1 rounded bg-emerald-700 hover:bg-emerald-600 text-white font-bold text-[10px] transition">
-              جني أرباح الهدف (+12%)
+            <button onclick="closeSimPosition(${idx})" class="px-2 py-1 rounded bg-indigo-700 hover:bg-indigo-600 text-white font-bold text-[10px] transition cursor-pointer">
+              إغلاق بسعر السوق اللحظي
             </button>
           </td>
         `;

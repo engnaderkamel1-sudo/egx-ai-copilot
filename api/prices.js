@@ -61,7 +61,7 @@ function getDynamicFundsNAV() {
   const elapsedDays = Math.max(0, Math.floor((now - baseDate) / (1000 * 60 * 60 * 24)));
   const baseNcsPrice = 15.42;
   const dailyRate = 0.224 / 365;
-  const dynamicNcsPrice = Number((baseNcsPrice * Math.pow(1 + dailyRate, elapsedDays % 365)).toFixed(2));
+  const dynamicNcsPrice = Number((baseNcsPrice * Math.pow(1 + dailyRate, elapsedDays)).toFixed(2));
 
   return {
     "NCS": {
@@ -162,7 +162,8 @@ function parseTechnicalRecord(item) {
     target2Val = week52High != null && week52High > target1Val ? week52High : null;
   } else if (week52High != null && week52High > price) {
     target1Val = week52High;
-    target2Val = null;
+    const fibSpread = (pivotR1 && pivotS1) ? (pivotR1 - pivotS1) * 0.618 : price * 0.05;
+    target2Val = Number((week52High + fibSpread).toFixed(2));
   } else {
     // Stock is trading in price discovery above R1, R2, and 52W High
     // Use mathematically defined Pivot Extension: R2 + (R1 - Pivot) or R2 * 1.05 strictly marked
@@ -185,7 +186,8 @@ function parseTechnicalRecord(item) {
     rrDisplay = 'تحذير (دون الدعم S1)';
   } else if (target1Val <= price) {
     rrRatio = 0;
-    rrDisplay = 'تحقق الهدف (جني أرباح)';
+    const isPullback = changePct < 0;
+    rrDisplay = isPullback ? 'ارتداد مقاومة (تخفيف)' : 'تحقق الهدف (جني أرباح)';
   }
 
   // Technical Trend & Momentum Classification
@@ -193,8 +195,14 @@ function parseTechnicalRecord(item) {
   let trendPts = 15;
   if (sma50 && sma200) {
     if (price > sma50 && sma50 > sma200) {
-      trend = 'اتجاه صاعد رئيسي (Golden Cross / Bullish)';
-      trendPts = 30;
+      const extPct = sma50 > 0 ? ((price - sma50) / sma50) * 100 : 0;
+      if (extPct > 30 && rsi > 78) {
+        trend = '⚠️ تحذير تمدد سعري ومضاربة (FOMO Pump Trap)';
+        trendPts = 5;
+      } else {
+        trend = 'اتجاه صاعد رئيسي (Golden Cross / Bullish)';
+        trendPts = 30;
+      }
     } else if (price < sma50 && sma50 < sma200) {
       trend = 'اتجاه هابط رئيسي (Bearish)';
       trendPts = 5;
@@ -304,10 +312,10 @@ function parseTechnicalRecord(item) {
     week52Low: week52Low,
     trend: trend,
     momentum: momentum,
-    support: `${supportVal} ج`,
-    target1: `${target1Val} ج`,
-    target2: target2Val ? `${target2Val} ج` : 'اكتشاف أسعار تاريخي',
-    stopLoss: `${stopLossVal} ج`,
+    support: supportVal != null ? `${supportVal} ج` : '--',
+    target1: target1Val != null ? `${target1Val} ج` : '--',
+    target2: target2Val != null ? `${target2Val} ج` : 'اكتشاف أسعار تاريخي',
+    stopLoss: stopLossVal != null ? `${stopLossVal} ج` : '--',
     rrRatio: rrRatio,
     rrDisplay: rrDisplay,
     catalyst: catalyst,
@@ -445,6 +453,17 @@ export default async function handler(req, res) {
       currentRegime = "BULLISH_EXPANSION";
       currentRegimeArabic = "زخم صعودي واستكشاف سعري (Bullish Expansion)";
       currentRegimeDescription = "سيولة شرائية واسعة واختراق للمقاومات الفنية مدعومة بحجم تداول مرتفع.";
+    }
+
+    // Guard against falling knife dip-buying during SYSTEMIC_SHOCK
+    if (currentRegime === "SYSTEMIC_SHOCK") {
+      radar.forEach(stock => {
+        if (stock.tags && stock.tags.includes('oversold_bounce')) {
+          stock.type = 'تشبع بيعي في هبوط عام (تجميد الشراء)';
+          stock.catalyst = `${stock.name} • تشبع بيعي لكن السوق في حالة هبوط ذعري شامل؛ يُفضل التريث والاحتفاظ بالكاش`;
+          stock.tags = stock.tags.map(t => t === 'oversold_bounce' ? 'systemic_hold' : t);
+        }
+      });
     }
 
     // Cairo Time stamp
