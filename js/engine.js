@@ -155,10 +155,18 @@
       }
 
       const maxRiskEgp = Math.round(totalCapital * (riskPct / 100));
-      const riskPerShare = Number((entryPrice - stopLoss).toFixed(2));
+      // Impose a minimum risk buffer (1.5% of entry price) to prevent runaway leverage on tight stops
+      const minRiskPerShare = Math.max(0.01, entryPrice * 0.015);
+      const effectiveRiskPerShare = Math.max(minRiskPerShare, Number((entryPrice - stopLoss).toFixed(2)));
 
-      // Strictly integer shares (Egyptian Exchange execution constraint)
-      const maxShares = Math.max(0, Math.floor(maxRiskEgp / riskPerShare));
+      // 1. Cap by Risk
+      const sharesByRisk = Math.floor(maxRiskEgp / effectiveRiskPerShare);
+
+      // 2. Cap by Total Capital (Spot execution constraint: no unauthorized margin)
+      const sharesByCapital = Math.floor(totalCapital / entryPrice);
+
+      // Strictly integer shares capped by risk AND capital
+      const maxShares = Math.max(0, Math.min(sharesByRisk, sharesByCapital));
       const totalInvestment = Math.round(maxShares * entryPrice);
       const portfolioWeightPct = totalCapital > 0 ? Number(((totalInvestment / totalCapital) * 100).toFixed(1)) : 0;
 

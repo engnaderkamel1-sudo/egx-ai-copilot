@@ -5402,7 +5402,7 @@
         returnPct,
         status: profit >= 0 ? 'ربح' : 'تراجع',
         advice,
-        action: profit < -15 ? 'REBALANCE_CANDIDATE' : (profit < -5 ? 'ACCUMULATE' : 'HOLD'),
+        action: returnPct < -15 ? 'REBALANCE_CANDIDATE' : (returnPct < -5 ? 'ACCUMULATE' : 'HOLD'),
         priceUpdatedAt: nowStr,
         priceSource: 'تعديل يدوي من المستخدم',
         decisionUpdatedAt: nowStr,
@@ -5959,6 +5959,22 @@
       activeRotationPlans = activeRotationPlans.filter(p => p.ticker !== item.ticker);
       activeRotationPlans.unshift(plan);
 
+      // 1. Immediately deduct sold shares from portfolio position upon plan commitment
+      item.shares = remainingShares;
+      item.value = Math.round(remainingShares * currentPrice);
+      const totalRemainingCost = Math.round(remainingShares * buyPrice);
+      item.profit = item.value - totalRemainingCost;
+      item.returnPct = totalRemainingCost > 0 ? parseFloat(((item.profit / totalRemainingCost) * 100).toFixed(2)) : 0;
+
+      // 2. Deposit liberated sell cash into CASH reserve immediately
+      let cashItem = portfolioData.find(p => p.ticker === 'CASH' || p.isCashReserve);
+      if (cashItem) {
+        cashItem.value = Number((Number(cashItem.value || 0) + sellCash).toFixed(2));
+        cashItem.buyPrice = cashItem.value;
+        cashItem.currentPrice = cashItem.value;
+      }
+      savePortfolio();
+
       try {
         localStorage.setItem('egx_copilot_active_plans', JSON.stringify(activeRotationPlans));
       } catch(e) {
@@ -5991,7 +6007,7 @@
     function cancelRotationPlan(planId) {
       const plan = activeRotationPlans.find(p => p.id === planId);
       const name = plan ? plan.name : 'السهم';
-      if (!confirm(`هل أنت متأكد من إلغاء خطة المراقبة اللحظية لسهم ${name} وإيقاف التنبيهات؟`)) return;
+      if (!confirm(`هل أنت متأكد من إلغاء خطة المراقبة لسهم ${name}؟\n(ملاحظة: سيتم الاحتفاظ بالكاش المحرر ${plan ? plan.sellCash.toLocaleString('en-US') : ''} ج كسيولة نقدية حرة في محفظتك).`)) return;
 
       activeRotationPlans = activeRotationPlans.filter(p => p.id !== planId);
       try {
@@ -6012,7 +6028,7 @@
 
       const confirmMsg = `هل قمت بالفعل بتنفيذ أمر الشراء في ثندر لسهم ${plan.name} بسعر ${executionPrice.toFixed(2)} ج؟\n\n` +
         `سيتم إضافة ${sharesCanBuy} سهم جديد إلى محفظتك تلقائياً وتحديث إجمالي الأسهم والأرباح.` +
-        (leftoverCash > 0 ? `\n(سيتم إيداع باقي الكاش غير المستخدم: ${leftoverCash.toLocaleString('en-US')} ج في رصيد النقدية).` : '');
+        (leftoverCash > 0 ? `\n(باقي الكاش غير المستخدم: ${leftoverCash.toLocaleString('en-US')} ج سيبقى برصيدك النقدي).` : '');
 
       if (!confirm(confirmMsg)) return;
 
@@ -6032,14 +6048,12 @@
         stock.profit = stock.value - totalCost;
         stock.returnPct = totalCost > 0 ? parseFloat(((stock.profit / totalCost) * 100).toFixed(2)) : 0;
 
-        // Refund unspent cash fraction to cash reserve to eliminate cash leak
-        if (leftoverCash > 0) {
-          const cashAsset = portfolioData.find(p => p.ticker === 'CASH' || p.isCashReserve);
-          if (cashAsset) {
-            cashAsset.value = +(Number(cashAsset.value || 0) + leftoverCash).toFixed(2);
-            cashAsset.buyPrice = cashAsset.value;
-            cashAsset.currentPrice = cashAsset.value;
-          }
+        // Deduct actual used cash from cash reserve (unspent leftover stays in cash reserve)
+        const cashAsset = portfolioData.find(p => p.ticker === 'CASH' || p.isCashReserve);
+        if (cashAsset) {
+          cashAsset.value = Math.max(0, +(Number(cashAsset.value || 0) - actualUsedCash).toFixed(2));
+          cashAsset.buyPrice = cashAsset.value;
+          cashAsset.currentPrice = cashAsset.value;
         }
 
         savePortfolio();
@@ -6153,9 +6167,12 @@
                     <span class="text-[10px] text-rose-300 block">تجاوز سقف الأمان (${(livePrice - plan.breakoutThreshold).toFixed(2)} ج زيادة)</span>
                   </div>
                   <div class="bg-gray-900/90 p-3 rounded-xl border border-rose-800/40">
-                    <span class="text-gray-400 block text-[11px]">الكاش المحمي معك:</span>
+                    <span class="text-gray-400 block text-[11px]">${plan.realizedProfit >= 0 ? 'الكاش المحمي معك:' : 'الكاش المسترد بالتخفيف:'}</span>
                     <span class="text-emerald-400 font-mono font-bold text-sm">${plan.sellCash.toLocaleString('en-US')} ج.م</span>
-                    <span class="text-[10px] text-emerald-300 block">منها +${plan.realizedProfit.toLocaleString('en-US')} ج ربح محقق</span>
+                    ${plan.realizedProfit >= 0 
+                      ? `<span class="text-[10px] text-emerald-300 block">منها +${plan.realizedProfit.toLocaleString('en-US')} ج ربح محقق</span>` 
+                      : `<span class="text-[10px] text-rose-400 block">تثبيت خسارة دفترية: -${Math.abs(plan.realizedProfit).toLocaleString('en-US')} ج</span>`
+                    }
                   </div>
                 </div>
 
@@ -6213,7 +6230,7 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
                   <div class="bg-gray-900/90 p-3 rounded-xl border border-emerald-800/40">
-                    <span class="text-gray-400 block text-[11px]">سعر البيع في القمة:</span>
+                    <span class="text-gray-400 block text-[11px]">${plan.realizedProfit >= 0 ? 'سعر البيع في القمة:' : 'سعر بيع التخفيف والتدوير:'}</span>
                     <span class="text-white font-mono font-bold text-sm">${plan.decisionPrice.toFixed(2)} ج.م</span>
                     <span class="text-[10px] text-gray-500 block">بعت: ${plan.sellShares} أسهم</span>
                   </div>
@@ -6323,9 +6340,9 @@
 
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs">
                   <div class="bg-gray-900/90 p-2.5 rounded-xl border border-gray-800">
-                    <span class="text-gray-400 block text-[10px]">سعر اعتماد البيع:</span>
+                    <span class="text-gray-400 block text-[10px]">${plan.realizedProfit >= 0 ? 'سعر اعتماد البيع:' : 'سعر بيع التخفيف:'}</span>
                     <span class="text-white font-mono font-bold">${plan.decisionPrice.toFixed(2)} ج.م</span>
-                    <span class="text-[9px] text-gray-500 block">كاش محقق: ${plan.sellCash.toLocaleString('en-US')} ج</span>
+                    <span class="text-[9px] text-gray-500 block">${plan.realizedProfit >= 0 ? `كاش محقق: ${plan.sellCash.toLocaleString('en-US')} ج` : `كاش مسترد: ${plan.sellCash.toLocaleString('en-US')} ج`}</span>
                   </div>
                   <div class="bg-gray-900/90 p-2.5 rounded-xl border border-cyan-800/40">
                     <span class="text-gray-400 block text-[10px]">السعر اللحظي الآن:</span>
@@ -6748,7 +6765,7 @@
                 <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i>
                 <span>تسجيل</span>
               </button>
-              <button onclick="openPositionSizingModal(${item.price}, ${parseFloat(item.stopLoss)})" class="p-1.5 rounded-lg bg-cyan-950/60 hover:bg-cyan-900 border border-cyan-800/60 text-cyan-300 font-bold text-[10px] transition cursor-pointer" title="حساب كمية الشراء الآمنة وفق قاعدة مخاطرة 2%">
+              <button onclick="openPositionSizingModal(${item.price}, ${!isNaN(parseFloat(item.stopLoss)) ? parseFloat(item.stopLoss) : 'null'})" class="p-1.5 rounded-lg bg-cyan-950/60 hover:bg-cyan-900 border border-cyan-800/60 text-cyan-300 font-bold text-[10px] transition cursor-pointer" title="حساب كمية الشراء الآمنة وفق قاعدة مخاطرة 2%">
                 <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
               </button>
               <button onclick="openAuditModal('${item.ticker}')" class="px-2 py-1.5 rounded-lg border border-gray-700 hover:border-emerald-500 bg-gray-800/80 text-gray-300 hover:text-emerald-400 font-bold text-[10px] flex items-center gap-1 transition cursor-pointer" title="بطاقة التقييم الاستثماري والمصادر الرسمية">
@@ -7079,9 +7096,7 @@
         tbody.innerHTML = '<tr><td colspan="7" class="py-4 text-center text-gray-500">لا توجد صفقات تجريبية مفتوحة حالياً. اختر سهماً ونفذ شراءً وهمياً أعلاه.</td></tr>';
       }
 
-      document.getElementById('sim-cash').innerText = `${Math.round(simCash).toLocaleString('en-US')} ج`;
-      document.getElementById('sim-stocks-val').innerText = `${Math.round(totalStocksValue).toLocaleString('en-US')} ج`;
-      document.getElementById('sim-positions-count').innerText = `${simPositions.length} صفقات مفتوحة`;
+      updateAutonomousSummaryMetrics();
     }
 
     function resetPaperTrading() {
@@ -7392,31 +7407,49 @@
     }
 
     function updateAutonomousSummaryMetrics() {
-      let openValue = 0;
+      let autoOpenVal = 0;
       let totalProfit = 0;
       let totalCost = 0;
       let closedCount = 0;
       let winningCount = 0;
 
-      autonomousLedger.forEach(trade => {
-        const nominalCost = 10000;
-        const shares = Math.max(1, Math.floor(nominalCost / trade.entryPrice));
-        const actualCost = shares * trade.entryPrice;
-        const currentVal = shares * trade.currentPrice;
-        const pnl = currentVal - actualCost;
+      // 1. Incorporate manual paper trading positions
+      let manualStocksVal = 0;
+      if (typeof simPositions !== 'undefined' && Array.isArray(simPositions)) {
+        simPositions.forEach(pos => {
+          const radarItem = (typeof fullMarketRadar !== 'undefined' && Array.isArray(fullMarketRadar))
+            ? fullMarketRadar.find(p => p.ticker === pos.ticker) : null;
+          const currentPrice = radarItem && radarItem.price ? Number(radarItem.price) : Number(pos.buyPrice);
+          const posVal = pos.shares * currentPrice;
+          manualStocksVal += posVal;
+          totalCost += pos.totalCost;
+          totalProfit += (posVal - pos.totalCost);
+        });
+      }
 
-        totalCost += actualCost;
-        totalProfit += pnl;
+      // 2. Incorporate autonomous ledger
+      if (typeof autonomousLedger !== 'undefined' && Array.isArray(autonomousLedger)) {
+        autonomousLedger.forEach(trade => {
+          const nominalCost = 10000;
+          const shares = Math.max(1, Math.floor(nominalCost / trade.entryPrice));
+          const actualCost = shares * trade.entryPrice;
+          const currentVal = shares * trade.currentPrice;
+          const pnl = currentVal - actualCost;
 
-        if (trade.status === 'PROFIT_TAKEN' || trade.status === 'CLOSED') {
-          closedCount++;
-          if (pnl > 0) winningCount++;
-        } else {
-          openValue += currentVal;
-        }
-      });
+          totalCost += actualCost;
+          totalProfit += pnl;
 
-      const openPositions = autonomousLedger.filter(t => t.status === 'OPEN').length;
+          if (trade.status === 'PROFIT_TAKEN' || trade.status === 'CLOSED') {
+            closedCount++;
+            if (pnl > 0) winningCount++;
+          } else {
+            autoOpenVal += currentVal;
+          }
+        });
+      }
+
+      const totalOpenCount = (typeof simPositions !== 'undefined' ? simPositions.length : 0) +
+        (typeof autonomousLedger !== 'undefined' ? autonomousLedger.filter(t => t.status === 'OPEN').length : 0);
       const profitEl = document.getElementById('sim-profit');
       const returnEl = document.getElementById('sim-return-pct');
       const cashEl = document.getElementById('sim-cash');
@@ -7424,10 +7457,10 @@
       const posCountEl = document.getElementById('sim-positions-count');
       const winRateEl = document.getElementById('sim-win-rate');
 
-      if (posCountEl) posCountEl.innerText = `${openPositions} صفقات مفتوحة`;
-      if (stocksValEl) stocksValEl.innerText = `${Math.round(openValue).toLocaleString('en-US')} ج`;
+      if (posCountEl) posCountEl.innerText = `${totalOpenCount} صفقات مفتوحة`;
+      if (stocksValEl) stocksValEl.innerText = `${Math.round(manualStocksVal + autoOpenVal).toLocaleString('en-US')} ج`;
       if (cashEl) {
-        const remainingCash = Math.max(0, 50000 - openValue + (totalProfit > 0 ? totalProfit : 0));
+        const remainingCash = typeof simCash !== 'undefined' ? simCash : Math.max(0, 50000 - (manualStocksVal + autoOpenVal));
         cashEl.innerText = `${Math.round(remainingCash).toLocaleString('en-US')} ج`;
       }
 
@@ -8026,9 +8059,12 @@ ${userLessonsSummary}
           parts: [{ text: `${systemPrompt}\n\nسؤال المستخدم:\n${text}` }]
         });
 
-        // Limit conversation history to last 6 turns
+        // Limit conversation history to last 6 turns, ensuring first message is always from 'user'
         if (geminiChatHistory.length > 6) {
           geminiChatHistory = geminiChatHistory.slice(-6);
+          while (geminiChatHistory.length > 0 && geminiChatHistory[0].role !== 'user') {
+            geminiChatHistory.shift();
+          }
         }
 
         const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
@@ -8863,11 +8899,17 @@ ${userLessonsSummary}
                   item.alertLevel = 'CRITICAL_RISK';
                   item.advice = `⚠️ كسر مستوى الدعم الفني الرئيسي S1 (${item.pivotS1} ج) • السعر الحالي ${item.currentPrice.toFixed(2)} ج دون مستوى الأمان. راقب تفعيل خطة الحماية لتجنب انزلاق سعري.`;
                 }
-                // 3. Oversold Bounce on Support S1
+                // 3. Oversold Bounce on Support S1 (with mandatory Systemic Shock check)
                 else if (item.rsi < 36 && item.pivotS1 && item.currentPrice >= item.pivotS1) {
-                  item.action = 'ACCUMULATE';
-                  item.alertLevel = 'ACCUMULATE';
-                  item.advice = `🟢 ارتداد من تشبع بيعي (RSI: ${item.rsi}) أعلى الدعم الفني S1 (${item.pivotS1} ج) • فرصة تعزيز للمستثمر طويل الأجل لخفض متوسط التكلفة.`;
+                  if (window.currentMarketRegime === 'SYSTEMIC_SHOCK') {
+                    item.action = 'HOLD';
+                    item.alertLevel = 'WARNING';
+                    item.advice = `⚠️ تشبع بيعي (RSI: ${item.rsi}) لكن السوق في حالة هبوط ذعري شامل؛ يُحظر التجميع الآن ويُفضل التريث والاحتفاظ بالكاش.`;
+                  } else {
+                    item.action = 'ACCUMULATE';
+                    item.alertLevel = 'ACCUMULATE';
+                    item.advice = `🟢 ارتداد من تشبع بيعي (RSI: ${item.rsi}) أعلى الدعم الفني S1 (${item.pivotS1} ج) • فرصة تعزيز للمستثمر طويل الأجل لخفض متوسط التكلفة.`;
+                  }
                 }
                 // 4. Bullish Trend Continuation (Above SMA 50)
                 else if (item.sma50 && item.currentPrice > item.sma50 && item.returnPct > 0) {
@@ -9144,15 +9186,16 @@ ${userLessonsSummary}
 
       listEl.innerHTML = sessionNotificationHistory.map(alert => {
         const isCritical = alert.type === 'CRITICAL_RISK';
+        const isShock = alert.type === 'SYSTEMIC_SHOCK';
         const isRebound = alert.type === 'REBOUND_RESISTANCE';
-        const containerCls = isCritical 
-          ? 'bg-rose-950/30 border border-rose-500/30' 
+        const containerCls = (isCritical || isShock)
+          ? 'bg-rose-950/40 border border-rose-500/60 shadow-lg shadow-rose-950/40' 
           : (isRebound ? 'bg-amber-950/30 border border-amber-500/30' : 'bg-emerald-950/30 border border-emerald-500/30');
-        const badgeCls = isCritical
-          ? 'bg-rose-500/20 text-rose-300'
+        const badgeCls = (isCritical || isShock)
+          ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40'
           : (isRebound ? 'bg-amber-500/20 text-amber-300' : 'bg-emerald-500/20 text-emerald-300');
-        const btnCls = isCritical
-          ? 'bg-rose-600 hover:bg-rose-500 text-white'
+        const btnCls = (isCritical || isShock)
+          ? 'bg-rose-600 hover:bg-rose-500 text-white shadow-md shadow-rose-950/50'
           : (isRebound ? 'bg-amber-600 hover:bg-amber-500 text-white' : 'bg-emerald-600 hover:bg-emerald-500 text-white');
 
         return `
@@ -9229,13 +9272,21 @@ ${userLessonsSummary}
       const capInput = document.getElementById('ps-total-capital');
       if (capInput) capInput.value = Math.round(totalCapital);
 
-      if (customEntry) {
+      const entryNum = parseFloat(customEntry);
+      if (!isNaN(entryNum) && entryNum > 0) {
         const entryInput = document.getElementById('ps-entry-price');
-        if (entryInput) entryInput.value = Number(customEntry).toFixed(2);
+        if (entryInput) entryInput.value = entryNum.toFixed(2);
       }
-      if (customStop) {
-        const stopInput = document.getElementById('ps-stop-loss');
-        if (stopInput) stopInput.value = Number(customStop).toFixed(2);
+
+      const stopNum = parseFloat(customStop);
+      const stopInput = document.getElementById('ps-stop-loss');
+      if (stopInput) {
+        if (!isNaN(stopNum) && stopNum > 0) {
+          stopInput.value = stopNum.toFixed(2);
+        } else if (!isNaN(entryNum) && entryNum > 0) {
+          // Set a safe default 4% protective stop when technical stop is undefined or '--'
+          stopInput.value = (entryNum * 0.96).toFixed(2);
+        }
       }
 
       calculatePositionSize();
@@ -9281,14 +9332,21 @@ ${userLessonsSummary}
       }
 
       const maxRiskEgp = Math.round(totalCapital * (riskPct / 100));
-      const riskPerShare = entryPrice - stopLoss;
+      // Impose a minimum risk buffer (1.5% of entry price) to prevent runaway leverage on ultra-tight stops
+      const minRiskPerShare = Math.max(0.01, entryPrice * 0.015);
+      const effectiveRiskPerShare = Math.max(minRiskPerShare, entryPrice - stopLoss);
 
-      const maxShares = Math.floor(maxRiskEgp / riskPerShare);
+      // 1. Cap by Risk
+      const sharesByRisk = Math.floor(maxRiskEgp / effectiveRiskPerShare);
+      // 2. Cap by Total Capital (Cash purchasing power constraint: Spot trading, no margin)
+      const sharesByCapital = Math.floor(totalCapital / entryPrice);
+
+      const maxShares = Math.max(0, Math.min(sharesByRisk, sharesByCapital));
       const totalInvestment = maxShares * entryPrice;
       const portfolioWeightPct = totalCapital > 0 ? ((totalInvestment / totalCapital) * 100).toFixed(1) : '0';
 
       if (maxRiskEl) maxRiskEl.innerText = `${maxRiskEgp.toLocaleString('en-US')} ج`;
-      if (riskPerShareEl) riskPerShareEl.innerText = `${riskPerShare.toFixed(2)} ج`;
+      if (riskPerShareEl) riskPerShareEl.innerText = `${effectiveRiskPerShare.toFixed(2)} ج`;
       if (resultSharesEl) resultSharesEl.innerText = `${maxShares.toLocaleString('en-US')} سهم`;
       if (resultCostEl) resultCostEl.innerText = `${Math.round(totalInvestment).toLocaleString('en-US')} ج.م`;
       if (resultWeightEl) resultWeightEl.innerText = `${portfolioWeightPct}%`;

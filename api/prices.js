@@ -78,7 +78,19 @@ function getDynamicFundsNAV() {
     },
     "BSB": {
       ticker: "BSB",
-      name: "صندوق بلتون لأسهم النمو (Beltone B-Secure / Equity)",
+      name: "صندوق بلتون للسيولة النقدية (Beltone B-Safe Cash)",
+      manager: "بلتون لإدارة الصناديق",
+      unitPrice: 16.73,
+      currency: "EGP",
+      annualYieldPct: 22.0,
+      lastOfficialUpdate: updateDateStr,
+      status: "🟢 وثيقة نقدية يومية • عائد تراكمي يُحدث يومياً",
+      note: "صندوق يومي منخفض المخاطر يُحسب عائده التراكمي يومياً ويطابق تطبيق ثندر.",
+      thndrUrl: "https://app.thndr.app/search?query=BSB"
+    },
+    "BGROWTH": {
+      ticker: "BGROWTH",
+      name: "صندوق بلتون لأسهم النمو (Beltone Equity Growth)",
       manager: "بلتون لإدارة الصناديق",
       unitPrice: 284.10,
       currency: "EGP",
@@ -86,7 +98,7 @@ function getDynamicFundsNAV() {
       lastOfficialUpdate: updateDateStr,
       status: "ℹ️ وثيقة أسهم نمو • تقييم دوري معتمد",
       note: "يُحدد سعر الوثيقة رسمياً من بلتون ويُنشر بنهاية كل جلسة تداول.",
-      thndrUrl: "https://app.thndr.app/search?query=BSB"
+      thndrUrl: "https://app.thndr.app/search?query=Beltone"
     }
   };
 }
@@ -166,9 +178,10 @@ function parseTechnicalRecord(item) {
     target2Val = Number((week52High + fibSpread).toFixed(2));
   } else {
     // Stock is trading in price discovery above R1, R2, and 52W High
-    // Use mathematically defined Pivot Extension: R2 + (R1 - Pivot) or R2 * 1.05 strictly marked
+    // Anchor to the highest structural level reached to prevent moving goalposts
+    const baseAnchor = Math.max(price, pivotR2 || 0, week52High || 0);
     const fibSpread = (pivotR1 && pivotS1) ? (pivotR1 - pivotS1) * 0.618 : price * 0.05;
-    target1Val = Number((price + fibSpread).toFixed(2));
+    target1Val = Number((baseAnchor + fibSpread).toFixed(2));
     target2Val = Number((target1Val + fibSpread).toFixed(2));
   }
 
@@ -217,13 +230,21 @@ function parseTechnicalRecord(item) {
       trendPts = 18;
     }
   } else if (sma50) {
-    if (price > sma50) {
+    const extPct = sma50 > 0 ? ((price - sma50) / sma50) * 100 : 0;
+    if (extPct > 30 && rsi > 78) {
+      trend = '⚠️ تحذير تمدد سعري ومضاربة (FOMO Pump Trap)';
+      trendPts = 5;
+    } else if (price > sma50) {
       trend = 'تداول أعلى متوسط 50 يوم';
       trendPts = 22;
     } else {
       trend = 'تداول أسفل متوسط 50 يوم';
       trendPts = 10;
     }
+  } else if (!sma50 && !sma200 && rsi > 78) {
+    // Newly listed IPO stocks (e.g. TAQA 2023) without moving averages
+    trend = '⚠️ تحذير تمدد سعري ومضاربة (IPO FOMO Trap)';
+    trendPts = 5;
   }
 
   let momentum = 'محايد';
@@ -291,7 +312,7 @@ function parseTechnicalRecord(item) {
     ticker: symbol,
     name: dict.name || item.d[1] || symbol,
     sector: dict.sector || "سوق الأسهم المصرية",
-    index: dict.index || (tradedValue > 50000000 ? "egx30" : "egx70"),
+    index: dict.index || "egx70",
     price: price,
     changePct: `${changePct >= 0 ? '+' : ''}${changePct}%`,
     changeNum: changePct,

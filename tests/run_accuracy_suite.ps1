@@ -74,8 +74,11 @@ function Simulate-ParseTechnicalRecord {
         $target1Val = $Week52High
         $target2Val = $null
     } else {
+        $r2Val = if ($PivotR2) { [double]$PivotR2 } else { 0.0 }
+        $w52Val = if ($Week52High) { [double]$Week52High } else { 0.0 }
+        $baseAnchor = [Math]::Max([double]$Price, [Math]::Max($r2Val, $w52Val))
         $fibSpread = if ($PivotR1 -and $PivotS1) { ($PivotR1 - $PivotS1) * 0.618 } else { $Price * 0.05 }
-        $target1Val = [Math]::Round(($Price + $fibSpread), 2)
+        $target1Val = [Math]::Round(($baseAnchor + $fibSpread), 2)
         $target2Val = [Math]::Round(($target1Val + $fibSpread), 2)
     }
 

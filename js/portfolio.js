@@ -50,8 +50,8 @@
     },
     {
       ticker: 'BSB',
-      name: 'صندوق بيل كاش (أسهم ونمو)',
-      category: 'صناديق استثمار أسهم • B-Safe',
+      name: 'صندوق بلتون للسيولة النقدية (B-Safe Cash)',
+      category: 'صناديق نقدية وسيولة • B-Safe',
       shares: 1222,
       buyPrice: 16.37,
       currentPrice: 16.73,
@@ -59,7 +59,7 @@
       profit: 439.92,
       returnPct: 2.20,
       status: 'ربح',
-      advice: 'مرجع وثيقة نمو • استثمار طويل الأجل في أسهم النمو المصرية',
+      advice: 'وثيقة سيولة يومية • استثمار آمن منخفض المخاطر يدر عائداً تراكمياً يطابق ثندر',
       action: 'HOLD',
       priceUpdatedAt: 'محفظة ثندر الرسمية',
       priceSource: 'شاشة ثندر اللحظية',
@@ -269,33 +269,46 @@
 
     load: function () {
       const savedVer = localStorage.getItem(PORTFOLIO_VERSION_KEY);
-      if (savedVer !== CURRENT_PORTFOLIO_VER) {
-        const fresh = this.getDefaultData();
-        this.save(fresh);
-        localStorage.setItem(PORTFOLIO_VERSION_KEY, CURRENT_PORTFOLIO_VER);
-        // Clean out legacy unversioned keys if corrupted
-        try {
-          const plans = localStorage.getItem('egx_copilot_active_plans');
-          if (plans && !Array.isArray(JSON.parse(plans))) {
-            localStorage.setItem('egx_copilot_active_plans', '[]');
-          }
-        } catch(e) {
-          localStorage.setItem('egx_copilot_active_plans', '[]');
-        }
-        return fresh;
-      }
-
       const saved = localStorage.getItem('egx_copilot_portfolio');
+      let parsed = null;
+
       if (saved) {
         try {
-          const parsed = JSON.parse(saved);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            return parsed;
-          }
-        } catch(e){}
+          parsed = JSON.parse(saved);
+        } catch (e) {
+          parsed = null;
+        }
       }
+
+      // If user has existing valid portfolio data, preserve it across version bumps
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        if (savedVer !== CURRENT_PORTFOLIO_VER) {
+          localStorage.setItem(PORTFOLIO_VERSION_KEY, CURRENT_PORTFOLIO_VER);
+          // Ensure CASH reserve exists in the migrated portfolio
+          const hasCash = parsed.some(p => p.ticker === 'CASH' || p.isCashReserve);
+          if (!hasCash) {
+            const defCash = defaultPortfolioData.find(p => p.ticker === 'CASH' || p.isCashReserve);
+            if (defCash) parsed.push(JSON.parse(JSON.stringify(defCash)));
+          }
+          this.save(parsed);
+
+          // Clean legacy unversioned plans if corrupted
+          try {
+            const plans = localStorage.getItem('egx_copilot_active_plans');
+            if (plans && !Array.isArray(JSON.parse(plans))) {
+              localStorage.setItem('egx_copilot_active_plans', '[]');
+            }
+          } catch (e) {
+            localStorage.setItem('egx_copilot_active_plans', '[]');
+          }
+        }
+        return parsed;
+      }
+
+      // First run or empty/corrupted storage: seed with official baseline portfolio
       const fresh = this.getDefaultData();
       this.save(fresh);
+      localStorage.setItem(PORTFOLIO_VERSION_KEY, CURRENT_PORTFOLIO_VER);
       return fresh;
     },
 
