@@ -140,7 +140,7 @@ function parseTechnicalRecord(item) {
 
   // Real Fundamental & Valuation Metrics (Auditable from Official Financial Statements)
   const rawPe = item.d[21] != null && !isNaN(Number(item.d[21])) ? Number(Number(item.d[21]).toFixed(2)) : null;
-  const eps = item.d[22] != null && !isNaN(Number(item.d[22])) ? Number(Number(item.d[22]).toFixed(2)) : null;
+  let eps = item.d[22] != null && !isNaN(Number(item.d[22])) ? Number(Number(item.d[22]).toFixed(2)) : null;
   const operatingMargin = item.d[23] != null && !isNaN(Number(item.d[23])) ? Number(Number(item.d[23]).toFixed(1)) : null;
   const netMargin = item.d[24] != null && !isNaN(Number(item.d[24])) ? Number(Number(item.d[24]).toFixed(1)) : null;
   const dividendYield = item.d[25] != null && !isNaN(Number(item.d[25])) ? Number(Number(item.d[25]).toFixed(2)) : null;
