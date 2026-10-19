@@ -508,11 +508,11 @@
           if (actionTextEl) actionTextEl.innerText = highestPriorityAlert.actionLabel;
 
           if (highestPriorityAlert.type === 'CRITICAL_RISK' || highestPriorityAlert.type === 'SYSTEMIC_SHOCK') {
-            banner.className = 'sticky top-14 z-40 bg-gradient-to-r from-rose-950 via-rose-900 to-amber-950 text-white border-b-2 border-rose-500 shadow-2xl px-4 py-2.5 transition-all animate-slide-down block';
+            banner.className = 'sticky top-14 z-40 bg-slate-950/95 backdrop-blur-md text-white border-b border-rose-500/30 shadow-xl px-4 py-2.5 transition-all animate-slide-down block';
           } else if (highestPriorityAlert.type === 'REBOUND_RESISTANCE') {
-            banner.className = 'sticky top-14 z-40 bg-gradient-to-r from-amber-950 via-orange-950 to-slate-900 text-white border-b-2 border-amber-500 shadow-2xl px-4 py-2.5 transition-all animate-slide-down block';
+            banner.className = 'sticky top-14 z-40 bg-slate-950/95 backdrop-blur-md text-white border-b border-amber-500/30 shadow-xl px-4 py-2.5 transition-all animate-slide-down block';
           } else {
-            banner.className = 'sticky top-14 z-40 bg-gradient-to-r from-emerald-950 via-teal-900 to-slate-900 text-white border-b-2 border-emerald-500 shadow-2xl px-4 py-2.5 transition-all animate-slide-down block';
+            banner.className = 'sticky top-14 z-40 bg-slate-950/95 backdrop-blur-md text-white border-b border-emerald-500/30 shadow-xl px-4 py-2.5 transition-all animate-slide-down block';
           }
 
           triggerBrowserNotification(highestPriorityAlert.title, highestPriorityAlert.desc, highestPriorityAlert.id);
