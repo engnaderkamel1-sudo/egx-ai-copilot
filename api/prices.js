@@ -139,6 +139,10 @@ function parseTechnicalRecord(item) {
   // Real Technical Targets & Support Levels (Strictly Non-Hallucinatory)
   const isSupportBroken = pivotS1 != null && price < pivotS1;
   const isR1Exceeded = pivotR1 != null && price >= pivotR1;
+  let brokenLevel = null;
+  if (pivotS1 != null && price < pivotS1) {
+    brokenLevel = pivotS1;
+  }
 
   // Support determination
   let supportVal = null;
@@ -163,27 +167,26 @@ function parseTechnicalRecord(item) {
     stopLossVal = Number((price * 0.96).toFixed(2));
   }
 
-  // Target determination: Structurally anchored to Resistance 1 (R1)
+  // Target determination: Structurally anchored to Resistance levels with Breakout & Fibonacci Extension
   let target1Val = null;
   let target2Val = null;
 
-  if (pivotR1 != null) {
+  if (pivotR1 != null && pivotR1 > price) {
     target1Val = pivotR1;
     target2Val = pivotR2 != null && pivotR2 > target1Val ? pivotR2 : (week52High != null && week52High > target1Val ? week52High : Number((target1Val * 1.05).toFixed(2)));
   } else if (pivotR2 != null && pivotR2 > price) {
     target1Val = pivotR2;
-    target2Val = week52High != null && week52High > target1Val ? week52High : null;
+    target2Val = week52High != null && week52High > target1Val ? week52High : Number((pivotR2 * 1.05).toFixed(2));
   } else if (week52High != null && week52High > price) {
     target1Val = week52High;
     const fibSpread = (pivotR1 && pivotS1) ? (pivotR1 - pivotS1) * 0.618 : price * 0.05;
     target2Val = Number((week52High + fibSpread).toFixed(2));
   } else {
-    // Stock is trading in price discovery above R1, R2, and 52W High
-    // Anchor to the highest structural level reached to prevent moving goalposts
+    // Dynamic Fibonacci Discovery for All-Time Highs & R2 Breaches
     const baseAnchor = Math.max(price, pivotR2 || 0, week52High || 0);
     const fibSpread = (pivotR1 && pivotS1) ? (pivotR1 - pivotS1) * 0.618 : price * 0.05;
-    target1Val = Number((baseAnchor + fibSpread).toFixed(2));
-    target2Val = Number((target1Val + fibSpread).toFixed(2));
+    target1Val = Number((baseAnchor + fibSpread * 1.272).toFixed(2));
+    target2Val = Number((baseAnchor + fibSpread * 1.618).toFixed(2));
   }
 
   // Risk/Reward Ratio Calculation (Strict & Robust with Penny-Stock scaling)
@@ -242,10 +245,13 @@ function parseTechnicalRecord(item) {
       trend = 'تداول أسفل متوسط 50 يوم';
       trendPts = 10;
     }
-  } else if (!sma50 && !sma200 && rsi > 78) {
-    // Newly listed IPO stocks (e.g. TAQA 2023) without moving averages
-    trend = '⚠️ تحذير تمدد سعري ومضاربة (IPO FOMO Trap)';
-    trendPts = 5;
+  } else if (!sma50 && !sma200) {
+    const isIntradaySurge = open > 0 && ((high - open) / open) > 0.20;
+    const isExtremeChange = changePct > 20.0;
+    if (rsi > 75 || isIntradaySurge || isExtremeChange) {
+      trend = '⚠️ تحذير تمدد سعري ومضاربة (IPO FOMO Trap)';
+      trendPts = 5;
+    }
   }
 
   let momentum = 'محايد';
@@ -294,16 +300,16 @@ function parseTechnicalRecord(item) {
     safetyTag = 'fomo_danger';
   } else if (isSupportBroken) {
     type = '⚠️ سهم تحت ضغط بيعي وكسر دعم';
-    catalyst = `${qualityDesc} • كسر صريح لمستوى الدعم الفني ${supportVal} ج (وقف الخسارة مفعل)`;
+    catalyst = `${qualityDesc} • كسر صريح لمستوى الدعم الفني ${brokenLevel || supportVal} ج (وقف الخسارة مفعل)`;
     safetyTag = 'broken_support';
   } else if (tradedValue >= 1000000000) {
     type = 'سيولة مليارية استثنائية • أمان مؤسسي فائق';
-    const flowType = changePct >= 0 ? 'تجميع مؤسسي قياسي وتدفقات سيولة ضخمة' : 'امتصاص بيعي مؤسسي وتثبيت سعري';
+    const flowType = changePct >= 0 ? 'تجميع مؤسسي قياسي وتدفقات سيولة ضخمة' : (changePct <= -3.0 ? 'ضغوط بيعية وتصريف مكثف عالي السيولة' : 'امتصاص بيعي مؤسسي وتثبيت سعري');
     catalyst = `${qualityDesc} • ${flowType} (تنفيذات ${turnoverMillions} مليون ج)`;
     safetyTag = 'volume_surge';
   } else if (tradedValue >= 100000000) {
     type = 'سيولة مؤسسية كبرى تتجاوز 100 مليون ج';
-    const flowType = changePct >= 0 ? 'تجميع مؤسسي قوي وتدفقات سيولة قيادية' : 'امتصاص بيعي مؤسسي وتثبيت سعري';
+    const flowType = changePct >= 0 ? 'تجميع مؤسسي قوي وتدفقات سيولة قيادية' : (changePct <= -3.0 ? 'ضغوط بيعية وتصريف مكثف عالي السيولة' : 'امتصاص بيعي مؤسسي وتثبيت سعري');
     catalyst = `${qualityDesc} • ${flowType} (تنفيذات ${turnoverMillions} مليون ج)`;
     safetyTag = 'volume_surge';
   } else if (changePct > 3.0 && tradedValue > 10000000) {
@@ -500,8 +506,8 @@ export default async function handler(req, res) {
 
     // Guard against falling knife dip-buying during SYSTEMIC_SHOCK
     if (currentRegime === "SYSTEMIC_SHOCK") {
-      radar.forEach(stock => {
-        if (stock.tags && stock.tags.includes('oversold_bounce')) {
+      [...radar, ...Object.values(prices)].forEach(stock => {
+        if (stock && stock.tags && stock.tags.includes('oversold_bounce')) {
           stock.type = 'تشبع بيعي في هبوط عام (تجميد الشراء)';
           stock.catalyst = `${stock.name} • تشبع بيعي لكن السوق في حالة هبوط ذعري شامل؛ يُفضل التريث والاحتفاظ بالكاش`;
           stock.tags = stock.tags.map(t => t === 'oversold_bounce' ? 'systemic_hold' : t);

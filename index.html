@@ -4798,6 +4798,23 @@
         const returnPct = buyPrice > 0 ? parseFloat((((currentPrice - buyPrice) / buyPrice) * 100).toFixed(2)) : 0;
 
         const existingIndex = newPortfolio.findIndex(p => p.ticker === ticker);
+        let assetAdvice = returnPct >= 15 ? 'احتفاظ قوي وجني أرباح تدريجي' : (returnPct <= -10 ? 'مستوى تعزيز أو مراقبة وقف الخسارة' : 'احتفاظ • متابعة الاتجاه');
+        let assetAction = returnPct >= 20 ? 'PROFIT_TAKE' : (returnPct <= -10 ? 'WATCH_STOP' : 'HOLD');
+        let assetStatus = profit >= 0 ? 'ربح ممتاز' : 'تراجع مؤقت';
+
+        if (typeof EGX_Engine !== 'undefined') {
+          const evalRes = EGX_Engine.evaluateAsset({
+            ticker, name: stockName, shares, buyPrice, currentPrice,
+            pivotR1: radarMatch ? radarMatch.pivotR1 : null,
+            pivotS1: radarMatch ? radarMatch.pivotS1 : null
+          }, typeof getMarketRegimeCode === 'function' ? getMarketRegimeCode() : 'NORMAL_CONSOLIDATION');
+          if (evalRes) {
+            assetAdvice = evalRes.advice;
+            assetAction = evalRes.action;
+            assetStatus = evalRes.status;
+          }
+        }
+
         const assetObj = {
           ticker: ticker,
           name: stockName,
@@ -4808,9 +4825,9 @@
           value: value,
           profit: profit,
           returnPct: returnPct,
-          status: profit >= 0 ? 'ربح ممتاز' : 'تراجع مؤقت',
-          advice: returnPct >= 15 ? 'احتفاظ قوي وجني أرباح تدريجي' : (returnPct <= -10 ? 'مستوى تعزيز أو مراقبة وقف الخسارة' : 'احتفاظ • متابعة الاتجاه'),
-          action: returnPct >= 20 ? 'PROFIT_TAKE' : (returnPct <= -10 ? 'WATCH_STOP' : 'HOLD'),
+          status: assetStatus,
+          advice: assetAdvice,
+          action: assetAction,
           priceUpdatedAt: 'مزامنة ثندر الآن',
           priceSource: 'محفظة ثندر اللحظية',
           decisionUpdatedAt: 'جلسة اليوم',
@@ -5779,6 +5796,21 @@
       document.getElementById('rot-sell-shares-pct').innerText = `(حوالي ${actualPct}% من إجمالي ملكيتك)`;
       document.getElementById('rot-cash-generated').innerText = `${sellCash.toLocaleString('en-US')} ج.م`;
       
+      const cashCard = document.getElementById('rot-cash-card');
+      const cashGenLabel = document.getElementById('rot-cash-generated-label');
+      const cashGenValue = document.getElementById('rot-cash-generated');
+      if (cashCard) {
+        if (isLosing) {
+          cashCard.className = 'bg-gray-900/90 p-2.5 rounded-xl border border-rose-500/30';
+          if (cashGenLabel) cashGenLabel.className = 'text-rose-400 text-[10px] block font-sans';
+          if (cashGenValue) cashGenValue.className = 'text-base font-bold text-rose-300';
+        } else {
+          cashCard.className = 'bg-gray-900/90 p-2.5 rounded-xl border border-emerald-500/30';
+          if (cashGenLabel) cashGenLabel.className = 'text-emerald-400 text-[10px] block font-sans';
+          if (cashGenValue) cashGenValue.className = 'text-base font-bold text-emerald-300';
+        }
+      }
+
       const profitPill = document.getElementById('rot-realized-profit-pill');
       if (profitPill) {
         if (isLosing) {
@@ -5929,10 +5961,10 @@
       let sellShares = Math.max(1, Math.round(totalShares * currentRotationRatio));
       if (sellShares >= totalShares && totalShares > 1) sellShares = totalShares - 1;
 
-      const grossSellCash = Math.round(sellShares * currentPrice);
-      const estCommission = Math.round(grossSellCash * 0.00175);
-      const sellCash = Math.max(0, grossSellCash - estCommission);
-      const realizedProfit = Math.round(sellShares * (currentPrice - buyPrice)) - estCommission;
+      const grossSellCash = Number((sellShares * currentPrice).toFixed(2));
+      const estCommission = Number((grossSellCash * 0.00175).toFixed(2));
+      const sellCash = Math.max(0, Number((grossSellCash - estCommission).toFixed(2)));
+      const realizedProfit = Number((sellShares * (currentPrice - buyPrice) - estCommission).toFixed(2));
       const remainingShares = totalShares - sellShares;
       // Technical support levels (S1 & S2) for disciplined re-entry zone
       const s1 = Number(item.pivotS1) || 0;
@@ -7002,10 +7034,10 @@
         : null;
       const pivot = p ? p.pp : Number(((high + low + close) / 3).toFixed(2));
       const r1 = p ? p.r1 : Number(((2 * pivot) - low).toFixed(2));
-      const s1 = p ? p.s1 : Number(((2 * pivot) - high).toFixed(2));
+      const s1 = p ? p.s1 : Number(Math.max(0.01, (2 * pivot) - high).toFixed(2));
       const r2 = p ? p.r2 : Number((pivot + (high - low)).toFixed(2));
-      const s2 = p ? p.s2 : Number((pivot - (high - low)).toFixed(2));
-      const stopLoss = Math.min(+(s1 * 0.97).toFixed(2), +(low * 0.98).toFixed(2));
+      const s2 = p ? p.s2 : Number(Math.max(0.01, pivot - (high - low)).toFixed(2));
+      const stopLoss = Math.max(0.01, Math.min(+(s1 * 0.97).toFixed(2), +(low * 0.98).toFixed(2)));
 
       if (close >= r1) {
         const riskPct = ((close - stopLoss) / close) * 100;
@@ -7205,6 +7237,10 @@
 
       const stock = fullMarketRadar.find(s => s.ticker === ticker);
       const shares = Math.floor(amount / price);
+      if (shares < 1) {
+        alert(`المبلغ المدخل (${amount.toLocaleString('en-US')} ج) لا يكفي لشراء سهم واحد في ${stock ? stock.name : ticker} بسعر ${price.toFixed(2)} ج.`);
+        return;
+      }
       const totalCost = shares * price;
 
       simCash -= totalCost;
@@ -8082,8 +8118,10 @@
           seenTickers.add(item.ticker);
           const livePrice = item.currentPrice || item.price || 0;
           if (livePrice > 0) {
-            // Check for cited price near ticker
-            const pricePattern = new RegExp(`(?:${item.ticker})[^0-9]{1,30}([0-9]+(?:\\.[0-9]+)?)\\s*(?:ج|جنيه|EGP)`, 'i');
+            // Check for cited price near ticker or Arabic name
+            const escapedName = item.name ? item.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') : '';
+            const symbolGroup = escapedName ? `(?:${item.ticker}|${escapedName})` : `(?:${item.ticker})`;
+            const pricePattern = new RegExp(`${symbolGroup}[^0-9]{1,30}([0-9]+(?:\\.[0-9]+)?)\\s*(?:ج|جنيه|EGP)`, 'i');
             const priceMatch = text.match(pricePattern);
             if (priceMatch && priceMatch[1]) {
               const citedPrice = parseFloat(priceMatch[1]);

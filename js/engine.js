@@ -24,9 +24,9 @@
 
       const pp = Number(((high + low + close) / 3).toFixed(2));
       const r1 = Number(((2 * pp) - low).toFixed(2));
-      const s1 = Number(((2 * pp) - high).toFixed(2));
+      const s1 = Number(Math.max(0.01, (2 * pp) - high).toFixed(2));
       const r2 = Number((pp + (high - low)).toFixed(2));
-      const s2 = Number((pp - (high - low)).toFixed(2));
+      const s2 = Number(Math.max(0.01, pp - (high - low)).toFixed(2));
 
       // Fibonacci extensions for breakout mode (R2 breached)
       const spread = high - low;
@@ -381,10 +381,10 @@
       let sellShares = Math.max(1, Math.round(totalShares * ratio));
       if (sellShares >= totalShares && totalShares > 1) sellShares = totalShares - 1;
 
-      const grossSellCash = Math.round(sellShares * currentPrice);
-      const estCommission = Math.round(grossSellCash * 0.00175); // EGX standard fee (~0.175%)
-      const sellCash = Math.max(0, grossSellCash - estCommission);
-      const realizedProfit = Math.round(sellShares * (currentPrice - buyPrice)) - estCommission;
+      const grossSellCash = Number((sellShares * currentPrice).toFixed(2));
+      const estCommission = Number((grossSellCash * 0.00175).toFixed(2)); // EGX standard fee (~0.175%)
+      const sellCash = Math.max(0, Number((grossSellCash - estCommission).toFixed(2)));
+      const realizedProfit = Number((sellShares * (currentPrice - buyPrice) - estCommission).toFixed(2));
       const remainingShares = totalShares - sellShares;
       const remainingValue = Math.round(remainingShares * currentPrice);
 
