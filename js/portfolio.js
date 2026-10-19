@@ -7,7 +7,7 @@
   'use strict';
 
   const PORTFOLIO_VERSION_KEY = 'egx_copilot_portfolio_ver';
-  const CURRENT_PORTFOLIO_VER = '2026_10_thndr_official_real_v214_clho_20_9x';
+  const CURRENT_PORTFOLIO_VER = '2026_10_zero_assumption_provenance_v215';
 
   const EGX_FUNDAMENTALS_REGISTRY = {
     "ABUK": {

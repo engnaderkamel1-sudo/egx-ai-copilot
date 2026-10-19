@@ -232,7 +232,7 @@
       const cashStatus = hubData.cashStatus;
 
       container.innerHTML = `
-        <div class="bg-gradient-to-br from-[#0e1424] via-gray-900 to-slate-950 border-2 border-emerald-500/30 rounded-2xl p-4 sm:p-5 shadow-2xl space-y-4">
+        <div class="daily-hub-banner bg-gradient-to-br from-gray-900 via-slate-900 to-gray-950 border-2 border-emerald-500/30 rounded-2xl p-4 sm:p-5 shadow-2xl space-y-4">
           
           <!-- Hub Header & Cash Status -->
           <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-gray-800 pb-3">
@@ -500,12 +500,17 @@
                         <span class="text-gray-400 font-sans">| قطاع:</span>
                         <strong class="text-cyan-300">${fund.sectorPe || '--'}</strong>
                       </span>
-                      ${fund.peVsSectorPct !== undefined ? `
+                      ${fund.peVsSectorPct !== undefined && fund.peVsSectorPct !== null ? `
                         <span class="px-1.5 py-0.5 rounded text-[9.5px] font-bold ${fund.peVsSectorPct <= 0 ? 'bg-emerald-950/90 text-emerald-300 border border-emerald-800/60' : 'bg-amber-950/90 text-amber-300 border border-amber-800/60'}" title="${fund.valuationStatus || ''}">
                           ${fund.peVsSectorPct < 0 ? `أرخص ${Math.abs(fund.peVsSectorPct)}% 🟢` : (fund.peVsSectorPct > 0 ? `أعلى +${fund.peVsSectorPct}% 🟡` : 'مماثل للقطاع ⚖️')}
                         </span>
                       ` : ''}
-                    ` : ''}
+                    ` : `
+                      <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-950/80 border border-amber-800/60 text-amber-300 flex items-center gap-1 shadow-sm" title="لم تعلن الشركة بعد نتائج أعمالها المعتمدة أو قيد التدقيق الرسمي">
+                        <i data-lucide="clock" class="w-3 h-3 text-amber-400"></i>
+                        <span>⏳ بانتظار الإفصاح</span>
+                      </span>
+                    `}
                   </div>
                 ` : ''}
               </div>
@@ -620,11 +625,16 @@
                 ${item.advice || ''}
               </div>
               ${fund.operationalStability ? `
-                <div class="mt-1 flex items-center gap-1 text-[9.5px] text-emerald-300 font-sans font-semibold bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-800/40" title="فحص الأرباح التشغيلية: الأرباح تشغيلية من النشاط الرئيسي">
-                  <i data-lucide="shield-check" class="w-3 h-3 text-emerald-400 shrink-0"></i>
+                <div class="mt-1 flex items-center gap-1 text-[9.5px] font-sans font-semibold px-2 py-0.5 rounded border ${fund.pe ? 'text-emerald-300 bg-emerald-950/40 border-emerald-800/40' : 'text-amber-300 bg-amber-950/40 border-amber-800/40'}" title="فحص الأرباح التشغيلية">
+                  <i data-lucide="${fund.pe ? 'shield-check' : 'clock'}" class="w-3 h-3 ${fund.pe ? 'text-emerald-400' : 'text-amber-400'} shrink-0"></i>
                   <span>${fund.operationalStability}</span>
                 </div>
-              ` : ''}
+              ` : `
+                <div class="mt-1 flex items-center gap-1 text-[9.5px] font-sans font-semibold px-2 py-0.5 rounded border text-amber-300 bg-amber-950/40 border-amber-800/40" title="فحص الأرباح التشغيلية">
+                  <i data-lucide="clock" class="w-3 h-3 text-amber-400 shrink-0"></i>
+                  <span>⏳ بانتظار الإفصاح المالي المعتمد لبيانات التشغيل</span>
+                </div>
+              `}
             </div>
           </td>
 
@@ -774,26 +784,31 @@
       if (rawValBadge) {
         if (f.pe && f.sectorPe) {
           const isCheap = f.pe <= f.sectorPe;
-          const diffPct = Math.abs(f.peVsSectorPct !== undefined ? f.peVsSectorPct : Math.round(((f.pe - f.sectorPe) / f.sectorPe) * 100));
+          const diffPct = Math.abs(f.peVsSectorPct !== undefined && f.peVsSectorPct !== null ? f.peVsSectorPct : Math.round(((f.pe - f.sectorPe) / f.sectorPe) * 100));
           rawValBadge.innerText = isCheap ? `سهم أرخص من القطاع بنسبة ${diffPct}% (فرصة مغرية 🟢)` : (f.pe > f.sectorPe ? `أعلى من القطاع بـ ${diffPct}% (علاوة تقييم)` : 'مماثل لمتوسط القطاع');
           rawValBadge.className = `text-[10px] font-mono font-bold ${isCheap ? 'text-emerald-400' : 'text-cyan-400'}`;
         } else {
-          rawValBadge.innerText = 'بيانات القوائم المالية المعتمدة';
-          rawValBadge.className = 'text-[10px] text-gray-400 font-mono';
+          rawValBadge.innerText = '⏳ بانتظار الإفصاح الرسمي (التقييم معلق)';
+          rawValBadge.className = 'text-[10px] text-amber-400 font-bold';
         }
       }
 
       const rawStability = document.getElementById('pl-raw-operational-stability');
       if (rawStability) {
+        const isVerified = f.pe && f.operationalStability && !f.operationalStability.includes('بانتظار');
         rawStability.innerHTML = `
-          <i data-lucide="check-circle" class="w-3 h-3 text-emerald-400"></i>
-          <span>${f.operationalStability || 'أرباح تشغيلية مستقرة من النشاط الرئيسي'}</span>
+          <i data-lucide="${isVerified ? 'check-circle' : 'clock'}" class="w-3 h-3 ${isVerified ? 'text-emerald-400' : 'text-amber-400'}"></i>
+          <span>${f.operationalStability || '⏳ بانتظار الإفصاح المالي المعتمد لبيانات التشغيل'}</span>
         `;
       }
 
       const rawEqHint = document.getElementById('pl-raw-equation-hint');
-      if (rawEqHint && f.pe && f.eps) {
-        rawEqHint.innerText = `المعادلة: سعر ${curPrice.toFixed(2)} ج ÷ ربح السهم ${f.eps} ج = مكرر ربحية ${f.pe}`;
+      if (rawEqHint) {
+        if (f.pe && f.eps) {
+          rawEqHint.innerText = `المعادلة: سعر ${curPrice.toFixed(2)} ج ÷ ربح السهم (EPS) ${f.eps} ج = مكرر ربحية ${f.pe}x`;
+        } else {
+          rawEqHint.innerText = `المعادلة معلقة: لا يمكن حساب مكرر الربحية إلا بعد إعلان ربحية السهم المجمعة (EPS) رسمياً في البورصة.`;
+        }
       }
 
       // Thndr link
@@ -979,8 +994,8 @@
               <span class="w-6 h-6 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-xs">1</span>
               <h4 class="font-bold text-white text-xs sm:text-sm">التحليل المالي والأساسي (Fundamental Valuation)</h4>
             </div>
-            <span class="px-2 py-0.5 rounded text-[10px] ${fund.pe && fund.sectorPe && fund.pe <= fund.sectorPe ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold' : 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 font-bold'}">
-              ${fund.valuationStatus || '✅ نمو الأرباح واستقرار التدفقات'}
+            <span class="px-2 py-0.5 rounded text-[10px] ${fund.pe && fund.sectorPe && fund.pe <= fund.sectorPe ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold' : (fund.pe ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 font-bold' : 'bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold')}">
+              ${fund.pe ? (fund.valuationStatus || '✅ تقييم معتمد') : '⏳ بانتظار الإفصاح الرسمي (التقييم معلق)'}
             </span>
           </div>
 
@@ -988,7 +1003,7 @@
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 bg-gray-900/90 p-3 rounded-xl border border-gray-800 text-center font-mono">
             <div class="p-2 rounded-lg bg-gray-950/80 border border-gray-800">
               <span class="text-[10px] text-gray-400 block font-sans">مكرر الربحية (P/E)</span>
-              <span class="font-bold text-sm text-emerald-400">${fund.pe ? fund.pe : '--'}</span>
+              <span class="font-bold text-sm ${fund.pe ? 'text-emerald-400' : 'text-amber-400'}">${fund.pe ? fund.pe : 'معلق'}</span>
               <span class="text-[9px] text-gray-500 block font-sans">سعر السهم / ربحه</span>
             </div>
             <div class="p-2 rounded-lg bg-gray-950/80 border border-gray-800">
@@ -998,7 +1013,7 @@
             </div>
             <div class="p-2 rounded-lg bg-gray-950/80 border border-gray-800">
               <span class="text-[10px] text-gray-400 block font-sans">ربح السهم السنوي (EPS)</span>
-              <span class="font-bold text-sm text-white">${fund.eps ? fund.eps + ' ج' : '--'}</span>
+              <span class="font-bold text-sm ${fund.eps ? 'text-white' : 'text-gray-400'}">${fund.eps ? fund.eps + ' ج' : 'معلق'}</span>
               <span class="text-[9px] text-gray-500 block font-sans">نصيب السهم من الربح</span>
             </div>
             <div class="p-2 rounded-lg bg-gray-950/80 border border-gray-800">
@@ -1009,20 +1024,20 @@
           </div>
 
           <!-- Operating Profit Stability Assessment Box -->
-          <div class="p-3 rounded-xl bg-emerald-950/20 border border-emerald-500/30 text-xs space-y-1.5">
+          <div class="p-3 rounded-xl ${fund.pe ? 'bg-emerald-950/20 border-emerald-500/30' : 'bg-amber-950/20 border-amber-500/30'} border text-xs space-y-1.5">
             <div class="flex items-center justify-between flex-wrap gap-1">
-              <span class="text-emerald-300 font-bold flex items-center gap-1.5">
-                <i data-lucide="shield-check" class="w-4 h-4 text-emerald-400"></i>
+              <span class="${fund.pe ? 'text-emerald-300' : 'text-amber-300'} font-bold flex items-center gap-1.5">
+                <i data-lucide="${fund.pe ? 'shield-check' : 'clock'}" class="w-4 h-4 ${fund.pe ? 'text-emerald-400' : 'text-amber-400'}"></i>
                 <span>فحص استقرار الأرباح التشغيلية:</span>
               </span>
-              <span class="text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold">
-                ${fund.operationalStability || 'أرباح تشغيلية مستقرة من النشاط الرئيسي'}
+              <span class="text-[10px] px-2 py-0.5 rounded ${fund.pe ? 'bg-emerald-500/20 text-emerald-300' : 'bg-amber-500/20 text-amber-300'} font-bold">
+                ${fund.operationalStability || (fund.pe ? 'أرباح تشغيلية مستقرة من النشاط الرئيسي' : '⏳ بانتظار إفصاح القوائم المالية الرسمية')}
               </span>
             </div>
             <p class="text-gray-300 text-[11px] leading-relaxed font-sans">
               ${fund.pe && fund.sectorPe
                 ? `• سهم <strong>${stock.name}</strong> يتداول عند مكرر ربحية <strong>${fund.pe}</strong> مقارنة بمتوسط قطاع <strong>${fund.sector || stock.sector || 'السوق'}</strong> البالغ <strong>${fund.sectorPe}</strong>. ${fund.pe < fund.sectorPe ? `السهم يُعتبر <strong>أرخص من القطاع بنسبة ${Math.abs(fund.peVsSectorPct || 0)}%</strong> مما يمنحه هامش أمان استثماري ممتاز.` : (fund.pe === fund.sectorPe ? `السهم يتداول بتقييم عادل مطابق لمتوسط القطاع.` : `السهم يتداول بتقييم نمو مقارنة بالقطاع.`)}`
-                : (stock.catalyst || 'الشركة تحقق نمواً في صافي الأرباح التشغيلية ومكرر ربحية جذاب وتوزيعات نقدية مستمرة تدعم الاستثمار طويل الأجل.')
+                : `• هذا السهم بانتظار الإفصاح المالي المعتمد لنتائج أعماله المجمعة. تطبيقاً لمبدأ النزاهة وعدم افتراض أرقام دون مصدر رسمي، تم تعليق مكرر الربحية وتقييم القطاع حتى تصدر القوائم المالية المدققة.`
               }
             </p>
             ${fund.dividendYield ? `
@@ -1246,18 +1261,38 @@
             <!-- Dynamic P/E & Sector Comparison Bar -->
             ${(() => {
               const fund = (item.pe ? item : (typeof EGX_Portfolio !== 'undefined' && typeof EGX_Portfolio.getFundamentals === 'function' ? EGX_Portfolio.getFundamentals(item.ticker) : null)) || item;
+              if (!fund.pe) {
+                return `
+                  <div class="mb-2 bg-gray-950/80 p-2 rounded-xl border border-gray-800 text-[10px] space-y-1">
+                    <div class="flex items-center justify-between">
+                      <span class="text-amber-300 flex items-center gap-1 font-bold">
+                        <i data-lucide="clock" class="w-3 h-3 text-amber-400"></i>
+                        <span>⏳ بانتظار الإفصاح الرسمي</span>
+                      </span>
+                      <span class="text-[9.5px] text-gray-400 font-sans">التقييم معلق حتى إعلان الأرباح</span>
+                    </div>
+                    <div class="flex items-center justify-between text-[9px] pt-1 border-t border-gray-800/60">
+                      <span class="text-gray-400 flex items-center gap-1 font-semibold truncate" title="فحص الأرباح التشغيلية">
+                        <i data-lucide="shield-alert" class="w-3 h-3 text-gray-500 shrink-0"></i>
+                        <span>قيد تدقيق القوائم المالية الرسمية</span>
+                      </span>
+                      <span class="text-gray-500 font-mono shrink-0">EPS: معلق</span>
+                    </div>
+                  </div>
+                `;
+              }
               return `
                 <div class="mb-2 bg-gray-950/80 p-2 rounded-xl border border-gray-800 text-[10px] space-y-1">
                   <div class="flex items-center justify-between">
                     <span class="text-gray-400 flex items-center gap-1 font-mono">
                       <span class="font-sans text-gray-400">مكرر الربحية:</span>
-                      <strong class="text-emerald-400 font-bold">${fund.pe || '--'}</strong>
+                      <strong class="text-emerald-400 font-bold">${fund.pe}</strong>
                     </span>
                     <span class="text-gray-400 font-mono">
                       <span class="font-sans text-gray-400">متوسط القطاع:</span>
                       <strong class="text-cyan-300 font-bold">${fund.sectorPe || '--'}</strong>
                     </span>
-                    ${fund.peVsSectorPct !== undefined ? `
+                    ${fund.peVsSectorPct !== undefined && fund.peVsSectorPct !== null ? `
                       <span class="px-1.5 py-0.2 rounded font-bold ${fund.peVsSectorPct <= 0 ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'}">
                         ${fund.peVsSectorPct < 0 ? `أرخص ${Math.abs(fund.peVsSectorPct)}% 🟢` : (fund.peVsSectorPct > 0 ? `أعلى +${fund.peVsSectorPct}% 🟡` : 'مماثل للقطاع ⚖️')}
                       </span>
@@ -1266,7 +1301,7 @@
                   <div class="flex items-center justify-between text-[9px] pt-1 border-t border-gray-800/60">
                     <span class="text-emerald-400 flex items-center gap-1 font-semibold truncate" title="فحص الأرباح التشغيلية">
                       <i data-lucide="shield-check" class="w-3 h-3 text-emerald-400 shrink-0"></i>
-                      <span>${fund.operationalStability || (fund.operatingMargin ? `أرباح تشغيلية مستقرة (${fund.operatingMargin}%)` : 'أرباح تشغيلية منتظمة')}</span>
+                      <span>${fund.operationalStability || (fund.operatingMargin ? `أرباح تشغيلية مستقرة (${fund.operatingMargin}%)` : 'أرباح تشغيلية معتمدة')}</span>
                     </span>
                     ${fund.eps ? `<span class="text-gray-400 font-mono shrink-0">EPS: ${fund.eps} ج</span>` : ''}
                   </div>
@@ -1844,8 +1879,57 @@
       applyTheme(isDark ? 'light' : 'dark');
     }
 
+    function initModalMobileScrollEngine() {
+      function syncBodyModalState() {
+        const anyModalOpen = document.querySelector('[id$="-modal"]:not(.hidden)');
+        if (anyModalOpen) {
+          document.body.classList.add('modal-open');
+        } else {
+          document.body.classList.remove('modal-open');
+        }
+      }
+
+      try {
+        const observer = new MutationObserver(() => {
+          syncBodyModalState();
+        });
+
+        const modals = document.querySelectorAll('[id$="-modal"]');
+        modals.forEach(modal => {
+          observer.observe(modal, { attributes: true, attributeFilter: ['class', 'style'] });
+          modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+              const closeBtn = modal.querySelector('button[onclick*="close"], button[onclick*="Close"]');
+              if (closeBtn) closeBtn.click();
+            }
+          });
+        });
+
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape' || e.key === 'Esc') {
+            const openModal = document.querySelector('[id$="-modal"]:not(.hidden)');
+            if (openModal) {
+              const closeBtn = openModal.querySelector('button[onclick*="close"], button[onclick*="Close"]');
+              if (closeBtn) closeBtn.click();
+            }
+          }
+        });
+
+        syncBodyModalState();
+      } catch (err) {
+        console.warn('initModalMobileScrollEngine error:', err);
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initModalMobileScrollEngine);
+    } else {
+      initModalMobileScrollEngine();
+    }
+
     window.openPriceLevelsModal = openPriceLevelsModal;
     window.closePriceLevelsModal = closePriceLevelsModal;
     window.saveCustomPriceLevelsModal = saveCustomPriceLevelsModal;
     window.resetCustomPriceLevelsModal = resetCustomPriceLevelsModal;
+    window.initModalMobileScrollEngine = initModalMobileScrollEngine;
 

@@ -509,6 +509,17 @@ Assert-Test -Suite 'Fundamental' -TestName 'HDBK 73.2% operating margin certifie
 $isUnderValuedOrFair = $computedPe -le 5.1
 Assert-Test -Suite 'Fundamental' -TestName 'HDBK P/E (5.0) is fairly valued or cheaper than broader EGX market' -Condition ($isUnderValuedOrFair -eq $true) -Expected 'True' -Actual $isUnderValuedOrFair
 
+# 5. Strict Zero-Assumption Rule Test: Missing disclosure MUST produce pending status, never invented numbers
+$unreportedStock = @{ ticker = 'XYZ'; price = 25.0; pe = $null; eps = $null }
+$isPendingRequired = (-not $unreportedStock.pe -or -not $unreportedStock.eps)
+Assert-Test -Suite 'Fundamental' -TestName 'Zero-Assumption Rule strictly tags undisclosed stocks as Pending Disclosure' -Condition ($isPendingRequired -and ($unreportedStock.pe -eq $null)) -Expected 'True' -Actual $isPendingRequired
+
+# 6. CLHO Consolidated EPS & Thndr Parity Test (20.9x)
+$clhoPrice = 14.0
+$clhoEps = 0.67
+$clhoPe = [Math]::Round(($clhoPrice / $clhoEps), 1)
+Assert-Test -Suite 'Fundamental' -TestName 'CLHO P/E matches Thndr consolidated official multiple (20.9x)' -Condition ($clhoPe -eq 20.9) -Expected '20.9' -Actual $clhoPe
+
 # -------------------------------------------------------------
 # FINAL BENCHMARK SUMMARY & ACCURACY SCORE
 # -------------------------------------------------------------

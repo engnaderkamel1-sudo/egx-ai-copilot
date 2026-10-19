@@ -786,6 +786,7 @@
       try { renderLearnedLessons(); } catch(e){ console.warn('renderLearnedLessons error:', e); }
       try { updateSimulationRegimeUI(); } catch(e){ console.warn('updateSimulationRegimeUI error:', e); }
       try { fetchCloudStatus(); } catch(e){ console.warn('fetchCloudStatus error:', e); }
+      try { if (window.initModalMobileScrollEngine) initModalMobileScrollEngine(); } catch(e){}
       try { if (window.lucide) lucide.createIcons(); } catch(e){}
     }
 
