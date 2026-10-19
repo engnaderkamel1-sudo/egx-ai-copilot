@@ -2186,7 +2186,7 @@
             <h2 class="text-xl font-bold text-white">إشارات السوق ومستويات الأمان اللحظية</h2>
             <p class="text-xs text-gray-400 mt-1">تنبيهات فورية عند وصول أهداف جني الأرباح، اقتراب نقاط الدعم، أو رصد شذوذ السيولة</p>
           </div>
-                  <!-- Native Web Push Notification Control Card (Without Telegram) -->
+        <!-- Native Web Push Notification Control Card (Without Telegram) -->
         <div class="p-4 rounded-xl bg-gradient-to-r from-cyan-950/40 via-gray-950 to-slate-900 border border-cyan-500/40 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div class="flex items-start gap-3">
             <div class="w-10 h-10 rounded-xl bg-cyan-500/20 border border-cyan-500/30 flex items-center justify-center text-cyan-400 shrink-0">
@@ -2194,25 +2194,24 @@
             </div>
             <div>
               <div class="flex items-center gap-2">
-                <h4 class="font-bold text-white text-sm">Ø§Ù„ØªÙ†Ø¨ÙŠÙ‡Ø§Øª Ø§Ù„Ø³Ø­Ø§Ø¨ÙŠØ© Ø§Ù„Ù…Ø¨Ø§Ø´Ø±Ø© Ø¹Ù„Ù‰ Ù‡Ø°Ø§ Ø§Ù„Ø¬Ù‡Ø§Ø² (Native Web Push)</h4>
+                <h4 class="font-bold text-white text-sm">التنبيهات السحابية المباشرة على هذا الجهاز (Native Web Push)</h4>
                 <div class="flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] bg-gray-900 border border-gray-700">
                   <span id="push-status-dot" class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
-                  <span id="push-status-text" class="text-gray-300 font-mono">Ø¬Ø§Ø±ÙŠ ÙØ­Øµ Ø§Ù„Ø¥Ø´Ø¹Ø§Ø±Ø§Øª...</span>
+                  <span id="push-status-text" class="text-gray-300 font-mono">التنبيهات السحابية غير مفعلة (اضغط للتفعيل) 🟡</span>
                 </div>
               </div>
               <p class="text-xs text-gray-300 mt-1 leading-relaxed">
-                ØªÙ†Ø¨ÙŠÙ‡Ø§Øª Ø®Ù„ÙÙŠØ© Ø³Ø­Ø§Ø¨ÙŠØ© Ù…Ø³ØªÙ‚Ù„Ø© ØªØ¹Ù…Ù„ Ù…Ù† Ø¯Ø§Ø®Ù„ Ø§Ù„ØªØ·Ø¨ÙŠÙ‚ Ù†ÙØ³Ù‡Ø› ÙŠØµÙ„Ùƒ Ø¥Ø´Ø¹Ø§Ø± ÙÙˆØ±ÙŠ Ø¹Ù„Ù‰ Ø´Ø§Ø´Ø© Ù‡Ø§ØªÙÙƒ Ø£Ùˆ Ø¬Ù‡Ø§Ø²Ùƒ Ø¹Ù†Ø¯ ÙƒØ³Ø± Ø£ÙŠ Ø¯Ø¹Ù… ÙÙ†ÙŠ S1 Ø£Ùˆ Ø¨Ù„ÙˆØº Ù…Ø³ØªÙ‡Ø¯Ù Ø§Ù„Ù…Ù‚Ø§ÙˆÙ…Ø© R1 Ø­ØªÙ‰ Ù„Ùˆ ÙƒØ§Ù† Ø§Ù„Ù…ØªØµÙØ­ Ù…ØºÙ„Ù‚Ø§Ù‹ØŒ ÙˆØ¯ÙˆÙ† Ø§Ù„Ø­Ø§Ø¬Ø© Ù„ØªØ·Ø¨ÙŠÙ‚ ØªÙŠÙ„ÙŠØ¬Ø±Ø§Ù….
+                تنبيهات خلفية سحابية مستقلة تعمل من داخل التطبيق نفسه؛ يصلك إشعار فوري على شاشة هاتفك أو جهازك عند كسر أي دعم فني S1 أو بلوغ مستهدف المقاومة R1 حتى لو كان المتصفح مغلقاً، ودون الحاجة لتطبيق تيليجرام.
               </p>
             </div>
           </div>
           <div class="flex items-center gap-2 shrink-0">
             <button onclick="sendTestNativeNotification()" id="btn-enable-push" class="px-3.5 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs transition flex items-center gap-1.5 shadow cursor-pointer">
               <i data-lucide="bell" class="w-4 h-4"></i>
-              <span>ØªÙØ¹ÙŠÙ„ / Ø§Ø®ØªØ¨Ø§Ø± Ø§Ù„Ø¥Ø´Ø¹Ø§Ø± Ø§Ù„Ø³Ø­Ø§Ø¨ÙŠ ðŸ””</span>
+              <span>تفعيل / اختبار الإشعار السحابي 🔔</span>
             </button>
           </div>
         </div>
-
         <button onclick="simulateMarketEmergency()" class="px-3.5 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs flex items-center gap-1.5 transition self-start shadow-md">
             <i data-lucide="alert-octagon" class="w-4 h-4"></i>
             <span>محاكاة تنبيه هبوط مفاجئ</span>

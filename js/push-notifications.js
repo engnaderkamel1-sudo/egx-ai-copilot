@@ -63,44 +63,72 @@
     }
   }
 
-  function showLocalPushAlert(title, body, url = '/') {
-    if (Notification.permission !== 'granted') return;
+  function playNotificationChime() {
+    try {
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContext) return;
+      const ctx = new AudioContext();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(587.33, ctx.currentTime);
+      osc.frequency.setValueAtTime(880, ctx.currentTime + 0.1);
+      gain.gain.setValueAtTime(0.12, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.45);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.45);
+    } catch (e) {}
+  }
 
-    if (swRegistration && swRegistration.showNotification) {
-      swRegistration.showNotification(title, {
-        body: body,
-        icon: 'https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/trending-up.svg',
-        badge: 'https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/shield-alert.svg',
-        vibrate: [200, 100, 200],
-        data: { url: url },
-        tag: 'egx-market-alert',
-        renotify: true
-      });
-    } else {
-      // Fallback in-window notification
-      try {
-        new Notification(title, { body: body, icon: '/favicon.ico' });
-      } catch (e) {}
+  function showLocalPushAlert(title, body, url = '/') {
+    // 1. Play auditory chime
+    playNotificationChime();
+
+    // 2. High-visibility in-app toast for instant feedback
+    if (typeof showToast === 'function') {
+      showToast(`<div class="space-y-1"><div class="font-bold text-white text-xs">${title}</div><div class="text-[11px] text-gray-300 leading-relaxed">${body}</div></div>`, 'info');
+    }
+
+    // 3. System-level Notification dispatch (Lockscreen / OS notification center)
+    if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+      if (swRegistration && swRegistration.showNotification) {
+        swRegistration.showNotification(title, {
+          body: body,
+          icon: 'https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/trending-up.svg',
+          badge: 'https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/shield-alert.svg',
+          vibrate: [200, 100, 200],
+          data: { url: url },
+          tag: 'egx-market-alert',
+          renotify: true
+        });
+      } else {
+        try {
+          new Notification(title, { body: body, icon: '/favicon.ico' });
+        } catch (e) {}
+      }
     }
   }
 
   function sendTestNativeNotification() {
-    if (Notification.permission !== 'granted') {
+    // Always trigger instant feedback chime and visual toast
+    showLocalPushAlert(
+      '🔔 إشعار تجريبي: تنبيه سحابي فوري من EGX Copilot',
+      'منظومة التنبيهات السحابية تعمل بنجاح! يتم رصد مستويات الأمان ومستهدفات الأرباح لأسهم محفظتك لحظة بلحظة.'
+    );
+
+    // If browser OS permission is not granted yet, prompt user for full lockscreen/OS alerts
+    if (typeof Notification !== 'undefined' && Notification.permission !== 'granted') {
       requestNativePushPermission().then(() => {
         if (Notification.permission === 'granted') {
           showLocalPushAlert(
-            '🔴 اختبار تنبيه كسر الدعم S1 (تجريبي)',
+            '🔴 تنبيه كسر الدعم S1 (نظام الإشعارات المباشرة)',
             'تحذير حقيقي: سهم البنك التجاري الدولي (CIB) كسر مستوى الدعم S1 (119.6 ج) • اضغط لفحص خطة الحماية والتدوير.'
           );
         }
       });
-      return;
     }
-
-    showLocalPushAlert(
-      '🟢 اختبار إشعار المقاومة R1 (تجريبي)',
-      'تنبيه الأرباح: سهم السويدي إليكتريك وصل لهدف المقاومة R1 (129.0 ج) • يُنصح بتأمين أرباح القمة وتدوير السيولة.'
-    );
   }
 
   function updatePushUIState() {
