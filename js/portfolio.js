@@ -7,7 +7,7 @@
   'use strict';
 
   const PORTFOLIO_VERSION_KEY = 'egx_copilot_portfolio_ver';
-  const CURRENT_PORTFOLIO_VER = '2026_10_thndr_official_real_v213_fundamentals';
+  const CURRENT_PORTFOLIO_VER = '2026_10_thndr_official_real_v214_clho_20_9x';
 
   const EGX_FUNDAMENTALS_REGISTRY = {
     "ABUK": {
@@ -47,10 +47,10 @@
       operationalStability: "أرباح تشغيلية وتدفقات عقارية وفندقية قوية (28.3%)"
     },
     "CLHO": {
-      pe: 14.8, eps: 0.36, sector: "رعاية صحية ومستشفيات", sectorPe: 14.5, peVsSectorPct: 2.1,
+      pe: 20.9, eps: 0.67, sector: "رعاية صحية ومستشفيات", sectorPe: 21.0, peVsSectorPct: -0.5,
       operatingMargin: 18.5, netMargin: 12.0, dividendYield: 2.1, priceToBook: 2.4,
-      valuationStatus: "مماثل لمتوسط قطاع الرعاية الصحية",
-      operationalStability: "أرباح تشغيلية دفاعية مستقرة (18.5%)"
+      valuationStatus: "مماثل لمتوسط قطاع الرعاية الصحية (20.9x مطابق لثندر)",
+      operationalStability: "أرباح تشغيلية دفاعية مستقرة من الرعاية الصحية (18.5%)"
     },
     "EGAL": {
       pe: 7.2, eps: 45.2, sector: "معادن وصناعة ثقيلة", sectorPe: 7.5, peVsSectorPct: -4.0,
@@ -230,6 +230,17 @@ const defaultPortfolioData = [
         "status": "تراجع",
         "advice": "🟢 ارتداد من تشبع بيعي (RSI: 27.3) أعلى الدعم الفني S1 (13.22 ج) • فرصة تعزيز للمستثمر طويل الأجل لخفض متوسط التكلفة.",
         "action": "ACCUMULATE",
+        "pe": 20.9,
+        "eps": 0.67,
+        "sector": "رعاية صحية ومستشفيات",
+        "sectorPe": 21.0,
+        "peVsSectorPct": -0.5,
+        "operatingMargin": 18.5,
+        "netMargin": 12.0,
+        "dividendYield": 2.1,
+        "priceToBook": 2.4,
+        "valuationStatus": "مماثل لمتوسط قطاع الرعاية الصحية (20.9x مطابق لثندر)",
+        "operationalStability": "أرباح تشغيلية دفاعية مستقرة من الرعاية الصحية (18.5%)",
         "priceUpdatedAt": "محفظة ثندر الرسمية",
         "priceSource": "شاشة ثندر اللحظية",
         "decisionUpdatedAt": "جلسة اليوم",
