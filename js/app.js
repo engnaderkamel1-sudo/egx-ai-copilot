@@ -1,4 +1,4 @@
-/**
+﻿/**
  * EGX AI Copilot - Application Lifecycle & Services (js/app.js)
  * Live market polling, cloud engine sync, emergency alerts (OED TTMS), auto-refresh worker, and bootstrap.
  */
@@ -797,3 +797,17 @@
     } else {
       bootApp();
     }
+
+    // Explicit Window Object Exposure for Inline Onclick Handlers
+    window.dismissOedBanner = dismissOedBanner;
+    window.handleOedBannerAction = handleOedBannerAction;
+    window.openNotificationCenter = openNotificationCenter;
+    window.closeNotificationCenter = closeNotificationCenter;
+    window.updateNotificationCenterUI = updateNotificationCenterUI;
+    window.handleAuditOrRotate = handleAuditOrRotate;
+    window.clearNotificationHistory = clearNotificationHistory;
+    window.showAutonomousLogModal = showAutonomousLogModal;
+    window.closeAutonomousLogModal = closeAutonomousLogModal;
+    window.exportAutonomousAuditLog = exportAutonomousAuditLog;
+    window.clearAutonomousLedger = clearAutonomousLedger;
+    window.renderAutonomousLedger = renderAutonomousLedger;

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * EGX AI Copilot - Smart Rotation & Capital Rebalance (js/rotation.js)
  * Profit taking around the core, capital rotations, watchdog monitoring, and rebalance allocation.
  */
@@ -8,20 +8,56 @@
     // ============================================================
     let currentRotationRatio = 0.33;
 
-    function openRotationPlanModal(index) {
-      const item = portfolioData[index];
-      if (!item) return;
+    function openRotationPlanModal(target) {
+      let index = -1;
+      let item = null;
 
-      document.getElementById('rot-asset-index').value = index;
-      document.getElementById('rot-stock-name').innerText = item.name;
-      document.getElementById('rot-stock-ticker').innerText = item.ticker;
+      if (typeof target === 'number' && Number.isInteger(target) && target >= 0 && typeof portfolioData !== 'undefined' && target < portfolioData.length) {
+        index = target;
+        item = portfolioData[index];
+      } else if (typeof target === 'string') {
+        const parsed = parseInt(target, 10);
+        if (!isNaN(parsed) && String(parsed) === target.trim() && typeof portfolioData !== 'undefined' && parsed >= 0 && parsed < portfolioData.length) {
+          index = parsed;
+          item = portfolioData[index];
+        } else {
+          const cleanTicker = target.trim().toUpperCase();
+          if (typeof portfolioData !== 'undefined' && Array.isArray(portfolioData)) {
+            index = portfolioData.findIndex(p => p && p.ticker && p.ticker.trim().toUpperCase() === cleanTicker);
+            if (index !== -1) item = portfolioData[index];
+          }
+          if (!item && typeof fullMarketRadar !== 'undefined' && Array.isArray(fullMarketRadar)) {
+            item = fullMarketRadar.find(p => p && p.ticker && p.ticker.trim().toUpperCase() === cleanTicker);
+          }
+        }
+      } else if (target && typeof target === 'object' && target.ticker) {
+        const cleanTicker = String(target.ticker).trim().toUpperCase();
+        if (typeof portfolioData !== 'undefined' && Array.isArray(portfolioData)) {
+          index = portfolioData.findIndex(p => p && p.ticker && p.ticker.trim().toUpperCase() === cleanTicker);
+        }
+        item = index !== -1 ? portfolioData[index] : target;
+      }
 
-      const currentPrice = Number(item.currentPrice) || 0;
-      const buyPrice = Number(item.buyPrice) || 0;
+      if (!item) {
+        if (typeof openAuditModal === 'function') {
+          openAuditModal(target);
+        }
+        return;
+      }
+
+      const assetIdxEl = document.getElementById('rot-asset-index');
+      if (assetIdxEl) assetIdxEl.value = index !== -1 ? index : -1;
+      const nameEl = document.getElementById('rot-stock-name');
+      if (nameEl) nameEl.innerText = item.name || item.ticker;
+      const tickerEl = document.getElementById('rot-stock-ticker');
+      if (tickerEl) tickerEl.innerText = item.ticker;
+
+      const currentPrice = Number(item.currentPrice || item.price) || 0;
+      const buyPrice = Number(item.buyPrice || item.price) || currentPrice;
       const totalShares = parseInt(item.shares, 10) || 1;
-      const profit = Math.round(item.profit) || 0;
-      const returnPct = Number(item.returnPct) || 0;
-      const isLosing = profit < 0;
+      const profit = Math.round(item.profit !== undefined ? item.profit : ((currentPrice - buyPrice) * totalShares)) || 0;
+      const returnPct = Number(item.returnPct !== undefined ? item.returnPct : (buyPrice > 0 ? ((currentPrice - buyPrice) / buyPrice * 100) : 0)) || 0;
+      const isLosing = profit < 0 || returnPct < 0;
 
       // Update Modal Header according to profit/loss status
       const titleEl = document.getElementById('rot-modal-title');
@@ -111,15 +147,25 @@
     }
 
     function recalcRotationModal() {
-      const index = parseInt(document.getElementById('rot-asset-index').value, 10);
-      const item = portfolioData[index];
+      const idxInput = document.getElementById('rot-asset-index');
+      const index = idxInput ? parseInt(idxInput.value, 10) : -1;
+      let item = index >= 0 && typeof portfolioData !== 'undefined' && portfolioData[index] ? portfolioData[index] : null;
+      if (!item) {
+        const tickerEl = document.getElementById('rot-stock-ticker');
+        const ticker = tickerEl ? tickerEl.innerText.trim().toUpperCase() : '';
+        if (ticker) {
+          item = (typeof portfolioData !== 'undefined' && Array.isArray(portfolioData) ? portfolioData.find(p => p && p.ticker && p.ticker.trim().toUpperCase() === ticker) : null) ||
+                 (typeof fullMarketRadar !== 'undefined' && Array.isArray(fullMarketRadar) ? fullMarketRadar.find(p => p && p.ticker && p.ticker.trim().toUpperCase() === ticker) : null);
+        }
+      }
       if (!item) return;
 
       const totalShares = parseInt(item.shares, 10) || 1;
-      const currentPrice = Number(item.currentPrice) || 0;
-      const buyPrice = Number(item.buyPrice) || 0;
-      const profit = Math.round(item.profit) || 0;
-      const isLosing = profit < 0;
+      const currentPrice = Number(item.currentPrice || item.price) || 0;
+      const buyPrice = Number(item.buyPrice || item.price) || currentPrice;
+      const profit = Math.round(item.profit !== undefined ? item.profit : ((currentPrice - buyPrice) * totalShares)) || 0;
+      const returnPct = Number(item.returnPct !== undefined ? item.returnPct : (buyPrice > 0 ? ((currentPrice - buyPrice) / buyPrice * 100) : 0)) || 0;
+      const isLosing = profit < 0 || returnPct < 0;
 
       // Selling calculations
       let sellShares = Math.max(1, Math.round(totalShares * currentRotationRatio));
@@ -288,8 +334,17 @@
     }
 
     function commitRotationPlan(scenarioType) {
-      const index = parseInt(document.getElementById('rot-asset-index').value, 10);
-      const item = portfolioData[index];
+      const idxInput = document.getElementById('rot-asset-index');
+      const index = idxInput ? parseInt(idxInput.value, 10) : -1;
+      let item = index >= 0 && typeof portfolioData !== 'undefined' && portfolioData[index] ? portfolioData[index] : null;
+      if (!item) {
+        const tickerEl = document.getElementById('rot-stock-ticker');
+        const ticker = tickerEl ? tickerEl.innerText.trim().toUpperCase() : '';
+        if (ticker) {
+          item = (typeof portfolioData !== 'undefined' && Array.isArray(portfolioData) ? portfolioData.find(p => p && p.ticker && p.ticker.trim().toUpperCase() === ticker) : null) ||
+                 (typeof fullMarketRadar !== 'undefined' && Array.isArray(fullMarketRadar) ? fullMarketRadar.find(p => p && p.ticker && p.ticker.trim().toUpperCase() === ticker) : null);
+        }
+      }
       if (!item) return;
 
       const totalShares = parseInt(item.shares, 10) || 1;
@@ -1132,3 +1187,18 @@
         calculateSmartAllocation();
       }
     }
+
+    // Explicit Window Object Exposure for Inline Onclick Handlers
+    window.openRotationPlanModal = openRotationPlanModal;
+    window.closeRotationModal = closeRotationModal;
+    window.setRotationRatio = setRotationRatio;
+    window.recalcRotationModal = recalcRotationModal;
+    window.commitRotationPlan = commitRotationPlan;
+    window.cancelRotationPlan = cancelRotationPlan;
+    window.completeRotationPlan = completeRotationPlan;
+    window.completeRotationPlanToCIB = completeRotationPlanToCIB;
+    window.switchPlanToCIB = switchPlanToCIB;
+    window.scrollToActiveRadar = scrollToActiveRadar;
+    window.renderActivePlansRadar = renderActivePlansRadar;
+    window.calculateSmartAllocation = calculateSmartAllocation;
+    window.setRebalanceAmount = setRebalanceAmount;

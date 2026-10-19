@@ -1,4 +1,4 @@
-/**
+﻿/**
  * EGX AI Copilot - Trading & Execution Layer (js/trade.js)
  * Real-time buy/sell orders, Thndr sync/import, fine-tuning, position sizing, and paper trading.
  */
@@ -1189,3 +1189,45 @@
       if (resultCostEl) resultCostEl.innerText = `${Math.round(totalInvestment).toLocaleString('en-US')} ج.م`;
       if (resultWeightEl) resultWeightEl.innerText = `${portfolioWeightPct}%`;
     }
+
+    // Explicit Window Object Exposure for Inline Onclick Handlers
+    window.recalcAssetModal = recalcAssetModal;
+    window.openAddAssetModal = openAddAssetModal;
+    window.editAsset = editAsset;
+    window.closeAssetModal = closeAssetModal;
+    window.generateThndrExtractorScript = generateThndrExtractorScript;
+    window.openThndrSyncModal = openThndrSyncModal;
+    window.closeThndrSyncModal = closeThndrSyncModal;
+    window.copyThndrVerifiedScript = copyThndrVerifiedScript;
+    window.pasteThndrFromClipboard = pasteThndrFromClipboard;
+    window.handleManualThndrImportSubmit = handleManualThndrImportSubmit;
+    window.downloadPortfolioBackupJSON = downloadPortfolioBackupJSON;
+    window.copyPortfolioBackupJSON = copyPortfolioBackupJSON;
+    window.applyThndrImport = applyThndrImport;
+    window.checkUrlForThndrSync = checkUrlForThndrSync;
+    window.openTradeModal = openTradeModal;
+    window.closeTradeModal = closeTradeModal;
+    window.setTradeMode = setTradeMode;
+    window.populateTradeStockDropdown = populateTradeStockDropdown;
+    window.toggleTradeCustomTicker = toggleTradeCustomTicker;
+    window.onTradeStockSelected = onTradeStockSelected;
+    window.recalcTradeSummary = recalcTradeSummary;
+    window.handleExecuteTrade = handleExecuteTrade;
+    window.handleSaveAsset = handleSaveAsset;
+    window.deleteAsset = deleteAsset;
+    window.openFineTuneModal = openFineTuneModal;
+    window.closeFineTuneModal = closeFineTuneModal;
+    window.adjustFineTuneShares = adjustFineTuneShares;
+    window.formatPoundsAndPiastres = formatPoundsAndPiastres;
+    window.adjustFineTunePrice = adjustFineTunePrice;
+    window.recalcFineTunePreview = recalcFineTunePreview;
+    window.fetchSingleStockLivePrice = fetchSingleStockLivePrice;
+    window.applyFineTuning = applyFineTuning;
+    window.updateSimPriceFromSelect = updateSimPriceFromSelect;
+    window.executeSimulatedBuy = executeSimulatedBuy;
+    window.closeSimPosition = closeSimPosition;
+    window.renderSimPositions = renderSimPositions;
+    window.resetPaperTrading = resetPaperTrading;
+    window.openPositionSizingModal = openPositionSizingModal;
+    window.closePositionSizingModal = closePositionSizingModal;
+    window.calculatePositionSize = calculatePositionSize;

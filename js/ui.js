@@ -211,9 +211,12 @@
 
     function openRotationPlanModalByTicker(ticker) {
       if (!ticker) return;
-      const idx = portfolioData.findIndex(p => p.ticker === ticker);
-      if (idx !== -1 && typeof openRotationPlanModal === 'function') {
-        openRotationPlanModal(idx);
+      if (typeof openRotationPlanModal === 'function') {
+        openRotationPlanModal(ticker);
+      } else if (typeof window.openRotationPlanModal === 'function') {
+        window.openRotationPlanModal(ticker);
+      } else if (typeof openAuditModal === 'function') {
+        openAuditModal(ticker);
       }
     }
 
@@ -881,11 +884,12 @@
     }
 
     function openAuditModal(ticker) {
-      const stock = fullMarketRadar.find(s => s.ticker === ticker) || 
-                    portfolioData.find(s => s.ticker === ticker) || 
+      const cleanTicker = ticker ? String(ticker).trim().toUpperCase() : '';
+      const stock = (typeof fullMarketRadar !== 'undefined' && Array.isArray(fullMarketRadar) ? fullMarketRadar.find(s => s.ticker && s.ticker.trim().toUpperCase() === cleanTicker) : null) || 
+                    (typeof portfolioData !== 'undefined' && Array.isArray(portfolioData) ? portfolioData.find(s => s.ticker && s.ticker.trim().toUpperCase() === cleanTicker) : null) || 
                     {
-                      ticker: ticker,
-                      name: ticker,
+                      ticker: ticker || 'TICKER',
+                      name: ticker || 'سهم بالبورصة المصرية',
                       price: 0,
                       catalyst: 'إيرادات تشغيلية ومحفزات قطاعية قوية بالبورصة المصرية',
                       support: 'دعم هيكلي متماسك',
@@ -893,6 +897,8 @@
                       stopLoss: 'وقف خسارة صارم',
                       volumeMultiplier: '2.5x'
                     };
+
+      const fund = (stock && stock.pe ? stock : (typeof EGX_Portfolio !== 'undefined' && typeof EGX_Portfolio.getFundamentals === 'function' ? EGX_Portfolio.getFundamentals(stock.ticker) : null)) || stock || {};
 
       const titleEl = document.getElementById('audit-modal-title');
       const subEl = document.getElementById('audit-modal-subtitle');
@@ -1932,4 +1938,14 @@
     window.saveCustomPriceLevelsModal = saveCustomPriceLevelsModal;
     window.resetCustomPriceLevelsModal = resetCustomPriceLevelsModal;
     window.initModalMobileScrollEngine = initModalMobileScrollEngine;
+    window.openAuditModal = openAuditModal;
+    window.closeAuditModal = closeAuditModal;
+    window.openRotationPlanModalByTicker = openRotationPlanModalByTicker;
+    window.switchTab = switchTab;
+    window.toggleSidebar = toggleSidebar;
+    window.toggleSidebarDrawer = toggleSidebarDrawer;
+    window.toggleTheme = toggleTheme;
+    window.setRadarFilter = setRadarFilter;
+    window.executeRiskCalculations = executeRiskCalculations;
+    window.generateStructuredThesis = generateStructuredThesis;
 

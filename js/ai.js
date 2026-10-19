@@ -1,4 +1,4 @@
-/**
+﻿/**
  * EGX AI Copilot - Gemini AI & Sanity Shield (js/ai.js)
  * Gemini copilot chat, prompt verification, anti-hallucination guardrails, and AI Sanity Shield.
  */
@@ -757,3 +757,24 @@ ${userLessonsSummary}
         showSuccessNotification('تم التدقيق الذاتي: جميع بيانات وتوصيات المحفظة مفحوصة ومطابقة 100% للمنطق المالي.');
       }
     }
+
+    // Explicit Window Object Exposure for Inline Onclick Handlers
+    window.getGeminiApiKey = getGeminiApiKey;
+    window.saveGeminiApiKey = saveGeminiApiKey;
+    window.saveGeminiApiKeyFromInput = saveGeminiApiKeyFromInput;
+    window.saveInlineGeminiKey = saveInlineGeminiKey;
+    window.removeGeminiApiKey = removeGeminiApiKey;
+    window.openGeminiModal = openGeminiModal;
+    window.closeGeminiModal = closeGeminiModal;
+    window.saveGeminiKeyFromModal = saveGeminiKeyFromModal;
+    window.testGeminiConnectionFromModal = testGeminiConnectionFromModal;
+    window.updateGeminiStatusUI = updateGeminiStatusUI;
+    window.testGeminiConnection = testGeminiConnection;
+    window.formatMarkdownReply = formatMarkdownReply;
+    window.askCopilot = askCopilot;
+    window.verifyAiResponse = verifyAiResponse;
+    window.handleChatSubmit = handleChatSubmit;
+    window.clearChat = clearChat;
+    window.openSanityAuditModal = openSanityAuditModal;
+    window.closeSanityAuditModal = closeSanityAuditModal;
+    window.runLiveSanityAudit = runLiveSanityAudit;
