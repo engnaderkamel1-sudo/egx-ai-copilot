@@ -270,7 +270,7 @@
         } else {
           action = 'HOLD';
           badgeText = 'احتفاظ ومراقبة الارتداد';
-          badgeColor = 'bg-gray-800/80 text-gray-300 border border-gray-700';
+          badgeColor = 'bg-slate-800/80 text-slate-300 border border-slate-700';
           advice = `احتفاظ بالمركز مع مراقبة الدعم ${pivotS1 || '--'} ج لانتظار موجة ارتدادية لتخفيف الخسارة (${returnPct.toFixed(1)}%).`;
         }
       } 
@@ -488,8 +488,8 @@
         stage: 2,
         nameAr: 'المرحلة 2: مسار صاعد معتدل',
         shortBadge: 'مسار صاعد 🟡 (احتفاظ)',
-        badgeClass: 'bg-cyan-950/70 text-cyan-300 border border-cyan-500/50 shadow-sm font-bold',
-        bgHeaderClass: 'from-cyan-950 to-slate-900',
+        badgeClass: 'bg-amber-950/70 text-amber-300 border border-amber-500/50 shadow-sm font-bold',
+        bgHeaderClass: 'from-amber-950 to-slate-900',
         advice: 'السهم يتحرك في اتجاه إيجابي صحي، لكنه ابتعد عن القاع. مناسب للاحتفاظ إذا كنت تملكه، ولا يُنصح بالشراء بكميات كبيرة الآن.',
         actionTag: 'احتفاظ بالمركز',
         progressPct: 60

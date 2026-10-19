@@ -351,7 +351,7 @@
                   <span class="w-3 h-3 rounded-full ${safety && safety.hasRisk ? 'bg-rose-500 animate-ping' : 'bg-emerald-400'}"></span>
                   <span class="text-xs font-black ${safety && safety.hasRisk ? 'text-rose-300' : 'text-slate-200'}">3. رادار الأمان وحالة المحفظة 🛡️</span>
                 </div>
-                <span class="text-[10px] px-2 py-0.5 rounded ${safety && safety.hasRisk ? 'bg-rose-900/90 text-rose-200 border border-rose-500/40' : 'bg-emerald-950/60 text-emerald-300 border border-emerald-500/30'} font-bold">
+                <span class="text-[10px] px-2 py-0.5 rounded ${safety && safety.hasRisk ? 'bg-rose-950/80 text-rose-300 border border-rose-500/40' : 'bg-emerald-950/80 text-emerald-300 border border-emerald-500/40'} font-bold">
                   ${safety && safety.hasRisk ? 'تحذير كسر دعم' : 'استقرار وأمان'}
                 </span>
               </div>
@@ -548,7 +548,7 @@
           </td>
 
           <!-- 4. Target 1 (سقف المكاسب الأول - بيع للربح) -->
-          <td class="py-3.5 px-3 text-center bg-emerald-950/10 border-x border-emerald-900/20">
+          <td class="py-3.5 px-3 text-center">
             ${!isCashOrFund ? `
               <div class="flex flex-col items-center gap-1">
                 <div class="font-mono font-black text-emerald-300 text-xs sm:text-sm">
@@ -572,7 +572,7 @@
           </td>
 
           <!-- 5. Stop Loss (حد الخسارة الأدنى - قاع الأمان) -->
-          <td class="py-3.5 px-3 text-center bg-rose-950/10 border-x border-rose-900/20">
+          <td class="py-3.5 px-3 text-center">
             ${!isCashOrFund ? `
               <div class="flex flex-col items-center gap-1">
                 <div class="font-mono font-black ${isStopBroken ? 'text-rose-400 animate-pulse' : 'text-rose-300'} text-xs sm:text-sm">

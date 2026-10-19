@@ -301,14 +301,24 @@
       border-color: #e2e8f0 !important;
     }
 
-    /* Subtle Tickers, Badges & Non-Button Grays */
-    html.light .bg-gray-800:not(button):not(a),
-    html.light .bg-slate-800:not(button):not(a),
-    html:not(.dark) .bg-gray-800:not(button):not(a),
-    html:not(.dark) .bg-slate-800:not(button):not(a) {
+    /* Subtle Tickers, Badges & Non-Button Grays in Light Mode (Catch all /80 /60 opacity variants) */
+    html.light [class*="bg-gray-800"]:not(button):not(a):not(input):not(select),
+    html.light [class*="bg-slate-800"]:not(button):not(a):not(input):not(select),
+    html.light [class*="bg-gray-700"]:not(button):not(a):not(input):not(select),
+    html.light [class*="bg-slate-700"]:not(button):not(a):not(input):not(select),
+    html:not(.dark) [class*="bg-gray-800"]:not(button):not(a):not(input):not(select),
+    html:not(.dark) [class*="bg-slate-800"]:not(button):not(a):not(input):not(select),
+    html:not(.dark) [class*="bg-gray-700"]:not(button):not(a):not(input):not(select),
+    html:not(.dark) [class*="bg-slate-700"]:not(button):not(a):not(input):not(select) {
       background-color: #f1f5f9 !important;
       border-color: #cbd5e1 !important;
-      color: #0f172a !important;
+      color: #1e293b !important;
+    }
+    html.light [class*="bg-gray-800"]:not(button):not(a):not(input):not(select) *,
+    html.light [class*="bg-slate-800"]:not(button):not(a):not(input):not(select) *,
+    html:not(.dark) [class*="bg-gray-800"]:not(button):not(a):not(input):not(select) *,
+    html:not(.dark) [class*="bg-slate-800"]:not(button):not(a):not(input):not(select) * {
+      color: #1e293b !important;
     }
 
     /* Buttons: Secondary, Muted & Outlined in Light Mode */
@@ -655,58 +665,108 @@
       font-weight: 700;
     }
 
-    /* Tinted Chips, Badges & Alert Boxes in Light Mode (No Blanket Wildcard Hijacking!) */
-    html.light [class*="bg-emerald-950"]:not(button):not(a),
+    /* Tinted Chips, Badges & Alert Boxes in Light Mode (Ultra Legible & Color Harmonized) */
+    html.light [class*="bg-emerald-950"]:not(button):not(a):not(header):not(.top-ticker-bar),
+    html.light [class*="bg-emerald-900"]:not(button):not(a):not(header):not(.top-ticker-bar),
     html.light [class*="bg-emerald-500/20"]:not(button):not(a),
     html.light [class*="bg-emerald-500/10"]:not(button):not(a),
-    html:not(.dark) [class*="bg-emerald-950"]:not(button):not(a),
+    html:not(.dark) [class*="bg-emerald-950"]:not(button):not(a):not(header):not(.top-ticker-bar),
+    html:not(.dark) [class*="bg-emerald-900"]:not(button):not(a):not(header):not(.top-ticker-bar),
     html:not(.dark) [class*="bg-emerald-500/20"]:not(button):not(a),
     html:not(.dark) [class*="bg-emerald-500/10"]:not(button):not(a) {
       background-color: #ecfdf5 !important;
       border-color: #a7f3d0 !important;
-      color: #047857;
+      color: #047857 !important;
     }
+    html.light [class*="bg-emerald-950"]:not(button):not(a):not(header):not(.top-ticker-bar) *,
+    html.light [class*="bg-emerald-900"]:not(button):not(a):not(header):not(.top-ticker-bar) *,
+    html:not(.dark) [class*="bg-emerald-950"]:not(button):not(a):not(header):not(.top-ticker-bar) *,
+    html:not(.dark) [class*="bg-emerald-900"]:not(button):not(a):not(header):not(.top-ticker-bar) * {
+      color: #047857 !important;
+    }
+
     html.light [class*="bg-cyan-950"]:not(button):not(a),
+    html.light [class*="bg-cyan-900"]:not(button):not(a),
     html.light [class*="bg-cyan-500/20"]:not(button):not(a),
     html.light [class*="bg-cyan-500/10"]:not(button):not(a),
     html:not(.dark) [class*="bg-cyan-950"]:not(button):not(a),
+    html:not(.dark) [class*="bg-cyan-900"]:not(button):not(a),
     html:not(.dark) [class*="bg-cyan-500/20"]:not(button):not(a),
     html:not(.dark) [class*="bg-cyan-500/10"]:not(button):not(a) {
       background-color: #f0f9ff !important;
       border-color: #bae6fd !important;
-      color: #0284c7;
+      color: #0284c7 !important;
     }
+    html.light [class*="bg-cyan-950"]:not(button):not(a) *,
+    html.light [class*="bg-cyan-900"]:not(button):not(a) *,
+    html:not(.dark) [class*="bg-cyan-950"]:not(button):not(a) *,
+    html:not(.dark) [class*="bg-cyan-900"]:not(button):not(a) * {
+      color: #0284c7 !important;
+    }
+
     html.light [class*="bg-rose-950"]:not(button):not(a),
+    html.light [class*="bg-rose-900"]:not(button):not(a),
     html.light [class*="bg-rose-500/20"]:not(button):not(a),
     html.light [class*="bg-rose-500/10"]:not(button):not(a),
     html:not(.dark) [class*="bg-rose-950"]:not(button):not(a),
+    html:not(.dark) [class*="bg-rose-900"]:not(button):not(a),
     html:not(.dark) [class*="bg-rose-500/20"]:not(button):not(a),
     html:not(.dark) [class*="bg-rose-500/10"]:not(button):not(a) {
       background-color: #fef2f2 !important;
       border-color: #fecaca !important;
-      color: #b91c1c;
+      color: #b91c1c !important;
     }
+    html.light [class*="bg-rose-950"]:not(button):not(a) *,
+    html.light [class*="bg-rose-900"]:not(button):not(a) *,
+    html:not(.dark) [class*="bg-rose-950"]:not(button):not(a) *,
+    html:not(.dark) [class*="bg-rose-900"]:not(button):not(a) * {
+      color: #b91c1c !important;
+    }
+
     html.light [class*="bg-amber-950"]:not(button):not(a),
+    html.light [class*="bg-amber-900"]:not(button):not(a),
     html.light [class*="bg-amber-500/20"]:not(button):not(a),
     html.light [class*="bg-amber-500/10"]:not(button):not(a),
     html:not(.dark) [class*="bg-amber-950"]:not(button):not(a),
+    html:not(.dark) [class*="bg-amber-900"]:not(button):not(a),
     html:not(.dark) [class*="bg-amber-500/20"]:not(button):not(a),
     html:not(.dark) [class*="bg-amber-500/10"]:not(button):not(a) {
       background-color: #fffbeb !important;
       border-color: #fde68a !important;
-      color: #b45309;
+      color: #b45309 !important;
     }
+    html.light [class*="bg-amber-950"]:not(button):not(a) *,
+    html.light [class*="bg-amber-900"]:not(button):not(a) *,
+    html:not(.dark) [class*="bg-amber-950"]:not(button):not(a) *,
+    html:not(.dark) [class*="bg-amber-900"]:not(button):not(a) * {
+      color: #b45309 !important;
+    }
+
     html.light [class*="bg-purple-950"]:not(button):not(a),
+    html.light [class*="bg-purple-900"]:not(button):not(a),
     html.light [class*="bg-indigo-950"]:not(button):not(a),
+    html.light [class*="bg-indigo-900"]:not(button):not(a),
     html.light [class*="bg-purple-500/20"]:not(button):not(a),
     html.light [class*="bg-indigo-500/20"]:not(button):not(a),
+    html.light [class*="bg-purple-500/10"]:not(button):not(a),
+    html.light [class*="bg-indigo-500/10"]:not(button):not(a),
     html:not(.dark) [class*="bg-purple-950"]:not(button):not(a),
+    html:not(.dark) [class*="bg-purple-900"]:not(button):not(a),
     html:not(.dark) [class*="bg-indigo-950"]:not(button):not(a),
+    html:not(.dark) [class*="bg-indigo-900"]:not(button):not(a),
     html:not(.dark) [class*="bg-purple-500/20"]:not(button):not(a),
-    html:not(.dark) [class*="bg-indigo-500/20"]:not(button):not(a) {
+    html:not(.dark) [class*="bg-indigo-500/20"]:not(button):not(a),
+    html:not(.dark) [class*="bg-purple-500/10"]:not(button):not(a),
+    html:not(.dark) [class*="bg-indigo-500/10"]:not(button):not(a) {
       background-color: #f5f3ff !important;
       border-color: #ddd6fe !important;
-      color: #6d28d9;
+      color: #6d28d9 !important;
+    }
+    html.light [class*="bg-purple-950"]:not(button):not(a) *,
+    html.light [class*="bg-indigo-950"]:not(button):not(a) *,
+    html:not(.dark) [class*="bg-purple-950"]:not(button):not(a) *,
+    html:not(.dark) [class*="bg-indigo-950"]:not(button):not(a) * {
+      color: #6d28d9 !important;
     }
 
     /* Daily Action Hub Banner */
@@ -1505,19 +1565,19 @@
                 <th class="py-3.5 px-3">السهم / الأصل</th>
                 <th class="py-3.5 px-3 text-center">السعر اللحظي</th>
                 <th class="py-3.5 px-3 text-center">متوسط الشراء والكمية</th>
-                <th class="py-3.5 px-3 text-center bg-emerald-950/30 text-emerald-300 border-x border-emerald-900/40">
+                <th class="py-3.5 px-3 text-center text-emerald-400">
                   <div class="flex items-center justify-center gap-1 font-bold">
                     <i data-lucide="target" class="w-3.5 h-3.5 text-emerald-400"></i>
                     <span>سقف المكاسب الأول</span>
                   </div>
-                  <span class="text-[9.5px] text-emerald-400/80 font-normal block mt-0.5">بيع لجني الأرباح 🎯</span>
+                  <span class="text-[9.5px] opacity-80 font-normal block mt-0.5">بيع لجني الأرباح 🎯</span>
                 </th>
-                <th class="py-3.5 px-3 text-center bg-rose-950/30 text-rose-300 border-x border-rose-900/40">
+                <th class="py-3.5 px-3 text-center text-rose-400">
                   <div class="flex items-center justify-center gap-1 font-bold">
                     <i data-lucide="shield-alert" class="w-3.5 h-3.5 text-rose-400"></i>
                     <span>حد الخسارة الأدنى</span>
                   </div>
-                  <span class="text-[9.5px] text-rose-400/80 font-normal block mt-0.5">وقف الخسارة للأمان 🛑</span>
+                  <span class="text-[9.5px] opacity-80 font-normal block mt-0.5">وقف الخسارة للأمان 🛑</span>
                 </th>
                 <th class="py-3.5 px-3">القيمة والأرباح</th>
                 <th class="py-3.5 px-3">قرار المستشار</th>
