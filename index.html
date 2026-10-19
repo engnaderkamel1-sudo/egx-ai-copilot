@@ -5389,6 +5389,11 @@
       const cairoTime = formatCairoTime(now);
 
       if (currentTradeMode === 'BUY') {
+        if (autoCash && cashItem.value < totalValue) {
+          alert(`⚠️ لا يمكن إتمام الشراء: الرصيد النقدي المتاح في المحفظة (${cashItem.value.toLocaleString('en-US')} ج) غير كافٍ لتغطية إجمالي الصفقة (${totalValue.toLocaleString('en-US')} ج).\nيرجى شحن المحفظة أو تقليل عدد الأسهم لحفظ توازن رأس المال.`);
+          return;
+        }
+
         let stock = portfolioData.find(p => p.ticker === ticker);
         const radarItem = fullMarketRadar.find(p => p.ticker === ticker);
 
@@ -5433,11 +5438,7 @@
         }
 
         if (autoCash) {
-          if (cashItem.value < totalValue) {
-            const proceed = confirm(`⚠️ تنبيه سيولة: رصيد الكاش الحالي (${cashItem.value.toLocaleString('en-US')} ج) أقل من تكلفة الشراء (${totalValue.toLocaleString('en-US')} ج).\nهل ترغب في متابعة العملية واستهلاك كامل الكاش المتاح؟`);
-            if (!proceed) return;
-          }
-          cashItem.value = Math.max(0, cashItem.value - totalValue);
+          cashItem.value = Number((cashItem.value - totalValue).toFixed(2));
           cashItem.shares = cashItem.value;
           cashItem.buyPrice = cashItem.value;
         }
@@ -5891,8 +5892,8 @@
       const buyPrice = parseFloat(document.getElementById('ft-input-buy-price').value) || 0;
       const currentPrice = parseFloat(document.getElementById('ft-input-current-price').value) || 0;
 
-      if (shares <= 0) {
-        alert('يرجى إدخال عدد أسهم صحيح أكبر من صفر.');
+      if (shares <= 0 || buyPrice <= 0 || currentPrice <= 0 || isNaN(shares) || isNaN(buyPrice) || isNaN(currentPrice)) {
+        alert('يرجى إدخال عدد أسهم وأسعار شراء وأسعار سوق صحيحة وموجبة أكبر من الصفر.');
         return;
       }
 
@@ -6076,9 +6077,9 @@
       const supportLow = +(currentPrice * 0.86).toFixed(2);
       const supportHigh = +(currentPrice * 0.89).toFixed(2);
       const avgSupport = (supportLow + supportHigh) / 2;
-      const rebuyShares = +(sellCash / avgSupport).toFixed(1);
-      const netGainShares = +(rebuyShares - sellShares).toFixed(1);
-      const newTotalShares = remainingShares + Math.round(rebuyShares);
+      const rebuyShares = Math.floor(sellCash / avgSupport);
+      const netGainShares = rebuyShares - sellShares;
+      const newTotalShares = remainingShares + rebuyShares;
 
       const step1Title = document.getElementById('rot-step1-title');
       const step1Note = document.getElementById('rot-step1-note');
@@ -6142,7 +6143,7 @@
         if (scenATag) scenATag.innerText = 'تكبير الملكية مجاناً';
         if (scenADesc) scenADesc.innerHTML = `السهم في منطقة قمة/مقاومة ومن المتوقع أن يصحح بنسبة 10-14% نحو منطقة الدعم الفني بين <strong class="text-white font-mono">${supportLow.toFixed(2)} ج - ${supportHigh.toFixed(2)} ج</strong>.`;
         if (scenASubdesc) scenASubdesc.innerHTML = `عند وصول السهم للدعم، تشتري بالـ <strong class="text-cyan-300" id="rot-scenario-a-cash">${sellCash.toLocaleString('en-US')} ج</strong>:`;
-        if (scenAShares) scenAShares.innerText = `${rebuyShares} سهم (~${Math.round(rebuyShares)} أسهم)`;
+        if (scenAShares) scenAShares.innerText = `${rebuyShares.toLocaleString('en-US')} سهم`;
         if (scenAOutcome) scenAOutcome.innerText = `النتيجة: أمنت كاش محمي، وعدد أسهمك في ${item.name} يزيد من ${totalShares} إلى ${newTotalShares} سهم مجاناً (+${netGainShares} سهم مجاني)!`;
         if (scenABtnText) scenABtnText.innerText = `اعتمدت هذا الخيار وفعّل المراقبة 🎯 (رصد القاع لحظياً + إنذار لو هرب السهم)`;
 
@@ -7077,7 +7078,60 @@
       const s2 = pivot - (high - low);
       const stopLoss = Math.min(s1 * 0.97, low * 0.98);
 
-      const potentialReward = Math.max(r1 - close, 0.05);
+      if (close >= r1) {
+        const riskPct = ((close - stopLoss) / close) * 100;
+        document.getElementById('out-pivot').innerText = `${pivot.toFixed(2)} ج`;
+        document.getElementById('out-r1').innerText = `${r1.toFixed(2)} ج (هدف محقق)`;
+        document.getElementById('out-r2').innerText = `${r2.toFixed(2)} ج`;
+        document.getElementById('out-s1').innerText = `${s1.toFixed(2)} ج`;
+        document.getElementById('out-s2').innerText = `${s2.toFixed(2)} ج`;
+        document.getElementById('out-stoploss').innerText = `${stopLoss.toFixed(2)} ج (-${riskPct.toFixed(1)}%)`;
+        document.getElementById('out-rr-ratio').innerText = `تم الوصول للهدف`;
+        document.getElementById('out-reward-pct').innerText = `0.0% (محقق)`;
+        document.getElementById('out-risk-pct').innerText = `-${riskPct.toFixed(1)}%`;
+
+        const verdictBox = document.getElementById('out-verdict-box');
+        verdictBox.className = 'p-3 rounded-xl border border-amber-500/30 bg-amber-950/20 text-xs text-gray-200';
+        verdictBox.innerHTML = `
+          <div class="font-bold text-amber-400 flex items-center gap-1 mb-1">
+            <i data-lucide="alert-circle" class="w-3.5 h-3.5"></i>
+            <span>قرار المحرك: السعر الحالي (${close.toFixed(2)} ج) وصل أو تجاوز المقاومة R1 (${r1.toFixed(2)} ج)</span>
+          </div>
+          <p class="text-[11px] text-gray-300">
+            لا يُنصح بالدخول الجديد في هذه المنطقة لأن الهدف الفني الأول تم تحقيقه بالفعل. انتظر جني أرباح أو ارتداداً نحو الدعم S1 (${s1.toFixed(2)} ج) لتحقيق نسبة عائد متكافئة.
+          </p>
+        `;
+        if (window.lucide) lucide.createIcons();
+        return;
+      }
+
+      if (close <= stopLoss) {
+        document.getElementById('out-pivot').innerText = `${pivot.toFixed(2)} ج`;
+        document.getElementById('out-r1').innerText = `${r1.toFixed(2)} ج`;
+        document.getElementById('out-r2').innerText = `${r2.toFixed(2)} ج`;
+        document.getElementById('out-s1').innerText = `${s1.toFixed(2)} ج`;
+        document.getElementById('out-s2').innerText = `${s2.toFixed(2)} ج`;
+        document.getElementById('out-stoploss').innerText = `${stopLoss.toFixed(2)} ج (مكسور)`;
+        document.getElementById('out-rr-ratio').innerText = `وقف مكسور`;
+        document.getElementById('out-reward-pct').innerText = `--`;
+        document.getElementById('out-risk-pct').innerText = `كاسر للوقف`;
+
+        const verdictBox = document.getElementById('out-verdict-box');
+        verdictBox.className = 'p-3 rounded-xl border border-rose-500/30 bg-rose-950/20 text-xs text-gray-200';
+        verdictBox.innerHTML = `
+          <div class="font-bold text-rose-400 flex items-center gap-1 mb-1">
+            <i data-lucide="alert-octagon" class="w-3.5 h-3.5"></i>
+            <span>قرار المحرك: السهم كسر مستوى وقف الخسارة (${stopLoss.toFixed(2)} ج)</span>
+          </div>
+          <p class="text-[11px] text-gray-300">
+            ممنوع الشراء تماماً. كسر حد الأمان يعرض رأس المال لانزلاق سعري، التزم بالحماية وتجنب مطاردة السكين الساقطة.
+          </p>
+        `;
+        if (window.lucide) lucide.createIcons();
+        return;
+      }
+
+      const potentialReward = r1 - close;
       const potentialRisk = Math.max(close - stopLoss, 0.05);
       const rrRatio = (potentialReward / potentialRisk);
 
@@ -9139,6 +9193,8 @@ ${userLessonsSummary}
 
           if (highestPriorityAlert.type === 'CRITICAL_RISK') {
             banner.className = 'sticky top-14 z-40 bg-gradient-to-r from-rose-950 via-rose-900 to-amber-950 text-white border-b-2 border-rose-500 shadow-2xl px-4 py-2.5 transition-all animate-slide-down block';
+          } else if (highestPriorityAlert.type === 'REBOUND_RESISTANCE') {
+            banner.className = 'sticky top-14 z-40 bg-gradient-to-r from-amber-950 via-orange-950 to-slate-900 text-white border-b-2 border-amber-500 shadow-2xl px-4 py-2.5 transition-all animate-slide-down block';
           } else {
             banner.className = 'sticky top-14 z-40 bg-gradient-to-r from-emerald-950 via-teal-900 to-slate-900 text-white border-b-2 border-emerald-500 shadow-2xl px-4 py-2.5 transition-all animate-slide-down block';
           }
@@ -9218,20 +9274,33 @@ ${userLessonsSummary}
         return;
       }
 
-      listEl.innerHTML = sessionNotificationHistory.map(alert => `
-        <div class="p-3.5 rounded-xl ${alert.type === 'CRITICAL_RISK' ? 'bg-rose-950/30 border border-rose-500/30' : 'bg-emerald-950/30 border border-emerald-500/30'} flex items-start justify-between gap-3">
+      listEl.innerHTML = sessionNotificationHistory.map(alert => {
+        const isCritical = alert.type === 'CRITICAL_RISK';
+        const isRebound = alert.type === 'REBOUND_RESISTANCE';
+        const containerCls = isCritical 
+          ? 'bg-rose-950/30 border border-rose-500/30' 
+          : (isRebound ? 'bg-amber-950/30 border border-amber-500/30' : 'bg-emerald-950/30 border border-emerald-500/30');
+        const badgeCls = isCritical
+          ? 'bg-rose-500/20 text-rose-300'
+          : (isRebound ? 'bg-amber-500/20 text-amber-300' : 'bg-emerald-500/20 text-emerald-300');
+        const btnCls = isCritical
+          ? 'bg-rose-600 hover:bg-rose-500 text-white'
+          : (isRebound ? 'bg-amber-600 hover:bg-amber-500 text-white' : 'bg-emerald-600 hover:bg-emerald-500 text-white');
+
+        return `
+        <div class="p-3.5 rounded-xl ${containerCls} flex items-start justify-between gap-3">
           <div class="space-y-1">
             <div class="flex items-center gap-2">
               <span class="font-bold text-white text-xs">${alert.title}</span>
-              <span class="text-[9px] px-1.5 py-0.2 rounded font-mono ${alert.type === 'CRITICAL_RISK' ? 'bg-rose-500/20 text-rose-300' : 'bg-emerald-500/20 text-emerald-300'}">${alert.time}</span>
+              <span class="text-[9px] px-1.5 py-0.2 rounded font-mono ${badgeCls}">${alert.time}</span>
             </div>
             <p class="text-[11px] text-gray-300 leading-snug">${alert.desc}</p>
           </div>
-          <button onclick="handleAuditOrRotate('${alert.ticker}', '${alert.actionType}')" class="shrink-0 px-2.5 py-1 rounded-lg ${alert.type === 'CRITICAL_RISK' ? 'bg-rose-600 hover:bg-rose-500 text-white' : 'bg-emerald-600 hover:bg-emerald-500 text-white'} font-bold text-[10px] transition cursor-pointer">
+          <button onclick="handleAuditOrRotate('${alert.ticker}', '${alert.actionType}')" class="shrink-0 px-2.5 py-1 rounded-lg ${btnCls} font-bold text-[10px] transition cursor-pointer">
             ${alert.actionLabel}
           </button>
-        </div>
-      `).join('');
+        </div>`;
+      }).join('');
 
       if (window.lucide) lucide.createIcons();
     }
@@ -9288,7 +9357,7 @@ ${userLessonsSummary}
       const modal = document.getElementById('position-sizing-modal');
       if (!modal) return;
 
-      const totalCapital = portfolioData.reduce((acc, cur) => acc + (cur.value || 0), 219000);
+      const totalCapital = portfolioData.reduce((acc, cur) => acc + (cur.value || 0), 0) || 219000;
       const capInput = document.getElementById('ps-total-capital');
       if (capInput) capInput.value = Math.round(totalCapital);
 
@@ -9321,18 +9390,34 @@ ${userLessonsSummary}
       const entryPrice = parseFloat(document.getElementById('ps-entry-price')?.value) || 100;
       const stopLoss = parseFloat(document.getElementById('ps-stop-loss')?.value) || 94;
 
-      const maxRiskEgp = Math.round(totalCapital * (riskPct / 100));
-      const riskPerShare = Math.max(0.01, entryPrice - stopLoss);
-
-      const maxShares = Math.floor(maxRiskEgp / riskPerShare);
-      const totalInvestment = maxShares * entryPrice;
-      const portfolioWeightPct = totalCapital > 0 ? ((totalInvestment / totalCapital) * 100).toFixed(1) : '0';
-
       const maxRiskEl = document.getElementById('ps-max-risk-egp');
       const riskPerShareEl = document.getElementById('ps-risk-per-share');
       const resultSharesEl = document.getElementById('ps-result-shares');
       const resultCostEl = document.getElementById('ps-result-cost');
       const resultWeightEl = document.getElementById('ps-result-weight');
+
+      if (entryPrice <= 0 || stopLoss <= 0) {
+        if (riskPerShareEl) riskPerShareEl.innerText = '--';
+        if (resultSharesEl) resultSharesEl.innerText = '--';
+        if (resultCostEl) resultCostEl.innerText = '--';
+        if (resultWeightEl) resultWeightEl.innerText = '--';
+        return;
+      }
+
+      if (stopLoss >= entryPrice) {
+        if (riskPerShareEl) riskPerShareEl.innerText = 'خطأ: الوقف أعلى أو مساوٍ لسعر الدخول';
+        if (resultSharesEl) resultSharesEl.innerText = '0 سهم (ممنوع)';
+        if (resultCostEl) resultCostEl.innerText = '0 ج.م';
+        if (resultWeightEl) resultWeightEl.innerText = '0%';
+        return;
+      }
+
+      const maxRiskEgp = Math.round(totalCapital * (riskPct / 100));
+      const riskPerShare = entryPrice - stopLoss;
+
+      const maxShares = Math.floor(maxRiskEgp / riskPerShare);
+      const totalInvestment = maxShares * entryPrice;
+      const portfolioWeightPct = totalCapital > 0 ? ((totalInvestment / totalCapital) * 100).toFixed(1) : '0';
 
       if (maxRiskEl) maxRiskEl.innerText = `${maxRiskEgp.toLocaleString('en-US')} ج`;
       if (riskPerShareEl) riskPerShareEl.innerText = `${riskPerShare.toFixed(2)} ج`;

@@ -141,8 +141,13 @@ function parseTechnicalRecord(item) {
     supportVal = low;
     stopLossVal = Number((low * 0.98).toFixed(2));
   } else {
-    supportVal = pivotS1 || low || price;
-    stopLossVal = pivotS1 ? Number((pivotS1 * 0.985).toFixed(2)) : Number((price * 0.96).toFixed(2));
+    supportVal = low > 0 ? Math.min(low, price * 0.97) : Number((price * 0.97).toFixed(2));
+    stopLossVal = Number((Math.min(price, supportVal) * 0.97).toFixed(2));
+  }
+
+  // Safety invariant: Stop loss must strictly be below current market price
+  if (stopLossVal != null && stopLossVal >= price) {
+    stopLossVal = Number((price * 0.96).toFixed(2));
   }
 
   // Target determination
@@ -428,15 +433,15 @@ export default async function handler(req, res) {
     let currentRegimeArabic = "تداول متوازن وعرضي (Consolidation)";
     let currentRegimeDescription = "السوق يتحرك في نطاق متوازن مع استقرار الدعوم والمقاومات.";
 
-    if (advancingPct < 15 && avgMarketChange < -4.0) {
+    if (advancingPct < 20 || avgMarketChange <= -3.0) {
       currentRegime = "SYSTEMIC_SHOCK";
       currentRegimeArabic = "حذر: ضغط بيعي واسع وشامل (Systemic Shock Alert)";
-      currentRegimeDescription = "هبوط حاد في أكثر من 85% من الأسهم؛ يُنصح بالتحفظ وتأجيل الشراء عند الدعوم حتى تهدأ السيولة.";
-    } else if (advancingPct >= 20 && advancingPct <= 45 && avgMarketChange >= -3.0 && avgMarketChange <= 0) {
+      currentRegimeDescription = "هبوط عام في أغلب الأسهم؛ يُنصح بالتحفظ وتأجيل الشراء عند الدعوم حتى تستقر السيولة.";
+    } else if (advancingPct <= 45 && avgMarketChange < 0) {
       currentRegime = "HEALTHY_CORRECTION";
       currentRegimeArabic = "تصحيح فني هادئ وجني أرباح صحي (Pullback)";
       currentRegimeDescription = "تراجع هادئ متوقع لجني الأرباح مع تماسك الأسهم القيادية فوق دعومها الرئيسية؛ فرصة تجميع للمستثمر.";
-    } else if (advancingPct > 65 && avgMarketChange > 1.5) {
+    } else if (advancingPct >= 60 && avgMarketChange >= 1.0) {
       currentRegime = "BULLISH_EXPANSION";
       currentRegimeArabic = "زخم صعودي واستكشاف سعري (Bullish Expansion)";
       currentRegimeDescription = "سيولة شرائية واسعة واختراق للمقاومات الفنية مدعومة بحجم تداول مرتفع.";

@@ -89,9 +89,12 @@ export default async function handler(req, res) {
 
       // Evaluate against Pivot Resistance R1
       if (s.pivotR1 && s.price >= s.pivotR1) {
-        action = 'TAKE_PROFIT_R1';
-        alertLevel = 'POSITIVE_CATALYST';
-        advice = `وصول لمستوى المقاومة الفنية الأولى R1 (${s.pivotR1} ج) • يُنصح بجني أرباح جزئي وتأمين الأرباح.`;
+        const isNegative = (s.changePct != null && s.changePct < 0);
+        action = isNegative ? 'REBOUND_RESISTANCE_REDUCE' : 'TAKE_PROFIT_R1';
+        alertLevel = isNegative ? 'REBOUND_REBALANCE' : 'POSITIVE_CATALYST';
+        advice = isNegative
+          ? `ارتداد فني لمستوى المقاومة R1 (${s.pivotR1} ج) لسهم متراجع • فرصة لتخفيف المركز وتدوير السيولة لحماية المحفظة.`
+          : `وصول لمستوى المقاومة الفنية الأولى R1 (${s.pivotR1} ج) • يُنصح بجني أرباح جزئي وتأمين الأرباح.`;
       } 
       // Evaluate against Pivot Support S1 Breakdown
       else if (s.pivotS1 && s.price < s.pivotS1) {
