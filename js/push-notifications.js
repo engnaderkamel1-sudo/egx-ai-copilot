@@ -32,11 +32,11 @@
   function getDeviceDescription() {
     const ua = navigator.userAgent || '';
     let platform = 'جهاز كمبيوتر';
-    if (/iPhone/i.test(ua)) platform = 'iPhone';
-    else if (/iPad/i.test(ua)) platform = 'iPad';
+    if (/iPhone/i.test(ua)) platform = 'هاتف iPhone';
+    else if (/iPad/i.test(ua)) platform = 'جهاز iPad';
     else if (/Android/i.test(ua)) platform = 'هاتف أندرويد';
     else if (/Macintosh/i.test(ua)) platform = 'جهاز Mac';
-    else if (/Windows/i.test(ua)) platform = 'جهاز Windows';
+    else if (/Windows/i.test(ua)) platform = 'كمبيوتر Windows';
 
     let browser = 'المتصفح';
     if (/Edg/i.test(ua)) browser = 'Edge';
@@ -45,6 +45,18 @@
     else if (/Safari/i.test(ua)) browser = 'Safari';
 
     return `${platform} (${browser})`;
+  }
+
+  async function getReadyRegistration() {
+    if (swRegistration) return swRegistration;
+    if ('serviceWorker' in navigator) {
+      try {
+        const reg = await navigator.serviceWorker.ready;
+        swRegistration = reg;
+        return reg;
+      } catch (e) {}
+    }
+    return null;
   }
 
   async function registerSubscriptionWithServer(subscription) {
@@ -78,17 +90,21 @@
     isPushSupported = true;
 
     try {
+      // Register root Service Worker
       swRegistration = await navigator.serviceWorker.register('/sw.js', { scope: '/' });
       await navigator.serviceWorker.ready;
+
+      // Force instant SW update so clients immediately run latest SW
       try {
         await swRegistration.update();
         if (swRegistration.waiting) {
           swRegistration.waiting.postMessage({ action: 'skipWaiting' });
         }
       } catch (updErr) {}
+
       console.log('✅ EGX Service Worker Registered & Updated:', swRegistration.scope);
 
-      // Check current subscription
+      // Check current subscription in PushManager
       if ('PushManager' in window && swRegistration.pushManager) {
         const subscription = await swRegistration.pushManager.getSubscription();
         if (subscription) {
@@ -104,7 +120,7 @@
 
       updatePushUIState();
     } catch (err) {
-      console.warn('Service Worker registration non-fatal notice:', err.message);
+      console.warn('Service Worker registration notice:', err.message);
       updatePushUIState();
     }
   }
@@ -120,12 +136,13 @@
       if (permission === 'granted') {
         isSubscribed = true;
 
-        if (swRegistration && 'pushManager' in swRegistration) {
+        const reg = await getReadyRegistration();
+        if (reg && 'pushManager' in reg) {
           try {
-            let subscription = await swRegistration.pushManager.getSubscription();
+            let subscription = await reg.pushManager.getSubscription();
             if (!subscription) {
               const convertedKey = urlBase64ToUint8Array(VAPID_PUBLIC_KEY);
-              subscription = await swRegistration.pushManager.subscribe({
+              subscription = await reg.pushManager.subscribe({
                 userVisibleOnly: true,
                 applicationServerKey: convertedKey
               });
@@ -146,7 +163,7 @@
         );
         return true;
       } else if (permission === 'denied') {
-        alert('⚠️ تم حظر الإشعارات في متصفحك. يرجى السماح بالإشعارات من إعدادات موقعك في شريط العنوان.');
+        alert('⚠️ تم حظر الإشعارات في متصفحك. يرجى السماح بالإشعارات من إعدادات الموقع بشريط العنوان.');
         return false;
       }
     } catch (err) {
@@ -212,23 +229,19 @@
   async function sendTestNativeNotification() {
     // 1. Always trigger instant auditory chime & visual toast for instant feedback
     playNotificationChime();
-    showLocalPushAlert(
-      '🔔 جارٍ إرسال التنبيه السحابي...',
-      'يتم بث الإشعار الآن عبر السيرفر لجميع أجهزتك المسجلة (الموبايل والكمبيوتر).'
-    );
 
-    // 2. If browser OS permission is not granted yet, prompt user for full lockscreen/OS alerts
+    // 2. Ensure this device has permission & push subscription
     if (typeof Notification !== 'undefined' && Notification.permission !== 'granted') {
       const granted = await requestNativePushPermission();
       if (!granted) return;
     } else {
-      // Ensure this device is subscribed and registered with the server
-      if (swRegistration && 'pushManager' in swRegistration) {
+      const reg = await getReadyRegistration();
+      if (reg && 'pushManager' in reg) {
         try {
-          let subscription = await swRegistration.pushManager.getSubscription();
+          let subscription = await reg.pushManager.getSubscription();
           if (!subscription) {
             const convertedKey = urlBase64ToUint8Array(VAPID_PUBLIC_KEY);
-            subscription = await swRegistration.pushManager.subscribe({
+            subscription = await reg.pushManager.subscribe({
               userVisibleOnly: true,
               applicationServerKey: convertedKey
             });
@@ -237,10 +250,15 @@
             await registerSubscriptionWithServer(subscription);
           }
         } catch (subErr) {
-          console.warn('Subscription check error:', subErr);
+          console.warn('Subscription check notice:', subErr);
         }
       }
     }
+
+    showLocalPushAlert(
+      '🔔 جارٍ بث التنبيه السحابي...',
+      'يتم بث الإشعار الآن عبر السيرفر لجميع الأجهزة المسجلة (الموبايل والكمبيوتر).'
+    );
 
     // 3. Trigger true Server Web Push to ALL registered devices
     try {
@@ -265,6 +283,7 @@
           showToast(data.message || 'تم إرسال التنبيه، يرجى تفعيل التنبيهات من الموبايل لتلقيه هناك.', 'warning');
         }
       }
+      updatePushUIState();
     } catch (err) {
       console.warn('Server push dispatch error:', err);
     }
@@ -296,34 +315,46 @@
     }
   }
 
-  function updatePushUIState() {
+  async function updatePushUIState() {
     const statusDot = document.getElementById('push-status-dot');
     const statusText = document.getElementById('push-status-text');
     const btnEnable = document.getElementById('btn-enable-push');
 
     const perm = ('Notification' in window) ? Notification.permission : 'unsupported';
 
+    // Fetch device count from server
+    let deviceCountText = '';
+    try {
+      const res = await fetch('/api/subscribe');
+      if (res.ok) {
+        const d = await res.json();
+        if (d.count > 0) {
+          deviceCountText = ` • (${d.count} أجهزة مسجلة في السحابة)`;
+        }
+      }
+    } catch (e) {}
+
     if (statusDot && statusText) {
       if (perm === 'granted') {
         statusDot.className = 'w-2 h-2 rounded-full bg-emerald-400 animate-pulse';
-        statusText.innerText = 'التنبيهات السحابية مفعلة على هذا الجهاز 🟢';
+        statusText.innerText = `التنبيهات السحابية مفعلة على هذا الجهاز 🟢${deviceCountText}`;
         if (btnEnable) {
-          btnEnable.innerText = 'التنبيهات مفعلة بنجاح (إرسال إشعار تجريبي سحابي 🚀)';
-          btnEnable.className = 'px-3 py-1.5 rounded-xl bg-emerald-950/60 border border-emerald-500/40 text-emerald-300 font-bold text-xs hover:bg-emerald-900 transition flex items-center gap-1.5 cursor-pointer';
+          btnEnable.innerText = 'إرسال إشعار تجريبي سحابي لجميع الأجهزة 🚀';
+          btnEnable.className = 'px-3.5 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-600 text-white font-bold text-xs transition flex items-center gap-1.5 shadow cursor-pointer';
         }
       } else if (perm === 'denied') {
         statusDot.className = 'w-2 h-2 rounded-full bg-rose-400';
         statusText.innerText = 'الإشعارات محظورة في إعدادات المتصفح 🔴';
         if (btnEnable) {
           btnEnable.innerText = 'محظور من المتصفح (اضغط للسماح)';
-          btnEnable.className = 'px-3 py-1.5 rounded-xl bg-rose-950/60 border border-rose-500/40 text-rose-300 font-bold text-xs hover:bg-rose-900 transition flex items-center gap-1.5 cursor-pointer';
+          btnEnable.className = 'px-3.5 py-2 rounded-xl bg-rose-950/60 border border-rose-500/40 text-rose-300 font-bold text-xs hover:bg-rose-900 transition flex items-center gap-1.5 cursor-pointer';
         }
       } else {
         statusDot.className = 'w-2 h-2 rounded-full bg-amber-400 animate-pulse';
-        statusText.innerText = 'التنبيهات السحابية غير مفعلة (اضغط للتفعيل) 🟡';
+        statusText.innerText = `التنبيهات السحابية غير مفعلة${deviceCountText} 🟡`;
         if (btnEnable) {
-          btnEnable.innerText = 'تفعيل التنبيهات السحابية الآن 🔔';
-          btnEnable.className = 'px-3 py-1.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs transition flex items-center gap-1.5 shadow cursor-pointer';
+          btnEnable.innerText = 'تفعيل التنبيهات السحابية على هذا الجهاز 🔔';
+          btnEnable.className = 'px-3.5 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs transition flex items-center gap-1.5 shadow cursor-pointer';
         }
       }
     }
