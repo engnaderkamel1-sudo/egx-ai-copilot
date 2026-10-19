@@ -91,21 +91,26 @@
       showToast(`<div class="space-y-1"><div class="font-bold text-white text-xs">${title}</div><div class="text-[11px] text-gray-300 leading-relaxed">${body}</div></div>`, 'info');
     }
 
-    // 3. System-level Notification dispatch (Lockscreen / OS notification center)
+    // 3. System-level Notification dispatch (Lockscreen / OS notification center, Android & iOS & Desktop)
     if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
-      if (swRegistration && swRegistration.showNotification) {
-        swRegistration.showNotification(title, {
-          body: body,
-          icon: 'https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/trending-up.svg',
-          badge: 'https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/shield-alert.svg',
-          vibrate: [200, 100, 200],
-          data: { url: url },
-          tag: 'egx-market-alert',
-          renotify: true
+      const options = {
+        body: body,
+        icon: 'https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/trending-up.svg',
+        badge: 'https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/shield-alert.svg',
+        vibrate: [200, 100, 200],
+        data: { url: url },
+        tag: 'egx-market-alert'
+      };
+
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.ready.then(reg => {
+          reg.showNotification(title, options);
+        }).catch(() => {
+          try { new Notification(title, options); } catch (e) {}
         });
       } else {
         try {
-          new Notification(title, { body: body, icon: '/favicon.ico' });
+          new Notification(title, options);
         } catch (e) {}
       }
     }

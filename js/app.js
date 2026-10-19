@@ -447,7 +447,7 @@
         // Check S1 Breakdown (Critical Risk)
         if (item.pivotS1 && item.currentPrice < item.pivotS1) {
           const alertObj = {
-            id: `s1_${item.ticker}_${Math.round(item.currentPrice)}`,
+            id: `s1_${item.ticker}`,
             ticker: item.ticker,
             name: item.name,
             type: 'CRITICAL_RISK',
@@ -467,7 +467,7 @@
         else if (item.pivotR1 && item.currentPrice >= item.pivotR1) {
           const isLosing = (item.profit !== undefined && item.profit < 0) || (item.returnPct !== undefined && item.returnPct < 0);
           const alertObj = {
-            id: `r1_${item.ticker}_${Math.round(item.currentPrice)}`,
+            id: `r1_${item.ticker}`,
             ticker: item.ticker,
             name: item.name,
             type: isLosing ? 'REBOUND_RESISTANCE' : 'TARGET_REACHED',
@@ -662,17 +662,16 @@
       });
     }
 
-    let lastNotifiedAlertKey = null;
-    let lastNotifiedAlertTimestamp = 0;
-
     function triggerBrowserNotification(title, body, alertId = 'default') {
+      const storageKey = `egx_sent_alert_${alertId}`;
+      const lastSent = Number(sessionStorage.getItem(storageKey) || 0);
       const now = Date.now();
-      // Intelligent Throttling: If the same alert was sent in the last 45 minutes, suppress repeat
-      if (lastNotifiedAlertKey === alertId && (now - lastNotifiedAlertTimestamp < 2700000)) {
+
+      // STRICT THROTTLE: If notified in the last 60 minutes for this alert, do not repeat
+      if (now - lastSent < 3600000) {
         return;
       }
-      lastNotifiedAlertKey = alertId;
-      lastNotifiedAlertTimestamp = now;
+      sessionStorage.setItem(storageKey, String(now));
 
       // Delegate to unified local push alert if present
       if (typeof showLocalPushAlert === 'function') {
@@ -681,9 +680,17 @@
       }
 
       if ('Notification' in window && Notification.permission === 'granted') {
-        try {
-          new Notification(title, { body: body, icon: '/favicon.ico', tag: 'egx-market-alert' });
-        } catch(e){}
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.ready.then(reg => {
+            reg.showNotification(title, { body: body, icon: '/favicon.ico', tag: 'egx-market-alert' });
+          }).catch(() => {
+            try { new Notification(title, { body: body, icon: '/favicon.ico', tag: 'egx-market-alert' }); } catch(e){}
+          });
+        } else {
+          try {
+            new Notification(title, { body: body, icon: '/favicon.ico', tag: 'egx-market-alert' });
+          } catch(e){}
+        }
       }
     }
 
@@ -719,29 +726,26 @@
       // 2. Background Web Worker (Immune to browser background tab freezing/throttling)
       initBackgroundHeartbeatWorker();
 
-      // 3. Instant Wake-up on Tab Focus (fires the exact millisecond user returns to browser)
+      // 3. Instant Wake-up on Tab Focus (fires strictly if at least 60 seconds elapsed since last fetch)
+      let lastTabWakeupTime = 0;
       document.addEventListener('visibilitychange', () => {
         if (document.visibilityState === 'visible') {
           const isOpen = (typeof isCairoSessionOpen === 'function') ? isCairoSessionOpen() : false;
-          if (isOpen) {
+          const now = Date.now();
+          if (isOpen && (now - lastTabWakeupTime > 60000)) {
+            lastTabWakeupTime = now;
             autoRefreshSeconds = 60;
             updateCountdownUI();
-            fetchLiveEGXPricesAndReevaluate(false);
+            fetchLiveEGXPricesAndReevaluate(true);
           } else {
             updateCountdownUI();
           }
         }
       });
 
+      // Window focus only refreshes the UI counter without triggering extra network calls or notifications
       window.addEventListener('focus', () => {
-        const isOpen = (typeof isCairoSessionOpen === 'function') ? isCairoSessionOpen() : false;
-        if (isOpen) {
-          autoRefreshSeconds = 60;
-          updateCountdownUI();
-          fetchLiveEGXPricesAndReevaluate(false);
-        } else {
-          updateCountdownUI();
-        }
+        updateCountdownUI();
       });
     }
 
