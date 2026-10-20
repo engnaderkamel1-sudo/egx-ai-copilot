@@ -288,35 +288,24 @@
                     }
                   }
                 }
-                // 2. Critical Support Breakdown (Pivot S1 Broken - Stop Loss Trigger)
-                else if (item.pivotS1 && item.currentPrice < item.pivotS1) {
-                  item.action = 'STOP_LOSS_WARNING';
-                  item.alertLevel = 'CRITICAL_RISK';
-                  item.advice = `⚠️ كسر مستوى الدعم الفني الرئيسي S1 (${item.pivotS1} ج) • السعر الحالي ${item.currentPrice.toFixed(2)} ج دون مستوى الأمان. راقب تفعيل خطة الحماية لتجنب انزلاق سعري.`;
-                }
-                // 3. Oversold Bounce on Support S1 (with mandatory Systemic Shock check)
-                else if (item.rsi < 36 && item.pivotS1 && item.currentPrice >= item.pivotS1) {
-                  if (getMarketRegimeCode() === 'SYSTEMIC_SHOCK') {
-                    item.action = 'HOLD';
-                    item.alertLevel = 'WARNING';
-                    item.advice = `⚠️ تشبع بيعي (RSI: ${item.rsi}) لكن السوق في حالة هبوط ذعري شامل؛ يُحظر التجميع الآن ويُفضل التريث والاحتفاظ بالكاش.`;
-                  } else {
-                    item.action = 'ACCUMULATE';
-                    item.alertLevel = 'ACCUMULATE';
-                    item.advice = `🟢 ارتداد من تشبع بيعي (RSI: ${item.rsi}) أعلى الدعم الفني S1 (${item.pivotS1} ج) • فرصة تعزيز للمستثمر طويل الأجل لخفض متوسط التكلفة.`;
-                  }
-                }
-                // 4. Bullish Trend Continuation (Above SMA 50)
-                else if (item.sma50 && item.currentPrice > item.sma50 && item.returnPct > 0) {
-                  item.action = 'HOLD';
-                  item.alertLevel = 'NORMAL';
-                  item.advice = `📈 اتجاه صاعد صحي أعلى متوسط 50 يوم (${item.sma50} ج) • نمو (+${item.returnPct.toFixed(1)}%)، احتفاظ استثماري هادئ مستهدفاً المقاومة ${item.pivotR1 || item.target1} ج.`;
-                }
-                // 5. Default Strategic Hold
+                // 2. Comprehensive Financial Decision Evaluation via Engine (Single Source of Truth)
                 else {
-                  item.action = 'HOLD';
-                  item.alertLevel = 'NORMAL';
-                  item.advice = `احتفاظ ومتابعة • السهم يتحرك في نطاق الدعم ${item.pivotS1 || item.support} والمقاومة ${item.pivotR1 || item.target1}.`;
+                  if (typeof EGX_Engine !== 'undefined' && typeof EGX_Engine.evaluateAsset === 'function') {
+                    const evalRes = EGX_Engine.evaluateAsset(item, getMarketRegimeCode());
+                    if (evalRes) {
+                      item.action = evalRes.action;
+                      item.alertLevel = evalRes.alertLevel;
+                      item.advice = evalRes.advice;
+                    }
+                  } else if (item.pivotS1 && item.currentPrice < item.pivotS1) {
+                    item.action = 'STOP_LOSS_WARNING';
+                    item.alertLevel = 'CRITICAL_RISK';
+                    item.advice = `⚠️ كسر مستوى الدعم الفني الرئيسي S1 (${item.pivotS1} ج) • السعر الحالي ${item.currentPrice.toFixed(2)} ج دون مستوى الأمان.`;
+                  } else {
+                    item.action = 'HOLD';
+                    item.alertLevel = 'NORMAL';
+                    item.advice = `احتفاظ ومتابعة • السهم يتحرك في نطاق الدعم ${item.pivotS1 || item.support} والمقاومة ${item.pivotR1 || item.target1}.`;
+                  }
                 }
 
                 updatedStocksCount++;

@@ -101,14 +101,39 @@ export default async function handler(req, res) {
       } 
       // Evaluate against Pivot Support S1 Breakdown
       else if (s.pivotS1 && s.price < s.pivotS1) {
-        action = 'STOP_LOSS_WARNING';
-        alertLevel = 'CRITICAL_RISK';
-        advice = `تحذير: كسر الدعم الفني الرئيسي S1 (${s.pivotS1} ج) • راقب تفعيل وقف الخسارة لحماية رأس المال.`;
+        if (s.changePct != null && s.changePct <= -6.5) {
+          action = 'EMERGENCY_STOP_LOSS';
+          alertLevel = 'CRITICAL_RISK';
+          advice = `🚨 خروج طارئ فوري: هبوط حاد (${s.changePct}%) يكسر الدعم S1 (${s.pivotS1} ج). نفّذ الخروج لتفادي تجميد المحفظة على الحد الأدنى.`;
+        } else {
+          // Check Cairo market hours (10:00 to 14:30)
+          const timeComponents = timePart.split(':');
+          const cairoHour = parseInt(timeComponents[0], 10);
+          const cairoMin = parseInt(timeComponents[1], 10);
+          const timeMins = cairoHour * 60 + cairoMin;
+          const isIntraday = timeMins >= 600 && timeMins <= 870;
+
+          if (isIntraday) {
+            action = 'INTRADAY_DIP_WATCH';
+            alertLevel = 'WARNING';
+            advice = `🟡 كسر لحظي أثناء الجلسة تحت الدعم S1 (${s.pivotS1} ج) • تريث ولا تتسرع بالبيع؛ انتظر تأكيد إغلاق 02:30 م لتفادي هزة الشجرة.`;
+          } else {
+            action = 'STOP_LOSS_CONFIRMED';
+            alertLevel = 'CRITICAL_RISK';
+            advice = `🔴 كسر مؤكد بالإغلاق اليومي للدعم S1 (${s.pivotS1} ج) • يُنصح بتفعيل خطة الحماية والتدوير لتفادي زيادة الخسارة.`;
+          }
+        }
       } 
-      // Oversold bounce opportunity
+      // Oversold bounce opportunity (with Falling Knife Guardrail)
       else if (s.rsi < 35 && s.pivotS1 && s.price >= s.pivotS1) {
-        action = 'ACCUMULATE_ON_SUPPORT';
-        advice = `تشبع بيعي (RSI: ${s.rsi}) قرب الدعم S1 (${s.pivotS1} ج) • فرصة تعزيز تدريجي للمستثمر طويل الأجل.`;
+        if (s.changePct != null && s.changePct <= -7.0) {
+          action = 'DEFENSIVE_HOLD';
+          alertLevel = 'WARNING';
+          advice = `⚠️ حظر التبريد: هبوط السهم (${s.changePct}%) يمنع ضخ سيولة جديدة رغم التشبع البيعي (RSI: ${s.rsi}). راقب ارتداد المقاومة R1 للتخفيف.`;
+        } else {
+          action = 'ACCUMULATE_ON_SUPPORT';
+          advice = `تشبع بيعي (RSI: ${s.rsi}) قرب الدعم S1 (${s.pivotS1} ج) • فرصة تعزيز تدريجي للمستثمر طويل الأجل.`;
+        }
       } 
       // Trend continuation
       else if (s.sma50 && s.price > s.sma50) {

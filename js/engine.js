@@ -1,4 +1,4 @@
-/**
+﻿/**
  * EGX AI Copilot - Core Financial Engine (js/engine.js)
  * Pure, deterministic mathematical and financial decision engine.
  * Single Source of Truth for all financial evaluations across the application.
@@ -327,10 +327,174 @@
     },
 
     /**
-     * Single Source of Truth for Asset Evaluation
-     * Enforces the iron rule: A losing stock NEVER gets "جني أرباح" or "منطقة قمة".
+     * Get Cairo Live Session Status
+     * Sunday to Thursday: 10:00 to 14:30 Cairo Time (Africa/Cairo)
      */
-    evaluateAsset: function (asset, marketRegime) {
+    getEGXSessionStatus: function (overrideDate) {
+      try {
+        const now = overrideDate || new Date();
+        const options = { timeZone: 'Africa/Cairo', hour12: false, weekday: 'short', hour: '2-digit', minute: '2-digit' };
+        const formatter = new Intl.DateTimeFormat('en-US', options);
+        const parts = formatter.formatToParts(now);
+        let weekday = '';
+        let hour = 0;
+        let minute = 0;
+        parts.forEach(p => {
+          if (p.type === 'weekday') weekday = p.value;
+          if (p.type === 'hour') hour = parseInt(p.value, 10);
+          if (p.type === 'minute') minute = parseInt(p.value, 10);
+        });
+
+        const isMarketDay = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu'].includes(weekday);
+        const timeMinutes = hour * 60 + minute;
+        // Official EGX Session: 10:00 (600 mins) to 14:30 (870 mins)
+        // Auction Window: 14:15 (855 mins) to 14:30 (870 mins)
+        const isOpen = isMarketDay && (timeMinutes >= 600 && timeMinutes < 870);
+        const isAuction = isMarketDay && (timeMinutes >= 855 && timeMinutes < 870);
+        const isClosed = !isOpen;
+
+        return {
+          isOpen,
+          isAuction,
+          isClosed,
+          timeMinutes,
+          weekday,
+          cairoTimeStr: `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`
+        };
+      } catch (e) {
+        return {
+          isOpen: false,
+          isAuction: false,
+          isClosed: true,
+          timeMinutes: 0,
+          weekday: '',
+          cairoTimeStr: '15:00'
+        };
+      }
+    },
+
+    /**
+     * Determine whether an asset belongs to Core (النواة الاستثمارية) or Satellite (الأقمار والمضاربات)
+     */
+    isCoreAsset: function (asset) {
+      if (!asset) return true;
+      if (asset.ticker === 'CASH' || asset.ticker === 'NCS' || asset.ticker === 'BSB' || asset.isCashReserve) {
+        return true;
+      }
+      if (asset.portfolioBucket === 'satellite' || asset.strategy === 'satellite') {
+        return false;
+      }
+      if (asset.portfolioBucket === 'core' || asset.strategy === 'core') {
+        return true;
+      }
+
+      const cat = String(asset.category || '').toLowerCase();
+      if (cat.includes('satellite') || cat.includes('أقمار') || cat.includes('مضارب') || cat.includes('طفرات') || cat.includes('egx70')) {
+        return false;
+      }
+
+      // Recognized Core stocks in EGX30 with solid fundamentals / dividends
+      const coreTickers = ['COMI', 'SWDY', 'ABUK', 'CLHO', 'EGAL', 'ORAS', 'MFPC', 'CIEB', 'ADIB', 'HDBK', 'TMGH'];
+      if (coreTickers.includes(asset.ticker)) {
+        return true;
+      }
+
+      return !cat.includes('egx70');
+    },
+
+    /**
+     * Check if a stock or market is in a Catastrophic / Emergency Drop
+     * Bypasses the "wait for close" rule if an extreme flash crash or systemic collapse occurs.
+     */
+    checkEmergencyDrop: function (asset, marketRegime) {
+      if (!asset) return { isEmergency: false };
+
+      const cleanNum = (val) => {
+        if (val == null) return null;
+        if (typeof val === 'number') return isNaN(val) ? null : val;
+        const cleaned = String(val).replace(/[^\d.-]/g, '');
+        const n = parseFloat(cleaned);
+        return isNaN(n) ? null : n;
+      };
+
+      const currentPrice = cleanNum(asset.currentPrice) || 0;
+      const buyPrice = cleanNum(asset.buyPrice) || currentPrice;
+      const pivotS1 = cleanNum(asset.pivotS1 || asset.support) || 0;
+      const pivotS2 = cleanNum(asset.pivotS2) || (pivotS1 > 0 ? Number((pivotS1 * 0.95).toFixed(2)) : 0);
+      const changePct = cleanNum(asset.changePct != null ? asset.changePct : asset.change);
+      const totalLossPct = buyPrice > 0 ? (((currentPrice - buyPrice) / buyPrice) * 100) : 0;
+
+      // 1. Systemic market flash crash
+      if (marketRegime === 'SYSTEMIC_SHOCK') {
+        return {
+          isEmergency: true,
+          reason: 'صدمة سوقية شاملة (Systemic Market Shock)'
+        };
+      }
+
+      // 2. Severe intraday crash (e.g. -6.5% or worse in a single session)
+      if (changePct !== null && changePct <= -6.5) {
+        return {
+          isEmergency: true,
+          reason: `هبوط لحظي عنيف للجلسة (${changePct.toFixed(1)}%) يقترب من حدود الإيقاف المؤقت`
+        };
+      }
+
+      // 3. Catastrophic support breakdown below S2
+      if (pivotS2 > 0 && currentPrice < pivotS2) {
+        return {
+          isEmergency: true,
+          reason: `انهيار كسر الدعم الثاني S2 (${pivotS2.toFixed(2)} ج) وانزلاق سعري حاد`
+        };
+      }
+
+      // 4. Extreme total drawdown exceeding -25% with broken S1
+      if (pivotS1 > 0 && currentPrice < pivotS1 && totalLossPct <= -25.0) {
+        return {
+          isEmergency: true,
+          reason: `تراجع كلي فادح (${totalLossPct.toFixed(1)}%) دون الدعم S1`
+        };
+      }
+
+      return { isEmergency: false };
+    },
+
+    /**
+     * Calculate Partial Exit (50% reduction) metrics
+     */
+    calculatePartialExit: function (shares, currentPrice, buyPrice) {
+      shares = parseInt(shares, 10) || 0;
+      currentPrice = Number(currentPrice) || 0;
+      buyPrice = Number(buyPrice) || currentPrice;
+
+      const exitShares = Math.floor(shares * 0.5);
+      const remainingShares = shares - exitShares;
+      const cashReleased = Math.round(exitShares * currentPrice);
+      const remainingValue = Math.round(remainingShares * currentPrice);
+      const realizedProfit = Math.round(exitShares * (currentPrice - buyPrice));
+      const realizedReturnPct = buyPrice > 0 ? Number((((currentPrice - buyPrice) / buyPrice) * 100).toFixed(2)) : 0;
+
+      return {
+        exitShares,
+        remainingShares,
+        cashReleased,
+        remainingValue,
+        realizedProfit,
+        realizedReturnPct,
+        guidanceText: `تخفيف 50% (${exitShares.toLocaleString('en-US')} سهم): يوفر سيولة حرة بقيمة ${cashReleased.toLocaleString('en-US')} ج.م مع الاحتفاظ بـ ${remainingShares.toLocaleString('en-US')} سهم لترقب الارتداد.`
+      };
+    },
+
+    /**
+     * Single Source of Truth for Asset Evaluation
+     * Enforces:
+     * 1. Iron Rule: A losing stock NEVER gets "جني أرباح" or "منطقة قمة".
+     * 2. Falling Knife Guardrail: A stock in deep drawdown (<= -7%) NEVER gets naive "تجميع / ACCUMULATE".
+     * 3. Emergency Hard Stop: Bypasses wait-for-close on severe crash / systemic collapse.
+     * 4. Session Timing: Differentiates between intraday dip (wait for 02:30 close) vs confirmed daily close.
+     * 5. Portfolio Archetype: Core assets get wide S2 buffer; Satellite assets enforce strict discipline.
+     */
+    evaluateAsset: function (asset, marketRegime, sessionContext) {
       if (!asset) return null;
 
       // Safe numeric cleaner for Egyptian piastre / currency strings (e.g. "83.20 ج")
@@ -371,6 +535,7 @@
       const pivotR1 = cleanNum(asset.pivotR1 || asset.target1);
       const pivotR2 = cleanNum(asset.pivotR2 || asset.target2);
       const pivotS1 = cleanNum(asset.pivotS1 || asset.support);
+      const pivotS2 = cleanNum(asset.pivotS2) || (pivotS1 ? Number((pivotS1 * 0.95).toFixed(2)) : null);
       const sma50 = cleanNum(asset.sma50);
       const rsi = cleanNum(asset.rsi) || 50;
 
@@ -380,6 +545,11 @@
       const returnPct = totalCost > 0 ? Number(((profit / totalCost) * 100).toFixed(2)) : 0;
       const isLosing = profit < 0 || returnPct < 0;
 
+      // Smart Context Evaluation
+      const isCore = this.isCoreAsset(asset);
+      const session = sessionContext || this.getEGXSessionStatus();
+      const emergency = this.checkEmergencyDrop(asset, marketRegime);
+
       let action = 'HOLD';
       let badgeText = 'احتفاظ';
       let badgeColor = 'bg-gray-800 text-gray-300 border border-gray-700';
@@ -388,32 +558,109 @@
 
       // 1. Losing Position Branch (Strict Sanitization: No profit-taking allowed)
       if (isLosing) {
-        if (pivotS1 && currentPrice < pivotS1) {
-          action = 'STOP_LOSS_WARNING';
+        // Condition A: Emergency Hard Stop (Catastrophic flash drop or Systemic Shock)
+        if (emergency.isEmergency && pivotS1 && currentPrice < pivotS1) {
+          action = 'EMERGENCY_STOP_LOSS';
           alertLevel = 'CRITICAL_RISK';
-          badgeText = '⚠️ كسر دعم / حماية رأس المال';
-          badgeColor = 'bg-rose-500/20 text-rose-300 border border-rose-500/40';
-          advice = `السعر الحالي (${currentPrice.toFixed(2)} ج) كسر مستوى الدعم S1 (${pivotS1.toFixed(2)} ج) مع تراجع (${returnPct.toFixed(1)}%). راقب خطة الحماية والتدوير لتفادي زيادة الخسارة.`;
-        } else if (pivotR1 && currentPrice >= pivotR1) {
+          badgeText = '🚨 خروج طارئ فوري';
+          badgeColor = 'bg-rose-950/90 text-rose-200 border border-rose-500 shadow-md shadow-rose-950/60 animate-pulse';
+          advice = `🚨 خروج طارئ فوري دون انتظار الإغلاق: ${emergency.reason}. نفّذ الخروج لتفادي تجميد المحفظة على الحد الأدنى (Limit Down).`;
+        }
+        // Condition B: Rebound towards Resistance R1 for a losing stock (Trimming opportunity)
+        else if (pivotR1 && currentPrice >= pivotR1) {
           action = 'REBALANCE_CANDIDATE';
           alertLevel = 'REBOUND_RESISTANCE';
           badgeText = '🔄 تدوير وتخفيف (ارتداد هابط)';
           badgeColor = 'bg-amber-500/20 text-amber-300 border border-amber-500/40';
-          advice = `ارتداد فني لمستوى المقاومة R1 (${pivotR1.toFixed(2)} ج) لسهم متراجع (${returnPct.toFixed(1)}%). فرصة ممتازة لتخفيف المركز وتدوير السيولة في أصل أسرع نمواً.`;
-        } else if (marketRegime === 'SYSTEMIC_SHOCK') {
-          // Guardrail: Freeze accumulation during market-wide crashes
+          advice = `ارتداد فني لمستوى المقاومة R1 (${pivotR1.toFixed(2)} ج) لسهم متراجع (${returnPct.toFixed(1)}%). فرصة مثالية لتخفيف 50% من الكمية وتدوير السيولة في أصل أسرع نمواً.`;
+        }
+        // Condition C: Broken Support S1 Breakdown Evaluation
+        else if (pivotS1 && currentPrice < pivotS1) {
+          if (session.isOpen) {
+            // Intraday session is active (10:00 to 14:30 Cairo)
+            if (isCore) {
+              if (pivotS2 && currentPrice >= pivotS2) {
+                // Core stock within S2 safety cushion
+                action = 'CORE_BUFFER_WATCH';
+                alertLevel = 'NORMAL';
+                badgeText = '🛡️ وسادة أمان النواة الاستثمارية';
+                badgeColor = 'bg-blue-950/60 text-blue-300 border border-blue-600/50';
+                advice = `🛡️ سهم قيادي من النواة: السعر (${currentPrice.toFixed(2)} ج) أدنى S1 (${pivotS1.toFixed(2)} ج) لحظياً ولكنه مستقر أعلى S2 (${pivotS2.toFixed(2)} ج). تريث؛ ملاءة الشركة وأرباحها تحمي المركز ولا داعي للبيع الذعري أثناء الجلسة.`;
+              } else {
+                // Core stock breached S2 intraday
+                action = 'INTRADAY_DIP_WATCH';
+                alertLevel = 'WARNING';
+                badgeText = '🟡 كسر دعم النواة S2 لحظياً';
+                badgeColor = 'bg-amber-500/20 text-amber-300 border border-amber-500/40';
+                advice = `🟡 كسر لحظي لدعم النواة S2 (${pivotS2 ? pivotS2.toFixed(2) + ' ج' : '--'}): لا تتسرع بالبيع العشوائي؛ انتظر تأكيد إغلاق الجلسة بعد 02:30 م للتأكد من سلوك المشتري.`;
+              }
+            } else {
+              // Satellite speculative stock
+              action = 'INTRADAY_DIP_WATCH';
+              alertLevel = 'WARNING';
+              badgeText = '🟡 كسر لحظي أثناء الجلسة';
+              badgeColor = 'bg-amber-500/20 text-amber-300 border border-amber-500/40';
+              advice = `🟡 كسر لحظي أثناء الجلسة (السعر ${currentPrice.toFixed(2)} ج < S1 ${pivotS1.toFixed(2)} ج): لا تبع الآن! انتظر تأكيد إغلاق الجلسة بعد 02:30 م لتفادي مصيدة هزة الشجرة (Shakeout) من صانع السوق.`;
+            }
+          } else {
+            // Session is closed: Confirmed daily close below support S1
+            if (isCore) {
+              if (pivotS2 && currentPrice >= pivotS2) {
+                action = 'HOLD';
+                alertLevel = 'WARNING';
+                badgeText = '🛡️ سهم نواة (أعلى S2)';
+                badgeColor = 'bg-indigo-950/60 text-indigo-300 border border-indigo-600/50';
+                advice = `سهم قيادي استثماري أغلق دون S1 (${pivotS1.toFixed(2)} ج) ولكنه متماسك أعلى S2 (${pivotS2.toFixed(2)} ج). احتفاظ هادئ ومراقبة التماسك؛ لا بيع عشوائي بخسارة طالما أرباح الشركة صلبة.`;
+              } else {
+                action = 'STOP_LOSS_CONFIRMED';
+                alertLevel = 'CRITICAL_RISK';
+                badgeText = '⚠️ كسر مؤكد لدعم النواة S2';
+                badgeColor = 'bg-rose-500/20 text-rose-300 border border-rose-500/40';
+                advice = `⚠️ تم تأكيد كسر الدعم الثاني S2 (${pivotS2 ? pivotS2.toFixed(2) + ' ج' : '--'}) بإغلاق الجلسة. يُنصح بتخفيف 50% لحماية المحفظة حتى يستعيد السهم مساره.`;
+              }
+            } else {
+              action = 'STOP_LOSS_CONFIRMED';
+              alertLevel = 'CRITICAL_RISK';
+              badgeText = '🔴 تأكيد كسر الدعم بالإغلاق';
+              badgeColor = 'bg-rose-500/20 text-rose-300 border border-rose-500/40';
+              advice = `🔴 تم تأكيد كسر الدعم S1 (${pivotS1.toFixed(2)} ج) بإغلاق الجلسة. سهم مضاربة تكتيكي: يُنصح بتفعيل الخروج (أو تخفيف 50%) لتأمين الكاش وتدويره في فرصة رابحة.`;
+            }
+          }
+        }
+        // Condition D: Systemic Shock Guardrail
+        else if (marketRegime === 'SYSTEMIC_SHOCK') {
           action = 'DEFENSIVE_HOLD';
           alertLevel = 'CRITICAL_RISK';
           badgeText = 'حذر / صدمة سوقية';
           badgeColor = 'bg-rose-950/40 text-rose-300 border border-rose-800/40';
           advice = `السوق يمر بمرحلة صدمة سوقية (Systemic Shock Alert). يُحظر تعزيز المراكز المتراجعة وتجميد الشراء لحين استقرار المؤشرات.`;
-        } else if (rsi < 36 && pivotS1 && currentPrice >= pivotS1) {
-          action = 'ACCUMULATE';
-          alertLevel = 'ACCUMULATE';
-          badgeText = 'تجميع لتخفيض المتوسط';
-          badgeColor = 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40';
-          advice = `تشبع بيعي (RSI: ${rsi}) أعلى الدعم S1 (${pivotS1.toFixed(2)} ج). مناسب للمستثمر طويل الأجل لتعزيز المركز وخفض متوسط التكلفة.`;
-        } else {
+        }
+        // Condition E: Falling Knife Guardrail vs Disciplined Accumulate
+        else if (rsi < 36 && pivotS1 && currentPrice >= pivotS1) {
+          if (returnPct <= -7.0) {
+            // STRICT GUARDRAIL: Never tell a user to average down on a bleeding stock (-7% or worse)
+            action = 'DEFENSIVE_HOLD';
+            alertLevel = 'WARNING';
+            badgeText = '🚫 حظر تبريد / مراقبة ارتداد';
+            badgeColor = 'bg-slate-800 text-amber-300 border border-amber-500/50 shadow-sm';
+            advice = `⚠️ حظر التبريد: تراجع السهم (${returnPct.toFixed(1)}%) يمنع ضخ سيولة جديدة في مسار هابط رغم التشبع البيعي (RSI: ${rsi}). لا تشتري الآن؛ انتظر ارتداداً نحو المقاومة ${pivotR1 ? pivotR1.toFixed(2) + ' ج' : 'R1'} لتخفيف 50% وتدوير الكاش.`;
+          } else if (isCore) {
+            // Mild dip in a fundamentally strong core stock
+            action = 'ACCUMULATE';
+            alertLevel = 'ACCUMULATE';
+            badgeText = 'تجميع لتخفيض المتوسط';
+            badgeColor = 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40';
+            advice = `تشبع بيعي (RSI: ${rsi}) أعلى الدعم S1 (${pivotS1.toFixed(2)} ج) لسهم قيادي بتراجع طفيف (${returnPct.toFixed(1)}%). مناسب للتجميع التدريجي المنضبط.`;
+          } else {
+            action = 'HOLD';
+            alertLevel = 'NORMAL';
+            badgeText = 'احتفاظ مضاربي حذر';
+            badgeColor = 'bg-slate-800 text-slate-300 border border-slate-700';
+            advice = `تشبع بيعي في سهم تكتيكي؛ يُفضل التريث والاحتفاظ دون تبريد لحين ظهور مشتري مؤكد.`;
+          }
+        }
+        // Condition F: Default losing hold
+        else {
           action = 'HOLD';
           badgeText = 'احتفاظ ومراقبة الارتداد';
           badgeColor = 'bg-slate-800/80 text-slate-300 border border-slate-700';
@@ -480,7 +727,9 @@
         alertLevel,
         badgeText,
         badgeColor,
-        advice
+        advice,
+        isCore,
+        emergency
       };
     },
 

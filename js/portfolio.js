@@ -1,4 +1,4 @@
-/**
+﻿/**
  * EGX AI Copilot - Portfolio Manager (js/portfolio.js)
  * Clean, robust portfolio state, storage persistence, and capital accounting.
  */
@@ -212,7 +212,7 @@ const defaultPortfolioData = [
     {
         "ticker": "CLHO",
         "name": "مستشفيات كليوباترا",
-        "category": "EGX30 • رعاية صحية ودفاعي",
+        "category": "EGX30 • رعاية صحية ودفاعي (النواة الاستثمارية)",
         "shares": 963,
         "buyPrice": 17.73,
         "currentPrice": 14,
@@ -228,8 +228,8 @@ const defaultPortfolioData = [
         "profit": -3592,
         "returnPct": -21.04,
         "status": "تراجع",
-        "advice": "🟢 ارتداد من تشبع بيعي (RSI: 27.3) أعلى الدعم الفني S1 (13.22 ج) • فرصة تعزيز للمستثمر طويل الأجل لخفض متوسط التكلفة.",
-        "action": "ACCUMULATE",
+        "advice": "⚠️ حظر التبريد: تراجع السهم (-21.0%) يمنع ضخ سيولة جديدة رغم التشبع البيعي (RSI: 27.3). انتظر ارتداداً للمقاومة R1 (15.80 ج) لتخفيف 50% وتدوير الكاش.",
+        "action": "DEFENSIVE_HOLD",
         "pe": 20.9,
         "eps": 0.67,
         "sector": "رعاية صحية ومستشفيات",
@@ -251,7 +251,7 @@ const defaultPortfolioData = [
     {
         "ticker": "COMI",
         "name": "البنك التجاري الدولي (CIB)",
-        "category": "EGX30 • السهم القيادي رقم 1",
+        "category": "EGX30 • البنك التجاري الدولي (النواة الاستثمارية)",
         "shares": 122,
         "buyPrice": 140.48,
         "currentPrice": 124.97,
@@ -267,7 +267,7 @@ const defaultPortfolioData = [
         "profit": -1893,
         "returnPct": -11.05,
         "status": "تراجع",
-        "advice": "احتفاظ ومتابعة • السهم يتحرك في نطاق الدعم 119.6 والمقاومة 137.9.",
+        "advice": "🛡️ سهم قيادي من النواة: احتفاظ هادئ ومتابعة ارتداد المقاومة 137.90 ج؛ ملاءة البنك صلبة وأرباحه قياسية، مع حظر الشراء الإضافي قبل اختراق 130 ج.",
         "action": "HOLD",
         "pe": 6.01,
         "eps": 21.16,
@@ -439,7 +439,7 @@ const defaultPortfolioData = [
     {
         "ticker": "RAYA",
         "name": "راية القابضة للاستثمارات",
-        "category": "EGX70 • تكنولوجيا وخدمات مالية",
+        "category": "EGX70 • تكنولوجيا ومضاربة (الأقمار)",
         "shares": 2193,
         "buyPrice": 6.88,
         "currentPrice": 5.83,
@@ -455,8 +455,8 @@ const defaultPortfolioData = [
         "profit": -2303,
         "returnPct": -15.26,
         "status": "تراجع",
-        "advice": "🟢 ارتداد من تشبع بيعي (RSI: 33.4) أعلى الدعم الفني S1 (5.37 ج) • فرصة تعزيز للمستثمر طويل الأجل لخفض متوسط التكلفة.",
-        "action": "ACCUMULATE",
+        "advice": "⚠️ حظر التبريد: سهم مضاربة تكتيكي متراجع (-15.3%). يمنع التبريد نهائياً؛ راقب موجة ارتدادية نحو المقاومة R1 (6.60 ج) لتخفيف المركز وتدوير السيولة.",
+        "action": "DEFENSIVE_HOLD",
         "priceUpdatedAt": "محفظة ثندر الرسمية",
         "priceSource": "شاشة ثندر اللحظية",
         "decisionUpdatedAt": "جلسة اليوم",

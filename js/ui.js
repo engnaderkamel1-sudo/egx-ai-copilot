@@ -592,9 +592,18 @@
                   ${effectiveStopLoss.toFixed(2)} <span class="text-[10px] text-gray-400 font-sans font-normal">ج</span>
                 </div>
                 <div class="flex items-center gap-1">
-                  ${isStopBroken 
-                    ? `<span class="px-1.5 py-0.5 rounded text-[9px] font-black bg-rose-600 text-white animate-ping shadow-sm">⚠️ مكسور! خروج</span>`
-                    : `<span class="px-1.5 py-0.5 rounded text-[9px] font-mono font-semibold text-rose-300 bg-rose-950/80 border border-rose-500/30">أمان ${stopLossBuffer}%</span>`
+                  ${evalResult.action === 'EMERGENCY_STOP_LOSS'
+                    ? `<span class="px-1.5 py-0.5 rounded text-[9px] font-black bg-rose-600 text-white animate-pulse shadow-sm" title="انهيار حاد: نفذ الخروج فوراً">🚨 خروج طارئ!</span>`
+                    : (evalResult.action === 'INTRADAY_DIP_WATCH'
+                      ? `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40" title="كسر لحظي أثناء الجلسة: انتظر تأكيد إغلاق 02:30 م">🟡 كسر لحظي (انتظر)</span>`
+                      : (evalResult.action === 'CORE_BUFFER_WATCH'
+                        ? `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-blue-500/20 text-blue-300 border border-blue-500/40" title="سهم قيادي استثماري: مستقر ضمن وسادة الأمان أعلى S2">🛡️ وسادة أمان</span>`
+                        : (isStopBroken 
+                          ? `<span class="px-1.5 py-0.5 rounded text-[9px] font-black bg-rose-600 text-white shadow-sm" title="تم تأكيد كسر الدعم بالإغلاق">🔴 تأكيد كسر S1</span>`
+                          : `<span class="px-1.5 py-0.5 rounded text-[9px] font-mono font-semibold text-rose-300 bg-rose-950/80 border border-rose-500/30">أمان ${stopLossBuffer}%</span>`
+                        )
+                      )
+                    )
                   }
                   ${isCustomStop ? `<span class="text-[8px] px-1 rounded bg-amber-500/20 text-amber-300 font-bold" title="رقم مخصص قمت بوضعه بنفسك">مخصص</span>` : ''}
                 </div>
@@ -764,8 +773,23 @@
       const stopStatusEl = document.getElementById('pl-modal-stoploss-status');
       if (stopStatusEl) {
         if (curPrice < activeStopLoss) {
-          stopStatusEl.innerText = '🚨 كسر حد الأمان (وقف خسارة مفعل)';
-          stopStatusEl.className = 'text-[10px] px-2 py-0.5 rounded bg-rose-600 text-white font-bold animate-ping';
+          const sess = (typeof EGX_Engine !== 'undefined' && typeof EGX_Engine.getEGXSessionStatus === 'function')
+            ? EGX_Engine.getEGXSessionStatus()
+            : { isOpen: false };
+          const isEmerg = (typeof EGX_Engine !== 'undefined' && typeof EGX_Engine.checkEmergencyDrop === 'function')
+            ? EGX_Engine.checkEmergencyDrop(item, typeof getMarketRegimeCode === 'function' ? getMarketRegimeCode() : 'NORMAL').isEmergency
+            : false;
+
+          if (isEmerg) {
+            stopStatusEl.innerText = '🚨 انهيار حاد طارئ (بيع فوري)';
+            stopStatusEl.className = 'text-[10px] px-2 py-0.5 rounded bg-rose-600 text-white font-bold animate-pulse';
+          } else if (sess.isOpen) {
+            stopStatusEl.innerText = '🟡 كسر لحظي أثناء الجلسة (انتظر إغلاق 02:30 م)';
+            stopStatusEl.className = 'text-[10px] px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold';
+          } else {
+            stopStatusEl.innerText = '🔴 كسر مؤكد بالإغلاق اليومي';
+            stopStatusEl.className = 'text-[10px] px-2 py-0.5 rounded bg-rose-600 text-white font-bold';
+          }
         } else {
           stopStatusEl.innerText = (customLevels && customLevels.customStopLoss) ? 'قاع مخصص ✏️' : 'قاع ستاندرد تلقائي';
           stopStatusEl.className = 'text-[10px] px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 font-bold';
@@ -948,11 +972,40 @@
       let verdictBadge = 'احتفاظ';
       let verdictAdvice = 'السهم يتحرك داخل نطاق سعري وفني آمن بين مستويات الدعم والمقاومة، دون مؤشرات كسر أو تشبع.';
 
-      if (isStopBroken) {
+      const evalStock = (typeof EGX_Engine !== 'undefined' && typeof EGX_Engine.evaluateAsset === 'function')
+        ? EGX_Engine.evaluateAsset(stock, typeof getMarketRegimeCode === 'function' ? getMarketRegimeCode() : 'NORMAL')
+        : null;
+
+      if (evalStock && evalStock.action === 'EMERGENCY_STOP_LOSS') {
+        verdictTitle = 'خروج طارئ فوري (انهيار حاد) 🚨';
+        verdictColor = 'bg-rose-950/80 text-rose-200 border border-rose-500 animate-pulse';
+        verdictBadge = 'وقف خسارة طارئ';
+        verdictAdvice = evalStock.advice;
+      } else if (evalStock && evalStock.action === 'INTRADAY_DIP_WATCH') {
+        verdictTitle = 'تريث ومراقبة: كسر لحظي أثناء الجلسة 🟡';
+        verdictColor = 'bg-amber-500/20 text-amber-300 border border-amber-500/40';
+        verdictBadge = 'كسر لحظي (انتظر الإغلاق)';
+        verdictAdvice = evalStock.advice;
+      } else if (evalStock && evalStock.action === 'CORE_BUFFER_WATCH') {
+        verdictTitle = 'وسادة أمان النواة الاستثمارية 🛡️';
+        verdictColor = 'bg-blue-500/20 text-blue-300 border border-blue-500/40';
+        verdictBadge = 'وسادة أمان S2';
+        verdictAdvice = evalStock.advice;
+      } else if (evalStock && evalStock.action === 'DEFENSIVE_HOLD') {
+        verdictTitle = 'حظر التبريد ومراقبة ارتداد لتخفيف المركز 🚫';
+        verdictColor = 'bg-slate-800 text-amber-300 border border-amber-600/40';
+        verdictBadge = 'حظر التبريد';
+        verdictAdvice = evalStock.advice;
+      } else if (evalStock && evalStock.action === 'STOP_LOSS_CONFIRMED') {
+        verdictTitle = 'تأكيد كسر الدعم بالإغلاق وحماية رأس المال 🔴';
+        verdictColor = 'bg-rose-500/20 text-rose-300 border border-rose-500/40';
+        verdictBadge = 'كسر مؤكد بالإغلاق';
+        verdictAdvice = evalStock.advice;
+      } else if (isStopBroken) {
         verdictTitle = 'حماية رأس المال ووقف الخسارة 🔴';
-        verdictColor = 'bg-rose-500/20 text-rose-300 border-rose-500/40';
+        verdictColor = 'bg-rose-500/20 text-rose-300 border border-rose-500/40';
         verdictBadge = 'وقف خسارة / خروج';
-        verdictAdvice = `السعر الحالي (${currentQuote.toFixed(2)} ج) كسر مستوى الأمان والدعم S1 (${stopLossVal.toFixed(2)} ج). الإجراء الإلزامي: حظر الشراء فوراً وتفعيل خطة الخروج أو التدوير لسهم أسرع تعويضاً لحماية رأس المال.`;
+        verdictAdvice = evalStock ? evalStock.advice : `السعر الحالي (${currentQuote.toFixed(2)} ج) كسر مستوى الأمان والدعم S1 (${stopLossVal.toFixed(2)} ج). الإجراء الإلزامي: حظر الشراء فوراً وتفعيل خطة الخروج أو التدوير لسهم أسرع تعويضاً لحماية رأس المال.`;
       } else if (isTargetReached) {
         verdictTitle = 'تأمين أرباح القمة وتكبير الأسهم مجاناً 🟡';
         verdictColor = 'bg-amber-500/20 text-amber-300 border-amber-500/40';
