@@ -93,9 +93,11 @@ export default async function handler(req, res) {
         const isReboundUnderTrend = (s.sma200 != null && s.price < s.sma200) || (s.changePct != null && s.changePct < 0);
         action = isReboundUnderTrend ? 'REBOUND_RESISTANCE_REDUCE' : 'TAKE_PROFIT_R1';
         alertLevel = isReboundUnderTrend ? 'REBOUND_REBALANCE' : 'POSITIVE_CATALYST';
+        const trailingStop = Number((s.pivotR1 * 0.975).toFixed(2));
+        const targetR2 = s.pivotR2 || Number((s.pivotR1 * 1.06).toFixed(2));
         advice = isReboundUnderTrend
           ? `ارتداد فني تصحيحي لاختبار المقاومة R1 (${s.pivotR1} ج) في مسار هابط • فرصة مناسبة لتخفيف المركز وتدوير السيولة لأصل صاعد.`
-          : `ملامسة المقاومة الفنية الأولى R1 (${s.pivotR1} ج) • للمراكز الرابحة: يُنصح بتأمين أرباح جزئية، وللمراكز المرتدة: تخفيف المركز وتدوير السيولة.`;
+          : `بلوغ مستهدف المقاومة الأولى R1 (${s.pivotR1} ج) • ارفع وقف الخسارة فوراً إلى [${trailingStop} ج] (لحجز الأرباح بهامش 2.5% لتذبذب الجلسة) ومراقبة امتداد الهدف التالي R2 (${targetR2} ج).`;
       } 
       // Evaluate against Pivot Support S1 Breakdown
       else if (s.pivotS1 && s.price < s.pivotS1) {

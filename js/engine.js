@@ -45,6 +45,151 @@
     },
 
     /**
+     * Calculate Trailing Stop Loss & Dynamic R2 Prospects when R1 is reached/tested
+     * Strictly avoids vague advice: computes exact trailing stop price (EGP) with a 2.5% volatility buffer,
+     * and evaluates R2 breakout probability using live dynamic metrics (RSI, Turnover, Price distance above R1).
+     */
+    calculateTrailingStopAndR2Prospects: function (params) {
+      if (!params || typeof params !== 'object') return null;
+
+      const currentPrice = Number(params.currentPrice) || 0;
+      const buyPrice = Number(params.buyPrice) || 0;
+      const pivotR1 = Number(params.pivotR1) || 0;
+      const pivotR2 = Number(params.pivotR2) || (pivotR1 > 0 ? Number((pivotR1 * 1.06).toFixed(2)) : 0);
+      const pivotS1 = Number(params.pivotS1) || 0;
+      const pp = Number(params.pp) || 0;
+      const rsi = (params.rsi !== undefined && params.rsi !== null && !isNaN(Number(params.rsi))) ? Number(Number(params.rsi).toFixed(1)) : 50;
+      const tradedValue = Number(params.tradedValue) || 0;
+      const volumeMultiplier = params.volumeMultiplier || '';
+      const category = params.category || 'core';
+
+      if (currentPrice <= 0 || pivotR1 <= 0) return null;
+
+      // 1. Exact Trailing Stop Loss Calculation (with 2.5% intraday volatility buffer below R1)
+      let proposedStop = Number((pivotR1 * 0.975).toFixed(2));
+
+      // If price surged higher above R1 (> +3%), trail dynamically under current price by 4%
+      if (currentPrice > pivotR1 * 1.03) {
+        proposedStop = Math.max(proposedStop, Number((currentPrice * 0.96).toFixed(2)));
+      }
+
+      // If buyPrice is known and profitable, ensure trailing stop secures breakeven + fee buffer at minimum
+      if (buyPrice > 0 && currentPrice > buyPrice) {
+        if (proposedStop < buyPrice) {
+          proposedStop = Number((buyPrice * 1.01).toFixed(2));
+        }
+      }
+
+      // Safety: trailing stop must strictly be below current price
+      if (proposedStop >= currentPrice) {
+        proposedStop = Number((currentPrice * 0.975).toFixed(2));
+      }
+
+      // Locked-in profit % at proposed trailing stop
+      const lockedProfitPct = (buyPrice > 0 && proposedStop > buyPrice)
+        ? Number((((proposedStop - buyPrice) / buyPrice) * 100).toFixed(1))
+        : null;
+
+      // Current profit %
+      const currentProfitPct = buyPrice > 0
+        ? Number((((currentPrice - buyPrice) / buyPrice) * 100).toFixed(1))
+        : null;
+
+      // 2. Dynamic Metric Factor 1: Distance & Stability above R1
+      const aboveR1Pct = Number((((currentPrice - pivotR1) / pivotR1) * 100).toFixed(1));
+      let factor1Text = '';
+      if (aboveR1Pct > 0) {
+        factor1Text = `ثبات السعر أعلى المقاومة R1 بنسبة (+${aboveR1Pct}%)`;
+      } else if (aboveR1Pct === 0) {
+        factor1Text = `ملامسة مباشرة لسقف المقاومة R1 (${pivotR1.toFixed(2)} ج)`;
+      } else {
+        factor1Text = `محاولة اختراق المقاومة R1 (السعر أدنى منها بـ ${Math.abs(aboveR1Pct)}%)`;
+      }
+
+      // 3. Dynamic Metric Factor 2: RSI Momentum
+      let rsiStatus = 'BULLISH';
+      let factor2Text = '';
+      if (rsi >= 50 && rsi <= 75) {
+        rsiStatus = 'BULLISH';
+        factor2Text = `مؤشر الزخم في نطاق صاعد صحي (RSI: ${rsi}) دون تشبع مفرط`;
+      } else if (rsi > 75) {
+        rsiStatus = 'OVERBOUGHT';
+        factor2Text = `دخول مؤشر الزخم في تشبع شرائي حاد (RSI: ${rsi}) ينذر بجني أرباح تصحيحي`;
+      } else {
+        rsiStatus = 'WEAK';
+        factor2Text = `هدوء القوة الشرائية اللحظية (RSI: ${rsi}) مما يقلل عزم الاختراق السريع`;
+      }
+
+      // 4. Dynamic Metric Factor 3: Liquidity & Turnover
+      let factor3Text = '';
+      let turnoverFormatted = '';
+      if (tradedValue > 0) {
+        turnoverFormatted = tradedValue >= 1000000 
+          ? `${(tradedValue / 1000000).toFixed(1)} مليون ج` 
+          : `${Math.round(tradedValue / 1000)} ألف ج`;
+        factor3Text = `تنفيذ سيولة نشطة بقيمة ${turnoverFormatted}`;
+      } else if (volumeMultiplier) {
+        turnoverFormatted = volumeMultiplier;
+        factor3Text = `حجم تداول بزخم ${volumeMultiplier}`;
+      } else {
+        turnoverFormatted = 'سيولة اعتيادية';
+        factor3Text = `معدلات تداول اعتيادية`;
+      }
+
+      // 5. Target R2 distance and upside
+      const targetR2 = pivotR2 > currentPrice ? pivotR2 : Number((pivotR1 * 1.06).toFixed(2));
+      const r2DistancePct = Number((((targetR2 - currentPrice) / currentPrice) * 100).toFixed(1));
+
+      // 6. Overall Verdict on R2
+      let verdict = 'FAVORED';
+      let headline = '';
+      let adviceText = '';
+
+      if (category === 'satellite') {
+        // Satellite portfolio prioritizes locking in tactical gains
+        if (rsiStatus === 'OVERBOUGHT' || rsiStatus === 'WEAK') {
+          verdict = 'EXHAUSTED';
+          headline = `🎯 جني أرباح تكتيكي لمحفظة الأقمار`;
+          adviceText = `🎯 وصول لهدف R1 (${pivotR1} ج) • 💡 يُنصح بالبيع وجني الأرباح لتأمين كاش محفظة الأقمار بدلاً من المخاطرة بانتظار R2 (${targetR2} ج) بسبب: (1) ${factor2Text}، (2) ${factor1Text}. لضمان الأرباح إن أردت الانتظار: ارفع الوقف فوراً إلى [${proposedStop} ج].`;
+        } else {
+          verdict = 'FAVORED';
+          headline = `🎯 بلوغ الهدف التكتيكي R1 (${pivotR1} ج)`;
+          adviceText = `🎯 وصول لهدف R1 (${pivotR1} ج) • 💡 ارفع وقف الخسارة فوراً إلى [${proposedStop} ج] (لحجز ربح ${lockedProfitPct !== null ? '+' + lockedProfitPct + '%' : 'مضمون'} مع ترك هامش 2.5% لتذبذب الجلسة). 🚀 فرصة الامتداد لـ R2 (${targetR2} ج / +${r2DistancePct}%) مدعومة بـ: (1) ${factor1Text}، (2) ${factor2Text}، (3) ${factor3Text}.`;
+        }
+      } else {
+        // Core portfolio allows riding the trend if momentum supports it
+        if (rsiStatus === 'OVERBOUGHT') {
+          verdict = 'EXHAUSTED';
+          headline = `⚠️ وصول لمقاومة R1 مع تشبع شرائي`;
+          adviceText = `🎯 ملامسة المقاومة R1 (${pivotR1} ج) • 💡 ارفع وقف الخسارة فوراً إلى [${proposedStop} ج]. يُفضل تأمين جزء من الأرباح (30%-50%) بسبب: (1) ${factor2Text}، (2) ${factor1Text}. فرصة R2 (${targetR2} ج) تتطلب الحذر من هبوط مفاجئ.`;
+        } else if (rsiStatus === 'BULLISH' && aboveR1Pct >= 0) {
+          verdict = 'FAVORED';
+          headline = `🚀 تجاوز المقاومة R1 والامتداد نحو R2`;
+          adviceText = `🎯 تجاوز المقاومة R1 (${pivotR1} ج) • 💡 ارفع وقف الخسارة فوراً إلى [${proposedStop} ج] (لحجز ربح ${lockedProfitPct !== null ? '+' + lockedProfitPct + '%' : 'مضمون'} مع ترك هامش 2.5% لتذبذب الجلسة). 🚀 امتداد الصعود لـ R2 (${targetR2} ج / +${r2DistancePct}%) مرجح بسبب: (1) ${factor1Text}، (2) ${factor2Text}، (3) ${factor3Text}.`;
+        } else {
+          verdict = 'CAUTIOUS';
+          headline = `🎯 اختبار المقاومة R1 (${pivotR1} ج)`;
+          adviceText = `🎯 اختبار المقاومة R1 (${pivotR1} ج) • 💡 ارفع وقف الخسارة إلى [${proposedStop} ج]. يُنصح بمراقبة استقرار التداول؛ الامتداد لـ R2 (${targetR2} ج) يتطلب زيادة في السيولة: (1) ${factor1Text}، (2) ${factor2Text}، (3) ${factor3Text}.`;
+        }
+      }
+
+      return {
+        proposedStop,
+        lockedProfitPct,
+        currentProfitPct,
+        targetR2,
+        r2DistancePct,
+        aboveR1Pct,
+        rsiStatus,
+        turnoverFormatted,
+        verdict,
+        headline,
+        adviceText,
+        factors: [factor1Text, factor2Text, factor3Text]
+      };
+    },
+
+    /**
      * Calculate Risk/Reward Ratio with complete protection against division by zero
      * and inverted entries (close >= r1 or close <= stopLoss).
      */
@@ -224,6 +369,7 @@
       const buyPrice = cleanNum(asset.buyPrice) || 0;
       const currentPrice = cleanNum(asset.currentPrice) || buyPrice;
       const pivotR1 = cleanNum(asset.pivotR1 || asset.target1);
+      const pivotR2 = cleanNum(asset.pivotR2 || asset.target2);
       const pivotS1 = cleanNum(asset.pivotS1 || asset.support);
       const sma50 = cleanNum(asset.sma50);
       const rsi = cleanNum(asset.rsi) || 50;
@@ -279,9 +425,26 @@
         if (pivotR1 && currentPrice >= pivotR1) {
           action = 'REBALANCE_CANDIDATE';
           alertLevel = 'TARGET_HIT';
-          badgeText = '🎯 جني أرباح قمة جزئية';
+          badgeText = '🎯 بلوغ الهدف R1';
           badgeColor = 'bg-amber-500/20 text-amber-300 border border-amber-500/40 shadow-sm';
-          advice = `وصول لمستوى المقاومة R1 (${pivotR1.toFixed(2)} ج) مع عائد (+${returnPct.toFixed(1)}%). يُنصح بتأمين أرباح جزئية وإعادة الشراء في القاع.`;
+          const prospects = (typeof this.calculateTrailingStopAndR2Prospects === 'function')
+            ? this.calculateTrailingStopAndR2Prospects({
+                currentPrice,
+                buyPrice,
+                pivotR1,
+                pivotR2,
+                pivotS1,
+                rsi,
+                tradedValue: cleanNum(asset.tradedValue),
+                volumeMultiplier: asset.volumeMultiplier,
+                category: asset.category
+              })
+            : null;
+          if (prospects) {
+            advice = prospects.adviceText;
+          } else {
+            advice = `وصول لمستوى المقاومة R1 (${pivotR1.toFixed(2)} ج) مع عائد (+${returnPct.toFixed(1)}%). يُنصح بتأمين أرباح جزئية وإعادة تدوير السيولة.`;
+          }
         } else if (returnPct >= 18) {
           action = 'REBALANCE_CANDIDATE';
           alertLevel = 'TARGET_HIT';

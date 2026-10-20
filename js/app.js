@@ -265,7 +265,27 @@
                   if (isLosing) {
                     item.advice = `🔄 ارتداد فني لمستوى المقاومة R1 (${item.pivotR1} ج) • سهم ${item.name} يختبر المقاومة بتراجع (${item.returnPct.toFixed(1)}%). فرصة مناسبة لتخفيف المركز وتدوير السيولة لأصل أسرع نمواً.`;
                   } else {
-                    item.advice = `🎯 وصول لمستوى المقاومة الفنية الأولى R1 (${item.pivotR1} ج) • سهم ${item.name} في منطقة جني أرباح القمة (+${item.returnPct.toFixed(1)}%). يُنصح بتأمين أرباح جزئية وإعادة تدوير السيولة.`;
+                    const prospects = (typeof EGX_Engine !== 'undefined' && typeof EGX_Engine.calculateTrailingStopAndR2Prospects === 'function')
+                      ? EGX_Engine.calculateTrailingStopAndR2Prospects({
+                          currentPrice: item.currentPrice,
+                          buyPrice: item.buyPrice,
+                          pivotR1: item.pivotR1,
+                          pivotR2: item.pivotR2,
+                          pivotS1: item.pivotS1,
+                          rsi: item.rsi,
+                          tradedValue: item.tradedValue,
+                          volumeMultiplier: item.volumeMultiplier,
+                          category: item.category
+                        })
+                      : null;
+                    if (prospects) {
+                      item.proposedTrailingStop = prospects.proposedStop;
+                      item.r2Prospects = prospects;
+                      item.advice = prospects.adviceText;
+                      item.decisionBasis = `سعر البورصة: ${item.currentPrice.toFixed(2)} ج | مقاومة R1: ${item.pivotR1} ج | وقف متحرك مقترح: ${prospects.proposedStop} ج | هدف R2: ${prospects.targetR2} ج`;
+                    } else {
+                      item.advice = `🎯 وصول لمستوى المقاومة الفنية الأولى R1 (${item.pivotR1} ج) • سهم ${item.name} في منطقة جني أرباح القمة (+${item.returnPct.toFixed(1)}%). يُنصح بتأمين أرباح جزئية وإعادة تدوير السيولة.`;
+                    }
                   }
                 }
                 // 2. Critical Support Breakdown (Pivot S1 Broken - Stop Loss Trigger)
@@ -476,9 +496,11 @@
               : `🟢 وصول لهدف المقاومة R1: ${item.name} (${item.ticker})`,
             desc: isLosing
               ? `السعر الحالي (${Number(item.currentPrice).toFixed(2)} ج) وصل لمستوى المقاومة R1 (${item.pivotR1} ج) في موجة ارتدادية (تراجع المركز ${item.returnPct.toFixed(1)}%). يُنصح بتخفيف المركز وتدوير السيولة.`
-              : `السعر الحالي (${Number(item.currentPrice).toFixed(2)} ج) حقق مستهدف المقاومة R1 (${item.pivotR1} ج) مع عائد (+${item.returnPct.toFixed(1)}%). يُنصح بتأمين أرباح القمة.`,
-            badge: isLosing ? 'تخفيف ارتداد' : 'جني أرباح',
-            actionLabel: isLosing ? 'تخفيف وتدوير 🔄' : 'تأمين أرباح القمة 💰',
+              : (item.r2Prospects
+                  ? `السعر (${Number(item.currentPrice).toFixed(2)} ج) حقق مستهدف R1 (${item.pivotR1} ج) بعائد (+${item.returnPct.toFixed(1)}%). 🛡️ ارفع الوقف فوراً إلى [${item.r2Prospects.proposedStop} ج] (لحجز ربح ${item.r2Prospects.lockedProfitPct !== null ? '+' + item.r2Prospects.lockedProfitPct + '%' : 'مضمون'}). ${item.r2Prospects.verdict === 'FAVORED' ? `🚀 فرصة R2 (${item.r2Prospects.targetR2} ج): ${item.r2Prospects.factors[0]} و${item.r2Prospects.factors[1]}.` : `⚠️ يُفضل جني الأرباح: ${item.r2Prospects.factors[1]}.`}`
+                  : `السعر الحالي (${Number(item.currentPrice).toFixed(2)} ج) حقق مستهدف المقاومة R1 (${item.pivotR1} ج) مع عائد (+${item.returnPct.toFixed(1)}%). يُنصح بتأمين أرباح القمة.`),
+            badge: isLosing ? 'تخفيف ارتداد' : (item.r2Prospects && item.r2Prospects.verdict === 'FAVORED' ? 'امتداد نحو R2 🚀' : 'جني أرباح 🎯'),
+            actionLabel: isLosing ? 'تخفيف وتدوير 🔄' : (item.r2Prospects ? `تأمين عند ${item.r2Prospects.proposedStop} ج 🛡️` : 'تأمين أرباح القمة 💰'),
             actionType: 'ROTATION',
             time: formatCairoTime(new Date(), false, true)
           };

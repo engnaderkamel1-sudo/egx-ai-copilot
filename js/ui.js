@@ -1723,7 +1723,7 @@
 
       if (close >= r1) {
         const rewardPct = ((r2 - close) / close) * 100;
-        const trailingStop = pivot;
+        const trailingStop = Math.max(pivot, Number((r1 * 0.975).toFixed(2)));
         const riskPct = ((close - trailingStop) / close) * 100;
         const rrRatio = riskPct > 0 ? (rewardPct / riskPct) : 1;
 
@@ -1745,7 +1745,7 @@
             <span>تجاوز المقاومة الأولى R1: استهداف المقاومة الثانية R2 (${r2.toFixed(2)} ج)</span>
           </div>
           <p class="text-[11px] text-gray-300">
-            تم تحقيق الهدف الفني الأول بنجاح (+${(((close - pivot) / pivot) * 100).toFixed(1)}%). للاستمرار في الصفقة نحو R2، ارفع وقف الخسارة إلى الارتكاز (${pivot.toFixed(2)} ج) لتأمين الأرباح ومنع تحولها لخسارة.
+            تم بلوغ الهدف الفني الأول بنجاح (+${(((close - pivot) / pivot) * 100).toFixed(1)}%). للاستمرار في الصفقة نحو R2، ارفع وقف الخسارة المتحرك فوراً إلى [${trailingStop.toFixed(2)} ج] (تحت R1 بهامش أمان 2.5% لمراعاة تذبذب الجلسة) لحجز الأرباح وتجنب الخروج العشوائي.
           </p>
         `;
         if (window.lucide) lucide.createIcons();

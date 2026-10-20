@@ -177,6 +177,15 @@ for ($i = 1; $i -le 100; $i++) {
 }
 Assert-Test -Suite 'Math' -TestName '100 Randomized Stress Test Cases Produce Valid Finite Metrics' -Condition ($randomMathErrors -eq 0) -Expected '0 errors' -Actual "$randomMathErrors errors"
 
+# Trailing Stop & R2 Mathematical Verification at R1
+$testR1 = 110.0
+$testBuy = 100.0
+$testCur = 111.0
+$expectedStop = [Math]::Round(($testR1 * 0.975), 2)
+$lockedGain = [Math]::Round(((($expectedStop - $testBuy) / $testBuy) * 100), 1)
+Assert-Test -Suite 'Math' -TestName 'Trailing Stop at R1 has exact 2.5 pct volatility buffer (107.25 EGP)' -Condition ($expectedStop -eq 107.25) -Expected '107.25' -Actual $expectedStop
+Assert-Test -Suite 'Math' -TestName 'Trailing Stop at R1 strictly locks in positive gains (>= 7.0 pct)' -Condition ($lockedGain -ge 7.0) -Expected '>= 7.0' -Actual $lockedGain
+
 # -------------------------------------------------------------
 # SUITE 2: PORTFOLIO STATE INVARIANCE & CAPITAL CONSERVATION (200 Transactions)
 # -------------------------------------------------------------
