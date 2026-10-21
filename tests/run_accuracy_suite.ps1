@@ -643,8 +643,8 @@ Assert-Test -Suite 'Architecture' -TestName 'UI modal strictly derives Title, Ad
 # -------------------------------------------------------------
 Write-Host "[10/10] Running Suite 10: 5-Category Action Hub Prioritization & Sorting Invariance..." -ForegroundColor Yellow
 
-$hasCategoriesInEngine = $engineJs.Contains("categories: {") -and $engineJs.Contains("profitTaking,") -and $engineJs.Contains("riskDefense,") -and $engineJs.Contains("accumulation,") -and $engineJs.Contains("marketOpportunities,") -and $engineJs.Contains("waitAndHold")
-Assert-Test -Suite 'ActionHub' -TestName 'Engine returns all 5 prioritized categories' -Condition $hasCategoriesInEngine -Expected 'True' -Actual $hasCategoriesInEngine
+$hasCategoriesInEngine = $engineJs.Contains("categories: {") -and $engineJs.Contains("profitTaking,") -and $engineJs.Contains("riskDefense,") -and $engineJs.Contains("safetyLevelUpdates,") -and $engineJs.Contains("accumulation,") -and $engineJs.Contains("marketOpportunities,") -and $engineJs.Contains("waitAndHold")
+Assert-Test -Suite 'ActionHub' -TestName 'Engine returns all 6 prioritized categories' -Condition $hasCategoriesInEngine -Expected 'True' -Actual $hasCategoriesInEngine
 
 # Mathematical sorting test: Profit-Taking strictly descending by returnPct
 $mockProfitItems = @(
@@ -670,8 +670,11 @@ Assert-Test -Suite 'ActionHub' -TestName 'Risk defense category sorts strictly d
 $hasSwitchCategory = $uiJs.Contains("function switchActionHubCategory") -and $uiJs.Contains("window.switchActionHubCategory = switchActionHubCategory")
 Assert-Test -Suite 'ActionHub' -TestName 'UI implements and exports switchActionHubCategory' -Condition $hasSwitchCategory -Expected 'True' -Actual $hasSwitchCategory
 
-$hasCategoryTabs = $uiJs.Contains("renderProfitTakingCard") -and $uiJs.Contains("renderRiskDefenseCard") -and $uiJs.Contains("renderAccumulationCard") -and $uiJs.Contains("renderMarketOpportunityCard") -and $uiJs.Contains("renderWaitAndHoldCard")
-Assert-Test -Suite 'ActionHub' -TestName 'UI implements dedicated card renderers for all 5 categories' -Condition $hasCategoryTabs -Expected 'True' -Actual $hasCategoryTabs
+$hasCategoryTabs = $uiJs.Contains("renderProfitTakingCard") -and $uiJs.Contains("renderRiskDefenseCard") -and $uiJs.Contains("renderSafetyLevelUpdateCard") -and $uiJs.Contains("renderAccumulationCard") -and $uiJs.Contains("renderMarketOpportunityCard") -and $uiJs.Contains("renderWaitAndHoldCard")
+Assert-Test -Suite 'ActionHub' -TestName 'UI implements dedicated card renderers for all 6 categories' -Condition $hasCategoryTabs -Expected 'True' -Actual $hasCategoryTabs
+
+$hasQuickSafety = $uiJs.Contains("function quickApplySafetyLevel") -and $uiJs.Contains("window.quickApplySafetyLevel = quickApplySafetyLevel")
+Assert-Test -Suite 'ActionHub' -TestName 'UI implements and exports quickApplySafetyLevel' -Condition $hasQuickSafety -Expected 'True' -Actual $hasQuickSafety
 
 # -------------------------------------------------------------
 # FINAL BENCHMARK SUMMARY & ACCURACY SCORE

@@ -77,6 +77,37 @@
             </div>
           </div>
 
+          <!-- Cash Allocation Destination Selector (Visible during SELL mode) -->
+          <div id="trade-sell-allocation-box" class="p-3 bg-gray-950 rounded-xl border border-gray-800 space-y-2 hidden">
+            <label class="block text-gray-200 font-bold text-xs flex items-center gap-1.5">
+              <i data-lucide="compass" class="w-3.5 h-3.5 text-cyan-400"></i>
+              <span>أين تريد توجيه السيولة النقدية الناتجة عن البيع؟</span>
+            </label>
+            <div class="space-y-1.5">
+              <label class="flex items-center gap-2 text-gray-200 text-xs p-2 rounded-lg bg-gray-900 border border-gray-800 cursor-pointer hover:border-emerald-500/40">
+                <input type="radio" name="trade-cash-dest" id="dest-free-cash" value="FREE_CASH" checked class="text-emerald-500">
+                <div>
+                  <span class="font-bold text-white block">💵 إيداع كاش حر في المحفظة (الافتراضي)</span>
+                  <span class="text-[10.5px] text-gray-400">ينزل العائد فوراً في رصيد الكاش الحر لديك ويكون جاهزاً لاقتناص أي هبوط.</span>
+                </div>
+              </label>
+              <label class="flex items-center gap-2 text-gray-200 text-xs p-2 rounded-lg bg-gray-900 border border-gray-800 cursor-pointer hover:border-cyan-500/40">
+                <input type="radio" name="trade-cash-dest" id="dest-pending-buy" value="PENDING_BUY" class="text-cyan-500">
+                <div>
+                  <span class="font-bold text-cyan-300 block">🎯 تسجيل أمر شراء معلق عند الدعم (تكبير الأسهم مجاناً)</span>
+                  <span class="text-[10.5px] text-gray-400">حجز المبلغ لإعادة شراء نفس السهم عند القاع لكسب أسهم إضافية مجاناً.</span>
+                </div>
+              </label>
+              <label class="flex items-center gap-2 text-gray-200 text-xs p-2 rounded-lg bg-gray-900 border border-gray-800 cursor-pointer hover:border-purple-500/40">
+                <input type="radio" name="trade-cash-dest" id="dest-radar-rotate" value="RADAR_ROTATE" class="text-purple-500">
+                <div>
+                  <span class="font-bold text-purple-300 block">🚀 تدوير في فرصة ذهبية من رادار السوق</span>
+                  <span class="text-[10.5px] text-gray-400">توجيه المبلغ لشراء سهم قيادي يتداول في قاع صاعد من رادار السوق.</span>
+                </div>
+              </label>
+            </div>
+          </div>
+
           <!-- Auto Cash Deduction Checkbox -->
           <label class="flex items-center gap-2 text-gray-300 text-[11px] cursor-pointer">
             <input type="checkbox" id="trade-auto-cash" checked class="rounded border-gray-700 text-emerald-600 focus:ring-emerald-500 bg-gray-950 w-4 h-4">

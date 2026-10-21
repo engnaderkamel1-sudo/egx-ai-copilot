@@ -12,7 +12,7 @@ $onclicks = @(
   'hardResetPortfolioToDefault', 'openAddAssetModal', 'openAuditModal', 'openFineTuneModal',
   'openGeminiModal', 'openNotificationCenter', 'openPositionSizingModal', 'openPriceLevelsModal',
   'openRotationPlanModalByTicker', 'openRotationPlanModal', 'openSanityAuditModal',
-  'openThndrSyncModal', 'openTradeModal', 'pasteThndrFromClipboard', 'printAuditReport', 'removeGeminiApiKey',
+  'openThndrSyncModal', 'openTradeModal', 'pasteThndrFromClipboard', 'printAuditReport', 'quickApplySafetyLevel', 'removeGeminiApiKey',
   'requestBrowserNotificationPermission', 'resetCustomPriceLevelsModal', 'resetPaperTrading',
   'resetToDefaultPortfolio', 'runLiveSanityAudit', 'runSimulationEngine', 'saveCustomPriceLevelsModal',
   'saveGeminiApiKeyFromInput', 'saveGeminiKeyFromModal', 'saveInlineGeminiKey', 'saveStrategySettings',

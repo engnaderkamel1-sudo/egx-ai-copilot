@@ -449,6 +449,14 @@
         submitLabel.innerText = 'تأكيد عملية البيع وإيداع الأرباح في الكاش';
         cashLabel.innerText = 'إضافة عائد البيع تلقائياً إلى رصيد الكاش المتوفر';
       }
+      const sellAllocBox = document.getElementById('trade-sell-allocation-box');
+      if (sellAllocBox) {
+        if (mode === 'SELL') {
+          sellAllocBox.classList.remove('hidden');
+        } else {
+          sellAllocBox.classList.add('hidden');
+        }
+      }
       populateTradeStockDropdown();
       onTradeStockSelected();
       recalcTradeSummary();
@@ -734,9 +742,20 @@
           console.warn('Post-mortem learning non-fatal warning:', postMortemErr);
         }
 
+        const cashDest = document.querySelector('input[name="trade-cash-dest"]:checked')?.value || 'FREE_CASH';
+        let destMsg = 'تم إيداع صافي العائد في رصيدك الكاش الحر.';
+        if (cashDest === 'PENDING_BUY') {
+          destMsg = 'تم تسجيل تخصيص العائد لأمر شراء معلق عند الدعم لإعادة الشراء وتكبير الأسهم مجاناً 🎯';
+        } else if (cashDest === 'RADAR_ROTATE') {
+          destMsg = 'تم تجهيز السيولة لتدويرها في فرصة ذهبية من رادار السوق 🚀';
+        }
+
         savePortfolio();
         closeTradeModal();
-        alert(`✅ تم بنجاح تسجيل بيع ${shares} سهم في (${ticker}) بسعر ${price.toFixed(2)} ج. صافي عائد البيع: ${netSellValue.toLocaleString('en-US')} ج تم إيداعه بالكاش (بعد خصم عمولة ${estCommission} ج). الأرباح المحققة: ${realizedProfit >= 0 ? '+' : ''}${realizedProfit.toLocaleString('en-US')} ج.م.`);
+        alert(`✅ تم بنجاح تسجيل بيع ${shares} سهم في (${ticker}) بسعر ${price.toFixed(2)} ج.\nصافي عائد البيع: ${netSellValue.toLocaleString('en-US')} ج.م (بعد خصم عمولة ${estCommission} ج).\nالأرباح المحققة: ${realizedProfit >= 0 ? '+' : ''}${realizedProfit.toLocaleString('en-US')} ج.م.\nتوجيه السيولة: ${destMsg}`);
+        if (cashDest === 'RADAR_ROTATE' && typeof switchTab === 'function') {
+          switchTab('radar');
+        }
       }
 
       fetchLiveEGXPricesAndReevaluate();

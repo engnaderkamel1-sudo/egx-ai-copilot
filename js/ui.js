@@ -220,11 +220,44 @@
       }
     }
 
+    function quickApplySafetyLevel(ticker, newStopLoss) {
+      if (!ticker) return;
+      const parsed = parseFloat(newStopLoss);
+      if (isNaN(parsed) || parsed <= 0) {
+        if (typeof showToast === 'function') showToast('يرجى إدخال رقم صحيح لخط الأمان', 'warning');
+        return;
+      }
+
+      if (typeof EGX_Portfolio !== 'undefined' && typeof EGX_Portfolio.setCustomLevels === 'function') {
+        EGX_Portfolio.setCustomLevels(ticker, { customStopLoss: parsed });
+      }
+
+      if (typeof portfolioData !== 'undefined' && Array.isArray(portfolioData)) {
+        const stock = portfolioData.find(s => s.ticker === ticker);
+        if (stock) {
+          stock.customStopLoss = parsed;
+          stock.stopLoss = parsed;
+        }
+      }
+
+      if (typeof savePortfolio === 'function') savePortfolio();
+      if (typeof renderPortfolioTable === 'function') renderPortfolioTable();
+      if (typeof renderDailyActionHub === 'function') renderDailyActionHub();
+
+      if (typeof showToast === 'function') {
+        showToast(`تم رفع وتثبيت خط الأمان لسهم ${ticker} عند ${parsed.toFixed(2)} ج بنجاح 🛡️`, 'success');
+      } else {
+        alert(`تم رفع وتثبيت خط الأمان لسهم ${ticker} عند ${parsed.toFixed(2)} ج بنجاح 🛡️`);
+      }
+    }
+    window.quickApplySafetyLevel = quickApplySafetyLevel;
+
     function switchActionHubCategory(catId) {
       window.activeActionHubCategory = catId;
       renderDailyActionHub();
     }
     window.switchActionHubCategory = switchActionHubCategory;
+    window.quickApplySafetyLevel = quickApplySafetyLevel;
 
     function renderProfitTakingCard(item, rank) {
       return `
@@ -249,6 +282,16 @@
               <p>• <strong>الخطوة 1 (بيع جزئي 30%):</strong> بيع <strong class="text-amber-300 font-mono">${item.sellShares} سهم</strong> بسعر القمة لحبس كاش مضمون <strong class="text-emerald-400 font-mono">${item.sellCash.toLocaleString('en-US')} ج.م</strong> مع ربح محقق <strong class="text-white font-mono">${item.realizedProfit.toLocaleString('en-US')} ج.م</strong>.</p>
               <p>• <strong>الخطوة 2 (إعادة شراء بالقاع):</strong> وضع أمر شراء عند الدعم <strong class="text-cyan-300 font-mono">${item.rebuyPrice} ج.م</strong> لشراء <strong class="text-white font-mono">${item.rebuyShares} سهم</strong>.</p>
               <p class="text-emerald-300 font-semibold">• <strong>المكسب المجاني (تكبير الأسهم):</strong> رصيد أسهمك سيزداد بمقدار <strong class="text-white font-mono font-bold">+${item.netGainShares} أسهم زيادة مجاناً</strong> دون دفع أي مليم!</p>
+            </div>
+
+            <div class="mt-2 pt-2 border-t border-gray-800/80 flex items-center justify-between flex-wrap gap-2 text-[11px] bg-blue-950/30 p-2.5 rounded-lg border border-blue-500/20">
+              <span class="text-blue-300 font-bold flex items-center gap-1.5">
+                <i data-lucide="shield-check" class="w-3.5 h-3.5 text-blue-400"></i>
+                <span>خط الأمان المقترح لحبس الأرباح: <strong class="text-white font-mono">${(item.currentPrice * 0.97).toFixed(2)} ج</strong></span>
+              </span>
+              <button onclick="quickApplySafetyLevel('${item.ticker}', ${(item.currentPrice * 0.97).toFixed(2)})" class="text-blue-400 hover:text-blue-300 font-bold underline cursor-pointer text-xs">
+                تثبيت خط الأمان فوراً 🛡️
+              </button>
             </div>
 
             <div class="flex items-center gap-2 flex-wrap pt-1">
@@ -416,6 +459,68 @@
       `;
     }
 
+    function renderSafetyLevelUpdateCard(item, rank) {
+      return `
+        <div class="bg-gray-950/90 border border-blue-500/40 hover:border-blue-500/70 rounded-xl overflow-hidden shadow-lg transition-all">
+          <div class="bg-blue-950/60 border-b border-blue-500/30 p-3 flex items-center justify-between flex-wrap gap-2">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-blue-400 animate-pulse"></span>
+              <span class="text-xs font-black text-blue-300">أولوية #${rank} • ${item.name} (${item.ticker})</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="font-mono font-bold text-xs text-emerald-400 bg-emerald-950/70 border border-emerald-500/30 px-2 py-0.5 rounded">
+                ${item.currentPrice.toFixed(2)} ج (+${item.returnPct.toFixed(1)}%)
+              </span>
+              <span class="text-[10px] px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/40 font-bold">
+                🛡️ حماية أرباح (+${item.lockedProfitPct}%)
+              </span>
+            </div>
+          </div>
+
+          <div class="p-3.5 space-y-3">
+            <div class="text-[11.5px] text-gray-300 leading-relaxed bg-gray-900/90 p-3 rounded-lg border border-gray-800 space-y-2 font-sans">
+              <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-center font-mono pb-1 border-b border-gray-800/80">
+                <div class="p-2 rounded-lg bg-gray-950/80 border border-gray-800">
+                  <span class="text-[10px] text-gray-400 block font-sans">خط الأمان الحالي القديم</span>
+                  <span class="font-bold text-xs text-amber-400">${item.currentStopLoss.toFixed(2)} ج</span>
+                  <span class="text-[9px] text-rose-400 block font-sans">معرض لخسارة المكسب</span>
+                </div>
+                <div class="p-2 rounded-lg bg-gray-950/80 border border-blue-500/30">
+                  <span class="text-[10px] text-blue-300 block font-sans">خط الأمان المقترح الجديد</span>
+                  <span class="font-bold text-xs text-blue-400">${item.suggestedStop.toFixed(2)} ج</span>
+                  <span class="text-[9px] text-emerald-400 block font-sans">يحبس ربح +${item.lockedProfitPct}%</span>
+                </div>
+                <div class="p-2 rounded-lg bg-gray-950/80 border border-gray-800 col-span-2 sm:col-span-1">
+                  <span class="text-[10px] text-gray-400 block font-sans">قيمة الأرباح المحمية</span>
+                  <span class="font-bold text-xs text-emerald-400">+${item.profitAtRisk.toLocaleString('en-US')} ج.م</span>
+                  <span class="text-[9px] text-gray-400 block font-sans">${item.shares} سهم مملوك</span>
+                </div>
+              </div>
+              <p class="text-[11.5px] leading-relaxed">
+                • <strong>توجيه المستشار:</strong> السهم صعد بنجاح وابتعد عن نقطة الدخول. ارفع خط الأمان الآن إلى <strong class="text-blue-300 font-mono">${item.suggestedStop} ج</strong> لضمان الخروج بربح لا يقل عن <strong class="text-emerald-400 font-mono">+${item.lockedProfitPct}%</strong> في حال حدث أي هبوط مفاجئ.
+              </p>
+            </div>
+
+            <div class="flex items-center gap-2 flex-wrap pt-1">
+              <div class="flex items-center gap-1.5 bg-gray-900 border border-gray-700 px-2.5 py-1.5 rounded-xl">
+                <span class="text-[11px] text-gray-300 font-bold whitespace-nowrap">السعر الجديد:</span>
+                <input type="number" step="0.05" id="quick-stop-input-${item.ticker}" value="${item.suggestedStop}" class="w-20 bg-gray-950 border border-blue-500/50 rounded-lg px-2 py-1 text-center font-mono font-bold text-xs text-white focus:outline-none focus:border-blue-400">
+                <span class="text-[10.5px] text-gray-400">ج</span>
+              </div>
+              <button onclick="quickApplySafetyLevel('${item.ticker}', document.getElementById('quick-stop-input-${item.ticker}').value)" class="flex-1 py-2 px-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-extrabold text-xs flex items-center justify-center gap-1.5 transition shadow-lg shadow-blue-950/40 cursor-pointer">
+                <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+                <span>اعتماد وتثبيت خط الأمان الجديد 🛡️</span>
+              </button>
+              <button onclick="openPriceLevelsModal('${item.ticker}')" class="py-2 px-3 rounded-xl bg-gray-900 hover:bg-gray-800 text-blue-300 font-bold text-xs flex items-center justify-center gap-1 border border-blue-500/30 cursor-pointer" title="تعديل وفحص المستويات كاملة">
+                <i data-lucide="sliders" class="w-3.5 h-3.5"></i>
+                <span>تعديل متقدم ⚙️</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
     function renderWaitAndHoldCard(item, rank) {
       return `
         <div class="bg-gray-950/90 border border-slate-800 hover:border-slate-700 rounded-xl overflow-hidden shadow-lg transition-all">
@@ -465,6 +570,7 @@
       const categories = hubData.categories || {
         profitTaking: [],
         riskDefense: [],
+        safetyLevelUpdates: [],
         accumulation: [],
         marketOpportunities: [],
         waitAndHold: []
@@ -473,6 +579,7 @@
       const counts = {
         profitTaking: (categories.profitTaking || []).length,
         riskDefense: (categories.riskDefense || []).length,
+        safetyLevelUpdates: (categories.safetyLevelUpdates || []).length,
         accumulation: (categories.accumulation || []).length,
         marketOpportunities: (categories.marketOpportunities || []).length,
         waitAndHold: (categories.waitAndHold || []).length
@@ -483,6 +590,7 @@
       if (!activeCat || !categories[activeCat]) {
         if (counts.profitTaking > 0) activeCat = 'profitTaking';
         else if (counts.riskDefense > 0) activeCat = 'riskDefense';
+        else if (counts.safetyLevelUpdates > 0) activeCat = 'safetyLevelUpdates';
         else if (counts.accumulation > 0) activeCat = 'accumulation';
         else if (counts.marketOpportunities > 0) activeCat = 'marketOpportunities';
         else activeCat = 'waitAndHold';
@@ -509,6 +617,16 @@
           activeBg: 'bg-rose-500/20 text-rose-300 shadow-lg shadow-rose-500/10',
           inactiveBorder: 'border-gray-800 hover:border-rose-500/40 text-gray-400 hover:text-rose-300',
           badgeClass: counts.riskDefense > 0 ? 'bg-rose-500/30 text-rose-300 border border-rose-500/50' : 'bg-gray-800 text-gray-500'
+        },
+        {
+          id: 'safetyLevelUpdates',
+          name: 'رفع خط الأمان',
+          icon: 'shield-check',
+          count: counts.safetyLevelUpdates,
+          activeBorder: 'border-blue-500',
+          activeBg: 'bg-blue-500/20 text-blue-300 shadow-lg shadow-blue-500/10',
+          inactiveBorder: 'border-gray-800 hover:border-blue-500/40 text-gray-400 hover:text-blue-300',
+          badgeClass: counts.safetyLevelUpdates > 0 ? 'bg-blue-500/30 text-blue-300 border border-blue-500/50' : 'bg-gray-800 text-gray-500'
         },
         {
           id: 'accumulation',
@@ -579,6 +697,12 @@
             emptyIcon = 'shield-check';
             emptyColor = 'text-emerald-400';
             break;
+          case 'safetyLevelUpdates':
+            emptyTitle = 'جميع خطوط الأمان محدثة لحماية الأرباح';
+            emptyDesc = 'لا توجد أسهم رابحة تحتاج لرفع خط الأمان حالياً؛ جميع مراكزك مؤمنة بوقف خسارة مواكب للأسعار.';
+            emptyIcon = 'shield-check';
+            emptyColor = 'text-blue-400';
+            break;
           case 'accumulation':
             emptyTitle = 'لا توجد أسهم في قيعان تجميع حالياً';
             emptyDesc = 'لا توجد مراكز متراجعة مؤهلة لتخفيض المتوسط أو ضخ سيولة جديدة اليوم وفق قواعد الأمان الصارمة. احتفظ بسيولتك النقدية الحرة بأمان.';
@@ -620,6 +744,8 @@
                 return renderProfitTakingCard(item, idx + 1);
               } else if (activeCat === 'riskDefense') {
                 return renderRiskDefenseCard(item, idx + 1);
+              } else if (activeCat === 'safetyLevelUpdates') {
+                return renderSafetyLevelUpdateCard(item, idx + 1);
               } else if (activeCat === 'accumulation') {
                 return renderAccumulationCard(item, idx + 1);
               } else if (activeCat === 'marketOpportunities') {
@@ -655,8 +781,8 @@
             </div>
           </div>
 
-          <!-- 5 Categorized Action Tabs -->
-          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 overflow-x-auto pb-1">
+          <!-- 6 Categorized Action Tabs -->
+          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 overflow-x-auto pb-1">
             ${tabsHtml}
           </div>
 
@@ -1320,8 +1446,14 @@
           <p class="text-xs text-gray-200 leading-relaxed font-sans bg-black/40 p-2.5 rounded-lg border border-white/10">
             <strong>تفسير ومبرر القرار:</strong> ${verdictAdvice}
           </p>
-          <div class="flex items-center justify-between text-[11px] text-gray-400 pt-1 border-t border-gray-800">
+          <div class="flex items-center justify-between text-[11px] text-gray-400 pt-1 border-t border-gray-800 flex-wrap gap-2">
             <span>القرار صادر بناءً على: <strong class="text-cyan-300 font-mono">${decBasis}</strong></span>
+            <span class="font-mono text-[10.5px]">
+              دعم S2: <strong class="text-indigo-400">${stock.pivotS2 || (stock.pivotS1 ? (stock.pivotS1 * 0.95).toFixed(2) : '--')} ج</strong> |
+              دعم S1: <strong class="text-cyan-400">${stock.pivotS1 || stock.support || '--'} ج</strong> |
+              مقاومة R1: <strong class="text-emerald-400">${stock.pivotR1 || stock.target1 || '--'} ج</strong> |
+              مقاومة R2: <strong class="text-amber-400">${stock.pivotR2 || (stock.pivotR1 ? (stock.pivotR1 * 1.05).toFixed(2) : '--')} ج</strong>
+            </span>
             <span>الرمز الرسمي: <strong class="text-white font-mono">${stock.ticker}</strong></span>
           </div>
         </div>
@@ -1447,25 +1579,25 @@
           </div>
 
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 bg-gray-900/90 p-3 rounded-xl border border-gray-800 text-center font-mono">
-            <div class="p-2 rounded-lg bg-gray-950/80 border border-gray-800">
-              <span class="text-[10px] text-gray-400 block font-sans">الدعم الفني (S1)</span>
-              <span class="font-bold text-sm text-cyan-400">${stock.pivotS1 || stock.support || '--'} ج</span>
-              <span class="text-[9px] text-gray-500 block font-sans">قاع الأمان</span>
+            <div class="p-2 rounded-lg bg-gray-950/80 border border-indigo-500/30">
+              <span class="text-[10px] text-gray-400 block font-sans">الدعم الثاني (S2)</span>
+              <span class="font-bold text-sm text-indigo-400">${stock.pivotS2 || (stock.pivotS1 ? (stock.pivotS1 * 0.95).toFixed(2) : '--')} ج</span>
+              <span class="text-[9px] text-gray-500 block font-sans">وسادة الأمان القصوى</span>
             </div>
-            <div class="p-2 rounded-lg bg-gray-950/80 border border-gray-800">
-              <span class="text-[10px] text-gray-400 block font-sans">المقاومة (R1)</span>
+            <div class="p-2 rounded-lg bg-gray-950/80 border border-cyan-500/30">
+              <span class="text-[10px] text-gray-400 block font-sans">الدعم الأول (S1)</span>
+              <span class="font-bold text-sm text-cyan-400">${stock.pivotS1 || stock.support || '--'} ج</span>
+              <span class="text-[9px] text-gray-500 block font-sans">قاع الأمان الأقرب</span>
+            </div>
+            <div class="p-2 rounded-lg bg-gray-950/80 border border-emerald-500/30">
+              <span class="text-[10px] text-gray-400 block font-sans">المقاومة الأولى (R1)</span>
               <span class="font-bold text-sm text-emerald-400">${stock.pivotR1 || stock.target1 || '--'} ج</span>
               <span class="text-[9px] text-gray-500 block font-sans">مستهدف جني الأرباح</span>
             </div>
-            <div class="p-2 rounded-lg bg-gray-950/80 border border-gray-800">
-              <span class="text-[10px] text-gray-400 block font-sans">متوسط 50 يوم (SMA50)</span>
-              <span class="font-bold text-sm text-white">${stock.sma50 || '--'} ج</span>
-              <span class="text-[9px] text-gray-500 block font-sans">اتجاه المسار الرئيسي</span>
-            </div>
-            <div class="p-2 rounded-lg bg-gray-950/80 border border-gray-800">
-              <span class="text-[10px] text-gray-400 block font-sans">مضاعف تدفق السيولة</span>
-              <span class="font-bold text-sm text-amber-300">${stock.volumeMultiplier || '1.8x'}</span>
-              <span class="text-[9px] text-gray-500 block font-sans">مقارنة بمتوسط 20 يوم</span>
+            <div class="p-2 rounded-lg bg-gray-950/80 border border-amber-500/30">
+              <span class="text-[10px] text-gray-400 block font-sans">المقاومة الثانية (R2)</span>
+              <span class="font-bold text-sm text-amber-300">${stock.pivotR2 || (stock.pivotR1 ? (stock.pivotR1 * 1.05).toFixed(2) : '--')} ج</span>
+              <span class="text-[9px] text-gray-500 block font-sans">المستهدف الصاعد الممتد</span>
             </div>
           </div>
 
@@ -1525,6 +1657,47 @@
               <span>سياسة إدارة المحفظة وقواعد الاستثمار (INVESTMENT_RULES.md)</span>
               <i data-lucide="shield" class="w-3 h-3"></i>
             </button>
+          </div>
+        </div>
+
+        <!-- Profit Protection & Cash Allocation Plan Box -->
+        <div class="bg-gradient-to-r from-blue-950/60 via-gray-950 to-indigo-950/60 p-4 rounded-xl border border-blue-500/40 space-y-3">
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <div class="flex items-center gap-2">
+              <div class="w-7 h-7 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold">
+                <i data-lucide="shield-check" class="w-4 h-4"></i>
+              </div>
+              <h4 class="font-bold text-white text-xs sm:text-sm">خطة حماية الأرباح وتدوير السيولة النقدية:</h4>
+            </div>
+            <span class="text-[10px] px-2.5 py-0.5 rounded-full bg-blue-500/20 text-blue-300 font-bold border border-blue-500/30">
+              إدارة رأس المال الذكية ⚡
+            </span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+            <!-- Box A: Trailing Stop Lock -->
+            <div class="bg-gray-900/90 p-3 rounded-lg border border-gray-800 space-y-2">
+              <span class="font-bold text-blue-300 block text-xs">1. خط الأمان المقترح لحبس الأرباح (وقف الخسارة المتحرك):</span>
+              <p class="text-gray-300 text-[11px] leading-relaxed">
+                إذا صعد السهم، لا تترك وقف الخسارة عند القاع القديم. ارفعه إلى <strong class="text-white font-mono">${(currentQuote * 0.97).toFixed(2)} ج</strong> لحبس معظم أرباحك وتجنب ضياعها.
+              </p>
+              <button onclick="quickApplySafetyLevel('${stock.ticker}', ${(currentQuote * 0.97).toFixed(2)})" class="w-full py-2 px-3 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition cursor-pointer">
+                <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+                <span>تثبيت خط الأمان عند ${(currentQuote * 0.97).toFixed(2)} ج في محفظتك 🛡️</span>
+              </button>
+            </div>
+
+            <!-- Box B: Where Cash Goes -->
+            <div class="bg-gray-900/90 p-3 rounded-lg border border-gray-800 space-y-2">
+              <span class="font-bold text-emerald-300 block text-xs">2. أين تذهب الفلوس عند البيع؟ (خطة السيولة النقدية):</span>
+              <p class="text-gray-300 text-[11px] leading-relaxed">
+                عند تنفيذ البيع، يسألك النظام فوراً: إيداع كاش حر بالمحفظة، أو أمر شراء معلق عند الدعم لتكبير الأسهم مجاناً، أو تدويرها في فرصة ذهبية من رادار السوق.
+              </p>
+              <button onclick="closeAuditModal(); openRotationPlanModalByTicker('${stock.ticker}')" class="w-full py-2 px-3 rounded-lg bg-gray-800 hover:bg-gray-700 text-cyan-300 font-bold text-xs flex items-center justify-center gap-1.5 border border-cyan-500/30 transition cursor-pointer">
+                <i data-lucide="compass" class="w-3.5 h-3.5"></i>
+                <span>فتح خطة تدوير وتكبير الأسهم بالكامل 🔄</span>
+              </button>
+            </div>
           </div>
         </div>
 

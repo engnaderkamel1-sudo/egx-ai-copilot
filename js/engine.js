@@ -1242,10 +1242,11 @@
         : 'NORMAL';
 
       // -------------------------------------------------------------
-      // Categorization Arrays for the 5 Prioritized Hub Categories
+      // Categorization Arrays for the Prioritized Hub Categories
       // -------------------------------------------------------------
       const profitTaking = [];
       const riskDefense = [];
+      const safetyLevelUpdates = [];
       const accumulation = [];
       const waitAndHold = [];
 
@@ -1423,6 +1424,45 @@
         });
       });
 
+      // Category 3 (تعديل ورفع خط الأمان): Stocks with solid profit whose active stop loss is lagging behind
+      stockHoldings.forEach(item => {
+        const curPrice = Number(item.currentPrice) || Number(item.buyPrice) || 0;
+        const buyPrice = Number(item.buyPrice) || curPrice;
+        const currentShares = parseInt(item.shares, 10) || 0;
+        const pivotS1 = Number(item.pivotS1 || item.support) || 0;
+        const pivotR1 = Number(item.pivotR1 || item.target1) || 0;
+        const returnPct = buyPrice > 0 ? Number((((curPrice - buyPrice) / buyPrice) * 100).toFixed(2)) : 0;
+        const isLosing = returnPct < 0;
+        const activeStopLoss = Number(item.customStopLoss || item.stopLoss || pivotS1 || (buyPrice * 0.95));
+
+        // Check if stock has significant profit (>= 7%) and active stop is lagging behind
+        if (!isLosing && returnPct >= 7.0 && curPrice > 0) {
+          const suggestedStop = Number((curPrice * 0.97).toFixed(2));
+          if (suggestedStop > (activeStopLoss * 1.015)) {
+            const lockedProfitPct = buyPrice > 0 ? Number((((suggestedStop - buyPrice) / buyPrice) * 100).toFixed(1)) : 0;
+            const profitAtRisk = Math.max(0, Math.round((suggestedStop - activeStopLoss) * currentShares));
+
+            safetyLevelUpdates.push({
+              ticker: item.ticker,
+              name: item.name,
+              currentPrice: curPrice,
+              buyPrice: buyPrice,
+              shares: currentShares,
+              returnPct: returnPct,
+              currentStopLoss: activeStopLoss,
+              suggestedStop: suggestedStop,
+              lockedProfitPct: lockedProfitPct,
+              profitAtRisk: profitAtRisk,
+              pivotS1: pivotS1,
+              pivotR1: pivotR1,
+              thndrUrl: item.thndrUrl || `https://app.thndr.app/search?query=${item.ticker}`
+            });
+          }
+        }
+      });
+
+      safetyLevelUpdates.sort((a, b) => (b.profitAtRisk || 0) - (a.profitAtRisk || 0));
+
       // SORTING PER CATEGORY:
       // Category 1 (جني الأرباح): Strictly highest return % descending (+50%, +30%, +20%)
       profitTaking.sort((a, b) => (Number(b.returnPct) || 0) - (Number(a.returnPct) || 0));
@@ -1430,10 +1470,10 @@
       // Category 2 (الحماية والبيع): Urgency descending (highest urgency score first)
       riskDefense.sort((a, b) => (b.urgencyScore || 0) - (a.urgencyScore || 0));
 
-      // Category 3 (التزويد والتجميع): Sorted by biggest discount/upside
+      // Category 4 (التزويد والتجميع): Sorted by biggest discount/upside
       accumulation.sort((a, b) => (Number(a.returnPct) || 0) - (Number(b.returnPct) || 0));
 
-      // Category 5 (الانتظار والمتابعة): Sorted by return % descending
+      // Category 6 (الانتظار والمتابعة): Sorted by return % descending
       waitAndHold.sort((a, b) => (Number(b.returnPct) || 0) - (Number(a.returnPct) || 0));
 
       // Category 4: MARKET OPPORTUNITIES (From fullMarketRadar - stocks not owned)
@@ -1534,6 +1574,7 @@
         categories: {
           profitTaking,
           riskDefense,
+          safetyLevelUpdates,
           accumulation,
           marketOpportunities,
           waitAndHold
