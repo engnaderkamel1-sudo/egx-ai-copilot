@@ -238,6 +238,11 @@
                 if (live.operatingMargin !== undefined) item.operatingMargin = live.operatingMargin;
                 if (live.netMargin !== undefined) item.netMargin = live.netMargin;
                 if (live.dividendYield !== undefined) item.dividendYield = live.dividendYield;
+                if (live.volume !== undefined) item.volume = live.volume;
+                if (live.tradedValue !== undefined) item.tradedValue = live.tradedValue;
+                if (live.rvol !== undefined) item.rvol = live.rvol;
+                if (live.rvolStatus !== undefined) item.rvolStatus = live.rvolStatus;
+                if (live.rvolBadge !== undefined) item.rvolBadge = live.rvolBadge;
                 if (live.priceToBook !== undefined) item.priceToBook = live.priceToBook;
                 if (live.operationalStability !== undefined) item.operationalStability = live.operationalStability;
                 if (live.valuationStatus !== undefined) item.valuationStatus = live.valuationStatus;
