@@ -424,7 +424,7 @@
         return isNaN(n) ? null : n;
       };
 
-      const currentPrice = cleanNum(asset.currentPrice) || 0;
+      const currentPrice = cleanNum(asset.currentPrice != null ? asset.currentPrice : (asset.price != null ? asset.price : asset.close)) || 0;
       const buyPrice = cleanNum(asset.buyPrice) || currentPrice;
       const pivotS1 = cleanNum(asset.pivotS1 || asset.support) || 0;
       const pivotS2 = cleanNum(asset.pivotS2) || (pivotS1 > 0 ? Number((pivotS1 * 0.95).toFixed(2)) : 0);
@@ -538,7 +538,7 @@
 
       const shares = parseInt(asset.shares, 10) || 0;
       const buyPrice = cleanNum(asset.buyPrice) || 0;
-      const currentPrice = cleanNum(asset.currentPrice) || buyPrice;
+      const currentPrice = cleanNum(asset.currentPrice != null ? asset.currentPrice : (asset.price != null ? asset.price : asset.close)) || buyPrice;
       const pivotR1 = cleanNum(asset.pivotR1 || asset.target1);
       const pivotR2 = cleanNum(asset.pivotR2 || asset.target2);
       const pivotS1 = cleanNum(asset.pivotS1 || asset.support);
@@ -713,13 +713,17 @@
               alertLevel = 'NORMAL';
               badgeText = '🛡️ وسادة أمان النواة الاستثمارية';
               badgeColor = 'bg-blue-950/60 text-blue-300 border border-blue-600/50';
-              advice = `🛡️ سهم قيادي من النواة: السعر (${currentPrice.toFixed(2)} ج) يتداول أعلى سعر شرائك (${buyPrice > 0 ? buyPrice.toFixed(2) + ' ج' : 'الأساسي'}) ولكنه دون S1 (${pivotS1.toFixed(2)} ج) لحظياً مع تماسكه أعلى S2. تريث؛ ملاءة الشركة وأرباحها تحمي المركز ولا داعي للبيع الذعري أثناء الجلسة.`;
+              advice = buyPrice > 0
+                ? `🛡️ سهم قيادي من النواة: السعر (${currentPrice.toFixed(2)} ج) يتداول أعلى سعر شرائك (${buyPrice.toFixed(2)} ج) ولكنه دون S1 (${pivotS1.toFixed(2)} ج) لحظياً مع تماسكه أعلى S2. تريث؛ ملاءة الشركة وأرباحها تحمي المركز ولا داعي للبيع الذعري أثناء الجلسة.`
+                : `🛡️ سهم قيادي من النواة: السعر (${currentPrice.toFixed(2)} ج) يختبر مستويات دون S1 (${pivotS1.toFixed(2)} ج) لحظياً ولكنه متماسك أعلى S2. تريث وراقب تماسك الجلسة قبل اتخاذ أي قرار.`;
             } else {
               action = 'INTRADAY_DIP_WATCH';
               alertLevel = 'WARNING';
               badgeText = '🟡 تراجع فني أسفل الدعم S1';
               badgeColor = 'bg-amber-500/20 text-amber-300 border border-amber-500/40';
-              advice = `🟡 تراجع فني أثناء الجلسة: السعر (${currentPrice.toFixed(2)} ج) دون مستوى الدعم S1 (${pivotS1.toFixed(2)} ج) ولكنه أعلى سعر شرائك محققاً (+${returnPct.toFixed(1)}%). تريث وراقب تماسك السهم حتى إغلاق الجلسة لتفادي مصيدة هزة الشجرة.`;
+              advice = buyPrice > 0
+                ? `🟡 تراجع فني أثناء الجلسة: السعر (${currentPrice.toFixed(2)} ج) دون مستوى الدعم S1 (${pivotS1.toFixed(2)} ج) ولكنه أعلى سعر شرائك (${buyPrice.toFixed(2)} ج) محققاً (+${returnPct.toFixed(1)}%). تريث وراقب تماسك السهم حتى إغلاق الجلسة لتفادي مصيدة هزة الشجرة.`
+                : `🟡 تراجع فني أثناء الجلسة: السعر (${currentPrice.toFixed(2)} ج) دون مستوى الدعم S1 (${pivotS1.toFixed(2)} ج). تريث وراقب تماسك السهم حتى إغلاق الجلسة لتفادي مصيدة هزة الشجرة.`;
             }
           } else {
             action = 'TRAILING_PROTECT';

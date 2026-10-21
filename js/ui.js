@@ -951,18 +951,34 @@
 
     function openAuditModal(ticker) {
       const cleanTicker = ticker ? String(ticker).trim().toUpperCase() : '';
-      const stock = (typeof fullMarketRadar !== 'undefined' && Array.isArray(fullMarketRadar) ? fullMarketRadar.find(s => s.ticker && s.ticker.trim().toUpperCase() === cleanTicker) : null) || 
-                    (typeof portfolioData !== 'undefined' && Array.isArray(portfolioData) ? portfolioData.find(s => s.ticker && s.ticker.trim().toUpperCase() === cleanTicker) : null) || 
-                    {
-                      ticker: ticker || 'TICKER',
-                      name: ticker || 'سهم بالبورصة المصرية',
-                      price: 0,
-                      catalyst: 'إيرادات تشغيلية ومحفزات قطاعية قوية بالبورصة المصرية',
-                      support: 'دعم هيكلي متماسك',
-                      target1: 'مستهدف صاعد',
-                      stopLoss: 'وقف خسارة صارم',
-                      volumeMultiplier: '2.5x'
-                    };
+      
+      const portfolioItem = (typeof portfolioData !== 'undefined' && Array.isArray(portfolioData))
+        ? portfolioData.find(s => s.ticker && s.ticker.trim().toUpperCase() === cleanTicker)
+        : null;
+
+      const radarItem = (typeof fullMarketRadar !== 'undefined' && Array.isArray(fullMarketRadar))
+        ? fullMarketRadar.find(s => s.ticker && s.ticker.trim().toUpperCase() === cleanTicker)
+        : null;
+
+      const rawStock = portfolioItem 
+        ? { ...radarItem, ...portfolioItem }
+        : (radarItem || {
+            ticker: cleanTicker || 'TICKER',
+            name: cleanTicker || 'سهم بالبورصة المصرية',
+            price: 0,
+            catalyst: 'إيرادات تشغيلية ومحفزات قطاعية قوية بالبورصة المصرية',
+            support: 'دعم هيكلي متماسك',
+            target1: 'مستهدف صاعد',
+            stopLoss: 'وقف خسارة صارم',
+            volumeMultiplier: '2.5x'
+          });
+
+      const currentQuote = Number(rawStock.currentPrice || rawStock.price || rawStock.close || 0);
+      const stock = {
+        ...rawStock,
+        price: currentQuote,
+        currentPrice: currentQuote
+      };
 
       const fund = (stock && stock.pe ? stock : (typeof EGX_Portfolio !== 'undefined' && typeof EGX_Portfolio.getFundamentals === 'function' ? EGX_Portfolio.getFundamentals(stock.ticker) : null)) || stock || {};
 
