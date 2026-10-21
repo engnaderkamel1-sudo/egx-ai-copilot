@@ -17,7 +17,7 @@ $onclicks = @(
   'resetToDefaultPortfolio', 'runLiveSanityAudit', 'runSimulationEngine', 'saveCustomPriceLevelsModal',
   'saveGeminiApiKeyFromInput', 'saveGeminiKeyFromModal', 'saveInlineGeminiKey', 'saveStrategySettings',
   'setRadarFilter', 'setRebalanceAmount', 'setRotationRatio', 'setTradeMode', 'showAutonomousLogModal',
-  'simulateMarketEmergency', 'switchPlanToCIB', 'switchTab', 'testGeminiConnection',
+  'simulateMarketEmergency', 'switchActionHubCategory', 'switchPlanToCIB', 'switchTab', 'testGeminiConnection',
   'testGeminiConnectionFromModal', 'toggleSidebar', 'toggleSidebarDrawer', 'toggleTheme',
   'toggleTradeCustomTicker', 'triggerCloudScanNow', 'triggerSimulatedBotCycle'
 )

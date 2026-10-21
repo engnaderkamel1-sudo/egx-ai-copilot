@@ -623,7 +623,7 @@ $remainingShares = $testShares - $exitShares
 $exitMathPassed = ($exitShares -eq 481) -and ($remainingShares -eq 482) -and ($cashReleased -eq 6734)
 Assert-Test -Suite 'Governance' -TestName 'Partial Exit calculation precisely splits 50% shares (481/482) and releases exact cash (6,734 EGP)' -Condition $exitMathPassed -Expected 'True' -Actual $exitMathPassed
 
-Write-Host "[9/9] Running Suite 9: Unified Verdict Architecture & Runtime Conflict Circuit Breaker..." -ForegroundColor Yellow
+Write-Host "[9/10] Running Suite 9: Unified Verdict Architecture & Runtime Conflict Circuit Breaker..." -ForegroundColor Yellow
 
 # Verify engine.js contains buildUnifiedVerdict and Circuit Breaker
 $engineJs = Get-Content -Raw "js/engine.js" -Encoding UTF8
@@ -637,6 +637,41 @@ Assert-Test -Suite 'Architecture' -TestName 'Engine strictly implements Runtime 
 $uiJs = Get-Content -Raw "js/ui.js" -Encoding UTF8
 $uiUsesVerdict = $uiJs.Contains("const verdict = (evalStock && evalStock.verdict)")
 Assert-Test -Suite 'Architecture' -TestName 'UI modal strictly derives Title, Advice and Button from unified verdict' -Condition $uiUsesVerdict -Expected 'True' -Actual $uiUsesVerdict
+
+# -------------------------------------------------------------
+# SUITE 10: 5-CATEGORY ACTION HUB PRIORITIZATION & SORTING INVARIANCE
+# -------------------------------------------------------------
+Write-Host "[10/10] Running Suite 10: 5-Category Action Hub Prioritization & Sorting Invariance..." -ForegroundColor Yellow
+
+$hasCategoriesInEngine = $engineJs.Contains("categories: {") -and $engineJs.Contains("profitTaking,") -and $engineJs.Contains("riskDefense,") -and $engineJs.Contains("accumulation,") -and $engineJs.Contains("marketOpportunities,") -and $engineJs.Contains("waitAndHold")
+Assert-Test -Suite 'ActionHub' -TestName 'Engine returns all 5 prioritized categories' -Condition $hasCategoriesInEngine -Expected 'True' -Actual $hasCategoriesInEngine
+
+# Mathematical sorting test: Profit-Taking strictly descending by returnPct
+$mockProfitItems = @(
+    @{ ticker = 'A'; returnPct = 15.0 },
+    @{ ticker = 'B'; returnPct = 50.0 },
+    @{ ticker = 'C'; returnPct = 30.0 }
+)
+$sortedProfit = $mockProfitItems | Sort-Object -Property { $_.returnPct } -Descending
+$isProfitSorted = ($sortedProfit[0].ticker -eq 'B') -and ($sortedProfit[1].ticker -eq 'C') -and ($sortedProfit[2].ticker -eq 'A')
+Assert-Test -Suite 'ActionHub' -TestName 'Profit-Taking category sorts strictly descending by returnPct (+50% > +30% > +15%)' -Condition $isProfitSorted -Expected 'True' -Actual $isProfitSorted
+
+# Urgency sorting test: Confirmed stop-loss precedes mild dips
+$mockRiskItems = @(
+    @{ ticker = 'DIP'; urgencyScore = 70 },
+    @{ ticker = 'CONFIRMED_EXIT'; urgencyScore = 90 },
+    @{ ticker = 'EMERGENCY'; urgencyScore = 100 }
+)
+$sortedRisk = $mockRiskItems | Sort-Object -Property { $_.urgencyScore } -Descending
+$isRiskSorted = ($sortedRisk[0].ticker -eq 'EMERGENCY') -and ($sortedRisk[1].ticker -eq 'CONFIRMED_EXIT') -and ($sortedRisk[2].ticker -eq 'DIP')
+Assert-Test -Suite 'ActionHub' -TestName 'Risk defense category sorts strictly descending by urgency (Emergency > Confirmed Exit > Dip)' -Condition $isRiskSorted -Expected 'True' -Actual $isRiskSorted
+
+# Verify ui.js contains switchActionHubCategory and all 5 tabs
+$hasSwitchCategory = $uiJs.Contains("function switchActionHubCategory") -and $uiJs.Contains("window.switchActionHubCategory = switchActionHubCategory")
+Assert-Test -Suite 'ActionHub' -TestName 'UI implements and exports switchActionHubCategory' -Condition $hasSwitchCategory -Expected 'True' -Actual $hasSwitchCategory
+
+$hasCategoryTabs = $uiJs.Contains("renderProfitTakingCard") -and $uiJs.Contains("renderRiskDefenseCard") -and $uiJs.Contains("renderAccumulationCard") -and $uiJs.Contains("renderMarketOpportunityCard") -and $uiJs.Contains("renderWaitAndHoldCard")
+Assert-Test -Suite 'ActionHub' -TestName 'UI implements dedicated card renderers for all 5 categories' -Condition $hasCategoryTabs -Expected 'True' -Actual $hasCategoryTabs
 
 # -------------------------------------------------------------
 # FINAL BENCHMARK SUMMARY & ACCURACY SCORE

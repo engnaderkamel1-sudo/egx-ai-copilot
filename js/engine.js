@@ -1223,6 +1223,7 @@
 
     /**
      * Generate Actionable Daily Hub Plan for Busy Investors
+     * Refactored: Unified 5-Category Action Hub (Prioritized Vertical Stacks)
      */
     generateDailyActionHub: function (portfolioData, fullMarketRadar, cashBalance) {
       portfolioData = Array.isArray(portfolioData) ? portfolioData : [];
@@ -1235,127 +1236,290 @@
       const fundsTotal = (ncsItem ? Number(ncsItem.value || 0) : 0) + (bsbItem ? Number(bsbItem.value || 0) : 0);
       const totalDryPowder = cashBalance; // Pure cash only - investment funds excluded per user requirement
 
-      // 1. Identify Buy / Accumulation Candidate
-      let buyCandidate = null;
-      const accumPortfolio = portfolioData.filter(p => p.ticker !== 'CASH' && p.ticker !== 'NCS' && p.ticker !== 'BSB' && (p.profit < 0 || p.action === 'ACCUMULATE'));
-      const preferredDip = accumPortfolio.find(p => p.ticker === 'COMI') || accumPortfolio[0];
-      
-      if (preferredDip) {
-        const curPrice = Number(preferredDip.currentPrice) || Number(preferredDip.buyPrice) || 100;
-        const buyPrice = Number(preferredDip.buyPrice) || curPrice;
-        const currentShares = parseInt(preferredDip.shares, 10) || 0;
-        
-        const suggestedCash = Math.min(5000, Math.max(1500, Math.round(cashBalance * 0.25)));
-        const sharesToBuy = curPrice > 0 ? Math.floor(suggestedCash / curPrice) : 0;
-        const actualCashSpend = Math.round(sharesToBuy * curPrice);
-        
-        const totalOldCost = currentShares * buyPrice;
-        const totalNewCost = totalOldCost + actualCashSpend;
-        const totalNewShares = currentShares + sharesToBuy;
-        const newAvgCost = totalNewShares > 0 ? Number((totalNewCost / totalNewShares).toFixed(2)) : buyPrice;
-        const avgReductionEgp = Number((buyPrice - newAvgCost).toFixed(2));
+      const session = (typeof this.getEGXSessionStatus === 'function') ? this.getEGXSessionStatus() : { isOpen: false };
+      const marketRegime = (typeof window !== 'undefined' && typeof window.getMarketRegimeCode === 'function') 
+        ? window.getMarketRegimeCode() 
+        : 'NORMAL';
 
-        const cycle = this.determineStockCycle(preferredDip);
+      // -------------------------------------------------------------
+      // Categorization Arrays for the 5 Prioritized Hub Categories
+      // -------------------------------------------------------------
+      const profitTaking = [];
+      const riskDefense = [];
+      const accumulation = [];
+      const waitAndHold = [];
 
-        // Generate 3-Tranche DCA Accumulation Plan
-        const dcaPlan = (typeof this.calculateThreeTrancheDCA === 'function')
-          ? this.calculateThreeTrancheDCA({
-              totalCash: suggestedCash,
-              currentPrice: curPrice,
-              supportPrice: preferredDip.pivotS1 || Number((curPrice * 0.97).toFixed(2)),
-              pivotPP: preferredDip.pp || Number((curPrice * 1.025).toFixed(2)),
-              existingShares: currentShares,
-              existingAvgCost: buyPrice
-            })
+      // Filter non-cash and non-fund assets from portfolio
+      const stockHoldings = portfolioData.filter(p => p.ticker !== 'CASH' && p.ticker !== 'NCS' && p.ticker !== 'BSB');
+
+      stockHoldings.forEach(item => {
+        const curPrice = Number(item.currentPrice) || Number(item.buyPrice) || 0;
+        const buyPrice = Number(item.buyPrice) || curPrice;
+        const currentShares = parseInt(item.shares, 10) || 0;
+        const pivotS1 = Number(item.pivotS1 || item.support) || 0;
+        const pivotR1 = Number(item.pivotR1 || item.target1) || 0;
+        const returnPct = buyPrice > 0 ? Number((((curPrice - buyPrice) / buyPrice) * 100).toFixed(2)) : 0;
+        const isLosing = returnPct < 0;
+
+        const evalRes = (typeof this.evaluateAsset === 'function')
+          ? this.evaluateAsset(item, marketRegime, session)
           : null;
 
-        buyCandidate = {
-          ticker: preferredDip.ticker,
-          name: preferredDip.name,
-          currentPrice: curPrice,
-          buyPrice: buyPrice,
-          returnPct: Number(preferredDip.returnPct) || 0,
-          currentShares: currentShares,
-          suggestedCash: actualCashSpend,
-          sharesToBuy: sharesToBuy,
-          newAvgCost: newAvgCost,
-          avgReductionEgp: avgReductionEgp,
-          cycle: cycle,
-          dcaPlan: dcaPlan,
-          supportPrice: preferredDip.pivotS1 || Number((curPrice * 0.97).toFixed(2)),
-          targetPrice: preferredDip.pivotR1 || Number((curPrice * 1.15).toFixed(2)),
-          thndrUrl: preferredDip.thndrUrl || `https://app.thndr.app/search?query=${preferredDip.ticker}`
-        };
-      }
-
-      // 2. Identify Profit-Taking & Share Accumulation Candidate (Trading Around Core)
-      let profitCandidate = null;
-      const winningPortfolio = portfolioData.filter(p => p.ticker !== 'CASH' && p.ticker !== 'NCS' && p.ticker !== 'BSB' && (p.profit > 0 || p.returnPct > 0));
-      winningPortfolio.sort((a, b) => (Number(b.returnPct) || 0) - (Number(a.returnPct) || 0));
-      
-      const topWinner = winningPortfolio[0];
-      if (topWinner && (topWinner.returnPct >= 18 || topWinner.action === 'REBALANCE_CANDIDATE')) {
-        const curPrice = Number(topWinner.currentPrice) || Number(topWinner.buyPrice) || 100;
-        const buyPrice = Number(topWinner.buyPrice) || curPrice;
-        const totalShares = parseInt(topWinner.shares, 10) || 0;
-        
-        const rebalance = this.calculateRebalance(totalShares, curPrice, buyPrice, 0.30, Number(topWinner.pivotS1) || (curPrice * 0.90));
-        const cycle = this.determineStockCycle(topWinner);
-
-        profitCandidate = {
-          ticker: topWinner.ticker,
-          name: topWinner.name,
-          currentPrice: curPrice,
-          buyPrice: buyPrice,
-          returnPct: Number(topWinner.returnPct) || 0,
-          totalShares: totalShares,
-          sellShares: rebalance.sellShares,
-          sellCash: rebalance.sellCash,
-          realizedProfit: rebalance.realizedProfit,
-          remainingShares: rebalance.remainingShares,
-          rebuyPrice: Number(topWinner.pivotS1) || Number((curPrice * 0.90).toFixed(2)),
-          rebuyShares: rebalance.rebuyShares,
-          netGainShares: Math.max(1, rebalance.netGainShares),
-          cycle: cycle,
-          thndrUrl: topWinner.thndrUrl || `https://app.thndr.app/search?query=${topWinner.ticker}`
-        };
-      }
-
-      // 3. Identify Capital Protection / Risk Alert
-      let safetyAlert = null;
-      const brokenAssets = portfolioData.filter(p => p.ticker !== 'CASH' && (p.isSupportBroken || (p.pivotS1 && p.currentPrice < p.pivotS1)));
-      if (brokenAssets.length > 0) {
-        const risky = brokenAssets[0];
-        const evalRisky = (typeof this.evaluateAsset === 'function') 
-          ? this.evaluateAsset(risky, marketRegime, session) 
+        const cycle = (typeof this.determineStockCycle === 'function')
+          ? this.determineStockCycle(item)
           : null;
-        const isDip = evalRisky && (evalRisky.action === 'INTRADAY_DIP_WATCH' || evalRisky.action === 'CORE_BUFFER_WATCH' || evalRisky.action === 'DEFENSIVE_HOLD' || evalRisky.action === 'TRAILING_PROTECT');
-        const isConfirmedExit = evalRisky && (evalRisky.action === 'STOP_LOSS_CONFIRMED' || evalRisky.action === 'EMERGENCY_STOP_LOSS');
 
-        safetyAlert = {
-          hasRisk: true,
-          ticker: risky.ticker,
-          name: risky.name,
-          currentPrice: Number(risky.currentPrice) || 0,
-          supportPrice: Number(risky.pivotS1) || 0,
-          returnPct: Number(risky.returnPct) || 0,
-          shares: Number(risky.shares) || 0,
-          isDip: isDip,
-          isConfirmedExit: isConfirmedExit,
-          badgeText: evalRisky ? evalRisky.badgeText : (isDip ? 'تريث ومراقبة 🟡' : 'تحذير كسر دعم 🔴'),
-          badgeClass: isConfirmedExit ? 'bg-rose-950/80 text-rose-300 border border-rose-500/40' : 'bg-amber-950/80 text-amber-300 border border-amber-500/40',
-          advice: evalRisky ? evalRisky.advice : `السعر الحالي (${Number(risky.currentPrice).toFixed(2)} ج) دون مستوى الدعم S1 (${risky.pivotS1} ج). التوجيه: تريث وراقب تماسك الارتداد لتفادي البيع في القيعان.`,
-          buttonText: isConfirmedExit ? 'سأنفذ الخروج/البيع ⚡' : 'تريث وفحص خطة الحماية 🛡️',
-          buttonClass: isConfirmedExit ? 'bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500' : 'bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500',
-          buttonAction: isConfirmedExit ? 'SELL' : 'AUDIT',
-          text: evalRisky ? evalRisky.advice : `سهم ${risky.name} (${risky.ticker}) دون مستوى الدعم S1 (${risky.pivotS1} ج). التوجيه: تريث ومتابعة حركة السهم.`
-        };
-      } else {
-        safetyAlert = {
-          hasRisk: false,
-          text: 'جميع أسهمك القيادية تتداول فوق خطوط الأمان والدعوم الفنية. لا توجد أي إشارات كسر دعم حرجة اليوم.'
-        };
+        const isSupportBroken = !!(item.isSupportBroken || (pivotS1 > 0 && curPrice < pivotS1));
+        const actionCode = evalRes ? evalRes.action : (item.action || 'HOLD');
+
+        // 1. RISK & DEFENSE CATEGORY CRITERIA:
+        // Broken support, confirmed stop loss, intraday dip, emergency, or defensive hold (falling knife)
+        const isRiskDefense = isSupportBroken || 
+          actionCode === 'STOP_LOSS_CONFIRMED' || 
+          actionCode === 'EMERGENCY_STOP_LOSS' || 
+          actionCode === 'INTRADAY_DIP_WATCH' || 
+          actionCode === 'CORE_BUFFER_WATCH' || 
+          actionCode === 'DEFENSIVE_HOLD' ||
+          actionCode === 'TRAILING_PROTECT' ||
+          (evalRes && evalRes.alertLevel === 'CRITICAL_RISK');
+
+        if (isRiskDefense) {
+          const isConfirmedExit = actionCode === 'STOP_LOSS_CONFIRMED' || actionCode === 'EMERGENCY_STOP_LOSS';
+          const isDip = actionCode === 'INTRADAY_DIP_WATCH' || actionCode === 'CORE_BUFFER_WATCH' || actionCode === 'DEFENSIVE_HOLD' || actionCode === 'TRAILING_PROTECT';
+
+          // Urgency score calculation for sorting (higher score = top urgency)
+          let urgencyScore = 50;
+          if (actionCode === 'EMERGENCY_STOP_LOSS') urgencyScore = 100;
+          else if (actionCode === 'STOP_LOSS_CONFIRMED') urgencyScore = 90;
+          else if (actionCode === 'INTRADAY_DIP_WATCH') urgencyScore = 80;
+          else if (actionCode === 'DEFENSIVE_HOLD') urgencyScore = 70 + Math.min(20, Math.abs(returnPct));
+          else if (actionCode === 'TRAILING_PROTECT') urgencyScore = 65;
+          else urgencyScore = 60 + Math.min(15, Math.abs(returnPct));
+
+          riskDefense.push({
+            ticker: item.ticker,
+            name: item.name,
+            currentPrice: curPrice,
+            buyPrice: buyPrice,
+            supportPrice: pivotS1,
+            pivotR1: pivotR1,
+            shares: currentShares,
+            returnPct: returnPct,
+            isLosing: isLosing,
+            isConfirmedExit: isConfirmedExit,
+            isDip: isDip,
+            urgencyScore: urgencyScore,
+            cycle: cycle,
+            evalRes: evalRes,
+            verdict: evalRes ? evalRes.verdict : null,
+            badgeText: evalRes ? evalRes.badgeText : (isConfirmedExit ? 'تأكيد كسر الدعم بالإغلاق' : 'تريث ومراقبة الدعم'),
+            badgeClass: isConfirmedExit ? 'bg-rose-950/80 text-rose-300 border border-rose-500/40' : 'bg-amber-950/80 text-amber-300 border border-amber-500/40',
+            advice: evalRes ? evalRes.advice : (item.advice || `السعر الحالي (${curPrice.toFixed(2)} ج) دون مستوى الدعم S1 (${pivotS1.toFixed(2)} ج). تريث وراقب تماسك الجلسة.`),
+            buttonText: isConfirmedExit ? 'سأنفذ الخروج ووقف الخسارة ⚡' : 'تريث وفحص خطة الحماية 🛡️',
+            buttonClass: isConfirmedExit ? 'bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500' : 'bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500',
+            buttonAction: isConfirmedExit ? 'SELL' : 'AUDIT',
+            thndrUrl: item.thndrUrl || `https://app.thndr.app/search?query=${item.ticker}`
+          });
+          return;
+        }
+
+        // 2. PROFIT-TAKING CATEGORY CRITERIA:
+        // Owned stock with solid gain (returnPct >= 10) OR reaching resistance R1 OR rebalance candidate
+        const isProfitTaking = returnPct >= 10 || actionCode === 'REBALANCE_CANDIDATE' || (pivotR1 > 0 && curPrice >= pivotR1);
+        if (isProfitTaking && !isLosing) {
+          const rebalance = (typeof this.calculateRebalance === 'function')
+            ? this.calculateRebalance(currentShares, curPrice, buyPrice, 0.30, pivotS1 || (curPrice * 0.90))
+            : { sellShares: Math.round(currentShares * 0.3), sellCash: Math.round(currentShares * 0.3 * curPrice), realizedProfit: 0, rebuyShares: 0, netGainShares: 1, rebuyPrice: pivotS1 };
+
+          profitTaking.push({
+            ticker: item.ticker,
+            name: item.name,
+            currentPrice: curPrice,
+            buyPrice: buyPrice,
+            returnPct: returnPct,
+            totalShares: currentShares,
+            pivotR1: pivotR1,
+            pivotS1: pivotS1,
+            sellShares: rebalance.sellShares,
+            sellCash: rebalance.sellCash,
+            realizedProfit: rebalance.realizedProfit,
+            remainingShares: rebalance.remainingShares,
+            rebuyPrice: Number(pivotS1) || Number((curPrice * 0.90).toFixed(2)),
+            rebuyShares: rebalance.rebuyShares,
+            netGainShares: Math.max(1, rebalance.netGainShares),
+            cycle: cycle,
+            evalRes: evalRes,
+            verdict: evalRes ? evalRes.verdict : null,
+            thndrUrl: item.thndrUrl || `https://app.thndr.app/search?query=${item.ticker}`
+          });
+          return;
+        }
+
+        // 3. ACCUMULATION / DCA CATEGORY CRITERIA:
+        // Stock in safe bottom, oversold, or action === 'ACCUMULATE'.
+        // Falling Knife Guardrail strictly enforced: returnPct > -7.0 (or explicit ACCUMULATE)
+        const isAccumulateCandidate = actionCode === 'ACCUMULATE' || (item.rsi && item.rsi < 40 && !isSupportBroken && returnPct > -7.0);
+        if (isAccumulateCandidate) {
+          const suggestedCash = Math.min(5000, Math.max(1500, Math.round(cashBalance * 0.25)));
+          const sharesToBuy = curPrice > 0 ? Math.floor(suggestedCash / curPrice) : 0;
+          const actualCashSpend = Math.round(sharesToBuy * curPrice);
+          const totalOldCost = currentShares * buyPrice;
+          const totalNewCost = totalOldCost + actualCashSpend;
+          const totalNewShares = currentShares + sharesToBuy;
+          const newAvgCost = totalNewShares > 0 ? Number((totalNewCost / totalNewShares).toFixed(2)) : buyPrice;
+          const avgReductionEgp = Number((buyPrice - newAvgCost).toFixed(2));
+
+          const dcaPlan = (typeof this.calculateThreeTrancheDCA === 'function')
+            ? this.calculateThreeTrancheDCA({
+                totalCash: suggestedCash,
+                currentPrice: curPrice,
+                supportPrice: pivotS1 || Number((curPrice * 0.97).toFixed(2)),
+                pivotPP: item.pp || Number((curPrice * 1.025).toFixed(2)),
+                existingShares: currentShares,
+                existingAvgCost: buyPrice
+              })
+            : null;
+
+          accumulation.push({
+            ticker: item.ticker,
+            name: item.name,
+            currentPrice: curPrice,
+            buyPrice: buyPrice,
+            returnPct: returnPct,
+            currentShares: currentShares,
+            suggestedCash: actualCashSpend,
+            sharesToBuy: sharesToBuy,
+            newAvgCost: newAvgCost,
+            avgReductionEgp: avgReductionEgp,
+            cycle: cycle,
+            dcaPlan: dcaPlan,
+            evalRes: evalRes,
+            verdict: evalRes ? evalRes.verdict : null,
+            supportPrice: pivotS1 || Number((curPrice * 0.97).toFixed(2)),
+            targetPrice: pivotR1 || Number((curPrice * 1.15).toFixed(2)),
+            thndrUrl: item.thndrUrl || `https://app.thndr.app/search?query=${item.ticker}`
+          });
+          return;
+        }
+
+        // 4. WAIT & HOLD CATEGORY (All remaining healthy portfolio holdings)
+        const distAboveS1Pct = pivotS1 > 0 ? (((curPrice - pivotS1) / pivotS1) * 100) : 5;
+        waitAndHold.push({
+          ticker: item.ticker,
+          name: item.name,
+          currentPrice: curPrice,
+          buyPrice: buyPrice,
+          currentValue: Math.round(currentShares * curPrice),
+          returnPct: returnPct,
+          shares: currentShares,
+          pivotS1: pivotS1,
+          pivotR1: pivotR1,
+          distAboveS1Pct: Number(distAboveS1Pct.toFixed(1)),
+          cycle: cycle,
+          evalRes: evalRes,
+          verdict: evalRes ? evalRes.verdict : null,
+          advice: evalRes ? evalRes.advice : (item.advice || 'السهم يتحرك داخل نطاق سعري آمن ومستقر، استمرار في الاحتفاظ الهادئ.'),
+          thndrUrl: item.thndrUrl || `https://app.thndr.app/search?query=${item.ticker}`
+        });
+      });
+
+      // SORTING PER CATEGORY:
+      // Category 1 (جني الأرباح): Strictly highest return % descending (+50%, +30%, +20%)
+      profitTaking.sort((a, b) => (Number(b.returnPct) || 0) - (Number(a.returnPct) || 0));
+
+      // Category 2 (الحماية والبيع): Urgency descending (highest urgency score first)
+      riskDefense.sort((a, b) => (b.urgencyScore || 0) - (a.urgencyScore || 0));
+
+      // Category 3 (التزويد والتجميع): Sorted by biggest discount/upside
+      accumulation.sort((a, b) => (Number(a.returnPct) || 0) - (Number(b.returnPct) || 0));
+
+      // Category 5 (الانتظار والمتابعة): Sorted by return % descending
+      waitAndHold.sort((a, b) => (Number(b.returnPct) || 0) - (Number(a.returnPct) || 0));
+
+      // Category 4: MARKET OPPORTUNITIES (From fullMarketRadar - stocks not owned)
+      const ownedTickers = new Set(portfolioData.map(p => p.ticker));
+      const marketOpportunities = fullMarketRadar
+        .filter(m => m.ticker && !ownedTickers.has(m.ticker) && (Number(m.score) >= 80))
+        .map(m => {
+          const mPrice = Number(m.price || m.close) || 0;
+          return {
+            ticker: m.ticker,
+            name: m.name,
+            index: m.index || 'egx30',
+            sector: m.sector || 'قطاع واعد',
+            price: mPrice,
+            changePct: m.changePct || '0.0%',
+            score: Number(m.score) || 85,
+            target1: m.target1 || (mPrice * 1.15).toFixed(2) + ' ج',
+            target2: m.target2 || (mPrice * 1.25).toFixed(2) + ' ج',
+            support: m.support || (mPrice * 0.95).toFixed(2) + ' ج',
+            stopLoss: m.stopLoss || (mPrice * 0.92).toFixed(2) + ' ج',
+            catalyst: m.catalyst || 'فرصة فنية واعدة بنسبة سيولة مرتفعة',
+            liquidityStatus: m.liquidityStatus || 'سيولة نشطة في ثندر',
+            thndrUrl: `https://app.thndr.app/search?query=${m.ticker}`
+          };
+        })
+        .sort((a, b) => (b.score || 0) - (a.score || 0))
+        .slice(0, 4);
+
+      // Legacy Candidates for backward compatibility with existing callers/tests
+      let buyCandidate = accumulation[0] || null;
+      if (!buyCandidate) {
+        const fallbackDip = stockHoldings.find(p => p.ticker === 'COMI' || p.profit < 0);
+        if (fallbackDip) {
+          const curPrice = Number(fallbackDip.currentPrice) || Number(fallbackDip.buyPrice) || 100;
+          const buyPrice = Number(fallbackDip.buyPrice) || curPrice;
+          const currentShares = parseInt(fallbackDip.shares, 10) || 0;
+          const suggestedCash = Math.min(5000, Math.max(1500, Math.round(cashBalance * 0.25)));
+          const sharesToBuy = curPrice > 0 ? Math.floor(suggestedCash / curPrice) : 0;
+          const actualCashSpend = Math.round(sharesToBuy * curPrice);
+          const totalOldCost = currentShares * buyPrice;
+          const totalNewCost = totalOldCost + actualCashSpend;
+          const totalNewShares = currentShares + sharesToBuy;
+          const newAvgCost = totalNewShares > 0 ? Number((totalNewCost / totalNewShares).toFixed(2)) : buyPrice;
+          const avgReductionEgp = Number((buyPrice - newAvgCost).toFixed(2));
+          const cycle = (typeof this.determineStockCycle === 'function') ? this.determineStockCycle(fallbackDip) : null;
+          buyCandidate = {
+            ticker: fallbackDip.ticker,
+            name: fallbackDip.name,
+            currentPrice: curPrice,
+            buyPrice: buyPrice,
+            returnPct: Number(fallbackDip.returnPct) || 0,
+            currentShares: currentShares,
+            suggestedCash: actualCashSpend,
+            sharesToBuy: sharesToBuy,
+            newAvgCost: newAvgCost,
+            avgReductionEgp: avgReductionEgp,
+            cycle: cycle,
+            supportPrice: fallbackDip.pivotS1 || Number((curPrice * 0.97).toFixed(2)),
+            targetPrice: fallbackDip.pivotR1 || Number((curPrice * 1.15).toFixed(2)),
+            thndrUrl: fallbackDip.thndrUrl || `https://app.thndr.app/search?query=${fallbackDip.ticker}`
+          };
+        }
       }
+
+      const profitCandidate = profitTaking[0] || null;
+      const safetyAlert = riskDefense.length > 0 ? {
+        hasRisk: true,
+        ticker: riskDefense[0].ticker,
+        name: riskDefense[0].name,
+        currentPrice: riskDefense[0].currentPrice,
+        supportPrice: riskDefense[0].supportPrice,
+        returnPct: riskDefense[0].returnPct,
+        shares: riskDefense[0].shares,
+        isDip: riskDefense[0].isDip,
+        isConfirmedExit: riskDefense[0].isConfirmedExit,
+        badgeText: riskDefense[0].badgeText,
+        badgeClass: riskDefense[0].badgeClass,
+        advice: riskDefense[0].advice,
+        buttonText: riskDefense[0].buttonText,
+        buttonClass: riskDefense[0].buttonClass,
+        buttonAction: riskDefense[0].buttonAction,
+        text: riskDefense[0].advice
+      } : {
+        hasRisk: false,
+        text: 'جميع أسهمك القيادية تتداول فوق خطوط الأمان والدعوم الفنية. لا توجد أي إشارات كسر دعم حرجة اليوم.'
+      };
 
       return {
         cashStatus: {
@@ -1366,7 +1530,14 @@
         },
         buyCandidate,
         profitCandidate,
-        safetyAlert
+        safetyAlert,
+        categories: {
+          profitTaking,
+          riskDefense,
+          accumulation,
+          marketOpportunities,
+          waitAndHold
+        }
       };
     },
 
