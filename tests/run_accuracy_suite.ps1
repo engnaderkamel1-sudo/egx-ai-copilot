@@ -623,6 +623,21 @@ $remainingShares = $testShares - $exitShares
 $exitMathPassed = ($exitShares -eq 481) -and ($remainingShares -eq 482) -and ($cashReleased -eq 6734)
 Assert-Test -Suite 'Governance' -TestName 'Partial Exit calculation precisely splits 50% shares (481/482) and releases exact cash (6,734 EGP)' -Condition $exitMathPassed -Expected 'True' -Actual $exitMathPassed
 
+Write-Host "[9/9] Running Suite 9: Unified Verdict Architecture & Runtime Conflict Circuit Breaker..." -ForegroundColor Yellow
+
+# Verify engine.js contains buildUnifiedVerdict and Circuit Breaker
+$engineJs = Get-Content -Raw "js/engine.js" -Encoding UTF8
+$hasUnifiedFn = $engineJs.Contains("buildUnifiedVerdict")
+Assert-Test -Suite 'Architecture' -TestName 'Engine strictly implements buildUnifiedVerdict tuple generator' -Condition $hasUnifiedFn -Expected 'True' -Actual $hasUnifiedFn
+
+$hasCircuitBreaker = $engineJs.Contains("Runtime Conflict Guardrail (Circuit Breaker)")
+Assert-Test -Suite 'Architecture' -TestName 'Engine strictly implements Runtime Conflict Circuit Breaker' -Condition $hasCircuitBreaker -Expected 'True' -Actual $hasCircuitBreaker
+
+# Verify ui.js uses verdict without separate split variables
+$uiJs = Get-Content -Raw "js/ui.js" -Encoding UTF8
+$uiUsesVerdict = $uiJs.Contains("const verdict = (evalStock && evalStock.verdict)")
+Assert-Test -Suite 'Architecture' -TestName 'UI modal strictly derives Title, Advice and Button from unified verdict' -Condition $uiUsesVerdict -Expected 'True' -Actual $uiUsesVerdict
+
 # -------------------------------------------------------------
 # FINAL BENCHMARK SUMMARY & ACCURACY SCORE
 # -------------------------------------------------------------

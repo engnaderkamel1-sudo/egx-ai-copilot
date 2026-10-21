@@ -992,73 +992,33 @@
       const isTargetReached = (targetVal > 0 && currentQuote >= targetVal);
       const isDipBuy = (!isStopBroken && (stock.action === 'BUY' || (supportVal > 0 && currentQuote <= supportVal * 1.03) || (stock.returnPct !== undefined && stock.returnPct < -1.5)));
 
-      let verdictTitle = 'احتفاظ استثماري ومتابعة متوازنة ⚪';
-      let verdictColor = 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40';
-      let verdictBadge = 'احتفاظ';
-      let verdictAdvice = 'السهم يتحرك داخل نطاق سعري وفني آمن بين مستويات الدعم والمقاومة، دون مؤشرات كسر أو تشبع.';
-
       const evalStock = (typeof EGX_Engine !== 'undefined' && typeof EGX_Engine.evaluateAsset === 'function')
         ? EGX_Engine.evaluateAsset(stock, typeof getMarketRegimeCode === 'function' ? getMarketRegimeCode() : 'NORMAL')
         : null;
 
-      if (evalStock && evalStock.action === 'EMERGENCY_STOP_LOSS') {
-        verdictTitle = 'خروج طارئ فوري (انهيار حاد) 🚨';
-        verdictColor = 'bg-rose-950/80 text-rose-200 border border-rose-500 animate-pulse';
-        verdictBadge = 'وقف خسارة طارئ';
-        verdictAdvice = evalStock.advice;
-      } else if (evalStock && evalStock.action === 'INTRADAY_DIP_WATCH') {
-        verdictTitle = 'تريث ومراقبة: كسر لحظي أثناء الجلسة 🟡';
-        verdictColor = 'bg-amber-500/20 text-amber-300 border border-amber-500/40';
-        verdictBadge = 'كسر لحظي (انتظر الإغلاق)';
-        verdictAdvice = evalStock.advice;
-      } else if (evalStock && evalStock.action === 'CORE_BUFFER_WATCH') {
-        verdictTitle = 'وسادة أمان النواة الاستثمارية 🛡️';
-        verdictColor = 'bg-blue-500/20 text-blue-300 border border-blue-500/40';
-        verdictBadge = 'وسادة أمان S2';
-        verdictAdvice = evalStock.advice;
-      } else if (evalStock && evalStock.action === 'DEFENSIVE_HOLD') {
-        verdictTitle = 'حظر التبريد ومراقبة ارتداد لتخفيف المركز 🚫';
-        verdictColor = 'bg-slate-800 text-amber-300 border border-amber-600/40';
-        verdictBadge = 'حظر التبريد';
-        verdictAdvice = evalStock.advice;
-      } else if (evalStock && evalStock.action === 'STOP_LOSS_CONFIRMED') {
-        verdictTitle = 'تأكيد كسر الدعم بالإغلاق وحماية رأس المال 🔴';
-        verdictColor = 'bg-rose-500/20 text-rose-300 border border-rose-500/40';
-        verdictBadge = 'كسر مؤكد بالإغلاق';
-        verdictAdvice = evalStock.advice;
-      } else if (evalStock && evalStock.action === 'TRAILING_PROTECT') {
-        verdictTitle = 'حماية وتأمين أرباح المركز 🛡️';
-        verdictColor = 'bg-amber-500/20 text-amber-300 border border-amber-500/40';
-        verdictBadge = 'حماية أرباح';
-        verdictAdvice = evalStock.advice;
-      } else if (isStopBroken) {
-        const isLosingStock = evalStock ? evalStock.isLosing : (currentQuote < (stock.buyPrice || 0));
-        if (isLosingStock) {
-          verdictTitle = 'حماية رأس المال ووقف الخسارة 🔴';
-          verdictColor = 'bg-rose-500/20 text-rose-300 border border-rose-500/40';
-          verdictBadge = 'وقف خسارة / خروج';
-          verdictAdvice = (evalStock && evalStock.advice && evalStock.isLosing) 
-            ? evalStock.advice 
-            : `السعر الحالي (${currentQuote.toFixed(2)} ج) كسر مستوى الأمان والدعم S1 (${stopLossVal.toFixed(2)} ج). الإجراء الإلزامي: حظر الشراء فوراً وتفعيل خطة الخروج أو التدوير لسهم أسرع تعويضاً لحماية رأس المال.`;
-        } else {
-          verdictTitle = 'تريث ومراقبة: تراجع أسفل الدعم S1 🟡';
-          verdictColor = 'bg-amber-500/20 text-amber-300 border border-amber-500/40';
-          verdictBadge = 'مراقبة الدعم';
-          verdictAdvice = (evalStock && evalStock.advice) 
-            ? evalStock.advice 
-            : `السعر الحالي (${currentQuote.toFixed(2)} ج) يتداول أدنى مستوى الدعم الفني S1 (${stopLossVal.toFixed(2)} ج) ولكنه متماسك أعلى سعر الشراء. لا بيع بهلع أثناء الارتداد؛ تريث وراقب استعادة الدعم.`;
-        }
-      } else if (isTargetReached) {
-        verdictTitle = 'تأمين أرباح القمة وتكبير الأسهم مجاناً 🟡';
-        verdictColor = 'bg-amber-500/20 text-amber-300 border-amber-500/40';
-        verdictBadge = 'جني أرباح جزئي';
-        verdictAdvice = `السعر الحالي (${currentQuote.toFixed(2)} ج) حقق مستهدف المقاومة R1 (${targetVal.toFixed(2)} ج). التوجيه: بيع ثلث الكمية لتأمين كاش محقق، وإعادة التمركز عند الدعم لإعادة الشراء وزيادة عدد أسهمك مجاناً.`;
-      } else if (isDipBuy) {
-        verdictTitle = 'فرصة اقتناص وتخفيض متوسط التكلفة 🟢';
-        verdictColor = 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40';
-        verdictBadge = 'شراء / تعزيز قاع';
-        verdictAdvice = `السهم يلامس منطقة دعم فني قوية (${supportVal.toFixed(2)} ج) مع مؤشرات تشبع بيعي واستقرار. التوجيه: اقتناص كمية مناسبة لخفض متوسط سعر الشراء وفق إدارة المخاطر.`;
-      }
+      // Extract Unified Guaranteed Verdict from Engine (Impossible to conflict)
+      const verdict = (evalStock && evalStock.verdict)
+        ? evalStock.verdict
+        : (typeof EGX_Engine !== 'undefined' && typeof EGX_Engine.buildUnifiedVerdict === 'function'
+            ? EGX_Engine.buildUnifiedVerdict({
+                action: isStopBroken ? (currentQuote < (stock.buyPrice || 0) ? 'STOP_LOSS_CONFIRMED' : 'INTRADAY_DIP_WATCH') : (isTargetReached ? 'REBALANCE_CANDIDATE' : (isDipBuy ? 'ACCUMULATE' : 'HOLD')),
+                isLosing: currentQuote < (stock.buyPrice || 0),
+                advice: 'السهم يتحرك داخل نطاق سعري وفني آمن بين مستويات الدعم والمقاومة.'
+              })
+            : {
+                title: 'احتفاظ استثماري ومتابعة متوازنة ⚪',
+                color: 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40',
+                badge: 'احتفاظ',
+                advice: 'السهم يتحرك داخل نطاق سعري وفني آمن بين مستويات الدعم والمقاومة، دون مؤشرات كسر أو تشبع.',
+                buttonText: 'احتفاظ وتحديث المحفظة 👁️',
+                buttonAction: 'HOLD',
+                buttonClass: 'bg-slate-700 hover:bg-slate-600'
+              });
+
+      const verdictTitle = verdict.title;
+      const verdictColor = verdict.color;
+      const verdictBadge = verdict.badge;
+      const verdictAdvice = verdict.advice;
 
       // Real Multi-Factor Score Assessment
       const qualityScore = stock.score || (stock.index === 'egx30' ? 88 : 78);
@@ -1323,7 +1283,7 @@
         <!-- Action Execution & Portfolio Sync Bar -->
         <div class="p-3.5 rounded-xl bg-gradient-to-r from-emerald-950/60 via-gray-950 to-teal-950/60 border border-emerald-500/50 flex items-center justify-between flex-wrap gap-2 text-xs">
           <div class="flex items-center gap-2.5">
-            <div class="w-8 h-8 rounded-lg ${isStopBroken ? 'bg-rose-500/20 text-rose-400' : 'bg-emerald-500/20 text-emerald-400'} flex items-center justify-center shrink-0">
+            <div class="w-8 h-8 rounded-lg ${verdict.buttonAction === 'SELL' ? (verdict.buttonClass && verdict.buttonClass.includes('rose') ? 'bg-rose-500/20 text-rose-400' : 'bg-amber-500/20 text-amber-400') : (verdict.buttonAction === 'BUY' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-slate-700 text-slate-300')} flex items-center justify-center shrink-0">
               <i data-lucide="zap" class="w-4 h-4"></i>
             </div>
             <div>
@@ -1331,9 +1291,9 @@
               <span class="text-gray-300 text-[11px]">اضغط لتسجيل العملية، وتعديل عدد الأسهم وسعر التنفيذ، وسيقوم النظام بتحديث محفظتك فوراً.</span>
             </div>
           </div>
-          <button onclick="closeAuditModal(); openTradeModal('${stock.ticker}', '${isStopBroken || isTargetReached ? 'SELL' : 'BUY'}', ${stock.sharesToBuy || stock.sellShares || stock.shares || 0}, ${currentQuote})" class="px-4 py-2.5 rounded-xl ${isStopBroken && (evalStock ? evalStock.isLosing : (currentQuote < (stock.buyPrice || 0))) ? 'bg-rose-600 hover:bg-rose-500' : (isTargetReached ? 'bg-amber-600 hover:bg-amber-500' : 'bg-emerald-600 hover:bg-emerald-500')} text-white font-black text-xs flex items-center gap-1.5 transition shadow-lg cursor-pointer">
+          <button onclick="closeAuditModal(); ${verdict.buttonAction === 'HOLD' ? 'if (typeof showToast === \'function\') showToast(\'تم تأكيد قرار الاحتفاظ ومتابعة السهم بنجاح 👁️\', \'info\');' : `openTradeModal('${stock.ticker}', '${verdict.buttonAction}', ${stock.sharesToBuy || stock.sellShares || stock.shares || 0}, ${currentQuote})`}" class="px-4 py-2.5 rounded-xl ${verdict.buttonClass || 'bg-slate-700 hover:bg-slate-600'} text-white font-black text-xs flex items-center gap-1.5 transition shadow-lg cursor-pointer">
             <i data-lucide="check-circle" class="w-4 h-4"></i>
-            <span>${(isStopBroken && (evalStock ? evalStock.isLosing : (currentQuote < (stock.buyPrice || 0)))) ? 'سأنفذ الخروج ووقف الخسارة ⚡' : (isTargetReached ? 'سأنفذ البيع وتأمين الأرباح ⚡' : ((isStopBroken && evalStock && !evalStock.isLosing) ? 'سأنفذ تأمين الأرباح ⚡' : 'سأنفذ الشراء وتحديث المحفظة ⚡'))}</span>
+            <span>${verdict.buttonText}</span>
           </button>
         </div>
 

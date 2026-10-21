@@ -741,6 +741,20 @@
         }
       }
 
+      const verdict = this.buildUnifiedVerdict({
+        action,
+        alertLevel,
+        badgeText,
+        badgeColor,
+        advice,
+        isLosing,
+        returnPct,
+        buyPrice,
+        currentPrice,
+        isCore,
+        emergency
+      });
+
       return {
         ticker: asset.ticker,
         name: asset.name,
@@ -759,7 +773,176 @@
         badgeColor,
         advice,
         isCore,
-        emergency
+        emergency,
+        verdict
+      };
+    },
+
+    /**
+     * Unified Guaranteed Verdict Tuple Generator with Circuit Breaker
+     * Locks Title, Badge, Color, Advice, ButtonText, ButtonAction into an unbreakable tuple
+     */
+    buildUnifiedVerdict: function (params) {
+      if (!params || typeof params !== 'object') {
+        return {
+          title: 'احتفاظ استثماري ومتابعة متوازنة ⚪',
+          color: 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40',
+          badge: 'احتفاظ',
+          advice: 'السهم يتحرك داخل نطاق سعري وفني آمن بين مستويات الدعم والمقاومة.',
+          buttonText: 'احتفاظ وتحديث المحفظة 👁️',
+          buttonAction: 'HOLD',
+          buttonClass: 'bg-slate-700 hover:bg-slate-600'
+        };
+      }
+
+      const {
+        action = 'HOLD',
+        alertLevel = 'NORMAL',
+        badgeText = 'احتفاظ',
+        badgeColor = 'bg-gray-800 text-gray-300',
+        advice = 'احتفاظ هادئ ومتابعة حركة السعر داخل النطاق الطبيعي.',
+        isLosing = false,
+        returnPct = 0,
+        buyPrice = 0,
+        currentPrice = 0,
+        isCore = false
+      } = params;
+
+      let title = 'احتفاظ استثماري ومتابعة متوازنة ⚪';
+      let color = 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40';
+      let badge = badgeText || 'احتفاظ';
+      let buttonText = 'احتفاظ وتحديث المحفظة 👁️';
+      let buttonAction = 'HOLD';
+      let buttonClass = 'bg-slate-700 hover:bg-slate-600';
+
+      switch (action) {
+        case 'EMERGENCY_STOP_LOSS':
+          title = 'خروج طارئ فوري (انهيار حاد) 🚨';
+          color = 'bg-rose-950/80 text-rose-200 border border-rose-500 animate-pulse';
+          badge = 'وقف خسارة طارئ';
+          buttonText = 'سأنفذ الخروج الطارئ فوراً ⚡';
+          buttonAction = 'SELL';
+          buttonClass = 'bg-rose-700 hover:bg-rose-600';
+          break;
+
+        case 'INTRADAY_DIP_WATCH':
+          title = isLosing 
+            ? 'تريث ومراقبة: كسر لحظي أثناء الجلسة 🟡' 
+            : 'تريث ومراقبة: تراجع أسفل الدعم S1 🟡';
+          color = 'bg-amber-500/20 text-amber-300 border border-amber-500/40';
+          badge = isLosing ? 'كسر لحظي (انتظر الإغلاق)' : 'مراقبة الدعم';
+          buttonText = 'تريث ومتابعة حركة السهم 👁️';
+          buttonAction = 'HOLD';
+          buttonClass = 'bg-amber-600 hover:bg-amber-500';
+          break;
+
+        case 'CORE_BUFFER_WATCH':
+          title = 'وسادة أمان النواة الاستثمارية 🛡️';
+          color = 'bg-blue-500/20 text-blue-300 border border-blue-500/40';
+          badge = 'وسادة أمان S2';
+          buttonText = 'احتفاظ هادئ بمحفظة النواة 🛡️';
+          buttonAction = 'HOLD';
+          buttonClass = 'bg-blue-600 hover:bg-blue-500';
+          break;
+
+        case 'DEFENSIVE_HOLD':
+          title = 'حظر التبريد ومراقبة ارتداد لتخفيف المركز 🚫';
+          color = 'bg-slate-800 text-amber-300 border border-amber-600/40';
+          badge = 'حظر التبريد';
+          buttonText = 'تريث ومراقبة الارتداد ⏸️';
+          buttonAction = 'HOLD';
+          buttonClass = 'bg-slate-700 hover:bg-slate-600';
+          break;
+
+        case 'STOP_LOSS_CONFIRMED':
+          title = 'تأكيد كسر الدعم بالإغلاق وحماية رأس المال 🔴';
+          color = 'bg-rose-500/20 text-rose-300 border border-rose-500/40';
+          badge = 'كسر مؤكد بالإغلاق';
+          buttonText = 'سأنفذ الخروج ووقف الخسارة ⚡';
+          buttonAction = 'SELL';
+          buttonClass = 'bg-rose-600 hover:bg-rose-500';
+          break;
+
+        case 'REBALANCE_CANDIDATE':
+          if (isLosing) {
+            title = 'تدوير وتخفيف عند الارتداد 🔄';
+            color = 'bg-amber-500/20 text-amber-300 border border-amber-500/40';
+            badge = 'تخفيف ارتداد';
+            buttonText = 'سأنفذ التخفيف وتدوير الكاش 🔄';
+            buttonAction = 'SELL';
+            buttonClass = 'bg-amber-600 hover:bg-amber-500';
+          } else {
+            title = 'تأمين أرباح القمة وتكبير الأسهم مجاناً 🟡';
+            color = 'bg-amber-500/20 text-amber-300 border border-amber-500/40';
+            badge = 'جني أرباح جزئي';
+            buttonText = 'سأنفذ البيع وتأمين الأرباح ⚡';
+            buttonAction = 'SELL';
+            buttonClass = 'bg-amber-600 hover:bg-amber-500';
+          }
+          break;
+
+        case 'TRAILING_PROTECT':
+          title = 'حماية وتأمين أرباح المركز 🛡️';
+          color = 'bg-amber-500/20 text-amber-300 border border-amber-500/40';
+          badge = 'حماية أرباح';
+          buttonText = 'سأنفذ تأمين الأرباح ⚡';
+          buttonAction = 'SELL';
+          buttonClass = 'bg-amber-600 hover:bg-amber-500';
+          break;
+
+        case 'ACCUMULATE':
+          title = 'فرصة اقتناص وتخفيض متوسط التكلفة 🟢';
+          color = 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40';
+          badge = 'شراء / تعزيز قاع';
+          buttonText = 'سأنفذ الشراء وتحديث المحفظة ⚡';
+          buttonAction = 'BUY';
+          buttonClass = 'bg-emerald-600 hover:bg-emerald-500';
+          break;
+
+        case 'HOLD':
+        default:
+          if (isLosing) {
+            title = 'احتفاظ ومراقبة الارتداد ⚪';
+            color = 'bg-slate-800 text-slate-300 border border-slate-700';
+            badge = 'احتفاظ هادئ';
+            buttonText = 'احتفاظ ومراقبة الارتداد 👁️';
+            buttonAction = 'HOLD';
+            buttonClass = 'bg-slate-700 hover:bg-slate-600';
+          } else {
+            title = 'احتفاظ استثماري ومتابعة متوازنة ⚪';
+            color = 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40';
+            badge = 'احتفاظ';
+            buttonText = 'استمرار الاحتفاظ ومتابعة الصعود 👁️';
+            buttonAction = 'HOLD';
+            buttonClass = 'bg-slate-700 hover:bg-slate-600';
+          }
+          break;
+      }
+
+      // Runtime Conflict Guardrail (Circuit Breaker)
+      // Automatically detect and reconcile any polarity conflict between title and advice
+      const isTitleLoss = /خسارة|كسر|خروج|انهيار/.test(title);
+      const isAdvicePureGain = /أرباح|مكاسب|إيجابي|صاعد|طفرة/.test(advice) && !/تخفيف|تأمين|حماية|ارتداد/.test(advice);
+      const isTitleGain = /أرباح|طفرة|شراء|تجميع/.test(title);
+      const isAdvicePureLoss = /خسارة|كسر مؤكد|نزيف|حظر/.test(advice);
+
+      if ((isTitleLoss && isAdvicePureGain) || (isTitleGain && isAdvicePureLoss)) {
+        title = 'تريث ومراقبة فنية: تدقيق مسار السعر 🟡';
+        badge = 'تدقيق الأمان';
+        color = 'bg-amber-500/20 text-amber-300 border border-amber-500/40';
+        buttonText = 'تريث ومتابعة الجلسة 👁️';
+        buttonAction = 'HOLD';
+        buttonClass = 'bg-amber-600 hover:bg-amber-500';
+      }
+
+      return {
+        title,
+        color,
+        badge,
+        advice,
+        buttonText,
+        buttonAction,
+        buttonClass
       };
     },
 
