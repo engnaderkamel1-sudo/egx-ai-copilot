@@ -908,6 +908,6 @@
     window.clearNotificationHistory = clearNotificationHistory;
     window.showAutonomousLogModal = showAutonomousLogModal;
     window.closeAutonomousLogModal = closeAutonomousLogModal;
-    window.exportAutonomousAuditLog = exportAutonomousAuditLog;
-    window.clearAutonomousLedger = clearAutonomousLedger;
-    window.renderAutonomousLedger = renderAutonomousLedger;
+    if (typeof exportAutonomousAuditLog !== 'undefined') window.exportAutonomousAuditLog = exportAutonomousAuditLog;
+    if (typeof clearAutonomousLedger !== 'undefined') window.clearAutonomousLedger = clearAutonomousLedger;
+    if (typeof renderAutonomousLedger !== 'undefined') window.renderAutonomousLedger = renderAutonomousLedger;

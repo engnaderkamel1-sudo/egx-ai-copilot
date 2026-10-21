@@ -992,7 +992,6 @@
       const consensusBanner = document.getElementById('audit-consensus-banner');
       const container = document.getElementById('audit-agents-container');
 
-      const currentQuote = Number(stock.currentPrice || stock.price || 0);
       const decTime = stock.decisionUpdatedAt || stock.priceUpdatedAt || 'جلسة اليوم';
       const decBasis = stock.decisionBasis || `سعر السهم اللحظي: ${currentQuote.toFixed(2)} ج`;
 
