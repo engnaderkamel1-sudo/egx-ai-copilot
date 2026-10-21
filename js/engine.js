@@ -705,6 +705,29 @@
           badgeText = '🎯 جني أرباح طفرة';
           badgeColor = 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40';
           advice = `السهم حقق مكاسب قوية (+${returnPct.toFixed(1)}%). يُنصح بتأمين جزء من الأرباح لحماية المكاسب المحققة.`;
+        } else if (pivotS1 && currentPrice < pivotS1) {
+          // Winning or Breakeven position pulling back below Technical Pivot S1
+          if (session.isOpen) {
+            if (isCore && pivotS2 && currentPrice >= pivotS2) {
+              action = 'CORE_BUFFER_WATCH';
+              alertLevel = 'NORMAL';
+              badgeText = '🛡️ وسادة أمان النواة الاستثمارية';
+              badgeColor = 'bg-blue-950/60 text-blue-300 border border-blue-600/50';
+              advice = `🛡️ سهم قيادي من النواة: السعر (${currentPrice.toFixed(2)} ج) يتداول أعلى سعر شرائك (${buyPrice > 0 ? buyPrice.toFixed(2) + ' ج' : 'الأساسي'}) ولكنه دون S1 (${pivotS1.toFixed(2)} ج) لحظياً مع تماسكه أعلى S2. تريث؛ ملاءة الشركة وأرباحها تحمي المركز ولا داعي للبيع الذعري أثناء الجلسة.`;
+            } else {
+              action = 'INTRADAY_DIP_WATCH';
+              alertLevel = 'WARNING';
+              badgeText = '🟡 تراجع فني أسفل الدعم S1';
+              badgeColor = 'bg-amber-500/20 text-amber-300 border border-amber-500/40';
+              advice = `🟡 تراجع فني أثناء الجلسة: السعر (${currentPrice.toFixed(2)} ج) دون مستوى الدعم S1 (${pivotS1.toFixed(2)} ج) ولكنه أعلى سعر شرائك محققاً (+${returnPct.toFixed(1)}%). تريث وراقب تماسك السهم حتى إغلاق الجلسة لتفادي مصيدة هزة الشجرة.`;
+            }
+          } else {
+            action = 'TRAILING_PROTECT';
+            alertLevel = 'WARNING';
+            badgeText = '🛡️ حماية أرباح المركز';
+            badgeColor = 'bg-amber-500/20 text-amber-300 border border-amber-500/40';
+            advice = `أغلق السهم دون مستوى الدعم S1 (${pivotS1.toFixed(2)} ج) مع الحفاظ على عائد (+${returnPct.toFixed(1)}%). يُنصح برفع خط الحماية إلى سعر الدخول لتأمين المكسب دون بيع متعجل.`;
+          }
         } else if (sma50 && currentPrice > sma50) {
           action = 'HOLD';
           badgeText = 'احتفاظ صاعد';

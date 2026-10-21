@@ -453,16 +453,43 @@
       portfolioData.forEach(item => {
         if (item.ticker === 'CASH' || item.ticker === 'NCS' || item.ticker === 'BSB') return;
 
-        // Check S1 Breakdown (Critical Risk)
+        // Check S1 Breakdown (Critical Risk or Dip Watch)
         if (item.pivotS1 && item.currentPrice < item.pivotS1) {
+          const evalItem = (typeof EGX_Engine !== 'undefined' && typeof EGX_Engine.evaluateAsset === 'function')
+            ? EGX_Engine.evaluateAsset(item, typeof getMarketRegimeCode === 'function' ? getMarketRegimeCode() : 'NORMAL')
+            : null;
+
+          const isLosing = (item.profit !== undefined && item.profit < 0) || (item.returnPct !== undefined && item.returnPct < 0);
+          const isEmergency = evalItem && evalItem.action === 'EMERGENCY_STOP_LOSS';
+          const isDip = evalItem && (evalItem.action === 'INTRADAY_DIP_WATCH' || evalItem.action === 'CORE_BUFFER_WATCH');
+
+          let alertType = 'CRITICAL_RISK';
+          let alertBadge = 'حماية عاجلة';
+          let alertTitle = `🔴 كسر مستوى الدعم الفني S1: ${item.name} (${item.ticker})`;
+          let alertDesc = `السعر الحالي (${Number(item.currentPrice).toFixed(2)} ج) كسر مستوى الدعم الفني الرئيسي S1 (${item.pivotS1} ج). يجب فحص خطة الحماية فوراً.`;
+
+          if (isDip) {
+            alertType = 'WARNING';
+            alertBadge = evalItem.badgeText || 'تريث ومراقبة';
+            alertTitle = evalItem.action === 'CORE_BUFFER_WATCH' 
+              ? `🛡️ وسادة أمان النواة: ${item.name} (${item.ticker})`
+              : `🟡 كسر لحظي أثناء الجلسة: ${item.name} (${item.ticker})`;
+            alertDesc = evalItem.advice;
+          } else if (!isLosing && !isEmergency) {
+            alertType = 'WARNING';
+            alertBadge = 'مراقبة الدعم 🛡️';
+            alertTitle = `🟡 تراجع فني أسفل S1: ${item.name} (${item.ticker})`;
+            alertDesc = `السعر الحالي (${Number(item.currentPrice).toFixed(2)} ج) دون مستوى الدعم S1 (${item.pivotS1} ج) مع بقاء المركز في ربح (+${(item.returnPct || 0).toFixed(1)}%). تريث وراقب تماسك الارتداد.`;
+          }
+
           const alertObj = {
             id: `s1_${item.ticker}`,
             ticker: item.ticker,
             name: item.name,
-            type: 'CRITICAL_RISK',
-            title: `🔴 كسر مستوى الدعم الفني S1: ${item.name} (${item.ticker})`,
-            desc: `السعر الحالي (${Number(item.currentPrice).toFixed(2)} ج) كسر مستوى الدعم الفني الرئيسي S1 (${item.pivotS1} ج). يجب فحص خطة الحماية فوراً.`,
-            badge: 'حماية عاجلة',
+            type: alertType,
+            title: alertTitle,
+            desc: alertDesc,
+            badge: alertBadge,
             actionLabel: 'فحص خطة الحماية 🛡️',
             actionType: 'AUDIT',
             time: formatCairoTime(new Date(), false, true)

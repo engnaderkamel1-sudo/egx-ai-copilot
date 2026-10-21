@@ -1026,11 +1026,28 @@
         verdictColor = 'bg-rose-500/20 text-rose-300 border border-rose-500/40';
         verdictBadge = 'كسر مؤكد بالإغلاق';
         verdictAdvice = evalStock.advice;
+      } else if (evalStock && evalStock.action === 'TRAILING_PROTECT') {
+        verdictTitle = 'حماية وتأمين أرباح المركز 🛡️';
+        verdictColor = 'bg-amber-500/20 text-amber-300 border border-amber-500/40';
+        verdictBadge = 'حماية أرباح';
+        verdictAdvice = evalStock.advice;
       } else if (isStopBroken) {
-        verdictTitle = 'حماية رأس المال ووقف الخسارة 🔴';
-        verdictColor = 'bg-rose-500/20 text-rose-300 border border-rose-500/40';
-        verdictBadge = 'وقف خسارة / خروج';
-        verdictAdvice = evalStock ? evalStock.advice : `السعر الحالي (${currentQuote.toFixed(2)} ج) كسر مستوى الأمان والدعم S1 (${stopLossVal.toFixed(2)} ج). الإجراء الإلزامي: حظر الشراء فوراً وتفعيل خطة الخروج أو التدوير لسهم أسرع تعويضاً لحماية رأس المال.`;
+        const isLosingStock = evalStock ? evalStock.isLosing : (currentQuote < (stock.buyPrice || 0));
+        if (isLosingStock) {
+          verdictTitle = 'حماية رأس المال ووقف الخسارة 🔴';
+          verdictColor = 'bg-rose-500/20 text-rose-300 border border-rose-500/40';
+          verdictBadge = 'وقف خسارة / خروج';
+          verdictAdvice = (evalStock && evalStock.advice && evalStock.isLosing) 
+            ? evalStock.advice 
+            : `السعر الحالي (${currentQuote.toFixed(2)} ج) كسر مستوى الأمان والدعم S1 (${stopLossVal.toFixed(2)} ج). الإجراء الإلزامي: حظر الشراء فوراً وتفعيل خطة الخروج أو التدوير لسهم أسرع تعويضاً لحماية رأس المال.`;
+        } else {
+          verdictTitle = 'تريث ومراقبة: تراجع أسفل الدعم S1 🟡';
+          verdictColor = 'bg-amber-500/20 text-amber-300 border border-amber-500/40';
+          verdictBadge = 'مراقبة الدعم';
+          verdictAdvice = (evalStock && evalStock.advice) 
+            ? evalStock.advice 
+            : `السعر الحالي (${currentQuote.toFixed(2)} ج) يتداول أدنى مستوى الدعم الفني S1 (${stopLossVal.toFixed(2)} ج) ولكنه متماسك أعلى سعر الشراء. لا بيع بهلع أثناء الارتداد؛ تريث وراقب استعادة الدعم.`;
+        }
       } else if (isTargetReached) {
         verdictTitle = 'تأمين أرباح القمة وتكبير الأسهم مجاناً 🟡';
         verdictColor = 'bg-amber-500/20 text-amber-300 border-amber-500/40';
@@ -1314,9 +1331,9 @@
               <span class="text-gray-300 text-[11px]">اضغط لتسجيل العملية، وتعديل عدد الأسهم وسعر التنفيذ، وسيقوم النظام بتحديث محفظتك فوراً.</span>
             </div>
           </div>
-          <button onclick="closeAuditModal(); openTradeModal('${stock.ticker}', '${isStopBroken || isTargetReached ? 'SELL' : 'BUY'}', ${stock.sharesToBuy || stock.sellShares || stock.shares || 0}, ${currentQuote})" class="px-4 py-2.5 rounded-xl ${isStopBroken ? 'bg-rose-600 hover:bg-rose-500' : (isTargetReached ? 'bg-amber-600 hover:bg-amber-500' : 'bg-emerald-600 hover:bg-emerald-500')} text-white font-black text-xs flex items-center gap-1.5 transition shadow-lg cursor-pointer">
+          <button onclick="closeAuditModal(); openTradeModal('${stock.ticker}', '${isStopBroken || isTargetReached ? 'SELL' : 'BUY'}', ${stock.sharesToBuy || stock.sellShares || stock.shares || 0}, ${currentQuote})" class="px-4 py-2.5 rounded-xl ${isStopBroken && (evalStock ? evalStock.isLosing : (currentQuote < (stock.buyPrice || 0))) ? 'bg-rose-600 hover:bg-rose-500' : (isTargetReached ? 'bg-amber-600 hover:bg-amber-500' : 'bg-emerald-600 hover:bg-emerald-500')} text-white font-black text-xs flex items-center gap-1.5 transition shadow-lg cursor-pointer">
             <i data-lucide="check-circle" class="w-4 h-4"></i>
-            <span>${isStopBroken ? 'سأنفذ الخروج ووقف الخسارة ⚡' : (isTargetReached ? 'سأنفذ البيع وتأمين الأرباح ⚡' : 'سأنفذ الشراء وتحديث المحفظة ⚡')}</span>
+            <span>${(isStopBroken && (evalStock ? evalStock.isLosing : (currentQuote < (stock.buyPrice || 0)))) ? 'سأنفذ الخروج ووقف الخسارة ⚡' : (isTargetReached ? 'سأنفذ البيع وتأمين الأرباح ⚡' : ((isStopBroken && evalStock && !evalStock.isLosing) ? 'سأنفذ تأمين الأرباح ⚡' : 'سأنفذ الشراء وتحديث المحفظة ⚡'))}</span>
           </button>
         </div>
 
