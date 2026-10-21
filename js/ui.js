@@ -376,14 +376,14 @@
             </div>
 
             <!-- CARD 3: 🛡️ SAFETY & RISK WATCH -->
-            <div class="bg-gray-950/90 border ${safety && safety.hasRisk ? 'border-rose-500/50' : 'border-slate-800'} rounded-xl overflow-hidden flex flex-col justify-between shadow-lg">
-              <div class="${safety && safety.hasRisk ? 'bg-rose-950/70 border-rose-500/30' : 'bg-slate-900/90 border-slate-700'} border-b p-3 flex items-center justify-between">
+            <div class="bg-gray-950/90 border ${safety && safety.hasRisk ? (safety.isConfirmedExit ? 'border-rose-500/50' : 'border-amber-500/50') : 'border-slate-800'} rounded-xl overflow-hidden flex flex-col justify-between shadow-lg">
+              <div class="${safety && safety.hasRisk ? (safety.isConfirmedExit ? 'bg-rose-950/70 border-rose-500/30' : 'bg-amber-950/70 border-amber-500/30') : 'bg-slate-900/90 border-slate-700'} border-b p-3 flex items-center justify-between">
                 <div class="flex items-center gap-2">
-                  <span class="w-3 h-3 rounded-full ${safety && safety.hasRisk ? 'bg-rose-500 animate-ping' : 'bg-emerald-400'}"></span>
-                  <span class="text-xs font-black ${safety && safety.hasRisk ? 'text-rose-300' : 'text-slate-200'}">3. رادار الأمان وحالة المحفظة 🛡️</span>
+                  <span class="w-3 h-3 rounded-full ${safety && safety.hasRisk ? (safety.isConfirmedExit ? 'bg-rose-500 animate-ping' : 'bg-amber-400 animate-pulse') : 'bg-emerald-400'}"></span>
+                  <span class="text-xs font-black ${safety && safety.hasRisk ? (safety.isConfirmedExit ? 'text-rose-300' : 'text-amber-300') : 'text-slate-200'}">3. رادار الأمان وحالة المحفظة 🛡️</span>
                 </div>
-                <span class="text-[10px] px-2 py-0.5 rounded ${safety && safety.hasRisk ? 'bg-rose-950/80 text-rose-300 border border-rose-500/40' : 'bg-emerald-950/80 text-emerald-300 border border-emerald-500/40'} font-bold">
-                  ${safety && safety.hasRisk ? 'تحذير كسر دعم' : 'استقرار وأمان'}
+                <span class="text-[10px] px-2 py-0.5 rounded ${safety && safety.hasRisk ? (safety.badgeClass || 'bg-amber-950/80 text-amber-300 border border-amber-500/40') : 'bg-emerald-950/80 text-emerald-300 border border-emerald-500/40'} font-bold">
+                  ${safety && safety.hasRisk ? (safety.badgeText || (safety.isConfirmedExit ? 'تحذير كسر دعم' : 'تريث ومراقبة')) : 'استقرار وأمان'}
                 </span>
               </div>
 
@@ -391,21 +391,21 @@
                 ${safety && safety.hasRisk ? `
                   <div class="space-y-2">
                     <div class="font-extrabold text-white text-sm sm:text-base">${safety.name} (${safety.ticker})</div>
-                    <div class="text-[11.5px] text-rose-200 leading-relaxed bg-rose-950/40 p-2.5 rounded-lg border border-rose-800/40 space-y-1 font-sans">
-                      <p>• <strong>تنبيه فني:</strong> السعر الحالي (${safety.currentPrice} ج) كسر مستوى الدعم S1 (${safety.supportPrice} ج).</p>
-                      <p>• <strong>التوجيه:</strong> يُنصح بعدم شراء كميات جديدة، وانتظار ارتداد مقاومة لتخفيف السهم ونقل السيولة لسهم أسرع تعويضاً.</p>
+                    <div class="text-[11.5px] ${safety.isConfirmedExit ? 'text-rose-200 bg-rose-950/40 border-rose-800/40' : 'text-amber-200 bg-amber-950/40 border-amber-800/40'} leading-relaxed p-2.5 rounded-lg border space-y-1 font-sans">
+                      <p>• <strong>الموقف الفني:</strong> السعر الحالي (${Number(safety.currentPrice).toFixed(2)} ج) دون مستوى الدعم S1 (${Number(safety.supportPrice).toFixed(2)} ج).</p>
+                      <p>• <strong>توجيه المستشار:</strong> ${safety.advice || 'تريث وراقب تماسك السهم خلال الجلسة لتفادي مصيدة هزة الشجرة؛ لا بيع عشوائي أثناء الارتداد.'}</p>
                     </div>
                   </div>
                   <div class="pt-2 flex items-center gap-2 flex-wrap">
-                    <button onclick="openTradeModal('${safety.ticker}', 'SELL', ${safety.shares || 0}, ${safety.currentPrice})" class="flex-1 py-2 px-3 rounded-xl bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 text-white font-extrabold text-xs flex items-center justify-center gap-1.5 transition shadow-lg shadow-rose-950/40 cursor-pointer">
+                    <button onclick="${safety.buttonAction === 'SELL' ? `openTradeModal('${safety.ticker}', 'SELL', ${safety.shares || 0}, ${safety.currentPrice})` : `openAuditModal('${safety.ticker}')`}" class="flex-1 py-2 px-3 rounded-xl ${safety.buttonClass || 'bg-amber-600 hover:bg-amber-500'} text-white font-extrabold text-xs flex items-center justify-center gap-1.5 transition shadow-lg cursor-pointer">
                       <i data-lucide="check-circle" class="w-3.5 h-3.5"></i>
-                      <span>سأنفذ الخروج/البيع ⚡</span>
+                      <span>${safety.buttonText || (safety.isConfirmedExit ? 'سأنفذ الخروج/البيع ⚡' : 'تريث وفحص خطة الحماية 🛡️')}</span>
                     </button>
-                    <button onclick="openAuditModal('${safety.ticker}')" class="py-2 px-3 rounded-xl bg-gray-900 hover:bg-gray-800 text-rose-300 font-bold text-xs flex items-center justify-center gap-1 border border-rose-800/40 cursor-pointer">
+                    <button onclick="openAuditModal('${safety.ticker}')" class="py-2 px-3 rounded-xl bg-gray-900 hover:bg-gray-800 text-amber-300 font-bold text-xs flex items-center justify-center gap-1 border border-gray-700 cursor-pointer">
                       <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
-                      <span>تقرير المخاطر 📊</span>
+                      <span>تقرير التحليل 📊</span>
                     </button>
-                    <button onclick="openRotationPlanModalByTicker('${safety.ticker}')" class="p-2 rounded-xl bg-gray-900 hover:bg-gray-800 text-gray-300 font-bold text-xs flex items-center justify-center gap-1 border border-rose-900/40 cursor-pointer" title="خطة الحماية والتدوير">
+                    <button onclick="openRotationPlanModalByTicker('${safety.ticker}')" class="p-2 rounded-xl bg-gray-900 hover:bg-gray-800 text-gray-300 font-bold text-xs flex items-center justify-center gap-1 border border-gray-800 cursor-pointer" title="خطة الحماية والتدوير">
                       <i data-lucide="shield-alert" class="w-3.5 h-3.5"></i>
                     </button>
                   </div>

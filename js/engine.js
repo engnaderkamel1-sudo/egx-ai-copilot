@@ -1326,6 +1326,12 @@
       const brokenAssets = portfolioData.filter(p => p.ticker !== 'CASH' && (p.isSupportBroken || (p.pivotS1 && p.currentPrice < p.pivotS1)));
       if (brokenAssets.length > 0) {
         const risky = brokenAssets[0];
+        const evalRisky = (typeof this.evaluateAsset === 'function') 
+          ? this.evaluateAsset(risky, marketRegime, session) 
+          : null;
+        const isDip = evalRisky && (evalRisky.action === 'INTRADAY_DIP_WATCH' || evalRisky.action === 'CORE_BUFFER_WATCH' || evalRisky.action === 'DEFENSIVE_HOLD' || evalRisky.action === 'TRAILING_PROTECT');
+        const isConfirmedExit = evalRisky && (evalRisky.action === 'STOP_LOSS_CONFIRMED' || evalRisky.action === 'EMERGENCY_STOP_LOSS');
+
         safetyAlert = {
           hasRisk: true,
           ticker: risky.ticker,
@@ -1333,7 +1339,16 @@
           currentPrice: Number(risky.currentPrice) || 0,
           supportPrice: Number(risky.pivotS1) || 0,
           returnPct: Number(risky.returnPct) || 0,
-          text: `سهم ${risky.name} (${risky.ticker}) كسر مستوى الدعم المحوري S1 (${risky.pivotS1} ج). يُنصح بمتابعة خطة الحماية والتدوير لتفادي زيادة الخسارة.`
+          shares: Number(risky.shares) || 0,
+          isDip: isDip,
+          isConfirmedExit: isConfirmedExit,
+          badgeText: evalRisky ? evalRisky.badgeText : (isDip ? 'تريث ومراقبة 🟡' : 'تحذير كسر دعم 🔴'),
+          badgeClass: isConfirmedExit ? 'bg-rose-950/80 text-rose-300 border border-rose-500/40' : 'bg-amber-950/80 text-amber-300 border border-amber-500/40',
+          advice: evalRisky ? evalRisky.advice : `السعر الحالي (${Number(risky.currentPrice).toFixed(2)} ج) دون مستوى الدعم S1 (${risky.pivotS1} ج). التوجيه: تريث وراقب تماسك الارتداد لتفادي البيع في القيعان.`,
+          buttonText: isConfirmedExit ? 'سأنفذ الخروج/البيع ⚡' : 'تريث وفحص خطة الحماية 🛡️',
+          buttonClass: isConfirmedExit ? 'bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500' : 'bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500',
+          buttonAction: isConfirmedExit ? 'SELL' : 'AUDIT',
+          text: evalRisky ? evalRisky.advice : `سهم ${risky.name} (${risky.ticker}) دون مستوى الدعم S1 (${risky.pivotS1} ج). التوجيه: تريث ومتابعة حركة السهم.`
         };
       } else {
         safetyAlert = {
