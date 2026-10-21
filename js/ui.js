@@ -595,6 +595,71 @@
       `;
     }
 
+        // Active Pending Rebuy Flow Handlers (تكبير الأسهم مجاناً)
+    function confirmCompletedRebuy(ticker) {
+      if (!ticker) return;
+      let pendingList = [];
+      try {
+        pendingList = JSON.parse(localStorage.getItem('egx_pending_rebuys') || '[]');
+      } catch(e) { pendingList = []; }
+
+      const plan = pendingList.find(p => p.ticker === ticker);
+      if (!plan) return;
+
+      const cost = Number((plan.rebuyShares * plan.rebuyPrice).toFixed(2));
+      const cashAsset = (typeof portfolioData !== 'undefined' && Array.isArray(portfolioData))
+        ? portfolioData.find(p => p.ticker === 'CASH' || p.isCashReserve)
+        : null;
+
+      if (cashAsset) {
+        cashAsset.value = Math.max(0, Number((cashAsset.value - cost).toFixed(2)));
+      }
+
+      let stock = portfolioData.find(p => p.ticker === ticker);
+      if (stock) {
+        const oldShares = stock.shares || 0;
+        const newShares = oldShares + plan.rebuyShares;
+        stock.shares = newShares;
+        stock.value = Math.round(newShares * (stock.currentPrice || plan.rebuyPrice));
+      }
+
+      // Remove from pending list
+      pendingList = pendingList.filter(p => p.ticker !== ticker);
+      localStorage.setItem('egx_pending_rebuys', JSON.stringify(pendingList));
+
+      if (typeof savePortfolio === 'function') savePortfolio();
+      if (typeof renderPortfolioTable === 'function') renderPortfolioTable();
+      if (typeof renderDailyActionHub === 'function') renderDailyActionHub();
+
+      const freeGain = plan.freeShares > 0 ? `وحصولك على +${plan.freeShares} أسهم إضافية مجاناً 🚀` : '';
+      if (typeof showToast === 'function') {
+        showToast(`🎉 مبروك! تم بنجاح تنفيذ إعادة شراء ${plan.rebuyShares} سهم في ${plan.name} ${freeGain}`, 'success');
+      } else {
+        alert(`🎉 مبروك! تم بنجاح تنفيذ إعادة شراء ${plan.rebuyShares} سهم في ${plan.name} ${freeGain}`);
+      }
+    }
+    window.confirmCompletedRebuy = confirmCompletedRebuy;
+
+    function cancelPendingRebuy(ticker) {
+      if (!ticker) return;
+      let pendingList = [];
+      try {
+        pendingList = JSON.parse(localStorage.getItem('egx_pending_rebuys') || '[]');
+      } catch(e) { pendingList = []; }
+
+      pendingList = pendingList.filter(p => p.ticker !== ticker);
+      localStorage.setItem('egx_pending_rebuys', JSON.stringify(pendingList));
+
+      if (typeof renderDailyActionHub === 'function') renderDailyActionHub();
+
+      if (typeof showToast === 'function') {
+        showToast(`تم إلغاء خطة إعادة الشراء والإبقاء على السيولة كاش حر بالمحفظة 💵`, 'info');
+      } else {
+        alert(`تم إلغاء خطة إعادة الشراء والإبقاء على السيولة كاش حر بالمحفظة 💵`);
+      }
+    }
+    window.cancelPendingRebuy = cancelPendingRebuy;
+
     // Render Top Daily Action Hub (Interactive Decision Engine for Plain-Arabic Guidance)
     function renderDailyActionHub() {
       const container = document.getElementById('daily-action-hub');
@@ -818,6 +883,46 @@
               <span class="text-gray-300">السيولة النقدية الحرة (الكاش): <strong class="text-cyan-300 font-mono font-bold">${Math.round(hubData.cashStatus.freeCash).toLocaleString('en-US')} ج.م</strong></span>
             </div>
           </div>
+
+          <!-- Active Pending Rebuy Guidance Card -->
+          ${(function() {
+            let pendingList = [];
+            try {
+              pendingList = JSON.parse(localStorage.getItem('egx_pending_rebuys') || '[]');
+            } catch(e) { pendingList = []; }
+            if (!pendingList || pendingList.length === 0) return '';
+
+            return pendingList.map(plan => `
+              <div class="bg-gradient-to-r from-amber-950/80 via-gray-950 to-emerald-950/80 border-2 border-amber-500/60 rounded-xl p-4 shadow-xl space-y-3">
+                <div class="flex items-center justify-between flex-wrap gap-2">
+                  <div class="flex items-center gap-2">
+                    <span class="w-3 h-3 rounded-full bg-amber-400 animate-ping"></span>
+                    <h3 class="text-xs sm:text-sm font-black text-amber-300">خطة إعادة الشراء المعلقة النشطة • ${plan.name} (${plan.ticker})</h3>
+                    <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40">قيد الانتظار في المنصة 🎯</span>
+                  </div>
+                  <div class="text-[11px] text-gray-300 font-mono">
+                    <span>كاش البيع المتاح: <strong class="text-emerald-400 font-bold">${Number(plan.sellCash).toLocaleString('en-US')} ج.م</strong></span>
+                  </div>
+                </div>
+
+                <div class="p-3 rounded-lg bg-black/60 border border-amber-500/30 text-xs text-gray-200 leading-relaxed space-y-1.5 font-sans">
+                  <p>• <strong>ما تم تنفيذه بنجاح:</strong> بيع <strong class="text-amber-300 font-mono">${plan.soldShares} سهم</strong> بسعر قمة <strong class="text-white font-mono">${Number(plan.sellPrice).toFixed(2)} ج</strong> وحبس كاش مضمون.</p>
+                  <p>• <strong>الخطوة المطلوبة منك في المنصة الآن:</strong> ضع أمر شراء معلق عند ارتكاز الدعم <strong class="text-cyan-300 font-mono font-bold">${Number(plan.rebuyPrice).toFixed(2)} ج</strong> لشراء <strong class="text-white font-mono font-bold">${plan.rebuyShares} سهم</strong>.</p>
+                  <p class="text-emerald-300 font-bold">• <strong>المكسب المجاني المستهدف:</strong> رصيد أسهمك سيزداد بمقدار <strong class="text-white font-mono font-black">+${plan.freeShares || Math.max(1, plan.rebuyShares - plan.soldShares)} أسهم إضافية مجاناً</strong> دون دفع أي مليم!</p>
+                </div>
+
+                <div class="flex items-center gap-2 flex-wrap pt-1">
+                  <button onclick="confirmCompletedRebuy('${plan.ticker}')" class="flex-1 py-2 px-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold text-xs flex items-center justify-center gap-1.5 transition shadow-lg cursor-pointer">
+                    <i data-lucide="check-circle" class="w-3.5 h-3.5"></i>
+                    <span>تم تنفيذ أمر الشراء المعلق في المنصة بنجاح ⚡</span>
+                  </button>
+                  <button onclick="cancelPendingRebuy('${plan.ticker}')" class="py-2 px-3 rounded-xl bg-gray-900 hover:bg-gray-800 text-gray-400 hover:text-rose-300 text-xs font-bold border border-gray-700 cursor-pointer">
+                    <span>إلغاء الخطة والإبقاء على الكاش 💵</span>
+                  </button>
+                </div>
+              </div>
+            `).join('');
+          })()}
 
           <!-- 6 Categorized Action Tabs -->
           <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 overflow-x-auto pb-1">

@@ -1,6 +1,6 @@
 $onclicks = @(
   'adjustFineTunePrice', 'adjustFineTuneShares', 'applyFineTuning', 'askCopilot',
-  'calculateSmartAllocation', 'cancelRotationPlan', 'clearChat', 'clearLearnedLessons',
+  'calculateSmartAllocation', 'cancelPendingRebuy', 'cancelRotationPlan', 'confirmCompletedRebuy', 'clearChat', 'clearLearnedLessons',
   'clearNotificationHistory', 'closeAssetModal', 'closeAuditModal', 'closeAutonomousLogModal',
   'closeAutonomousTrade', 'closeFineTuneModal', 'closeGeminiModal', 'closeNotificationCenter',
   'closePositionSizingModal', 'closePriceLevelsModal', 'closeRotationModal', 'closeSanityAuditModal',

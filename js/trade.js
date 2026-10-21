@@ -744,6 +744,39 @@
 
         const cashDest = document.querySelector('input[name="trade-cash-dest"]:checked')?.value || 'FREE_CASH';
         let destMsg = 'تم إيداع صافي العائد في رصيدك الكاش الحر.';
+        // Record active pending rebuy plan if selling
+        try {
+          const rebuyPrice = (stock && stock.pivotR1 && price >= stock.pivotR1)
+            ? Number((price * 0.97).toFixed(2))
+            : (stock && stock.pivotS1 ? Number(stock.pivotS1.toFixed(2)) : Number((price * 0.92).toFixed(2)));
+          const rebuyShares = rebuyPrice > 0 ? Math.floor(netSellValue / rebuyPrice) : shares;
+          const freeShares = Math.max(0, rebuyShares - shares);
+
+          const pendingPlan = {
+            ticker: ticker,
+            name: stock ? stock.name : ticker,
+            soldShares: shares,
+            sellPrice: price,
+            sellCash: netSellValue,
+            realizedProfit: realizedProfit,
+            rebuyPrice: rebuyPrice,
+            rebuyShares: rebuyShares,
+            freeShares: freeShares,
+            createdAt: cairoTime,
+            status: 'PENDING'
+          };
+
+          let pendingList = [];
+          try {
+            pendingList = JSON.parse(localStorage.getItem('egx_pending_rebuys') || '[]');
+          } catch(err) { pendingList = []; }
+          pendingList = pendingList.filter(p => p.ticker !== ticker);
+          pendingList.push(pendingPlan);
+          localStorage.setItem('egx_pending_rebuys', JSON.stringify(pendingList));
+        } catch(planErr) {
+          console.warn('Pending rebuy plan recording warning:', planErr);
+        }
+
         if (cashDest === 'PENDING_BUY') {
           destMsg = 'تم تسجيل تخصيص العائد لأمر شراء معلق عند الدعم لإعادة الشراء وتكبير الأسهم مجاناً 🎯';
         } else if (cashDest === 'RADAR_ROTATE') {
