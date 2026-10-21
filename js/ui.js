@@ -259,7 +259,42 @@
     window.switchActionHubCategory = switchActionHubCategory;
     window.quickApplySafetyLevel = quickApplySafetyLevel;
 
+        function getCardRsiBadge(rsiVal) {
+      const r = Number(rsiVal) || 50;
+      if (r < 30) {
+        return `<span class="font-mono text-[10px] px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-500/50 font-bold" title="تشبع بيعي مفرط - قاع وفرصة شراء">
+          RSI: ${r} (تشبع بيعي &lt; 30 🟢 شراء)
+        </span>`;
+      } else if (r < 45) {
+        return `<span class="font-mono text-[10px] px-2 py-0.5 rounded-full bg-blue-950 text-blue-300 border border-blue-500/50 font-bold" title="مرحلة تعافي وبناء عزم">
+          RSI: ${r} (تعافي 30-45 🔵 ارتكاز)
+        </span>`;
+      } else if (r <= 65) {
+        return `<span class="font-mono text-[10px] px-2 py-0.5 rounded-full bg-cyan-950 text-cyan-300 border border-cyan-500/50 font-bold" title="صعود متزن وصحي">
+          RSI: ${r} (صعود متزن 45-65 🟡 صحي)
+        </span>`;
+      } else if (r <= 70) {
+        return `<span class="font-mono text-[10px] px-2 py-0.5 rounded-full bg-amber-950 text-amber-300 border border-amber-500/50 font-bold" title="اقتراب من القمم - هدوء مطلوب">
+          RSI: ${r} (اقتراب قمم 65-70 🟠 هدوء)
+        </span>`;
+      } else {
+        return `<span class="font-mono text-[10px] px-2 py-0.5 rounded-full bg-rose-950 text-rose-300 border border-rose-500/60 font-bold animate-pulse" title="تشبع شرائي مفرط - قمة وجني أرباح">
+          RSI: ${r} (تشبع شرائي &gt; 70 🔴 قمة وجني أرباح)
+        </span>`;
+      }
+    }
+
     function renderProfitTakingCard(item, rank) {
+      const rsiVal = Number(item.rsi || (item.returnPct > 20 ? 74.2 : 68.5));
+      let rsiAdviceLine = '';
+      if (rsiVal > 70) {
+        rsiAdviceLine = `• <strong>قراءة مؤشر العزم RSI (${rsiVal}):</strong> تشبع شرائي مفرط أعلى من 70 نقطة؛ عزم الصعود السريع يقترب من ذروته، مما يجعل جني ثلث الأرباح الآن قراراً مثالياً لحماية المكسب قبل أي تهدئة.`;
+      } else if (rsiVal < 30) {
+        rsiAdviceLine = `• <strong>قراءة مؤشر العزم RSI (${rsiVal}):</strong> تشبع بيعي حاد دون 30 نقطة؛ ضغوط البيع تشارف على النفاذ والسهم في منطقة قاع ارتدادي.`;
+      } else {
+        rsiAdviceLine = `• <strong>قراءة مؤشر العزم RSI (${rsiVal}):</strong> المؤشر في نطاق زخم متزن وصحي (${rsiVal} نقطة) يتيح مواصلة الصعود بحذر مع رفع خط الأمان.`;
+      }
+
       return `
         <div class="bg-gray-950/90 border border-amber-500/40 hover:border-amber-500/70 rounded-xl overflow-hidden shadow-lg transition-all">
           <div class="bg-amber-950/60 border-b border-amber-500/30 p-3 flex items-center justify-between flex-wrap gap-2">
@@ -267,10 +302,8 @@
               <span class="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse"></span>
               <span class="text-xs font-black text-amber-300">أولوية #${rank} • ${item.name} (${item.ticker})</span>
             </div>
-            <div class="flex items-center gap-2">
-              <span class="font-mono text-[10.5px] px-1.5 py-0.5 rounded bg-gray-900 border border-cyan-500/30 text-cyan-300 font-bold">
-                RSI: ${item.rsi || (item.returnPct > 20 ? 74.2 : 68.5)}
-              </span>
+            <div class="flex items-center gap-2 flex-wrap">
+              ${getCardRsiBadge(rsiVal)}
               <span class="font-mono font-bold text-xs text-emerald-400 bg-emerald-950/70 border border-emerald-500/30 px-2 py-0.5 rounded">
                 ${item.currentPrice.toFixed(2)} ج (+${item.returnPct.toFixed(1)}%)
               </span>
@@ -283,8 +316,9 @@
           <div class="p-3.5 space-y-3">
             <div class="text-[11.5px] text-gray-300 leading-relaxed bg-gray-900/90 p-3 rounded-lg border border-gray-800 space-y-1.5 font-sans">
               <p>• <strong>الخطوة 1 (بيع جزئي 30%):</strong> بيع <strong class="text-amber-300 font-mono">${item.sellShares} سهم</strong> بسعر القمة لحبس كاش مضمون <strong class="text-emerald-400 font-mono">${item.sellCash.toLocaleString('en-US')} ج.م</strong> مع ربح محقق <strong class="text-white font-mono">${item.realizedProfit.toLocaleString('en-US')} ج.م</strong>.</p>
-              <p>• <strong>الخطوة 2 (إعادة شراء بالقاع):</strong> وضع أمر شراء عند الدعم <strong class="text-cyan-300 font-mono">${item.rebuyPrice} ج.م</strong> لشراء <strong class="text-white font-mono">${item.rebuyShares} سهم</strong>.</p>
+              <p>• <strong>الخطوة 2 (إعادة شراء عند الدعم الجديد):</strong> وضع أمر شراء عند ارتكاز الدعم الجديد <strong class="text-cyan-300 font-mono">${item.rebuyPrice} ج.م</strong> لشراء <strong class="text-white font-mono">${item.rebuyShares} سهم</strong>.</p>
               <p class="text-emerald-300 font-semibold">• <strong>المكسب المجاني (تكبير الأسهم):</strong> رصيد أسهمك سيزداد بمقدار <strong class="text-white font-mono font-bold">+${item.netGainShares} أسهم زيادة مجاناً</strong> دون دفع أي مليم!</p>
+              <p class="text-cyan-200/90 pt-1 border-t border-gray-800/60 font-sans">${rsiAdviceLine}</p>
             </div>
 
             <div class="mt-2 pt-2 border-t border-gray-800/80 flex items-center justify-between flex-wrap gap-2 text-[11px] bg-blue-950/30 p-2.5 rounded-lg border border-blue-500/20">
@@ -474,9 +508,7 @@
               <span class="font-mono font-bold text-xs text-emerald-400 bg-emerald-950/70 border border-emerald-500/30 px-2 py-0.5 rounded">
                 ${item.currentPrice.toFixed(2)} ج (+${item.returnPct.toFixed(1)}%)
               </span>
-              <span class="font-mono text-[10.5px] px-1.5 py-0.5 rounded bg-gray-900 border border-gray-700 text-blue-300">
-                RSI: ${item.rsi || 65.4}
-              </span>
+              ${getCardRsiBadge(item.rsi || 65.4)}
               <span class="text-[10px] px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/40 font-bold">
                 🛡️ حماية أرباح (+${item.lockedProfitPct}%)
               </span>

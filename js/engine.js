@@ -1473,9 +1473,20 @@
         // Owned stock with solid gain (returnPct >= 10) OR reaching resistance R1 OR rebalance candidate
         const isProfitTaking = returnPct >= 10 || actionCode === 'REBALANCE_CANDIDATE' || (pivotR1 > 0 && curPrice >= pivotR1);
         if (isProfitTaking && !isLosing) {
+          // Dynamic Support Level Anchor:
+          // If the stock has broken above R1 or gained heavily, the realistic pullback support
+          // is NOT the ancient S1 (e.g. 78 EGP), but the new breakout retest / dynamic trailing stop level (e.g. 91.18 EGP)!
+          let dynamicRebuySupport = (curPrice >= pivotR1 && pivotR1 > 0)
+            ? Number((curPrice * 0.97).toFixed(2))
+            : (Number(pivotS1) || Number((curPrice * 0.92).toFixed(2)));
+
+          if (dynamicRebuySupport >= curPrice) {
+            dynamicRebuySupport = Number((curPrice * 0.97).toFixed(2));
+          }
+
           const rebalance = (typeof this.calculateRebalance === 'function')
-            ? this.calculateRebalance(currentShares, curPrice, buyPrice, 0.30, pivotS1 || (curPrice * 0.90))
-            : { sellShares: Math.round(currentShares * 0.3), sellCash: Math.round(currentShares * 0.3 * curPrice), realizedProfit: 0, rebuyShares: 0, netGainShares: 1, rebuyPrice: pivotS1 };
+            ? this.calculateRebalance(currentShares, curPrice, buyPrice, 0.30, dynamicRebuySupport)
+            : { sellShares: Math.round(currentShares * 0.3), sellCash: Math.round(currentShares * 0.3 * curPrice), realizedProfit: 0, rebuyShares: 0, netGainShares: 1, rebuyPrice: dynamicRebuySupport };
 
           profitTaking.push({
             ticker: item.ticker,
@@ -1490,9 +1501,11 @@
             sellCash: rebalance.sellCash,
             realizedProfit: rebalance.realizedProfit,
             remainingShares: rebalance.remainingShares,
-            rebuyPrice: Number(pivotS1) || Number((curPrice * 0.90).toFixed(2)),
+            rebuyPrice: dynamicRebuySupport,
             rebuyShares: rebalance.rebuyShares,
             netGainShares: Math.max(1, rebalance.netGainShares),
+            suggestedTrailingStop: dynamicRebuySupport,
+            rsi: item.rsi,
             cycle: cycle,
             evalRes: evalRes,
             verdict: evalRes ? evalRes.verdict : null,
