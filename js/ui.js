@@ -660,6 +660,47 @@
     }
     window.cancelPendingRebuy = cancelPendingRebuy;
 
+        // Thndr Sync View Handlers
+    function pasteThndrFromClipboardView() {
+      if (!navigator.clipboard) {
+        if (typeof showToast === 'function') showToast('متصفحك لا يدعم القراءة المباشرة؛ استخدم Ctrl + V للصق النص.', 'info');
+        return;
+      }
+      navigator.clipboard.readText().then(text => {
+        const input = document.getElementById('thndr-manual-json-input-view');
+        if (input) {
+          input.value = text;
+          if (typeof showToast === 'function') showToast('تم لصق أرقام المحفظة من الحافظة بنجاح ✅', 'success');
+        }
+      }).catch(() => {
+        if (typeof showToast === 'function') showToast('يرجى لصق الكود يدوياً داخل المربع.', 'info');
+      });
+    }
+    window.pasteThndrFromClipboardView = pasteThndrFromClipboardView;
+
+    function handleThndrViewSyncSubmit() {
+      const input = document.getElementById('thndr-manual-json-input-view');
+      const replaceAll = document.getElementById('thndr-replace-all-view') ? document.getElementById('thndr-replace-all-view').checked : true;
+      if (!input || !input.value.trim()) {
+        if (typeof showToast === 'function') showToast('يرجى لصق الكود المنسوخ من ثندر أولاً.', 'error');
+        else alert('يرجى لصق الكود المنسوخ من ثندر أولاً.');
+        return;
+      }
+      try {
+        const parsed = JSON.parse(input.value.trim());
+        if (typeof applyThndrImport === 'function') {
+          applyThndrImport(parsed, replaceAll);
+        }
+        input.value = '';
+        if (typeof switchTab === 'function') switchTab('portfolio');
+        if (typeof showToast === 'function') showToast('تمت مزامنة وتحديث المحفظة بنجاح بالقرش! ✅', 'success');
+      } catch (err) {
+        if (typeof showToast === 'function') showToast('صيغة البيانات غير صحيحة: ' + err.message, 'error');
+        else alert('صيغة البيانات غير صحيحة: ' + err.message);
+      }
+    }
+    window.handleThndrViewSyncSubmit = handleThndrViewSyncSubmit;
+
     // Render Top Daily Action Hub (Interactive Decision Engine for Plain-Arabic Guidance)
     function renderDailyActionHub() {
       const container = document.getElementById('daily-action-hub');
@@ -2759,8 +2800,16 @@
         'simulation': { title: 'مختبر المحاكاة والتدريب المؤسسي لمنع الهلوسة', desc: 'محاكاة أداء الذكاء الاصطناعي على بيانات تاريخية معتمدة ومراقبة بيئة السوق ودفتر الصفقات', badge: 'معتمد 100% ضد الهلوسة' },
         'glossary': { title: 'دليل المصطلحات المالية', desc: 'شرح مبسط لكل مصطلحات البورصة والتحليل الفني والمالي', badge: 'قاموس المستثمر' },
         'valuation': { title: 'محرك تقييم القيمة العادلة المخصومة (DCF & DDM)', desc: 'تقييم التدفقات النقدية وهوامش الأمان الاستثمارية وفق أسعار الفائدة المصرية', badge: 'تقييم جوهري • DCF' },
+        'thndrsync': { title: 'مزامنة مع Thndr', desc: 'سحب ومزامنة جميع أسهمك ومتوسطات الشراء من محفظة ثندر بالقرش في 3 خطوات بسيطة', badge: 'مزامنة ذكية ⚡' },
         'alpha': { title: 'متتبع ألفا والأداء التراكمي للمحفظة (Benchmark Alpha Tracker)', desc: 'مقارنة الأداء التراكمي بمؤشر EGX30 وعائد صناديق السيولة النقدية والتضخم', badge: 'Alpha & Sharpe' }
       };
+
+      if (tabId === 'thndrsync') {
+        const box = document.getElementById('thndr-verified-script-box-tab');
+        if (box && typeof generateThndrExtractorScript === 'function') {
+          box.value = generateThndrExtractorScript();
+        }
+      }
 
       if (tabMeta[tabId]) {
         const titleEl = document.getElementById('active-tab-title');

@@ -5,7 +5,7 @@ $onclicks = @(
   'closeAutonomousTrade', 'closeFineTuneModal', 'closeGeminiModal', 'closeNotificationCenter',
   'closePositionSizingModal', 'closePriceLevelsModal', 'closeRotationModal', 'closeSanityAuditModal',
   'closeSimPosition', 'closeThndrSyncModal', 'closeTradeModal', 'commitRotationPlan',
-  'completeRotationPlan', 'completeRotationPlanToCIB', 'copyAuditReport', 'copyThndrVerifiedScript', 'dismissOedBanner',
+  'completeRotationPlan', 'completeRotationPlanToCIB', 'copyAuditReport', 'copyThndrVerifiedScript', 'handleThndrViewSyncSubmit', 'pasteThndrFromClipboardView', 'dismissOedBanner',
   'executeRiskCalculations', 'executeSimulatedBuy', 'fetchLiveEGXPricesAndReevaluate',
   'fetchSingleStockLivePrice', 'forceFreshSync', 'generateStructuredThesis', 'handleAuditOrRotate',
   'handleManualThndrImportSubmit', 'handleOedBannerAction',

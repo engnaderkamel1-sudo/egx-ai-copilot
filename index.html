@@ -1160,6 +1160,13 @@
             </div>
             <span class="text-[10px] px-1.5 py-0.5 rounded-md bg-white/20 text-white font-mono" id="nav-portfolio-count">11 أصل</span>
           </button>
+          <button onclick="switchTab('thndrsync')" id="tab-thndrsync" class="tab-btn w-full px-3 py-2.5 rounded-xl flex items-center justify-between transition text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-800/60">
+            <div class="flex items-center gap-2.5">
+              <i data-lucide="zap" class="w-4 h-4 text-amber-300 shrink-0"></i>
+              <span>مزامنة مع Thndr</span>
+            </div>
+            <span class="text-[10px] px-1.5 py-0.5 rounded-md bg-amber-500/20 text-amber-300 font-bold">1-Click ⚡</span>
+          </button>
           <button onclick="switchTab('alpha')" id="tab-alpha" class="tab-btn w-full px-3 py-2.5 rounded-xl flex items-center justify-between transition text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-800/60">
             <div class="flex items-center gap-2.5">
               <i data-lucide="trending-up" class="w-4 h-4 text-cyan-400 shrink-0"></i>
@@ -1645,6 +1652,125 @@
       </div>
     </div>
   </div>
+
+    <!-- ============================================== -->
+    <!-- TAB: THNDR 1-CLICK SYNC WIZARD                 -->
+    <!-- ============================================== -->
+    <div id="view-thndrsync" class="view-panel hidden space-y-6">
+
+      <!-- Header Banner -->
+      <div class="bg-gradient-to-r from-emerald-950 via-gray-900 to-cyan-950 border border-emerald-500/40 rounded-3xl p-5 sm:p-6 shadow-2xl space-y-3">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-600 via-teal-600 to-cyan-500 flex items-center justify-center text-white shadow-lg shadow-emerald-950/60 shrink-0">
+            <i data-lucide="zap" class="w-6 h-6 text-amber-300"></i>
+          </div>
+          <div>
+            <h2 class="text-base sm:text-xl font-black text-white flex items-center gap-2">
+              <span>أداة مزامنة محفظة ثندر بالقرش</span>
+              <span class="text-[10.5px] px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/40 font-mono">100% Accurate</span>
+            </h2>
+            <p class="text-xs text-gray-300 mt-0.5">سحب وتحديث كافة أرقام أسهمك ومتوسطات الشراء والرصيد النقدي وتحديث التطبيق في 3 خطوات بسيطة ومباشرة</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3-Step Wizard Cards Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+
+        <!-- STEP 1: Copy Script -->
+        <div class="bg-gray-900/90 border border-emerald-500/30 rounded-2xl p-5 space-y-4 shadow-xl flex flex-col justify-between">
+          <div class="space-y-3">
+            <div class="flex items-center gap-2.5 border-b border-gray-800 pb-3">
+              <span class="w-7 h-7 rounded-full bg-emerald-600 text-white font-black flex items-center justify-center text-xs shrink-0 shadow">1</span>
+              <div>
+                <h3 class="font-bold text-white text-sm">الخطوة الأولى: انسخ الكود من هنا</h3>
+                <p class="text-[11px] text-gray-400">كود سحب آمن 100% يعمل داخل متصفحك فقط</p>
+              </div>
+            </div>
+            <p class="text-xs text-gray-300 leading-relaxed">
+              اضغط على الزر بالأسفل لنسخ كود السحب المعتمد إلى حافظة جهازك بنقرة واحدة:
+            </p>
+            <button onclick="copyThndrVerifiedScript()" class="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs flex items-center justify-center gap-2 transition shadow-lg cursor-pointer transform active:scale-95">
+              <i data-lucide="copy" class="w-4 h-4"></i>
+              <span id="btn-copy-verified-text-tab">📋 اضغط هنا لنسخ الكود المعتمد</span>
+            </button>
+            <details class="text-[11px] text-gray-400 cursor-pointer pt-1">
+              <summary class="hover:text-emerald-300 transition select-none">عرض نص الكود للاطلاع أو النسخ اليدوي ▾</summary>
+              <textarea id="thndr-verified-script-box-tab" readonly rows="5" class="w-full mt-2 bg-gray-950 border border-gray-800 rounded-xl p-2.5 text-[10px] font-mono text-emerald-400 select-all focus:outline-none"></textarea>
+            </details>
+          </div>
+          <div class="text-[10.5px] text-emerald-400 bg-emerald-950/40 p-2.5 rounded-xl border border-emerald-500/20">
+            ✅ الكود لا يطلب أي كلمات سر ولا يرسل أي بيانات لخوادم خارجية؛ يعمل محلياً في جهازك فقط.
+          </div>
+        </div>
+
+        <!-- STEP 2: Run in Thndr -->
+        <div class="bg-gray-900/90 border border-cyan-500/30 rounded-2xl p-5 space-y-4 shadow-xl flex flex-col justify-between">
+          <div class="space-y-3">
+            <div class="flex items-center gap-2.5 border-b border-gray-800 pb-3">
+              <span class="w-7 h-7 rounded-full bg-cyan-600 text-white font-black flex items-center justify-center text-xs shrink-0 shadow">2</span>
+              <div>
+                <h3 class="font-bold text-white text-sm">الخطوة الثانية: شغل الكود في ثندر</h3>
+                <p class="text-[11px] text-gray-400">على متصفح الكمبيوتر أو اللابتوب</p>
+              </div>
+            </div>
+            <a href="https://app.thndr.app" target="_blank" class="w-full py-2.5 rounded-xl bg-gray-800 hover:bg-gray-700 text-cyan-300 border border-cyan-700/50 font-bold text-xs flex items-center justify-center gap-1.5 transition shadow">
+              <span>فتح موقع ثندر ويب ↗</span>
+            </a>
+            <div class="space-y-2 text-xs text-gray-300 leading-relaxed pt-1">
+              <div class="flex items-start gap-2 bg-black/40 p-2 rounded-lg border border-white/5">
+                <span class="font-bold text-cyan-400">أ.</span>
+                <span>افتح صفحة <strong>"المحفظة"</strong> في حسابك على ثندر.</span>
+              </div>
+              <div class="flex items-start gap-2 bg-black/40 p-2 rounded-lg border border-white/5">
+                <span class="font-bold text-cyan-400">ب.</span>
+                <span>اضغط مفتاح <kbd class="px-1.5 py-0.5 rounded bg-gray-800 text-gray-200 border border-gray-700 font-mono">F12</kbd> في الكيبورد وافتح تبويب <strong class="text-white">Console</strong>.</span>
+              </div>
+              <div class="flex items-start gap-2 bg-black/40 p-2 rounded-lg border border-white/5">
+                <span class="font-bold text-cyan-400">ج.</span>
+                <span>الصق الكود (<kbd class="px-1.5 py-0.5 rounded bg-gray-800 text-gray-200 border border-gray-700 font-mono">Ctrl + V</kbd>) ثم اضغط <kbd class="px-1.5 py-0.5 rounded bg-gray-800 text-gray-200 border border-gray-700 font-mono">Enter</kbd>.</span>
+              </div>
+            </div>
+          </div>
+          <div class="text-[10.5px] text-cyan-300 bg-cyan-950/40 p-2.5 rounded-xl border border-cyan-500/20">
+            ⚡ سيقوم الكود بنسخ أرقام محفظتك تلقائياً إلى الحافظة فور ضغط زر Enter.
+          </div>
+        </div>
+
+        <!-- STEP 3: Paste and Sync -->
+        <div class="bg-gray-900/90 border border-amber-500/40 rounded-2xl p-5 space-y-4 shadow-xl flex flex-col justify-between">
+          <div class="space-y-3">
+            <div class="flex items-center gap-2.5 border-b border-gray-800 pb-3">
+              <span class="w-7 h-7 rounded-full bg-amber-500 text-gray-950 font-black flex items-center justify-center text-xs shrink-0 shadow">3</span>
+              <div>
+                <h3 class="font-bold text-white text-sm">الخطوة الثالثة: الصق هنا وطبق التحديث</h3>
+                <p class="text-[11px] text-gray-400">استيراد وحساب لحظي لكافة الأسهم</p>
+              </div>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-xs text-gray-300 font-bold">مربع لصق الأرقام:</span>
+              <button onclick="pasteThndrFromClipboardView()" class="px-2.5 py-1 rounded-lg bg-gray-800 hover:bg-gray-700 border border-emerald-500/40 text-emerald-300 font-bold text-[11px] flex items-center gap-1 transition cursor-pointer">
+                <i data-lucide="clipboard" class="w-3.5 h-3.5"></i>
+                <span>لصق من الحافظة فوراً</span>
+              </button>
+            </div>
+            <textarea id="thndr-manual-json-input-view" rows="5" placeholder="الصق هنا الكود الذي تم نسخه من Console ثندر..." class="w-full bg-gray-950 border border-gray-700 rounded-xl p-3 text-emerald-300 font-mono text-xs focus:border-emerald-500 focus:outline-none leading-relaxed"></textarea>
+            <div class="flex items-center justify-between text-[11px] bg-gray-950/80 p-2.5 rounded-xl border border-gray-800">
+              <label class="flex items-center gap-1.5 text-gray-200 cursor-pointer">
+                <input type="checkbox" id="thndr-replace-all-view" checked class="rounded border-gray-700 text-emerald-600 focus:ring-emerald-500">
+                <span>استبدال المحفظة بالكامل بالأرقام المحدثة</span>
+              </label>
+            </div>
+          </div>
+          <button onclick="handleThndrViewSyncSubmit()" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 text-white font-extrabold text-xs flex items-center justify-center gap-2 transition shadow-xl shadow-emerald-950/60 cursor-pointer transform active:scale-95">
+            <i data-lucide="zap" class="w-4 h-4 text-amber-300"></i>
+            <span>تحديث وتطبيق المحفظة فوراً بالقرش ⚡</span>
+          </button>
+        </div>
+
+      </div>
+
+    </div>
 
     <!-- ============================================== -->
     <!-- TAB: BENCHMARK ALPHA TRACKER                   -->
@@ -3115,20 +3241,20 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
   <!-- Modular Pure Engines (Single Source of Truth) -->
-  <script src="js/engine.js?v=2.4.4"></script>
-  <script src="js/portfolio.js?v=2.4.4"></script>
-  <script src="js/firebase-sync.js?v=2.4.4"></script>
-  <script src="js/modals.js?v=2.4.4"></script>
-  <script src="js/push-notifications.js?v=2.4.4"></script>
-  <script src="js/valuation.js?v=2.4.4"></script>
+  <script src="js/engine.js?v=2.4.5"></script>
+  <script src="js/portfolio.js?v=2.4.5"></script>
+  <script src="js/firebase-sync.js?v=2.4.5"></script>
+  <script src="js/modals.js?v=2.4.5"></script>
+  <script src="js/push-notifications.js?v=2.4.5"></script>
+  <script src="js/valuation.js?v=2.4.5"></script>
 
-  <script src="js/state.js?v=2.4.4"></script>
-  <script src="js/ui.js?v=2.4.4"></script>
-  <script src="js/trade.js?v=2.4.4"></script>
-  <script src="js/rotation.js?v=2.4.4"></script>
-  <script src="js/scenarios.js?v=2.4.4"></script>
-  <script src="js/ai.js?v=2.4.4"></script>
-  <script src="js/app.js?v=2.4.4"></script>
+  <script src="js/state.js?v=2.4.5"></script>
+  <script src="js/ui.js?v=2.4.5"></script>
+  <script src="js/trade.js?v=2.4.5"></script>
+  <script src="js/rotation.js?v=2.4.5"></script>
+  <script src="js/scenarios.js?v=2.4.5"></script>
+  <script src="js/ai.js?v=2.4.5"></script>
+  <script src="js/app.js?v=2.4.5"></script>
   <script>
     if (typeof bootApp === 'function') { bootApp(); }
   </script>
