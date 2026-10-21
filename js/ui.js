@@ -282,6 +282,31 @@
                     <div class="text-[11.5px] text-gray-300 leading-relaxed bg-gray-900/90 p-2.5 rounded-lg border border-gray-800 space-y-1 font-sans">
                       <p>• <strong>الخطة المقترحة:</strong> تخصيص <strong class="text-emerald-300 font-mono">${buy.suggestedCash.toLocaleString('en-US')} ج</strong> من رصيدك الكاش لشراء <strong class="text-white font-mono">${buy.sharesToBuy} سهم</strong> بسعر السوق الحالي.</p>
                       <p>• <strong>الفائدة المباشرة:</strong> سينخفض متوسط تكلفة السهم عليك من <strong class="text-rose-300 font-mono">${buy.buyPrice.toFixed(2)} ج</strong> إلى <strong class="text-emerald-400 font-mono">${buy.newAvgCost.toFixed(2)} ج</strong> فوراً (توفير ${buy.avgReductionEgp} ج لكل سهم!).</p>
+                      ${buy.dcaPlan ? `
+                        <div class="mt-2 pt-2 border-t border-gray-800/80">
+                          <div class="flex items-center justify-between text-[11px] font-bold text-cyan-300 mb-1.5">
+                            <span class="flex items-center gap-1"><i data-lucide="layers" class="w-3.5 h-3.5 text-cyan-400"></i> خطة التجميع الهرمي (3 دفعات ذكية):</span>
+                            <span class="text-[10px] text-emerald-400 font-normal">توفير إجمالي: ${buy.dcaPlan.totalReductionEgp} ج/سهم</span>
+                          </div>
+                          <div class="grid grid-cols-3 gap-1.5 text-[10px] text-center font-mono">
+                            <div class="bg-gray-950 p-1.5 rounded-lg border border-emerald-500/30">
+                              <div class="text-[9px] text-emerald-400 font-bold">1. فوري (40%)</div>
+                              <div class="text-white font-bold">${buy.dcaPlan.tranches[0].shares} سهم</div>
+                              <div class="text-gray-400 text-[8.5px]">${buy.dcaPlan.tranches[0].allocationCash.toLocaleString('en-US')} ج</div>
+                            </div>
+                            <div class="bg-gray-950 p-1.5 rounded-lg border border-cyan-500/30">
+                              <div class="text-[9px] text-cyan-400 font-bold">2. ارتداد (30%)</div>
+                              <div class="text-white font-bold">${buy.dcaPlan.tranches[1].shares} سهم</div>
+                              <div class="text-gray-400 text-[8.5px]">عند ${buy.dcaPlan.tranches[1].targetPrice} ج</div>
+                            </div>
+                            <div class="bg-gray-950 p-1.5 rounded-lg border border-purple-500/30">
+                              <div class="text-[9px] text-purple-400 font-bold">3. اختراق (30%)</div>
+                              <div class="text-white font-bold">${buy.dcaPlan.tranches[2].shares} سهم</div>
+                              <div class="text-gray-400 text-[8.5px]">عند ${buy.dcaPlan.tranches[2].targetPrice} ج</div>
+                            </div>
+                          </div>
+                        </div>
+                      ` : ''}
                     </div>
                   </div>
                   <div class="pt-2 flex items-center gap-2 flex-wrap">
@@ -1431,13 +1456,13 @@
 
     function setRadarFilter(filter) {
       currentRadarFilter = filter;
-      ['all', 'egx30', 'egx70', 'volume_surge', 'oversold_bounce', 'low_risk'].forEach(f => {
+      ['all', 'egx30', 'egx70', 'volume_surge', 'oversold_bounce', 'low_risk', 'dividend_champions', 'institutional_surge'].forEach(f => {
         const btn = document.getElementById(`rf-${f}`);
         if (btn) {
           if (f === filter) {
-            btn.className = 'px-3.5 py-1.5 rounded-lg font-bold bg-emerald-600 text-white transition';
+            btn.className = 'px-3.5 py-1.5 rounded-lg font-bold bg-emerald-600 text-white transition shrink-0';
           } else {
-            btn.className = 'px-3.5 py-1.5 rounded-lg font-bold bg-gray-800 text-gray-300 hover:bg-gray-700 transition';
+            btn.className = 'px-3.5 py-1.5 rounded-lg font-bold bg-gray-800 text-gray-300 hover:bg-gray-700 transition shrink-0';
           }
         }
       });
@@ -1476,7 +1501,9 @@
       const filtered = fullMarketRadar.filter(item => {
         const matchesCategory = currentRadarFilter === 'all' 
           || item.index === currentRadarFilter 
-          || (item.tags && item.tags.includes(currentRadarFilter));
+          || (item.tags && item.tags.includes(currentRadarFilter))
+          || (currentRadarFilter === 'dividend_champions' && (item.isDividendChampion || (item.tags && item.tags.includes('dividend_champion'))))
+          || (currentRadarFilter === 'institutional_surge' && (item.rvolTag === 'institutional_surge' || (item.rvol && item.rvol >= 1.5)));
 
         const matchesSearch = !query 
           || item.ticker.toLowerCase().includes(query)
@@ -1538,6 +1565,17 @@
                 <i data-lucide="layers" class="w-3 h-3"></i>
                 <span>توافق المعايير الثلاثية</span>
               </span>
+              ${item.rvol ? `
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded-md ${item.rvolBadge || 'bg-slate-800 text-slate-300 border border-slate-700'} flex items-center gap-1" title="${item.rvolStatus || 'مؤشر السيولة المؤسسية'}">
+                  <i data-lucide="activity" class="w-3 h-3"></i>
+                  <span>RVol: ${item.rvol}x</span>
+                </span>
+              ` : ''}
+              ${(item.isDividendChampion || (item.dividendYield && item.dividendYield > 0)) ? `
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-amber-950/80 text-amber-300 border border-amber-800/60 flex items-center gap-1" title="عائد التوزيع النقدي المعتمد">
+                  <span>👑 كوبون: ${item.dividendYield || (item.dividendProfile && item.dividendProfile.yieldPct) || '--'}%</span>
+                </span>
+              ` : ''}
               ${isVolumeSpike ? `
                 <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-amber-950/80 text-amber-300 border border-amber-800/60 flex items-center gap-1 animate-pulse">
                   <i data-lucide="zap" class="w-3 h-3"></i>

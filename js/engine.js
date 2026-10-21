@@ -1,4 +1,4 @@
-﻿/**
+/**
  * EGX AI Copilot - Core Financial Engine (js/engine.js)
  * Pure, deterministic mathematical and financial decision engine.
  * Single Source of Truth for all financial evaluations across the application.
@@ -62,6 +62,7 @@
       const tradedValue = Number(params.tradedValue) || 0;
       const volumeMultiplier = params.volumeMultiplier || '';
       const category = params.category || 'core';
+      const rvol = (params.rvol !== undefined && params.rvol !== null && !isNaN(Number(params.rvol))) ? Number(Number(params.rvol).toFixed(2)) : 0;
 
       if (currentPrice <= 0 || pivotR1 <= 0) return null;
 
@@ -120,10 +121,16 @@
         factor2Text = `هدوء القوة الشرائية اللحظية (RSI: ${rsi}) مما يقلل عزم الاختراق السريع`;
       }
 
-      // 4. Dynamic Metric Factor 3: Liquidity & Turnover
+      // 4. Dynamic Metric Factor 3: Liquidity & Turnover (with Institutional RVol)
       let factor3Text = '';
       let turnoverFormatted = '';
-      if (tradedValue > 0) {
+      if (rvol >= 1.8) {
+        turnoverFormatted = `سيولة مؤسسية استثنائية (${rvol}x)`;
+        factor3Text = `تدفق سيولة مؤسسية استثنائية (RVol: ${rvol}x ضعف المعتاد) يدعم بقوة اختراق المقاومة`;
+      } else if (rvol > 0 && rvol < 0.65) {
+        turnoverFormatted = `ضعف في السيولة (${rvol}x)`;
+        factor3Text = `⚠️ ضعف حجم التداول اللحظي (RVol: ${rvol}x) ينذر بنقص عزم الاختراق ومصيدة قمة`;
+      } else if (tradedValue > 0) {
         turnoverFormatted = tradedValue >= 1000000 
           ? `${(tradedValue / 1000000).toFixed(1)} مليون ج` 
           : `${Math.round(tradedValue / 1000)} ألف ج`;
@@ -909,6 +916,102 @@
     },
 
     /**
+     * Institutional 3-Tranche DCA Accumulation Planner
+     * Tranche 1: 40% of cash deployed at current support (S1)
+     * Tranche 2: 30% of cash deployed on confirmed bounce (+2.5% from support)
+     * Tranche 3: 30% of cash deployed on breakout/reclaiming pivot point (PP)
+     */
+    calculateThreeTrancheDCA: function (params) {
+      params = params || {};
+      const totalCash = Number(params.totalCash) || 0;
+      const currentPrice = Number(params.currentPrice) || 0;
+      const supportPrice = Number(params.supportPrice) || Number((currentPrice * 0.97).toFixed(2));
+      const pivotPP = Number(params.pivotPP) || Number((currentPrice * 1.03).toFixed(2));
+      const existingShares = parseInt(params.existingShares, 10) || 0;
+      const existingAvgCost = Number(params.existingAvgCost) || currentPrice;
+
+      if (totalCash <= 0 || currentPrice <= 0) {
+        return null;
+      }
+
+      // Tranche 1: 40% of cash at current price (near S1)
+      const cashT1 = Math.round(totalCash * 0.40);
+      const sharesT1 = Math.floor(cashT1 / currentPrice);
+      const actualCashT1 = Math.round(sharesT1 * currentPrice);
+      const totalCostAfterT1 = (existingShares * existingAvgCost) + actualCashT1;
+      const totalSharesAfterT1 = existingShares + sharesT1;
+      const avgAfterT1 = totalSharesAfterT1 > 0 ? Number((totalCostAfterT1 / totalSharesAfterT1).toFixed(2)) : currentPrice;
+
+      // Tranche 2: 30% of cash on confirmation bounce (+2.5% from support or current)
+      const priceT2 = Number((supportPrice * 1.025).toFixed(2));
+      const cashT2 = Math.round(totalCash * 0.30);
+      const sharesT2 = priceT2 > 0 ? Math.floor(cashT2 / priceT2) : 0;
+      const actualCashT2 = Math.round(sharesT2 * priceT2);
+      const totalCostAfterT2 = totalCostAfterT1 + actualCashT2;
+      const totalSharesAfterT2 = totalSharesAfterT1 + sharesT2;
+      const avgAfterT2 = totalSharesAfterT2 > 0 ? Number((totalCostAfterT2 / totalSharesAfterT2).toFixed(2)) : avgAfterT1;
+
+      // Tranche 3: 30% of cash on breakout above Pivot Point (PP confirmation)
+      const priceT3 = pivotPP > currentPrice ? pivotPP : Number((currentPrice * 1.04).toFixed(2));
+      const cashT3 = totalCash - actualCashT1 - actualCashT2;
+      const sharesT3 = priceT3 > 0 ? Math.floor(cashT3 / priceT3) : 0;
+      const actualCashT3 = Math.round(sharesT3 * priceT3);
+      const totalCostAfterT3 = totalCostAfterT2 + actualCashT3;
+      const totalSharesAfterT3 = totalSharesAfterT2 + sharesT3;
+      const finalAvgCost = totalSharesAfterT3 > 0 ? Number((totalCostAfterT3 / totalSharesAfterT3).toFixed(2)) : avgAfterT2;
+
+      const totalNewShares = sharesT1 + sharesT2 + sharesT3;
+      const totalActualCash = actualCashT1 + actualCashT2 + actualCashT3;
+      const totalReductionEgp = Number((existingAvgCost - finalAvgCost).toFixed(2));
+      const totalReductionPct = existingAvgCost > 0 ? Number(((totalReductionEgp / existingAvgCost) * 100).toFixed(1)) : 0;
+
+      return {
+        totalCash,
+        totalActualCash,
+        totalNewShares,
+        initialAvgCost: existingAvgCost,
+        finalAvgCost,
+        totalReductionEgp,
+        totalReductionPct,
+        tranches: [
+          {
+            step: 1,
+            name: "الدفعة 1: تثبيت القاع والتمركز",
+            weightPct: 40,
+            allocationCash: actualCashT1,
+            targetPrice: currentPrice,
+            shares: sharesT1,
+            condition: "تنفذ فوراً عند السعر الحالي قرب الدعم S1 لبدء تثبيت المركز.",
+            status: "READY_NOW",
+            avgCostResult: avgAfterT1
+          },
+          {
+            step: 2,
+            name: "الدفعة 2: تأكيد التماسك والارتداد",
+            weightPct: 30,
+            allocationCash: actualCashT2,
+            targetPrice: priceT2,
+            shares: sharesT2,
+            condition: "تُعلق حتى ظهور شمعة انعكاسية خضراء أو إغلاق أعلى قاع اليوم السابق.",
+            status: "WAITING_BOUNCE",
+            avgCostResult: avgAfterT2
+          },
+          {
+            step: 3,
+            name: "الدفعة 3: استعادة الاتجاه الصاعد",
+            weightPct: 30,
+            allocationCash: actualCashT3,
+            targetPrice: priceT3,
+            shares: sharesT3,
+            condition: "تُنفذ عند اختراق واستقرار السعر أعلى نقطة الارتكاز المحورية (PP).",
+            status: "WAITING_BREAKOUT",
+            avgCostResult: finalAvgCost
+          }
+        ]
+      };
+    },
+
+    /**
      * Generate Actionable Daily Hub Plan for Busy Investors
      */
     generateDailyActionHub: function (portfolioData, fullMarketRadar, cashBalance) {
@@ -944,6 +1047,18 @@
 
         const cycle = this.determineStockCycle(preferredDip);
 
+        // Generate 3-Tranche DCA Accumulation Plan
+        const dcaPlan = (typeof this.calculateThreeTrancheDCA === 'function')
+          ? this.calculateThreeTrancheDCA({
+              totalCash: suggestedCash,
+              currentPrice: curPrice,
+              supportPrice: preferredDip.pivotS1 || Number((curPrice * 0.97).toFixed(2)),
+              pivotPP: preferredDip.pp || Number((curPrice * 1.025).toFixed(2)),
+              existingShares: currentShares,
+              existingAvgCost: buyPrice
+            })
+          : null;
+
         buyCandidate = {
           ticker: preferredDip.ticker,
           name: preferredDip.name,
@@ -956,6 +1071,7 @@
           newAvgCost: newAvgCost,
           avgReductionEgp: avgReductionEgp,
           cycle: cycle,
+          dcaPlan: dcaPlan,
           supportPrice: preferredDip.pivotS1 || Number((curPrice * 0.97).toFixed(2)),
           targetPrice: preferredDip.pivotR1 || Number((curPrice * 1.15).toFixed(2)),
           thndrUrl: preferredDip.thndrUrl || `https://app.thndr.app/search?query=${preferredDip.ticker}`

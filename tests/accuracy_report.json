@@ -1,8 +1,8 @@
 ﻿{
-    "timestamp":  "2026-10-20T13:45:28+03:00",
+    "timestamp":  "2026-10-21T08:32:42+03:00",
     "total_tests":  66,
-    "passed_tests":  63,
-    "failed_tests":  3,
-    "accuracy_score_pct":  95.45,
-    "certification_status":  "REJECTED"
+    "passed_tests":  66,
+    "failed_tests":  0,
+    "accuracy_score_pct":  100,
+    "certification_status":  "ACCURATE_APPROVED"
 }

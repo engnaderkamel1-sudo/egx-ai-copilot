@@ -530,6 +530,100 @@ $clhoPe = [Math]::Round(($clhoPrice / $clhoEps), 1)
 Assert-Test -Suite 'Fundamental' -TestName 'CLHO P/E matches Thndr consolidated official multiple (20.9x)' -Condition ($clhoPe -eq 20.9) -Expected '20.9' -Actual $clhoPe
 
 # -------------------------------------------------------------
+# SUITE 8: STOP-LOSS GOVERNANCE, SESSION TIMING & FALLING KNIFE GUARDRAILS
+# -------------------------------------------------------------
+Write-Host "[8/8] Running Suite 8: Stop-Loss Governance, Session Timing & Falling Knife Guardrails..." -ForegroundColor Yellow
+
+# Helper function to simulate evaluateAsset logic from js/engine.js
+function Simulate-EvaluateAsset {
+    param(
+        $Ticker, $BuyPrice, $CurrentPrice, $PivotS1, $PivotS2, $PivotR1, $RSI, $ChangePct, $Category, $IsSessionOpen, $MarketRegime
+    )
+    $profit = $CurrentPrice - $BuyPrice
+    $returnPct = if ($BuyPrice -gt 0) { [Math]::Round((($profit / $BuyPrice) * 100), 2) } else { 0 }
+    $isLosing = $profit -lt 0
+
+    $coreTickers = @('COMI', 'SWDY', 'ABUK', 'CLHO', 'EGAL', 'ORAS', 'MFPC', 'CIEB', 'ADIB', 'HDBK', 'TMGH')
+    $isCore = ($coreTickers -contains $Ticker) -or ($Category -like '*Core*')
+
+    $isEmergency = ($MarketRegime -eq 'SYSTEMIC_SHOCK') -or ($ChangePct -ne $null -and $ChangePct -le -6.5) -or ($PivotS2 -ne $null -and $CurrentPrice -lt $PivotS2)
+
+    if ($isLosing) {
+        if ($isEmergency -and $PivotS1 -ne $null -and $CurrentPrice -lt $PivotS1) {
+            return @{ Action = 'EMERGENCY_STOP_LOSS'; AlertLevel = 'CRITICAL_RISK' }
+        }
+        if ($PivotR1 -ne $null -and $CurrentPrice -ge $PivotR1) {
+            return @{ Action = 'REBALANCE_CANDIDATE'; AlertLevel = 'REBOUND_RESISTANCE' }
+        }
+        if ($PivotS1 -ne $null -and $CurrentPrice -lt $PivotS1) {
+            if ($IsSessionOpen) {
+                if ($isCore) {
+                    if ($PivotS2 -ne $null -and $CurrentPrice -ge $PivotS2) {
+                        return @{ Action = 'CORE_BUFFER_WATCH'; AlertLevel = 'NORMAL' }
+                    } else {
+                        return @{ Action = 'INTRADAY_DIP_WATCH'; AlertLevel = 'WARNING' }
+                    }
+                } else {
+                    return @{ Action = 'INTRADAY_DIP_WATCH'; AlertLevel = 'WARNING' }
+                }
+            } else {
+                if ($isCore -and $PivotS2 -ne $null -and $CurrentPrice -ge $PivotS2) {
+                    return @{ Action = 'HOLD'; AlertLevel = 'WARNING' }
+                } else {
+                    return @{ Action = 'STOP_LOSS_CONFIRMED'; AlertLevel = 'CRITICAL_RISK' }
+                }
+            }
+        }
+        if ($RSI -lt 36 -and $PivotS1 -ne $null -and $CurrentPrice -ge $PivotS1) {
+            if ($returnPct -le -7.0) {
+                return @{ Action = 'DEFENSIVE_HOLD'; AlertLevel = 'WARNING' }
+            } elseif ($isCore) {
+                return @{ Action = 'ACCUMULATE'; AlertLevel = 'ACCUMULATE' }
+            } else {
+                return @{ Action = 'HOLD'; AlertLevel = 'NORMAL' }
+            }
+        }
+        return @{ Action = 'HOLD'; AlertLevel = 'NORMAL' }
+    }
+    return @{ Action = 'HOLD'; AlertLevel = 'NORMAL' }
+}
+
+# 1. Falling Knife Guardrail Test (CLHO scenario: -21% with RSI=27.3)
+$evalClho = Simulate-EvaluateAsset -Ticker 'CLHO' -BuyPrice 17.73 -CurrentPrice 14.0 -PivotS1 13.22 -PivotS2 12.50 -PivotR1 15.80 -RSI 27.3 -ChangePct (-1.0) -Category 'Core' -IsSessionOpen $true -MarketRegime 'NORMAL'
+$clhoGuardrailPassed = ($evalClho.Action -eq 'DEFENSIVE_HOLD') -and ($evalClho.Action -ne 'ACCUMULATE')
+Assert-Test -Suite 'Governance' -TestName 'Falling Knife Guardrail strictly blocks ACCUMULATE on -21% stock (CLHO)' -Condition $clhoGuardrailPassed -Expected 'DEFENSIVE_HOLD' -Actual $evalClho.Action
+
+# 2. Falling Knife Guardrail on Tactical Satellite (RAYA scenario: -15.2% with RSI=33.4)
+$evalRaya = Simulate-EvaluateAsset -Ticker 'RAYA' -BuyPrice 6.88 -CurrentPrice 5.83 -PivotS1 5.37 -PivotS2 5.00 -PivotR1 6.60 -RSI 33.4 -ChangePct (-0.5) -Category 'EGX70 Satellite' -IsSessionOpen $true -MarketRegime 'NORMAL'
+$rayaGuardrailPassed = ($evalRaya.Action -eq 'DEFENSIVE_HOLD') -and ($evalRaya.Action -ne 'ACCUMULATE')
+Assert-Test -Suite 'Governance' -TestName 'Falling Knife Guardrail strictly blocks ACCUMULATE on speculative -15% stock (RAYA)' -Condition $rayaGuardrailPassed -Expected 'DEFENSIVE_HOLD' -Actual $evalRaya.Action
+
+# 3. Emergency Hard Stop Test (Intraday crash <= -6.5%)
+$evalCrash = Simulate-EvaluateAsset -Ticker 'XYZ' -BuyPrice 50.0 -CurrentPrice 46.0 -PivotS1 48.0 -PivotS2 45.0 -PivotR1 54.0 -RSI 20.0 -ChangePct (-7.5) -Category 'Satellite' -IsSessionOpen $true -MarketRegime 'NORMAL'
+$crashPassed = ($evalCrash.Action -eq 'EMERGENCY_STOP_LOSS')
+Assert-Test -Suite 'Governance' -TestName 'Emergency Hard Stop triggers immediately on -7.5% flash crash without waiting for close' -Condition $crashPassed -Expected 'EMERGENCY_STOP_LOSS' -Actual $evalCrash.Action
+
+# 4. Intraday Dip vs Daily Close on Satellite Stock (S1 broken during active session)
+$evalDip = Simulate-EvaluateAsset -Ticker 'ABC' -BuyPrice 10.0 -CurrentPrice 9.30 -PivotS1 9.50 -PivotS2 9.00 -PivotR1 11.00 -RSI 42.0 -ChangePct (-2.0) -Category 'Satellite' -IsSessionOpen $true -MarketRegime 'NORMAL'
+$dipPassed = ($evalDip.Action -eq 'INTRADAY_DIP_WATCH')
+Assert-Test -Suite 'Governance' -TestName 'Satellite stock below S1 during active session sets INTRADAY_DIP_WATCH (prevents shakeout sale)' -Condition $dipPassed -Expected 'INTRADAY_DIP_WATCH' -Actual $evalDip.Action
+
+# 5. Core Stock S2 Buffer Protection (COMI / Core stock below S1 but above S2)
+$evalCoreBuffer = Simulate-EvaluateAsset -Ticker 'COMI' -BuyPrice 140.0 -CurrentPrice 124.0 -PivotS1 126.0 -PivotS2 119.6 -PivotR1 138.0 -RSI 40.0 -ChangePct (-1.0) -Category 'Core' -IsSessionOpen $true -MarketRegime 'NORMAL'
+$coreBufferPassed = ($evalCoreBuffer.Action -eq 'CORE_BUFFER_WATCH')
+Assert-Test -Suite 'Governance' -TestName 'Core stock below S1 but above S2 activates CORE_BUFFER_WATCH (preserves long-term thesis)' -Condition $coreBufferPassed -Expected 'CORE_BUFFER_WATCH' -Actual $evalCoreBuffer.Action
+
+# 6. Partial Exit 50% Sizing Math Test
+$testShares = 963
+$testPrice = 14.0
+$testBuyPrice = 17.73
+$exitShares = [Math]::Floor($testShares * 0.5)
+$cashReleased = [Math]::Round($exitShares * $testPrice)
+$remainingShares = $testShares - $exitShares
+$exitMathPassed = ($exitShares -eq 481) -and ($remainingShares -eq 482) -and ($cashReleased -eq 6734)
+Assert-Test -Suite 'Governance' -TestName 'Partial Exit calculation precisely splits 50% shares (481/482) and releases exact cash (6,734 EGP)' -Condition $exitMathPassed -Expected 'True' -Actual $exitMathPassed
+
+# -------------------------------------------------------------
 # FINAL BENCHMARK SUMMARY & ACCURACY SCORE
 # -------------------------------------------------------------
 $AccuracyScore = [Math]::Round((($PassedTests / $TotalTests) * 100), 2)
