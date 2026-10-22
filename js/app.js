@@ -962,14 +962,15 @@
     // ============================================================
     // Real-Time System Auto-Update Engine
     // ============================================================
-    const LOCAL_APP_VERSION = '2.5.0';
+    const LOCAL_APP_VERSION = '2.5.1';
     window.LOCAL_APP_VERSION = LOCAL_APP_VERSION;
 
     let isUpdateBannerDismissed = false;
 
     async function checkForAppUpdates(silent = true) {
       try {
-        const res = await fetch(`/version.json?_t=${Date.now()}`);
+        const apiBase = (window.location.protocol === 'file:' || !window.location.host) ? 'https://egx-ai-copilot.vercel.app' : '';
+        const res = await fetch(`${apiBase}/version.json?_t=${Date.now()}`);
         if (!res.ok) return;
         const data = await res.json();
         const serverVer = data.latest_version || data.version;
@@ -1016,6 +1017,16 @@
       banner.classList.add('block');
       if (window.lucide) lucide.createIcons();
     }
+
+    function testShowUpdateBanner() {
+      isUpdateBannerDismissed = false;
+      showAppUpdateBanner('2.5.1 (تجربة التنبيه)', 'جلسة اليوم');
+      if (typeof showToast === 'function') {
+        showToast('تم إظهار شريط التحديث التجريبي في أعلى الشاشة 🚀', 'info');
+      }
+    }
+
+    window.testShowUpdateBanner = testShowUpdateBanner;
 
     function dismissUpdateBanner() {
       isUpdateBannerDismissed = true;

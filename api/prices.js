@@ -767,7 +767,7 @@ export default async function handler(req, res) {
 
     return res.status(200).json({
       success: true,
-      app_version: "2.5.0",
+      app_version: "2.5.1",
       timestamp: new Date().toISOString(),
       cairo_time: cairoTimeStr,
       source: "TradingView Live EGX Technical Scanner",

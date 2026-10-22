@@ -2790,7 +2790,7 @@
 
       // Update Header Title, Subtitle and Badge dynamically
       const tabMeta = {
-        'changelog': { title: 'سجل التحديثات والإصدارات الرسمية', desc: 'تتبع كافة التعديلات والتطويرات المرفوعة للنظام وتواريخها بدقة', badge: 'v2.5.0' },
+        'changelog': { title: 'سجل التحديثات والإصدارات الرسمية', desc: 'تتبع كافة التعديلات والتطويرات المرفوعة للنظام وتواريخها بدقة', badge: 'v2.5.1' },
         'portfolio': { title: 'المحفظة وتوزيع الأصول', desc: 'متابعة الأصول والأسهم المملوكة في ثندر وتطور الأرباح اللحظية', badge: 'محفظة حية • EGX' },
         'radar': { title: 'رادار السوق والفرص', desc: 'رصد تدفقات السيولة غير المعتادة واختراق المقاومات بالبورصة المصرية', badge: '18 فرصة استثمارية' },
         'risk': { title: 'حاسبة الدعم وإدارة المخاطر (R/R)', desc: 'حسابات نقاط الارتكاز والدعم الكلاسيكية ونسبة العائد للمخاطرة', badge: 'معيار الأمان ≥ 1:2.0' },
@@ -3275,7 +3275,7 @@
         }
       ];
 
-      const currentVer = 'v2.5.0';
+      const currentVer = 'v2.5.1';
 
       container.innerHTML = releases.map((rel, idx) => {
         const isCurrent = rel.version === currentVer;
