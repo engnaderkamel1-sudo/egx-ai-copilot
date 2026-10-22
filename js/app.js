@@ -878,6 +878,83 @@
 
     let isAppBooted = false;
 
+
+    // ============================================================
+    // Real-Time System Auto-Update Engine
+    // ============================================================
+    const LOCAL_APP_VERSION = '2.4.8';
+    window.LOCAL_APP_VERSION = LOCAL_APP_VERSION;
+
+    let isUpdateBannerDismissed = false;
+
+    async function checkForAppUpdates(silent = true) {
+      try {
+        const res = await fetch(`/version.json?_t=${Date.now()}`);
+        if (!res.ok) return;
+        const data = await res.json();
+        const serverVer = data.latest_version || data.version;
+
+        if (serverVer && isNewerVersion(serverVer, LOCAL_APP_VERSION)) {
+          showAppUpdateBanner(serverVer, data.release_date_cairo);
+          if (!silent && typeof showToast === 'function') {
+            showToast(`🚀 يتوفر تحديث جديد للنظام (${serverVer})!`, 'info');
+          }
+        } else {
+          if (!silent && typeof showToast === 'function') {
+            showToast(`أنت تستخدم أحدث إصدار بالفعل (${LOCAL_APP_VERSION}) ✓`, 'success');
+          }
+        }
+      } catch (err) {
+        if (!silent && typeof showToast === 'function') {
+          showToast('تعذر فحص التحديثات، تحقق من الاتصال بالإنترنت.', 'error');
+        }
+      }
+    }
+
+    function isNewerVersion(serverVer, localVer) {
+      const sParts = String(serverVer).replace(/[^0-9.]/g, '').split('.').map(Number);
+      const lParts = String(localVer).replace(/[^0-9.]/g, '').split('.').map(Number);
+      for (let i = 0; i < Math.max(sParts.length, lParts.length); i++) {
+        const s = sParts[i] || 0;
+        const l = lParts[i] || 0;
+        if (s > l) return true;
+        if (s < l) return false;
+      }
+      return false;
+    }
+
+    function showAppUpdateBanner(serverVer, releaseDate) {
+      const banner = document.getElementById('app-update-available-banner');
+      if (!banner || isUpdateBannerDismissed) return;
+      const badge = document.getElementById('update-banner-version-badge');
+      if (badge) badge.innerText = `إصدار جديد ${serverVer}`;
+      const desc = document.getElementById('update-banner-desc');
+      if (desc && releaseDate) {
+        desc.innerText = `تم رفع تحديث جديد (${releaseDate})؛ اضغط لتطبيق التحديث وتحديث الصفحة فوراً.`;
+      }
+      banner.classList.remove('hidden');
+      banner.classList.add('block');
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function dismissUpdateBanner() {
+      isUpdateBannerDismissed = true;
+      const banner = document.getElementById('app-update-available-banner');
+      if (banner) banner.classList.add('hidden');
+    }
+
+    function applyAppUpdateNow() {
+      try {
+        sessionStorage.removeItem('oed_dismissed_alerts');
+      } catch (e) {}
+      const cleanUrl = window.location.origin + window.location.pathname;
+      window.location.href = `${cleanUrl}?refresh=${Date.now()}`;
+    }
+
+    window.checkForAppUpdates = checkForAppUpdates;
+    window.applyAppUpdateNow = applyAppUpdateNow;
+    window.dismissUpdateBanner = dismissUpdateBanner;
+
     function bootApp() {
       if (isAppBooted) return;
       isAppBooted = true;
@@ -913,6 +990,13 @@
       try { renderLearnedLessons(); } catch(e){ console.warn('renderLearnedLessons error:', e); }
       try { updateSimulationRegimeUI(); } catch(e){ console.warn('updateSimulationRegimeUI error:', e); }
       try { fetchCloudStatus(); } catch(e){ console.warn('fetchCloudStatus error:', e); }
+      try {
+        checkForAppUpdates(true);
+        setInterval(() => checkForAppUpdates(true), 60000);
+        document.addEventListener('visibilitychange', () => {
+          if (document.visibilityState === 'visible') checkForAppUpdates(true);
+        });
+      } catch(e){}
       try { if (window.initModalMobileScrollEngine) initModalMobileScrollEngine(); } catch(e){}
       try { if (window.lucide) lucide.createIcons(); } catch(e){}
     }
