@@ -2186,6 +2186,8 @@
     }
 
     function renderRadarGrid() {
+      try { renderMarketBreadthWidget(); } catch(e){}
+      try { renderPendingThndrOrdersUI(); } catch(e){}
       updateLiveTickerMarquee();
       const container = document.getElementById('radar-grid');
       container.innerHTML = '';
@@ -2962,6 +2964,252 @@
       initModalMobileScrollEngine();
     }
 
+
+    // ============================================================
+    // Market Breadth & Systemic Liquidity Pulse (Live EGX Visual Gauge)
+    // ============================================================
+    function renderMarketBreadthWidget() {
+      const container = document.getElementById('market-breadth-pulse-widget');
+      if (!container) return;
+
+      const regimeData = (window.currentMarketRegime && typeof window.currentMarketRegime === 'object')
+        ? window.currentMarketRegime
+        : { regime: getMarketRegimeCode(), regimeArabic: window.currentMarketRegimeArabic || 'تداول متوازن وعرضي' };
+
+      let advancingCount = 0;
+      let decliningCount = 0;
+      let unchangedCount = 0;
+      let totalTracked = 0;
+      let avgMarketChange = 0;
+
+      if (regimeData.breadth && regimeData.breadth.totalTracked) {
+        advancingCount = regimeData.breadth.advancingCount || 0;
+        decliningCount = regimeData.breadth.decliningCount || 0;
+        unchangedCount = regimeData.breadth.unchangedCount || 0;
+        totalTracked = regimeData.breadth.totalTracked || (advancingCount + decliningCount + unchangedCount);
+        avgMarketChange = regimeData.breadth.avgMarketChange || 0;
+      } else if (Array.isArray(fullMarketRadar) && fullMarketRadar.length > 0) {
+        let sumChange = 0;
+        fullMarketRadar.forEach(stock => {
+          const c = stock.changeNum !== undefined ? stock.changeNum : parseFloat((stock.changePct || '0').replace('%', ''));
+          if (c > 0) advancingCount++;
+          else if (c < 0) decliningCount++;
+          else unchangedCount++;
+          sumChange += (c || 0);
+        });
+        totalTracked = fullMarketRadar.length;
+        avgMarketChange = totalTracked > 0 ? parseFloat((sumChange / totalTracked).toFixed(2)) : 0;
+      }
+
+      const advancingPct = totalTracked > 0 ? parseFloat(((advancingCount / totalTracked) * 100).toFixed(1)) : 50;
+      const decliningPct = totalTracked > 0 ? parseFloat(((decliningCount / totalTracked) * 100).toFixed(1)) : 50;
+
+      const isShock = regimeData.regime === 'SYSTEMIC_SHOCK' || advancingPct < 20 || avgMarketChange <= -3.0;
+      const isHealthy = regimeData.regime === 'BULLISH_EXPANSION' || (advancingPct >= 60 && avgMarketChange > 0);
+
+      let statusBadgeClass = 'bg-amber-500/20 text-amber-300 border border-amber-500/30';
+      let statusIcon = 'activity';
+      if (isShock) {
+        statusBadgeClass = 'bg-rose-500/20 text-rose-300 border border-rose-500/40 animate-pulse';
+        statusIcon = 'alert-triangle';
+      } else if (isHealthy) {
+        statusBadgeClass = 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40';
+        statusIcon = 'trending-up';
+      }
+
+      container.innerHTML = `
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-gray-800">
+          <div>
+            <div class="flex items-center gap-2.5 flex-wrap">
+              <div class="p-2 rounded-xl ${isShock ? 'bg-rose-900/60 text-rose-400' : 'bg-emerald-900/60 text-emerald-400'} shrink-0 shadow-sm border border-gray-700">
+                <i data-lucide="${statusIcon}" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <h3 class="text-base sm:text-lg font-black text-white">مقياس نبض وعمق سيولة البورصة المصرية (EGX Market Breadth)</h3>
+                  <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full ${statusBadgeClass}">${regimeData.regimeArabic || 'تداول متوازن وعرضي'}</span>
+                </div>
+                <p class="text-xs text-gray-400 mt-0.5">تحليل حي لمسار السيولة اللحظية: نسبة الأسهم الصاعدة مقابل الهابطة وقوة الضغط البيعي/الشرائي</p>
+              </div>
+            </div>
+          </div>
+          <div class="text-right sm:text-left shrink-0">
+            <span class="inline-flex items-center gap-1.5 text-[11px] font-bold px-2.5 py-1 rounded-lg bg-gray-950 text-gray-400 border border-gray-800">
+              <i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-400"></i>
+              <span>المصدر: تداول البورصة المصرية EGX عبر TradingView Feed</span>
+            </span>
+          </div>
+        </div>
+
+        <!-- Visual Dual Breadth Gauge Bar -->
+        <div class="mt-4 space-y-2">
+          <div class="flex items-center justify-between text-xs font-bold">
+            <span class="flex items-center gap-1.5 text-rose-400">
+              <span class="w-2 h-2 rounded-full bg-rose-500 animate-ping"></span>
+              <span>الأسهم الهابطة: ${decliningCount} سهم (${decliningPct}%)</span>
+            </span>
+            <span class="text-gray-400 text-[11px]">إجمالي المفحوص: ${totalTracked} شركة نشطة</span>
+            <span class="flex items-center gap-1.5 text-emerald-400">
+              <span>الأسهم الصاعدة: ${advancingCount} سهم (${advancingPct}%)</span>
+              <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+            </span>
+          </div>
+          
+          <!-- Split Progress Bar -->
+          <div class="w-full h-4 bg-gray-950 rounded-full overflow-hidden flex p-0.5 border border-gray-800 shadow-inner">
+            <div class="h-full bg-gradient-to-r from-rose-700 to-rose-500 rounded-r-full transition-all duration-700 shadow-sm" style="width: ${decliningPct}%;"></div>
+            <div class="h-full bg-gradient-to-l from-emerald-600 to-emerald-400 rounded-l-full transition-all duration-700 shadow-sm" style="width: ${advancingPct}%;"></div>
+          </div>
+        </div>
+
+        <!-- 4 Stats Cards Grid -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4">
+          <div class="bg-gray-950/70 p-3 rounded-xl border border-gray-800/80">
+            <span class="text-[11px] text-gray-400 font-bold block">متوسط حركة السوق</span>
+            <span class="text-sm sm:text-base font-black ${avgMarketChange < 0 ? 'text-rose-400' : 'text-emerald-400'} dir-ltr block mt-0.5">
+              ${avgMarketChange > 0 ? '+' : ''}${avgMarketChange}%
+            </span>
+          </div>
+          <div class="bg-gray-950/70 p-3 rounded-xl border border-gray-800/80">
+            <span class="text-[11px] text-gray-400 font-bold block">حالة نظام التداول</span>
+            <span class="text-xs sm:text-sm font-bold ${isShock ? 'text-rose-400' : 'text-slate-200'} block mt-0.5">
+              ${isShock ? 'هبوط ذعري شامل' : (isHealthy ? 'توسع صاعد قوي' : 'تداول متوازن')}
+            </span>
+          </div>
+          <div class="bg-gray-950/70 p-3 rounded-xl border border-gray-800/80">
+            <span class="text-[11px] text-gray-400 font-bold block">إشارات الشراء بالدعوم</span>
+            <span class="text-xs sm:text-sm font-bold ${isShock ? 'text-rose-400 font-black' : 'text-emerald-400'} block mt-0.5">
+              ${isShock ? '⚠️ مجمدة لحماية الكاش' : 'نشطة مع إدارة المخاطر'}
+            </span>
+          </div>
+          <div class="bg-gray-950/70 p-3 rounded-xl border border-gray-800/80">
+            <span class="text-[11px] text-gray-400 font-bold block">المؤشر الرئيسي EGX30</span>
+            <span class="text-xs sm:text-sm font-bold text-gray-300 block mt-0.5">
+              جلسة اليوم اللحظية
+            </span>
+          </div>
+        </div>
+      `;
+
+      if (window.lucide) lucide.createIcons();
+    }
+
+    // ============================================================
+    // Thndr Active Pending Orders UI (Direct Protection Guardrail)
+    // ============================================================
+    function renderPendingThndrOrdersUI() {
+      const container = document.getElementById('thndr-pending-orders-widget');
+      if (!container) return;
+
+      const orders = (typeof pendingThndrOrders !== 'undefined' && Array.isArray(pendingThndrOrders))
+        ? pendingThndrOrders
+        : [];
+
+      const regimeCode = getMarketRegimeCode();
+      const isShock = regimeCode === 'SYSTEMIC_SHOCK';
+
+      const pendingBuys = orders.filter(o => o.status === 'PENDING');
+
+      let rowsHtml = '';
+      if (pendingBuys.length === 0) {
+        rowsHtml = `
+          <div class="p-4 text-center text-gray-400 text-xs bg-gray-950/50 rounded-xl border border-gray-800">
+            لا توجد أوامر معلقة مسجلة حالياً في تطبيق ثندر. اضغط زر "إضافة أمر ثندر جديد" إذا وضعت طلباً معلقاً لحمايته تلقائياً.
+          </div>
+        `;
+      } else {
+        rowsHtml = pendingBuys.map(order => {
+          return `
+            <div class="p-3.5 rounded-xl border ${isShock ? 'bg-rose-950/40 border-rose-600/60 shadow-lg' : 'bg-gray-950 border-gray-800'} flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition">
+              <div class="flex items-start gap-3">
+                <div class="w-10 h-10 rounded-xl ${isShock ? 'bg-rose-600/30 text-rose-300 border border-rose-500/40' : 'bg-emerald-600/20 text-emerald-400'} flex items-center justify-center font-black text-sm shrink-0">
+                  ${order.ticker}
+                </div>
+                <div>
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <span class="font-bold text-white text-sm">${order.name}</span>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${order.type.includes('BUY') ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30' : 'bg-amber-500/20 text-amber-300'}">
+                      ${order.type === 'BUY_LIMIT' ? 'طلب شراء محدد' : order.type}
+                    </span>
+                    <span class="text-[10px] font-mono text-gray-400">سعر الأمر: ${Number(order.orderPrice).toFixed(2)} ج</span>
+                    <span class="text-[10px] text-gray-400">الكمية: ${order.shares} سهم</span>
+                  </div>
+                  <p class="text-xs ${isShock ? 'text-rose-300 font-bold' : 'text-gray-400'} mt-1">
+                    ${isShock ? '⚠️ تحذير هبوط ذعري: يوصى بإلغاء هذا الأمر فوراً في تطبيق ثندر حتى لا ينفذ أثناء النزول العنيف!' : (order.notes || 'أمر معلق قيد المتابعة')}
+                  </p>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-2 shrink-0 justify-end">
+                <a href="https://app.thndr.app" target="_blank" class="px-3 py-1.5 rounded-xl ${isShock ? 'bg-rose-600 hover:bg-rose-500 text-white font-black animate-pulse' : 'bg-slate-800 hover:bg-slate-700 text-slate-200'} text-xs font-bold transition flex items-center gap-1.5 shadow">
+                  <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+                  <span>فتح تطبيق ثندر لإلغاء الأمر</span>
+                </a>
+                <button onclick="markPendingThndrOrderCancelled('${order.id}')" class="px-3 py-1.5 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-300 text-xs font-bold transition" title="تأكيد أنك ألغيت الأمر بالفعل في ثندر">
+                  تم الإلغاء ✓
+                </button>
+                <button onclick="removePendingThndrOrder('${order.id}')" class="p-1.5 rounded-lg text-gray-400 hover:text-rose-400 hover:bg-gray-800 transition" title="حذف من السجل">
+                  <i data-lucide="trash-2" class="w-4 h-4"></i>
+                </button>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      container.innerHTML = `
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-gray-800">
+          <div class="flex items-center gap-2">
+            <div class="p-1.5 rounded-lg bg-indigo-500/20 text-indigo-400">
+              <i data-lucide="list-checks" class="w-4 h-4"></i>
+            </div>
+            <div>
+              <h4 class="font-bold text-white text-sm">أوامر تطبيق ثندر المعلقة (سجل حماية الأوامر النشطة)</h4>
+              <p class="text-[11px] text-gray-400">أي أمر شراء تضعه في ثندر يتابعه النظام هنا؛ وإذا حدث هبوط ذعري بالسوق ينبهك فوراً لإلغائه</p>
+            </div>
+          </div>
+          <button onclick="openAddThndrOrderPrompt()" class="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold flex items-center gap-1.5 transition self-start sm:self-auto shadow">
+            <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+            <span>إضافة أمر ثندر جديد</span>
+          </button>
+        </div>
+
+        <div class="space-y-2.5 mt-3">
+          ${rowsHtml}
+        </div>
+      `;
+
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function openAddThndrOrderPrompt() {
+      const ticker = prompt('أدخل رمز السهم في ثندر (مثال: ABUK أو SWDY):', 'ABUK');
+      if (!ticker) return;
+      const price = prompt(`أدخل سعر أمر الشراء المحدد لسهم ${ticker.toUpperCase()} بالجنيه:`, '91.50');
+      if (!price || isNaN(parseFloat(price))) return;
+      const shares = prompt('أدخل عدد الأسهم المطلوبة:', '200');
+
+      const stockObj = (Array.isArray(fullMarketRadar) && fullMarketRadar.find(s => s.ticker === ticker.toUpperCase()))
+        || (Array.isArray(portfolioData) && portfolioData.find(s => s.ticker === ticker.toUpperCase()))
+        || { name: ticker.toUpperCase(), ticker: ticker.toUpperCase() };
+
+      addPendingThndrOrder({
+        id: 'thndr_' + Date.now(),
+        ticker: ticker.toUpperCase(),
+        name: stockObj.name || ticker.toUpperCase(),
+        type: 'BUY_LIMIT',
+        orderPrice: parseFloat(price),
+        shares: parseInt(shares) || 100,
+        date: new Date().toISOString().split('T')[0],
+        status: 'PENDING',
+        notes: 'أمر شراء محدد مسجل يدوياً للمتابعة والحماية'
+      });
+
+      if (typeof showToast === 'function') {
+        showToast(`تم تسجيل أمر الشراء المعلق لسهم ${ticker.toUpperCase()} بنجاح!`, 'success');
+      }
+    }
+
     window.openPriceLevelsModal = openPriceLevelsModal;
     window.closePriceLevelsModal = closePriceLevelsModal;
     window.saveCustomPriceLevelsModal = saveCustomPriceLevelsModal;
@@ -2982,3 +3230,7 @@
     window.renderDailyActionHub = renderDailyActionHub;
     window.switchActionHubCategory = switchActionHubCategory;
 
+
+    window.renderMarketBreadthWidget = renderMarketBreadthWidget;
+    window.renderPendingThndrOrdersUI = renderPendingThndrOrdersUI;
+    window.openAddThndrOrderPrompt = openAddThndrOrderPrompt;

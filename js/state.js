@@ -572,11 +572,87 @@
 
 
     function getMarketRegimeCode() {
+      if (!window.currentMarketRegime) {
+        try {
+          const cached = localStorage.getItem('egx_market_regime');
+          if (cached) window.currentMarketRegime = JSON.parse(cached);
+        } catch (e) {}
+      }
       if (!window.currentMarketRegime) return 'NORMAL_CONSOLIDATION';
       if (typeof window.currentMarketRegime === 'object') {
         return window.currentMarketRegime.regime || 'NORMAL_CONSOLIDATION';
       }
       return String(window.currentMarketRegime);
+    }
+
+    // ============================================================
+    // Pending Thndr Orders Registry (User Execution Mirror)
+    // ============================================================
+    const PENDING_ORDERS_STORAGE_KEY = 'egx_copilot_pending_thndr_orders';
+    let pendingThndrOrders = [];
+
+    function loadPendingThndrOrders() {
+      try {
+        const raw = localStorage.getItem(PENDING_ORDERS_STORAGE_KEY);
+        if (raw) {
+          pendingThndrOrders = JSON.parse(raw);
+        } else {
+          pendingThndrOrders = [
+            {
+              id: 'thndr_abuk_buy_91',
+              ticker: 'ABUK',
+              name: 'أبو قير للأسمدة',
+              type: 'BUY_LIMIT',
+              orderPrice: 91.50,
+              shares: 200,
+              date: '2026-10-21',
+              status: 'PENDING',
+              notes: 'طلب شراء محدد معلق في ثندر عند مستوى الدعم الفني S1'
+            }
+          ];
+          savePendingThndrOrders();
+        }
+      } catch (e) {
+        pendingThndrOrders = [];
+      }
+    }
+
+    function savePendingThndrOrders() {
+      try {
+        localStorage.setItem(PENDING_ORDERS_STORAGE_KEY, JSON.stringify(pendingThndrOrders));
+      } catch (e) {}
+    }
+
+    function addPendingThndrOrder(order) {
+      if (!order) return;
+      if (!order.id) order.id = 'thndr_' + Date.now();
+      pendingThndrOrders.push(order);
+      savePendingThndrOrders();
+      if (typeof renderPendingThndrOrdersUI === 'function') renderPendingThndrOrdersUI();
+      if (typeof evaluateInAppAlerts === 'function') evaluateInAppAlerts();
+    }
+
+    function removePendingThndrOrder(orderId) {
+      pendingThndrOrders = pendingThndrOrders.filter(o => o.id !== orderId);
+      savePendingThndrOrders();
+      if (typeof renderPendingThndrOrdersUI === 'function') renderPendingThndrOrdersUI();
+      if (typeof evaluateInAppAlerts === 'function') evaluateInAppAlerts();
+    }
+
+    function markPendingThndrOrderCancelled(orderId) {
+      const target = pendingThndrOrders.find(o => o.id === orderId);
+      if (target) {
+        target.status = 'CANCELLED';
+        target.cancelledAt = new Date().toISOString();
+        savePendingThndrOrders();
+        if (typeof renderPendingThndrOrdersUI === 'function') renderPendingThndrOrdersUI();
+        if (typeof evaluateInAppAlerts === 'function') evaluateInAppAlerts();
+      }
+    }
+
+    function getPendingBuyOrders() {
+      if (!Array.isArray(pendingThndrOrders)) return [];
+      return pendingThndrOrders.filter(o => o.status === 'PENDING' && (o.type === 'BUY_LIMIT' || o.type.includes('BUY')));
     }
 
 

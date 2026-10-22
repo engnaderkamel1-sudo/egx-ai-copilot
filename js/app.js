@@ -335,6 +335,19 @@
           savePortfolio();
           try { renderActivePlansRadar(); } catch(e){}
 
+          // 4b. Update Real-Time Market Regime & Breadth FIRST (Single Source of Truth)
+          if (data.market_regime) {
+            window.currentMarketRegime = typeof data.market_regime === 'object' ? data.market_regime : {
+              regime: String(data.market_regime),
+              regimeArabic: data.market_regime_arabic || 'تداول متوازن وعرضي',
+              description: data.market_regime_description || '',
+              breadth: data.breadth || { advancingPct: 50, avgMarketChange: 0 }
+            };
+            window.currentMarketRegimeArabic = window.currentMarketRegime.regimeArabic;
+            try { localStorage.setItem('egx_market_regime', JSON.stringify(window.currentMarketRegime)); } catch(e){}
+            try { updateSimulationRegimeUI(); } catch(e){}
+          }
+
           // Evaluate In-App Sticky Emergency Alert Banner & Browser Push Notifications
           try { evaluateInAppAlerts(); } catch(alertErr) { console.warn('Alert evaluation warning:', alertErr); }
 
@@ -347,18 +360,6 @@
             } catch (radarErr) {
               console.warn('Radar render non-fatal warning:', radarErr);
             }
-          }
-
-          // 4b. Update Real-Time Market Regime & Breadth
-          if (data.market_regime) {
-            window.currentMarketRegime = typeof data.market_regime === 'object' ? data.market_regime : {
-              regime: String(data.market_regime),
-              regimeArabic: data.market_regime_arabic || 'تداول متوازن وعرضي',
-              description: '',
-              breadth: { advancingPct: 50, avgMarketChange: 0 }
-            };
-            window.currentMarketRegimeArabic = window.currentMarketRegime.regimeArabic;
-            try { updateSimulationRegimeUI(); } catch(e){}
           }
 
           // 4c. Update Autonomous Forward Testing Ledger live quotes (D-09: Zero Stale Prices)
@@ -437,22 +438,38 @@
 
       // 0. Check Systemic Market Shock Alert (Flash crash protection)
       if (getMarketRegimeCode() === 'SYSTEMIC_SHOCK') {
+        const pendingBuys = (typeof getPendingBuyOrders === 'function') ? getPendingBuyOrders() : [];
+
+        let shockTitle = '⚠️ تحذير هبوط ذعري شامل (Systemic Shock Alert)';
+        let shockDesc = 'أكثر من 80% من أسهم السوق في مسار هابط أو تراجع المؤشر بأكثر من -3.0%. تم تجميد إشارات الشراء عند الدعوم تلقائياً لحماية السيولة.';
+        let shockBadge = 'تجميد الشراء';
+        let actionLabel = 'متابعة نبض السوق 📊';
+        let actionType = 'RADAR';
+
+        if (pendingBuys.length > 0) {
+          const buySummary = pendingBuys.map(o => ${o.name} () بسعر  ج).join(' و ');
+          shockTitle = 🚨 إلغاء فوري لأوامر الشراء في ثندر ();
+          shockDesc = السوق في هبوط ذعري شامل! ادخل على تطبيق ثندر فوراً وألغِ أمر شراء  لحماية كاشك وتجنب الشراء في الهبوط العنيف.;
+          shockBadge = 'إلغاء أمر ثندر فوراً ⚡';
+          actionLabel = 'فتح ثندر لإلغاء الأمر ⚡';
+          actionType = 'OPEN_THNDR';
+        }
+
         const shockAlert = {
-          id: `shock_systemic_alert`,
-          ticker: 'EGX',
+          id: shock_systemic_alert,
+          ticker: pendingBuys.length > 0 ? pendingBuys[0].ticker : 'EGX',
           name: 'سوق البورصة المصرية',
           type: 'SYSTEMIC_SHOCK',
-          title: `⚠️ تحذير هبوط ذعري شامل (Systemic Shock Alert)`,
-          desc: `أكثر من 80% من أسهم السوق في مسار هابط أو تراجع المؤشر بأكثر من -3.0%. تم تجميد إشارات الشراء عند الدعوم تلقائياً لحماية السيولة.`,
-          badge: 'تجميد الشراء',
-          actionLabel: 'متابعة الرادار 🛡️',
-          actionType: 'RADAR',
+          title: shockTitle,
+          desc: shockDesc,
+          badge: shockBadge,
+          actionLabel: actionLabel,
+          actionType: actionType,
           time: formatCairoTime(new Date(), false, true)
         };
         alertsList.push(shockAlert);
-        if (!highestPriorityAlert && !dismissedKeys.includes(shockAlert.id)) {
-          highestPriorityAlert = shockAlert;
-        }
+        // Systemic shock alerts are life-or-death guardrails: ALWAYS show and prioritize on mobile/desktop
+        highestPriorityAlert = shockAlert;
       }
 
       portfolioData.forEach(item => {
@@ -592,7 +609,11 @@
 
     function handleOedBannerAction() {
       if (!activeEmergencyAlert) return;
-      if (activeEmergencyAlert.actionType === 'ROTATION') {
+      if (activeEmergencyAlert.actionType === 'OPEN_THNDR') {
+        window.open('https://app.thndr.app', '_blank');
+      } else if (activeEmergencyAlert.actionType === 'RADAR') {
+        switchTab('radar');
+      } else if (activeEmergencyAlert.actionType === 'ROTATION') {
         const idx = portfolioData.findIndex(p => p.ticker === activeEmergencyAlert.ticker);
         if (idx !== -1) openRotationPlanModal(idx);
       } else {
@@ -864,6 +885,7 @@
       try { initTheme(); } catch(e){ console.warn('initTheme error:', e); }
       try { initSidebar(); } catch(e){ console.warn('initSidebar error:', e); }
       try { loadPortfolio(); } catch(e){ console.warn('loadPortfolio error:', e); }
+      try { if (typeof loadPendingThndrOrders === 'function') loadPendingThndrOrders(); } catch(e){ console.warn('loadPendingThndrOrders error:', e); }
       try {
         if (typeof EGX_FirebaseSync !== 'undefined' && EGX_FirebaseSync.init) {
           EGX_FirebaseSync.init();

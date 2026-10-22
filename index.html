@@ -1370,7 +1370,7 @@
       </header>
 
       <!-- OED TTMS Pattern: Global Real-Time Emergency Sticky Banner (Light Red Theme) -->
-      <div id="oed-emergency-banner" class="hidden sticky top-14 z-40 bg-rose-50/95 dark:bg-rose-950/90 border-b-2 border-rose-300 dark:border-rose-700/60 shadow-lg px-4 py-2.5 transition-all animate-slide-down">
+      <div id="oed-emergency-banner" class="hidden sticky top-14 z-50 bg-rose-50/95 dark:bg-rose-950/90 border-b-2 border-rose-300 dark:border-rose-700/60 shadow-xl px-4 py-3 transition-all animate-slide-down">
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-3">
           <div class="flex items-start gap-3 min-w-0 flex-1">
             <div id="oed-banner-bell" class="p-2 rounded-xl bg-rose-100 text-rose-600 dark:bg-rose-900/60 dark:text-rose-300 font-bold shrink-0 shadow-sm border border-rose-200 dark:border-rose-700/50 mt-0.5">
@@ -1866,6 +1866,16 @@
     <!-- ============================================== -->
     <div id="view-radar" class="view-panel hidden space-y-6">
       
+      <!-- Market Breadth & Systemic Liquidity Pulse (Live EGX Visual Gauge) -->
+      <div id="market-breadth-pulse-widget" class="bg-gray-900 rounded-2xl border border-gray-800 p-5 shadow-xl transition-all">
+        <!-- Rendered dynamically by renderMarketBreadthWidget() -->
+      </div>
+
+      <!-- User Active Thndr Pending Orders Tracker (Direct Synchronization Guardrail) -->
+      <div id="thndr-pending-orders-widget" class="bg-gray-900 rounded-2xl border border-gray-800 p-5 shadow-xl transition-all">
+        <!-- Rendered dynamically by renderPendingThndrOrdersUI() -->
+      </div>
+
       <!-- Filter & Search Controls Header -->
       <div class="bg-gray-900 p-5 rounded-2xl border border-gray-800 shadow-xl space-y-4">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -3241,20 +3251,20 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
   <!-- Modular Pure Engines (Single Source of Truth) -->
-  <script src="js/engine.js?v=2.4.5"></script>
-  <script src="js/portfolio.js?v=2.4.5"></script>
-  <script src="js/firebase-sync.js?v=2.4.5"></script>
-  <script src="js/modals.js?v=2.4.5"></script>
-  <script src="js/push-notifications.js?v=2.4.5"></script>
-  <script src="js/valuation.js?v=2.4.5"></script>
+  <script src="js/engine.js?v=2.4.6"></script>
+  <script src="js/portfolio.js?v=2.4.6"></script>
+  <script src="js/firebase-sync.js?v=2.4.6"></script>
+  <script src="js/modals.js?v=2.4.6"></script>
+  <script src="js/push-notifications.js?v=2.4.6"></script>
+  <script src="js/valuation.js?v=2.4.6"></script>
 
-  <script src="js/state.js?v=2.4.5"></script>
-  <script src="js/ui.js?v=2.4.5"></script>
-  <script src="js/trade.js?v=2.4.5"></script>
-  <script src="js/rotation.js?v=2.4.5"></script>
-  <script src="js/scenarios.js?v=2.4.5"></script>
-  <script src="js/ai.js?v=2.4.5"></script>
-  <script src="js/app.js?v=2.4.5"></script>
+  <script src="js/state.js?v=2.4.6"></script>
+  <script src="js/ui.js?v=2.4.6"></script>
+  <script src="js/trade.js?v=2.4.6"></script>
+  <script src="js/rotation.js?v=2.4.6"></script>
+  <script src="js/scenarios.js?v=2.4.6"></script>
+  <script src="js/ai.js?v=2.4.6"></script>
+  <script src="js/app.js?v=2.4.6"></script>
   <script>
     if (typeof bootApp === 'function') { bootApp(); }
   </script>
