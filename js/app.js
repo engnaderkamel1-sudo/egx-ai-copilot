@@ -436,40 +436,79 @@
       const alertsList = [];
       let highestPriorityAlert = null;
 
-      // 0. Check Systemic Market Shock Alert (Flash crash protection)
-      if (getMarketRegimeCode() === 'SYSTEMIC_SHOCK') {
-        const pendingBuys = (typeof getPendingBuyOrders === 'function') ? getPendingBuyOrders() : [];
+      // 0. Dynamic Scenario-Based Order Decision Engine
+      const regimeCode = getMarketRegimeCode();
+      const confirmedActions = JSON.parse(localStorage.getItem('oed_confirmed_actions') || '[]');
+      const pendingBuys = (typeof getPendingBuyOrders === 'function') ? getPendingBuyOrders() : [];
 
-        let shockTitle = '⚠️ تحذير هبوط ذعري شامل (Systemic Shock Alert)';
-        let shockDesc = 'أكثر من 80% من أسهم السوق في مسار هابط أو تراجع المؤشر بأكثر من -3.0%. تم تجميد إشارات الشراء عند الدعوم تلقائياً لحماية السيولة.';
-        let shockBadge = 'تجميد الشراء';
-        let actionLabel = 'متابعة نبض السوق 📊';
-        let actionType = 'RADAR';
+      if (regimeCode === 'SYSTEMIC_SHOCK') {
+        // Only show if user has not already clicked "تم تنفيذ التعديل" for this order
+        const isShockConfirmed = confirmedActions.includes('shock_systemic_alert') && pendingBuys.length === 0;
 
-        if (pendingBuys.length > 0) {
-          const buySummary = pendingBuys.map(o => `${o.name} (${o.ticker}) بسعر ${Number(o.orderPrice).toFixed(2)} ج`).join(' و ');
-          shockTitle = `🚨 إلغاء فوري لأوامر الشراء في ثندر (${pendingBuys.map(o => o.ticker).join(', ')})`;
-          shockDesc = `السوق في هبوط ذعري شامل! ادخل على تطبيق ثندر فوراً وألغِ أمر شراء ${buySummary} لحماية كاشك وتجنب الشراء في الهبوط العنيف.`;
-          shockBadge = 'إلغاء أمر ثندر فوراً ⚡';
-          actionLabel = 'فتح ثندر لإلغاء الأمر ⚡';
-          actionType = 'OPEN_THNDR';
+        if (!isShockConfirmed) {
+          let shockTitle = '⚠️ تحذير هبوط ذعري شامل (Systemic Shock Alert)';
+          let shockDesc = 'أكثر من 80% من أسهم السوق في مسار هابط أو تراجع المؤشر بأكثر من -3.0%. تم تجميد إشارات الشراء عند الدعوم تلقائياً لحماية السيولة.';
+          let shockBadge = 'تجميد الشراء';
+          let actionLabel = 'فتح تطبيق ثندر ⚡';
+          let actionType = 'OPEN_THNDR';
+
+          if (pendingBuys.length > 0) {
+            const firstOrder = pendingBuys[0];
+            const stockData = (Array.isArray(fullMarketRadar) && fullMarketRadar.find(s => s.ticker === firstOrder.ticker))
+              || (Array.isArray(portfolioData) && portfolioData.find(s => s.ticker === firstOrder.ticker))
+              || { ticker: firstOrder.ticker, name: firstOrder.name };
+
+            const sma50Text = stockData.sma50 ? Number(stockData.sma50).toFixed(2) + ' ج' : 'الدعم التالي';
+            const volumeText = stockData.volumeMultiplier || (stockData.tradedValue ? Math.round(stockData.tradedValue / 1e6) + 'M ج' : 'سيولة ضخمة');
+
+            shockTitle = `🚨 إلغاء فوري لأمر الشراء في ثندر (${firstOrder.ticker})`;
+            shockDesc = `السوق في هبوط ذعري شامل (تداولات بيع مكثفة بقيمة ${volumeText})! التوجيه الفوري: لا تعدل السعر الآن؛ ادخل ثندر وألغِ أمر شراء ${firstOrder.name} بسعر ${Number(firstOrder.orderPrice).toFixed(2)} ج واحتفظ بكامل الكاش لحين هدوء السوق واستقرار السعر حول دعم ${sma50Text}. (المصدر: مسح السيولة ومؤشرات TradingView EGX).`;
+            shockBadge = 'إلغاء أمر ثندر فوراً ⚡';
+            actionLabel = 'فتح ثندر لإلغاء الأمر ⚡';
+            actionType = 'OPEN_THNDR';
+          }
+
+          const shockAlert = {
+            id: 'shock_systemic_alert',
+            ticker: pendingBuys.length > 0 ? pendingBuys[0].ticker : 'EGX',
+            name: 'سوق البورصة المصرية',
+            type: 'SYSTEMIC_SHOCK',
+            title: shockTitle,
+            desc: shockDesc,
+            badge: shockBadge,
+            actionLabel: actionLabel,
+            actionType: actionType,
+            time: formatCairoTime(new Date(), false, true)
+          };
+          alertsList.push(shockAlert);
+          highestPriorityAlert = shockAlert;
         }
+      }
+      else if (regimeCode === 'HEALTHY_CORRECTION' && pendingBuys.length > 0) {
+        // Dynamic Scenario B: Order Price Adjustment Recommendation (Pullback to Support)
+        const firstOrder = pendingBuys[0];
+        const stockData = (Array.isArray(fullMarketRadar) && fullMarketRadar.find(s => s.ticker === firstOrder.ticker))
+          || (Array.isArray(portfolioData) && portfolioData.find(s => s.ticker === firstOrder.ticker));
 
-        const shockAlert = {
-          id: 'shock_systemic_alert',
-          ticker: pendingBuys.length > 0 ? pendingBuys[0].ticker : 'EGX',
-          name: 'سوق البورصة المصرية',
-          type: 'SYSTEMIC_SHOCK',
-          title: shockTitle,
-          desc: shockDesc,
-          badge: shockBadge,
-          actionLabel: actionLabel,
-          actionType: actionType,
-          time: formatCairoTime(new Date(), false, true)
-        };
-        alertsList.push(shockAlert);
-        // Systemic shock alerts are life-or-death guardrails: ALWAYS show and prioritize on mobile/desktop
-        highestPriorityAlert = shockAlert;
+        if (stockData && stockData.pivotS1 && firstOrder.orderPrice > stockData.pivotS1) {
+          const modAlertId = `modify_order_${firstOrder.ticker}_${Math.round(stockData.pivotS1)}`;
+          if (!confirmedActions.includes(modAlertId)) {
+            const modAlert = {
+              id: modAlertId,
+              ticker: firstOrder.ticker,
+              name: firstOrder.name,
+              type: 'WARNING',
+              title: `🔄 تعديل سعر أمر الشراء في ثندر: ${firstOrder.name} (${firstOrder.ticker})`,
+              desc: `الهبوط الحالي تصحيحي فني طبيعي؛ الدعم الفني S1 محدد عند ${Number(stockData.pivotS1).toFixed(2)} ج. التوجيه الفوري: ادخل ثندر وعدّل سعر أمر الشراء من ${Number(firstOrder.orderPrice).toFixed(2)} ج إلى ${Number(stockData.pivotS1).toFixed(2)} ج لرفع نسبة الأمان واقتناص السهم من دعم أقوى. (المصدر: ارتكازات الدعم الكلاسيكية لجلسة اليوم).`,
+              badge: 'تعديل السعر المقترح',
+              actionLabel: 'فتح ثندر لتعديل السعر ⚡',
+              actionType: 'OPEN_THNDR',
+              time: formatCairoTime(new Date(), false, true)
+            };
+            alertsList.push(modAlert);
+            if (!highestPriorityAlert) highestPriorityAlert = modAlert;
+          }
+        }
       }
 
       portfolioData.forEach(item => {
@@ -596,6 +635,49 @@
         if (pingBadge) pingBadge.classList.add('hidden');
       }
     }
+
+    function confirmActionExecuted() {
+      if (activeEmergencyAlert) {
+        const alertId = activeEmergencyAlert.id;
+        const ticker = activeEmergencyAlert.ticker;
+
+        // Mark matching pending Thndr orders as ACTIONED so they don't trigger alerts
+        if (typeof pendingThndrOrders !== 'undefined' && Array.isArray(pendingThndrOrders)) {
+          pendingThndrOrders.forEach(o => {
+            if (o.status === 'PENDING' && (o.ticker === ticker || ticker === 'EGX')) {
+              o.status = 'ACTIONED';
+              o.actionedAt = new Date().toISOString();
+              o.notes = (o.notes || '') + ' • تم تأكيد تنفيذ التعديل من المستخدم بنجاح';
+            }
+          });
+          if (typeof savePendingThndrOrders === 'function') savePendingThndrOrders();
+        }
+
+        // Persist confirmed alert ID to localStorage
+        const confirmed = JSON.parse(localStorage.getItem('oed_confirmed_actions') || '[]');
+        if (!confirmed.includes(alertId)) confirmed.push(alertId);
+        localStorage.setItem('oed_confirmed_actions', JSON.stringify(confirmed));
+
+        const dismissed = JSON.parse(sessionStorage.getItem('oed_dismissed_alerts') || '[]');
+        if (!dismissed.includes(alertId)) dismissed.push(alertId);
+        sessionStorage.setItem('oed_dismissed_alerts', JSON.stringify(dismissed));
+      }
+
+      // Hide emergency banner immediately
+      const banner = document.getElementById('oed-emergency-banner');
+      if (banner) {
+        banner.classList.add('hidden');
+        banner.classList.remove('block');
+      }
+      activeEmergencyAlert = null;
+
+      if (typeof renderPendingThndrOrdersUI === 'function') renderPendingThndrOrdersUI();
+      if (typeof showToast === 'function') {
+        showToast('تم تسجيل تنفيذ التعديل بنجاح، ولن يظهر هذا التنبيه مجدداً ✓', 'success');
+      }
+    }
+
+    window.confirmActionExecuted = confirmActionExecuted;
 
     function dismissOedBanner() {
       if (activeEmergencyAlert) {
@@ -882,7 +964,7 @@
     // ============================================================
     // Real-Time System Auto-Update Engine
     // ============================================================
-    const LOCAL_APP_VERSION = '2.4.8';
+    const LOCAL_APP_VERSION = '2.4.9';
     window.LOCAL_APP_VERSION = LOCAL_APP_VERSION;
 
     let isUpdateBannerDismissed = false;
