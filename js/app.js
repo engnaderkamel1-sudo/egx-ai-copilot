@@ -447,16 +447,16 @@
         let actionType = 'RADAR';
 
         if (pendingBuys.length > 0) {
-          const buySummary = pendingBuys.map(o => ${o.name} () بسعر  ج).join(' و ');
-          shockTitle = 🚨 إلغاء فوري لأوامر الشراء في ثندر ();
-          shockDesc = السوق في هبوط ذعري شامل! ادخل على تطبيق ثندر فوراً وألغِ أمر شراء  لحماية كاشك وتجنب الشراء في الهبوط العنيف.;
+          const buySummary = pendingBuys.map(o => `${o.name} (${o.ticker}) بسعر ${Number(o.orderPrice).toFixed(2)} ج`).join(' و ');
+          shockTitle = `🚨 إلغاء فوري لأوامر الشراء في ثندر (${pendingBuys.map(o => o.ticker).join(', ')})`;
+          shockDesc = `السوق في هبوط ذعري شامل! ادخل على تطبيق ثندر فوراً وألغِ أمر شراء ${buySummary} لحماية كاشك وتجنب الشراء في الهبوط العنيف.`;
           shockBadge = 'إلغاء أمر ثندر فوراً ⚡';
           actionLabel = 'فتح ثندر لإلغاء الأمر ⚡';
           actionType = 'OPEN_THNDR';
         }
 
         const shockAlert = {
-          id: shock_systemic_alert,
+          id: 'shock_systemic_alert',
           ticker: pendingBuys.length > 0 ? pendingBuys[0].ticker : 'EGX',
           name: 'سوق البورصة المصرية',
           type: 'SYSTEMIC_SHOCK',
