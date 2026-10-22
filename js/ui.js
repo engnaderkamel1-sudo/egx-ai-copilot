@@ -2790,7 +2790,7 @@
 
       // Update Header Title, Subtitle and Badge dynamically
       const tabMeta = {
-        'changelog': { title: 'سجل التحديثات والإصدارات الرسمية', desc: 'تتبع كافة التعديلات والتطويرات المرفوعة للنظام وتواريخها بدقة', badge: 'v2.4.9' },
+        'changelog': { title: 'سجل التحديثات والإصدارات الرسمية', desc: 'تتبع كافة التعديلات والتطويرات المرفوعة للنظام وتواريخها بدقة', badge: 'v2.5.0' },
         'portfolio': { title: 'المحفظة وتوزيع الأصول', desc: 'متابعة الأصول والأسهم المملوكة في ثندر وتطور الأرباح اللحظية', badge: 'محفظة حية • EGX' },
         'radar': { title: 'رادار السوق والفرص', desc: 'رصد تدفقات السيولة غير المعتادة واختراق المقاومات بالبورصة المصرية', badge: '18 فرصة استثمارية' },
         'risk': { title: 'حاسبة الدعم وإدارة المخاطر (R/R)', desc: 'حسابات نقاط الارتكاز والدعم الكلاسيكية ونسبة العائد للمخاطرة', badge: 'معيار الأمان ≥ 1:2.0' },
@@ -3144,12 +3144,9 @@
               </div>
 
               <div class="flex items-center gap-2 shrink-0 justify-end">
-                <a href="https://app.thndr.app" target="_blank" class="px-3 py-1.5 rounded-xl ${isShock ? 'bg-rose-600 hover:bg-rose-500 text-white font-black animate-pulse' : 'bg-slate-800 hover:bg-slate-700 text-slate-200'} text-xs font-bold transition flex items-center gap-1.5 shadow">
-                  <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
-                  <span>فتح تطبيق ثندر لإلغاء الأمر</span>
-                </a>
-                <button onclick="markPendingThndrOrderCancelled('${order.id}')" class="px-3 py-1.5 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-300 text-xs font-bold transition" title="تأكيد أنك ألغيت الأمر بالفعل في ثندر">
-                  تم الإلغاء ✓
+                <button onclick="markPendingThndrOrderCancelled('${order.id}')" class="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition flex items-center gap-1.5 shadow" title="تأكيد أنك نفذت التعديل">
+                  <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-white"></i>
+                  <span>تم تنفيذ التعديل ✓</span>
                 </button>
                 <button onclick="removePendingThndrOrder('${order.id}')" class="p-1.5 rounded-lg text-gray-400 hover:text-rose-400 hover:bg-gray-800 transition" title="حذف من السجل">
                   <i data-lucide="trash-2" class="w-4 h-4"></i>
@@ -3278,7 +3275,7 @@
         }
       ];
 
-      const currentVer = 'v2.4.9';
+      const currentVer = 'v2.5.0';
 
       container.innerHTML = releases.map((rel, idx) => {
         const isCurrent = rel.version === currentVer;

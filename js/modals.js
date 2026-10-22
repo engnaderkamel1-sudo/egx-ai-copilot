@@ -181,9 +181,7 @@
               <span class="w-6 h-6 rounded-full bg-cyan-600 text-white font-bold flex items-center justify-center text-xs shrink-0 shadow">2</span>
               <span class="font-bold text-white text-xs">الخطوة الثانية: شغل الكود في ثندر ويب</span>
             </div>
-            <a href="https://app.thndr.app" target="_blank" class="px-3 py-1 rounded-xl bg-gray-800 hover:bg-gray-700 text-cyan-300 border border-cyan-800 font-bold text-[11px] flex items-center gap-1 transition">
-              <span>فتح موقع ثندر ↗</span>
-            </a>
+
           </div>
 
           <div class="space-y-1.5 text-[11px] text-gray-300 leading-relaxed pr-8">

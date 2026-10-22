@@ -691,9 +691,7 @@
 
     function handleOedBannerAction() {
       if (!activeEmergencyAlert) return;
-      if (activeEmergencyAlert.actionType === 'OPEN_THNDR') {
-        window.open('https://app.thndr.app', '_blank');
-      } else if (activeEmergencyAlert.actionType === 'RADAR') {
+      if (activeEmergencyAlert.actionType === 'RADAR') {
         switchTab('radar');
       } else if (activeEmergencyAlert.actionType === 'ROTATION') {
         const idx = portfolioData.findIndex(p => p.ticker === activeEmergencyAlert.ticker);
@@ -964,7 +962,7 @@
     // ============================================================
     // Real-Time System Auto-Update Engine
     // ============================================================
-    const LOCAL_APP_VERSION = '2.4.9';
+    const LOCAL_APP_VERSION = '2.5.0';
     window.LOCAL_APP_VERSION = LOCAL_APP_VERSION;
 
     let isUpdateBannerDismissed = false;
