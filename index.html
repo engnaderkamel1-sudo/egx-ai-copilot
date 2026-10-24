@@ -1364,6 +1364,12 @@
             <span class="hidden lg:inline">حاسبة المخاطر</span>
           </button>
 
+          <!-- Voice Assistant Header Button -->
+          <button onclick="openVoiceTradingModal()" class="p-2 sm:px-3 sm:py-2 rounded-xl bg-purple-950/50 hover:bg-purple-900/70 text-purple-200 border border-purple-500/50 transition flex items-center gap-1.5 text-xs font-bold shadow-sm cursor-pointer" title="المساعد الصوتي الذكي (أوامر التداول وتعديل الحدود)">
+            <i data-lucide="mic" class="w-4 h-4 text-purple-300"></i>
+            <span class="hidden sm:inline">أمر صوتي</span>
+          </button>
+
           <!-- Cloud Scan Fast Button -->
           <button onclick="triggerCloudScanNow()" class="hidden sm:flex px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs items-center gap-1.5 transition shadow">
             <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
@@ -1625,6 +1631,10 @@
             <p class="text-xs text-cyan-400 mt-0.5 animate-pulse" id="live-egx-status-text">⏳ جاري الاتصال بالبورصة المصرية ومزامنة أحدث الأسعار اللحظية تلقائياً...</p>
           </div>
           <div class="flex items-center gap-2 flex-wrap">
+            <button onclick="openVoiceTradingModal()" class="px-4 py-2 rounded-xl bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 hover:from-purple-500 hover:to-indigo-500 text-white border border-purple-400/40 text-xs font-bold transition flex items-center gap-2 shadow-lg shadow-purple-950/50 transform active:scale-95" title="تسجيل صفقة أو تعديل حد أمان صوتياً بالذكاء الاصطناعي">
+              <i data-lucide="mic" class="w-4 h-4 text-purple-200 animate-pulse"></i>
+              <span>🎙️ أمر صوتي ذكي</span>
+            </button>
             <button onclick="openTradeModal()" class="px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white border border-emerald-400/40 text-xs font-bold transition flex items-center gap-2 shadow-lg shadow-emerald-950/50 transform active:scale-95" title="تسجيل عملية شراء أو بيع نفذتها في ثندر">
               <i data-lucide="arrow-left-right" class="w-4 h-4 text-emerald-200"></i>
               <span>+ تسجيل صفقة (شراء / بيع)</span>
@@ -2371,6 +2381,9 @@
         <div class="p-4 bg-gray-950 border-t border-gray-800">
           <form id="chat-form" onsubmit="handleChatSubmit(event)" class="flex items-center gap-2">
             <input type="text" id="chat-input" placeholder="اكتب سؤالك أو استشارتك عن أي سهم في البورصة..." class="flex-1 bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500 transition">
+            <button type="button" id="btn-chat-mic" onclick="toggleChatVoiceInput()" class="p-2.5 rounded-xl bg-gray-800 hover:bg-gray-700 text-purple-400 border border-purple-500/30 transition flex items-center justify-center cursor-pointer" title="تحدث بالسؤال صوتياً بالمايك">
+              <i data-lucide="mic" class="w-4 h-4"></i>
+            </button>
             <button type="submit" class="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1.5 transition">
               <span>إرسال</span>
               <i data-lucide="send" class="w-3.5 h-3.5"></i>
@@ -3331,6 +3344,7 @@
   <script src="js/state.js?v=2.5.1"></script>
   <script src="js/ui.js?v=2.5.1"></script>
   <script src="js/trade.js?v=2.5.1"></script>
+  <script src="js/voice-assistant.js?v=2.5.1"></script>
   <script src="js/rotation.js?v=2.5.1"></script>
   <script src="js/scenarios.js?v=2.5.1"></script>
   <script src="js/ai.js?v=2.5.1"></script>

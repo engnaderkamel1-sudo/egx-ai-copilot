@@ -19,6 +19,8 @@ $onclicks = @(
   'setRadarFilter', 'setRebalanceAmount', 'setRotationRatio', 'setTradeMode', 'showAutonomousLogModal',
   'simulateMarketEmergency', 'switchActionHubCategory', 'switchPlanToCIB', 'switchTab', 'testGeminiConnection',
   'testGeminiConnectionFromModal', 'toggleSidebar', 'toggleSidebarDrawer', 'toggleTheme',
+    'openVoiceTradingModal', 'closeVoiceTradingModal', 'toggleVoiceRecording', 'toggleChatVoiceInput',
+  'parseVoiceFromManualInput', 'testVoiceCommandSample', 'executeVoiceOrderFromModal', 'resetVoiceModalToListen',
   'toggleTradeCustomTicker', 'triggerCloudScanNow', 'triggerSimulatedBotCycle'
 )
 

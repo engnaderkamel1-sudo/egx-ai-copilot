@@ -399,13 +399,20 @@
           const buy = p.buyPrice || p.costPrice || p.currentPrice || 0;
           const cur = p.currentPrice || buy;
           const ret = buy > 0 ? (((cur - buy) / buy) * 100).toFixed(1) : '0.0';
-          const tech = p.pivotR1 ? `[مقاومة R1: ${p.pivotR1} ج، هدف R2: ${p.pivotR2 || '--'} ج، دعم S1: ${p.pivotS1} ج، وقف متحرك مقترح: ${p.proposedTrailingStop || (p.pivotR1 * 0.975).toFixed(2)} ج، RSI: ${p.rsi || '--'}، متوسط 50: ${p.sma50 || '--'} ج، عائد/مخاطرة R/R: ${p.rrDisplay || '--'}]` : '';
-          return `- سهم ${p.name} (${p.ticker}): عدد ${p.shares || 0} سهم، متوسط تكلفة الشراء ${buy} ج، السعر اللحظي ${cur} ج، العائد: ${ret}% ${tech}`;
+          const custom = (typeof EGX_Portfolio !== 'undefined' && typeof EGX_Portfolio.getCustomLevels === 'function') ? EGX_Portfolio.getCustomLevels(p.ticker) : null;
+          const safeStop = (custom && custom.customStopLoss) ? `${custom.customStopLoss} ج (محدد يدوياً)` : (p.stopLoss || p.pivotS1 || '--');
+          const targetLvl = (custom && custom.customTarget1) ? `${custom.customTarget1} ج (محدد يدوياً)` : (p.target1 || p.pivotR1 || '--');
+          const tech = p.pivotR1 ? `[مقاومة R1: ${p.pivotR1} ج، هدف R2: ${p.pivotR2 || '--'} ج، دعم S1: ${p.pivotS1} ج، حد بيع آمن/وقف: ${safeStop}، مستهدف: ${targetLvl}، RSI: ${p.rsi || '--'}، متوسط 50: ${p.sma50 || '--'} ج]` : `[حد أمان: ${safeStop}]`;
+          return `- سهم ${p.name} (${p.ticker}): عدد ${p.shares || 0} سهم، متوسط شراء ${buy} ج، سعر لحظي ${cur} ج، عائد: ${ret}% ${tech}`;
         }).join('\n');
 
-        const topRadarSummary = fullMarketRadar.slice(0, 8).map(r => 
-          `- سهم ${r.name} (${r.ticker}): سعر ${r.price} ج (${r.changePct})، سيولة ${r.volumeMultiplier}، مقاومة R1: ${r.pivotR1 || r.target1}، دعم S1: ${r.pivotS1 || r.support}، اتجاه: ${r.trend || r.type}، عائد/مخاطرة: ${r.rrDisplay}`
+        const topRadarSummary = fullMarketRadar.map(r => 
+          `- سهم ${r.name} (${r.ticker}): سعر لحظي ${r.price} ج (${r.changePct})، سيولة ${r.volumeMultiplier}، هدف R1: ${r.pivotR1 || r.target1}، دعم S1: ${r.pivotS1 || r.support}، وقف أمان: ${r.stopLoss || '--'}`
         ).join('\n');
+
+        const pendingOrdersSummary = (Array.isArray(window.pendingThndrOrders) && window.pendingThndrOrders.length > 0)
+          ? window.pendingThndrOrders.map(o => `- أمر معلق: ${o.type} لسهم ${o.name} (${o.ticker}) بسعر ${o.orderPrice} ج بعدد ${o.shares} سهم`).join('\n')
+          : 'لا توجد أوامر معلقة حالياً.';
 
         const currentRegime = (window.currentMarketRegime && typeof window.currentMarketRegime === 'object')
           ? window.currentMarketRegime
@@ -418,7 +425,8 @@
         const userLessonsSummary = typeof getUserLearnedLessonsSummary === 'function' ? getUserLearnedLessonsSummary() : 'لا توجد دروس مسجلة بعد.';
 
         const systemPrompt = `أنت "مستشار البورصة المصرية المعتمد والمحلل المالي الرقمي" (EGX Institutional Copilot).
-المستخدم مستثمر في البورصة المصرية ويدير محفظته عبر تطبيق ثندر (Thndr):
+المستخدم مستثمر في البورصة المصرية ويدير محفظته عبر تطبيق ثندر (Thndr).
+قاعدة ذهبية إلزامية: جميع الأرقام الواردة أدناه هي أرقام ديناميكية لحظية حقيقية 100% مسحوبة لحظياً من البورصة المصرية ومحفظة المستخدم. يُمنع منعاً باتاً ذكر أي أرقام ثابتة قديمة أو مخترعة؛ التزم فقط بهذه الأرقام الديناميكية:
 - إجمالي قيمة المحفظة الحقيقية الحالية: ${Math.round(totalWealth).toLocaleString('en-US')} ج.م (${equityPct}% أسهم، ${cashPct}% كاش حر).
 - الرصيد النقدي المتوفر (كاش): ${Math.round(cashBalance).toLocaleString('en-US')} ج.م.
 - بيئة السوق اللحظية المعتمدة (Market Regime): ${currentRegime.regimeArabic} (${currentRegime.description}).
@@ -432,6 +440,9 @@ ${topRadarSummary}
 1. **حظر اعتبار التصحيح الهادئ أزمة أو انهياراً:** لا تخلط إطلاقاً بين جني الأرباح الفني الهادئ (Healthy Pullback) والانهيارات الهيكلية الشاملة (مثل أزمة كورونا 2020). طالما أن السهم يتداول فوق دعومه المحورية (S1 أو SMA50) وأحجام التداول متناقصة، فهذه فرصة تجميع وليست أزمة بيع بالهلع.
 2. **شرط استدعاء الأزمات الشاملة (Systemic Shock):** لا تحذر من انهيار شامل أو بجعة سوداء إلا إذا تحقق هبوط جماعي في أكثر من 85% من قطاعات السوق مع توقف السيولة وكسر صريح للمتوسط 200 يوم.
 3. **مصائد القمم المضاربية (Bull Trap Warning):** حذر المستخدم بشدة إذا كان السهم يبتعد بأكثر من 30% عن متوسط 50 يوم مع وصول RSI فوق 85 (مثل سيناريو بلتون 2023).
+
+الأوامر المعلقة النشطة في ثندر (Pending Orders):
+${pendingOrdersSummary}
 
 دروس وذاكرة المتداول السابقة المستخلصة من صفقاته المحققة في ثندر:
 ${userLessonsSummary}
