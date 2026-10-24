@@ -1,7 +1,7 @@
 // sw.js - EGX AI Copilot Native Service Worker & Push Notification Handler
 // Version: v3.1-mobile-robust (Compatible with Android Chrome, iOS Safari PWA, and Desktop)
 
-const SW_VERSION = 'v3.1-mobile-robust';
+const SW_VERSION = 'v3.2-voice-copilot';
 
 self.addEventListener('install', (event) => {
   self.skipWaiting();
