@@ -351,10 +351,10 @@
                   <span>المساعد الصوتي لتنفيذ الأوامر</span>
                   <span class="text-[10px] px-2 py-0.5 rounded-full bg-purple-950 text-purple-300 border border-purple-700/50 font-normal">ذكاء اصطناعي 100%</span>
                 </h3>
-                <p class="text-[11px] text-gray-400">تحدث بالعامية المصرية لتسجيل شراء، بيع، أوامر محددة، أو حدود أمان</p>
+                <p class="text-xs text-gray-400">تحدث بالعامية المصرية لتسجيل شراء، بيع، أوامر محددة، أو حدود أمان</p>
               </div>
             </div>
-            <button onclick="closeVoiceTradingModal()" class="text-gray-400 hover:text-white p-1 rounded-lg hover:bg-gray-800 transition" aria-label="إغلاق">
+            <button onclick="closeVoiceTradingModal()" class="text-slate-300 hover:text-white font-bold p-1 rounded-lg hover:bg-gray-800 transition" aria-label="إغلاق">
               <i data-lucide="x" class="w-5 h-5"></i>
             </button>
           </div>
@@ -366,9 +366,9 @@
               
               <!-- Pulsing Mic Button -->
               <div class="flex justify-center items-center py-2">
-                <button type="button" id="btn-voice-pulse" onclick="toggleVoiceRecording()" class="w-16 h-16 rounded-full bg-purple-600 hover:bg-purple-500 text-white flex items-center justify-center shadow-lg shadow-purple-900/50 transition transform active:scale-95 relative cursor-pointer">
+                <button type="button" id="btn-voice-pulse" onclick="toggleVoiceRecording()" class="w-20 h-20 rounded-full bg-gradient-to-br from-purple-600 to-indigo-600 hover:bg-purple-500 text-white flex items-center justify-center shadow-lg shadow-purple-900/50 transition transform active:scale-95 relative cursor-pointer">
                   <span id="voice-pulse-ring" class="hidden absolute inset-0 rounded-full border-2 border-purple-400 animate-ping"></span>
-                  <i data-lucide="mic" id="voice-mic-icon" class="w-8 h-8 text-white"></i>
+                  <i data-lucide="mic" id="voice-mic-icon" class="w-10 h-10 text-white"></i>
                 </button>
               </div>
 
@@ -377,19 +377,19 @@
                 <div id="voice-status-heading" class="font-bold text-sm text-purple-300">
                   اضغط على زر المايك وتحدث بأمرك...
                 </div>
-                <p id="voice-status-sub" class="text-xs text-gray-400 mt-1">
+                <p id="voice-status-sub" class="text-xs text-slate-300 mt-1">
                   مثال: «اشتريت 500 سهم في السويدي بسعر 52 جنيه وحد البيع الآمن 58 جنيه»
                 </p>
               </div>
 
               <!-- Live Transcript Box -->
               <div id="voice-transcript-box" class="p-3 bg-gray-950 rounded-xl border border-gray-800 text-xs text-purple-200 min-h-[48px] flex items-center justify-center text-center font-medium">
-                <span class="text-gray-500 text-[11px]">في انتظار الاستماع لكلامك...</span>
+                <span class="text-slate-300 text-xs font-medium">في انتظار الاستماع لكلامك...</span>
               </div>
 
               <!-- Quick Dialect Examples -->
               <div class="flex items-center justify-center gap-1.5 flex-wrap pt-1 text-[10px]">
-                <span class="text-gray-500">جرب أن تقول:</span>
+                <span class="text-slate-300 text-xs font-bold">جرب أن تقول:</span>
                 <button type="button" onclick="testVoiceCommandSample('اشتريت 500 سهم في السويدي بسعر 52 جنيه')" class="px-2 py-0.5 rounded bg-gray-800 text-purple-300 hover:bg-purple-900/40 border border-gray-700">شراء 500 سهم السويدي</button>
                 <button type="button" onclick="testVoiceCommandSample('بعت نص كمية فوري على سعر 8.20')" class="px-2 py-0.5 rounded bg-gray-800 text-rose-300 hover:bg-rose-900/40 border border-gray-700">بيع نص كمية فوري</button>
                 <button type="button" onclick="testVoiceCommandSample('غير حد البيع الآمن لطلعت مصطفى إلى 85 جنيه')" class="px-2 py-0.5 rounded bg-gray-800 text-cyan-300 hover:bg-cyan-900/40 border border-gray-700">تعديل حد بيع طلعت مصطفى</button>
@@ -398,7 +398,7 @@
 
             <!-- Manual Text Fallback (Input box in case mic is blocked) -->
             <div class="p-2.5 bg-gray-950 rounded-xl border border-gray-800 flex items-center gap-2">
-              <input type="text" id="voice-manual-input" placeholder="أو اكتب الأمر هنا لو المايك غير مفعل بالمتصفح..." class="flex-1 bg-transparent text-xs text-white placeholder-gray-500 focus:outline-none">
+              <input type="text" id="voice-manual-input" placeholder="أو اكتب الأمر هنا لو المايك غير مفعل بالمتصفح..." class="flex-1 bg-transparent text-xs text-white placeholder-slate-400 text-white text-xs sm:text-sm focus:outline-none">
               <button type="button" onclick="parseVoiceFromManualInput()" class="px-3 py-1.5 rounded-lg bg-gray-800 hover:bg-purple-900/50 text-purple-300 border border-purple-500/30 text-xs font-bold transition">
                 تحليل وتأكيد
               </button>
@@ -413,9 +413,9 @@
                   <span id="confirm-badge-action" class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-600 text-white shadow-sm">
                     شراء مؤكد 🛒
                   </span>
-                  <span class="text-xs text-gray-400">مراجعة المعطيات قبل الاعتماد</span>
+                  <span class="text-xs text-slate-300">مراجعة المعطيات قبل الاعتماد</span>
                 </div>
-                <div class="text-[11px] font-mono text-cyan-400 flex items-center gap-1">
+                <div class="text-xs font-mono text-cyan-400 flex items-center gap-1">
                   <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
                   <span>حماية وأمان 100%</span>
                 </div>
@@ -425,7 +425,7 @@
               <div class="p-3 rounded-xl bg-gray-900 border border-gray-800 flex items-center justify-between">
                 <div>
                   <h4 id="confirm-stock-name" class="font-bold text-white text-sm">السويدي إليكتريك</h4>
-                  <div class="flex items-center gap-2 text-xs text-gray-400 mt-0.5">
+                  <div class="flex items-center gap-2 text-xs text-slate-300 mt-0.5">
                     <span id="confirm-stock-ticker" class="font-mono text-cyan-400 font-bold">SWDY</span>
                     <span>•</span>
                     <span id="confirm-stock-category">EGX30 • طاقة وكابلات</span>
@@ -440,34 +440,34 @@
               <!-- Editable Inputs Grid -->
               <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
                 <div class="p-2.5 bg-gray-900 rounded-xl border border-gray-800">
-                  <label class="text-[11px] text-gray-400 block mb-1">عدد الأسهم:</label>
+                  <label class="text-xs font-bold text-slate-300 block mb-1">عدد الأسهم:</label>
                   <input type="number" id="confirm-input-shares" oninput="recalcVoiceConfirmationMetrics()" class="w-full bg-gray-950 border border-gray-700 rounded-lg px-2.5 py-1.5 text-xs text-white font-mono font-bold focus:border-purple-500 focus:outline-none">
                 </div>
                 <div class="p-2.5 bg-gray-900 rounded-xl border border-gray-800">
-                  <label class="text-[11px] text-gray-400 block mb-1">سعر التنفيذ (ج):</label>
+                  <label class="text-xs font-bold text-slate-300 block mb-1">سعر التنفيذ (ج):</label>
                   <input type="number" step="0.01" id="confirm-input-price" oninput="recalcVoiceConfirmationMetrics()" class="w-full bg-gray-950 border border-gray-700 rounded-lg px-2.5 py-1.5 text-xs text-white font-mono font-bold focus:border-purple-500 focus:outline-none">
                 </div>
                 <div class="col-span-2 sm:col-span-1 p-2.5 bg-gray-900 rounded-xl border border-gray-800">
-                  <label class="text-[11px] text-gray-400 block mb-1">حد البيع الآمن (ج):</label>
+                  <label class="text-xs font-bold text-slate-300 block mb-1">حد البيع الآمن (ج):</label>
                   <input type="number" step="0.01" id="confirm-input-safesell" class="w-full bg-gray-950 border border-gray-700 rounded-lg px-2.5 py-1.5 text-xs text-amber-300 font-mono font-bold focus:border-amber-500 focus:outline-none" placeholder="اختياري">
                 </div>
               </div>
 
               <!-- Dynamic Financial Calculation Box -->
               <div class="p-3 rounded-xl bg-gray-900/90 border border-gray-800 text-xs space-y-2">
-                <div class="flex items-center justify-between text-gray-300">
+                <div class="flex items-center justify-between text-slate-200">
                   <span>إجمالي قيمة الصفقة (مع عمولة البورصة وثندر):</span>
                   <strong id="confirm-metric-total" class="font-mono text-white text-sm">26,046 ج.م</strong>
                 </div>
-                <div class="flex items-center justify-between text-gray-400 text-[11px]">
+                <div class="flex items-center justify-between text-gray-400 text-xs">
                   <span>رصيد الكاش المتاح بالمحفظة:</span>
                   <span id="confirm-metric-cash-avail" class="font-mono text-cyan-400">25,320 ج.م</span>
                 </div>
-                <div class="flex items-center justify-between border-t border-gray-800 pt-2 text-[11px]">
+                <div class="flex items-center justify-between border-t border-gray-800 pt-2 text-xs">
                   <span id="confirm-metric-impact-label">أثر الصفقة على رصيد الكاش:</span>
                   <strong id="confirm-metric-impact" class="font-mono text-emerald-400">سيتبقى 12,400 ج.م</strong>
                 </div>
-                <div id="confirm-metric-profit-row" class="hidden flex items-center justify-between border-t border-gray-800 pt-2 text-[11px]">
+                <div id="confirm-metric-profit-row" class="hidden flex items-center justify-between border-t border-gray-800 pt-2 text-xs">
                   <span>الأرباح الرأسمالية المحققة من متوسط الشراء:</span>
                   <strong id="confirm-metric-profit" class="font-mono text-emerald-400">+3,200 ج (+14.2%)</strong>
                 </div>
@@ -479,7 +479,7 @@
                   <i data-lucide="check-circle" class="w-4 h-4"></i>
                   <span id="confirm-btn-label">تأكيد وتنفيذ العملية فوراً</span>
                 </button>
-                <button type="button" onclick="resetVoiceModalToListen()" class="px-4 py-3 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-300 font-bold text-xs transition flex items-center gap-1.5 active:scale-95 cursor-pointer">
+                <button type="button" onclick="resetVoiceModalToListen()" class="px-4 py-3 rounded-xl bg-gray-800 hover:bg-gray-700 text-slate-200 font-bold text-xs transition flex items-center gap-1.5 active:scale-95 cursor-pointer">
                   <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
                   <span>إعادة</span>
                 </button>
@@ -490,9 +490,9 @@
           </div>
 
           <!-- Modal Footer Note -->
-          <div class="border-t border-gray-800 pt-3 flex items-center justify-between text-[11px] text-gray-500 shrink-0">
+          <div class="border-t border-gray-800 pt-3 flex items-center justify-between text-xs text-slate-300 shrink-0 font-medium">
             <span>🔒 لا يتم تنفيذ أي أمر مالي دون معاينتك وتأكيدك المباشر.</span>
-            <button onclick="closeVoiceTradingModal()" class="text-gray-400 hover:text-white">إلغاء</button>
+            <button onclick="closeVoiceTradingModal()" class="text-slate-300 hover:text-white font-bold">إلغاء</button>
           </div>
 
         </div>
@@ -549,7 +549,7 @@
 
     const transcriptBox = document.getElementById('voice-transcript-box');
     if (transcriptBox) {
-      transcriptBox.innerHTML = '<span class="text-gray-500 text-[11px]">في انتظار الاستماع لكلامك...</span>';
+      transcriptBox.innerHTML = '<span class="text-slate-300 text-xs font-medium">في انتظار الاستماع لكلامك...</span>';
     }
 
     const heading = document.getElementById('voice-status-heading');

@@ -891,8 +891,8 @@
       if (ftSourceEl) {
         ftSourceEl.innerText = priceSource;
         ftSourceEl.className = priceSource.includes('يدوي') 
-          ? 'px-1.5 py-0.5 rounded text-[9px] bg-amber-500/20 text-amber-300 font-bold'
-          : 'px-1.5 py-0.5 rounded text-[9px] bg-cyan-500/20 text-cyan-300 font-bold';
+          ? 'px-1.5 py-0.5 rounded text-[11px] bg-amber-500/20 text-amber-300 font-bold'
+          : 'px-1.5 py-0.5 rounded text-[11px] bg-cyan-500/20 text-cyan-300 font-bold';
       }
 
       recalcFineTunePreview();
@@ -979,7 +979,7 @@
         profitPreview.innerText = `${isPositive ? '+' : ''}${Math.round(profit).toLocaleString('en-US')} ج.م`;
       }
       if (returnPctEl) {
-        returnPctEl.className = `text-[9px] font-mono block ${isPositive ? 'text-emerald-400' : 'text-rose-400'}`;
+        returnPctEl.className = `text-[11px] font-mono block ${isPositive ? 'text-emerald-400' : 'text-rose-400'}`;
         returnPctEl.innerText = `${isPositive ? '+' : ''}${returnPct.toFixed(2)}% ${isPositive ? 'نمو وتطور' : 'تراجع'}`;
       }
     }
@@ -1001,7 +1001,7 @@
           const ftUpdatedEl = document.getElementById('ft-price-updated-at');
           if (ftUpdatedEl) ftUpdatedEl.innerText = `آخر تحديث: ${nowStr}`;
           if (badge) {
-            badge.className = 'px-1.5 py-0.5 rounded text-[9px] bg-emerald-500/20 text-emerald-300 font-bold';
+            badge.className = 'px-1.5 py-0.5 rounded text-[11px] bg-emerald-500/20 text-emerald-300 font-bold';
             badge.innerText = 'شاشة البورصة اللحظية';
           }
           recalcFineTunePreview();
@@ -1160,7 +1160,7 @@
       });
 
       if (simPositions.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" class="py-4 text-center text-gray-500">لا توجد صفقات تجريبية مفتوحة حالياً. اختر سهماً ونفذ شراءً وهمياً أعلاه.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" class="py-4 text-center text-slate-400">لا توجد صفقات تجريبية مفتوحة حالياً. اختر سهماً ونفذ شراءً وهمياً أعلاه.</td></tr>';
       }
 
       updateAutonomousSummaryMetrics();

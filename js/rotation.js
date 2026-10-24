@@ -200,10 +200,10 @@
       const profitPill = document.getElementById('rot-realized-profit-pill');
       if (profitPill) {
         if (isLosing) {
-          profitPill.className = 'text-[9px] text-rose-400/90 block font-sans mt-0.5';
+          profitPill.className = 'text-xs text-rose-300 block font-sans mt-0.5 font-bold';
           profitPill.innerText = `مبلغ مسترد (تثبيت خسارة دفترية: -${Math.abs(realizedProfit).toLocaleString('en-US')} ج)`;
         } else {
-          profitPill.className = 'text-[9px] text-emerald-400/80 block font-sans mt-0.5';
+          profitPill.className = 'text-xs text-emerald-300 block font-sans mt-0.5 font-bold';
           profitPill.innerText = `منها +${realizedProfit.toLocaleString('en-US')} ج ربح كاش محقق`;
         }
       }
@@ -707,7 +707,7 @@
                   <div class="bg-gray-900/90 p-3 rounded-xl border border-rose-800/40">
                     <span class="text-gray-400 block text-[11px]">سعر البيع وقت القرار:</span>
                     <span class="text-white font-mono font-bold text-sm">${plan.decisionPrice.toFixed(2)} ج.م</span>
-                    <span class="text-[10px] text-gray-500 block">سقف الهروب (+4%): ${plan.breakoutThreshold} ج</span>
+                    <span class="text-xs text-slate-300 block font-bold">سقف الهروب (+4%): ${plan.breakoutThreshold} ج</span>
                   </div>
                   <div class="bg-gray-900/90 p-3 rounded-xl border border-rose-800/40">
                     <span class="text-gray-400 block text-[11px]">السعر اللحظي الآن:</span>
@@ -780,7 +780,7 @@
                   <div class="bg-gray-900/90 p-3 rounded-xl border border-emerald-800/40">
                     <span class="text-gray-400 block text-[11px]">${plan.realizedProfit >= 0 ? 'سعر البيع في القمة:' : 'سعر بيع التخفيف والتدوير:'}</span>
                     <span class="text-white font-mono font-bold text-sm">${plan.decisionPrice.toFixed(2)} ج.م</span>
-                    <span class="text-[10px] text-gray-500 block">بعت: ${plan.sellShares} أسهم</span>
+                    <span class="text-xs text-slate-300 block font-bold">بعت: ${plan.sellShares} أسهم</span>
                   </div>
                   <div class="bg-gray-900/90 p-3 rounded-xl border border-emerald-800/40">
                     <span class="text-gray-400 block text-[11px]">سعر القاع الحالي (شراء الآن):</span>
@@ -890,24 +890,24 @@
                   <div class="bg-gray-900/90 p-2.5 rounded-xl border border-gray-800">
                     <span class="text-gray-400 block text-[10px]">${plan.realizedProfit >= 0 ? 'سعر اعتماد البيع:' : 'سعر بيع التخفيف:'}</span>
                     <span class="text-white font-mono font-bold">${plan.decisionPrice.toFixed(2)} ج.م</span>
-                    <span class="text-[9px] text-gray-500 block">${plan.realizedProfit >= 0 ? `كاش محقق: ${plan.sellCash.toLocaleString('en-US')} ج` : `كاش مسترد: ${plan.sellCash.toLocaleString('en-US')} ج`}</span>
+                    <span class="text-xs text-slate-300 block font-bold">${plan.realizedProfit >= 0 ? `كاش محقق: ${plan.sellCash.toLocaleString('en-US')} ج` : `كاش مسترد: ${plan.sellCash.toLocaleString('en-US')} ج`}</span>
                   </div>
                   <div class="bg-gray-900/90 p-2.5 rounded-xl border border-cyan-800/40">
                     <span class="text-gray-400 block text-[10px]">السعر اللحظي الآن:</span>
                     <span class="text-cyan-300 font-mono font-extrabold">${livePrice.toFixed(2)} ج.م</span>
-                    <span class="text-[9px] ${priceDiffPct >= 0 ? 'text-rose-400' : 'text-emerald-400'} block">
+                    <span class="text-xs ${priceDiffPct >= 0 ? 'text-rose-400' : 'text-emerald-400'} block">
                       ${priceDiffPct >= 0 ? '+' : ''}${priceDiffPct.toFixed(1)}% عن سعر البيع
                     </span>
                   </div>
                   <div class="bg-gray-900/90 p-2.5 rounded-xl border border-emerald-800/40">
                     <span class="text-emerald-400 block text-[10px]">نطاق شراء القاع:</span>
                     <span class="text-white font-mono font-bold">${plan.supportLow} - ${plan.supportHigh} ج</span>
-                    <span class="text-[9px] text-emerald-300 block">باقي ${distToDip} ج (${distToDipPct}%)</span>
+                    <span class="text-xs text-emerald-300 block">باقي ${distToDip} ج (${distToDipPct}%)</span>
                   </div>
                   <div class="bg-gray-900/90 p-2.5 rounded-xl border border-rose-800/40">
                     <span class="text-rose-400 block text-[10px]">سقف إلغاء الخطة (+4%):</span>
                     <span class="text-white font-mono font-bold">${plan.breakoutThreshold} ج.م</span>
-                    <span class="text-[9px] text-rose-300 block">باقي ${distToBreakout} ج (${distToBreakoutPct}%)</span>
+                    <span class="text-xs text-rose-300 block">باقي ${distToBreakout} ج (${distToBreakoutPct}%)</span>
                   </div>
                 </div>
 
@@ -929,7 +929,7 @@
                     <div class="bg-cyan-500 h-full" style="width: 30%"></div>
                     <div class="bg-rose-500 h-full" style="width: 35%"></div>
                   </div>
-                  <div class="flex items-center justify-between text-[10px] text-gray-500">
+                  <div class="flex items-center justify-between text-xs text-slate-300">
                     <span>🎯 اقتراب من القاع: باقي ${distToDip} ج</span>
                     <span>🚨 إنذار الهروب: باقي ${distToBreakout} ج</span>
                   </div>

@@ -421,19 +421,19 @@
                   </div>
                   <div class="grid grid-cols-3 gap-1.5 text-[10px] text-center font-mono">
                     <div class="bg-gray-950 p-1.5 rounded-lg border border-emerald-500/30">
-                      <div class="text-[9px] text-emerald-400 font-bold">1. فوري (40%)</div>
+                      <div class="text-xs text-emerald-300 font-bold">1. فوري (40%)</div>
                       <div class="text-white font-bold">${item.dcaPlan.tranches[0].shares} سهم</div>
-                      <div class="text-gray-400 text-[8.5px]">${item.dcaPlan.tranches[0].allocationCash.toLocaleString('en-US')} ج</div>
+                      <div class="text-gray-400 text-[11px]">${item.dcaPlan.tranches[0].allocationCash.toLocaleString('en-US')} ج</div>
                     </div>
                     <div class="bg-gray-950 p-1.5 rounded-lg border border-cyan-500/30">
-                      <div class="text-[9px] text-cyan-400 font-bold">2. ارتداد (30%)</div>
+                      <div class="text-xs text-cyan-300 font-bold">2. ارتداد (30%)</div>
                       <div class="text-white font-bold">${item.dcaPlan.tranches[1].shares} سهم</div>
-                      <div class="text-gray-400 text-[8.5px]">عند ${item.dcaPlan.tranches[1].targetPrice} ج</div>
+                      <div class="text-gray-400 text-[11px]">عند ${item.dcaPlan.tranches[1].targetPrice} ج</div>
                     </div>
                     <div class="bg-gray-950 p-1.5 rounded-lg border border-purple-500/30">
-                      <div class="text-[9px] text-purple-400 font-bold">3. اختراق (30%)</div>
+                      <div class="text-xs text-purple-300 font-bold">3. اختراق (30%)</div>
                       <div class="text-white font-bold">${item.dcaPlan.tranches[2].shares} سهم</div>
-                      <div class="text-gray-400 text-[8.5px]">عند ${item.dcaPlan.tranches[2].targetPrice} ج</div>
+                      <div class="text-gray-400 text-[11px]">عند ${item.dcaPlan.tranches[2].targetPrice} ج</div>
                     </div>
                   </div>
                 </div>
@@ -521,17 +521,17 @@
                 <div class="p-2 rounded-lg bg-gray-950/80 border border-gray-800">
                   <span class="text-[10px] text-gray-400 block font-sans">خط الأمان الحالي القديم</span>
                   <span class="font-bold text-xs text-amber-400">${item.currentStopLoss.toFixed(2)} ج</span>
-                  <span class="text-[9px] text-rose-400 block font-sans">معرض لخسارة المكسب</span>
+                  <span class="text-xs text-rose-300 block font-sans font-medium">معرض لخسارة المكسب</span>
                 </div>
                 <div class="p-2 rounded-lg bg-gray-950/80 border border-blue-500/30">
                   <span class="text-[10px] text-blue-300 block font-sans">خط الأمان المقترح الجديد</span>
                   <span class="font-bold text-xs text-blue-400">${item.suggestedStop.toFixed(2)} ج</span>
-                  <span class="text-[9px] text-emerald-400 block font-sans">يحبس ربح +${item.lockedProfitPct}%</span>
+                  <span class="text-xs text-emerald-300 block font-sans font-medium">يحبس ربح +${item.lockedProfitPct}%</span>
                 </div>
                 <div class="p-2 rounded-lg bg-gray-950/80 border border-gray-800 col-span-2 sm:col-span-1">
                   <span class="text-[10px] text-gray-400 block font-sans">قيمة الأرباح المحمية</span>
                   <span class="font-bold text-xs text-emerald-400">+${item.profitAtRisk.toLocaleString('en-US')} ج.م</span>
-                  <span class="text-[9px] text-gray-400 block font-sans">${item.shares} سهم مملوك</span>
+                  <span class="text-xs text-slate-300 block font-sans font-medium">${item.shares} سهم مملوك</span>
                 </div>
               </div>
               <p class="text-[11.5px] leading-relaxed">
@@ -750,7 +750,7 @@
           activeBorder: 'border-amber-500',
           activeBg: 'bg-amber-500/20 text-amber-300 shadow-lg shadow-amber-500/10',
           inactiveBorder: 'border-gray-800 hover:border-amber-500/40 text-gray-400 hover:text-amber-300',
-          badgeClass: counts.profitTaking > 0 ? 'bg-amber-500/30 text-amber-300 border border-amber-500/50' : 'bg-gray-800 text-gray-500'
+          badgeClass: counts.profitTaking > 0 ? 'bg-amber-500/30 text-amber-300 border border-amber-500/50' : 'bg-slate-800/80 text-slate-300 border border-slate-700/60'
         },
         {
           id: 'riskDefense',
@@ -760,7 +760,7 @@
           activeBorder: 'border-rose-500',
           activeBg: 'bg-rose-500/20 text-rose-300 shadow-lg shadow-rose-500/10',
           inactiveBorder: 'border-gray-800 hover:border-rose-500/40 text-gray-400 hover:text-rose-300',
-          badgeClass: counts.riskDefense > 0 ? 'bg-rose-500/30 text-rose-300 border border-rose-500/50' : 'bg-gray-800 text-gray-500'
+          badgeClass: counts.riskDefense > 0 ? 'bg-rose-500/30 text-rose-300 border border-rose-500/50' : 'bg-slate-800/80 text-slate-300 border border-slate-700/60'
         },
         {
           id: 'safetyLevelUpdates',
@@ -770,7 +770,7 @@
           activeBorder: 'border-blue-500',
           activeBg: 'bg-blue-500/20 text-blue-300 shadow-lg shadow-blue-500/10',
           inactiveBorder: 'border-gray-800 hover:border-blue-500/40 text-gray-400 hover:text-blue-300',
-          badgeClass: counts.safetyLevelUpdates > 0 ? 'bg-blue-500/30 text-blue-300 border border-blue-500/50' : 'bg-gray-800 text-gray-500'
+          badgeClass: counts.safetyLevelUpdates > 0 ? 'bg-blue-500/30 text-blue-300 border border-blue-500/50' : 'bg-slate-800/80 text-slate-300 border border-slate-700/60'
         },
         {
           id: 'accumulation',
@@ -780,7 +780,7 @@
           activeBorder: 'border-emerald-500',
           activeBg: 'bg-emerald-500/20 text-emerald-300 shadow-lg shadow-emerald-500/10',
           inactiveBorder: 'border-gray-800 hover:border-emerald-500/40 text-gray-400 hover:text-emerald-300',
-          badgeClass: counts.accumulation > 0 ? 'bg-emerald-500/30 text-emerald-300 border border-emerald-500/50' : 'bg-gray-800 text-gray-500'
+          badgeClass: counts.accumulation > 0 ? 'bg-emerald-500/30 text-emerald-300 border border-emerald-500/50' : 'bg-slate-800/80 text-slate-300 border border-slate-700/60'
         },
         {
           id: 'marketOpportunities',
@@ -790,7 +790,7 @@
           activeBorder: 'border-cyan-500',
           activeBg: 'bg-cyan-500/20 text-cyan-300 shadow-lg shadow-cyan-500/10',
           inactiveBorder: 'border-gray-800 hover:border-cyan-500/40 text-gray-400 hover:text-cyan-300',
-          badgeClass: counts.marketOpportunities > 0 ? 'bg-cyan-500/30 text-cyan-300 border border-cyan-500/50' : 'bg-gray-800 text-gray-500'
+          badgeClass: counts.marketOpportunities > 0 ? 'bg-cyan-500/30 text-cyan-300 border border-cyan-500/50' : 'bg-slate-800/80 text-slate-300 border border-slate-700/60'
         },
         {
           id: 'waitAndHold',
@@ -800,7 +800,7 @@
           activeBorder: 'border-slate-500',
           activeBg: 'bg-slate-800 text-slate-200 shadow-lg shadow-slate-800/20',
           inactiveBorder: 'border-gray-800 hover:border-slate-600 text-gray-400 hover:text-slate-300',
-          badgeClass: counts.waitAndHold > 0 ? 'bg-slate-700 text-slate-300 border border-slate-600' : 'bg-gray-800 text-gray-500'
+          badgeClass: counts.waitAndHold > 0 ? 'bg-slate-700 text-slate-300 border border-slate-600' : 'bg-slate-800/80 text-slate-300 border border-slate-700/60'
         }
       ];
 
@@ -1067,8 +1067,8 @@
                 ${item.ticker}
               </div>
               <div>
-                <div class="font-bold text-white text-xs sm:text-sm">${item.name}</div>
-                <div class="text-[10px] text-gray-400">${item.category}</div>
+                <div class="font-bold text-white text-sm sm:text-base">${item.name}</div>
+                <div class="text-xs text-slate-300 font-medium">${item.category}</div>
                 ${item.ticker !== 'CASH' ? `
                   <div class="mt-1.5 flex items-center gap-1.5 flex-wrap">
                     <span class="px-2 py-0.5 rounded text-[10px] font-bold ${cycle.badgeClass}" title="${cycle.advice || ''}">
@@ -1102,17 +1102,17 @@
           <td class="py-3.5 px-3 text-center">
             ${item.currentPrice && item.ticker !== 'CASH' && item.ticker !== 'NCS' && item.ticker !== 'BSB' 
               ? `<div class="inline-flex flex-col items-center">
-                  <div class="bg-cyan-950/50 border border-cyan-800/60 px-2.5 py-1 rounded-lg inline-block font-mono font-bold text-cyan-300 text-xs sm:text-sm shadow-sm">
+                  <div class="bg-cyan-950/50 border border-cyan-800/60 px-2.5 py-1 rounded-lg inline-block font-mono font-bold text-cyan-200 text-sm sm:text-base shadow-sm">
                     <span>${Number(item.currentPrice).toFixed(2)}</span>
                     <span class="text-[10px] text-gray-400 font-sans">ج</span>
                   </div>
-                  <div class="flex items-center gap-1 mt-1 text-[9px] text-gray-400 font-mono">
+                  <div class="flex items-center gap-1 mt-1 text-[11px] text-slate-300 font-mono font-medium">
                     <span class="w-1.5 h-1.5 rounded-full ${item.priceSource && item.priceSource.includes('يدوي') ? 'bg-amber-400' : 'bg-emerald-400 animate-pulse'}"></span>
                     <span>آخر تحديث: ${formatDateTimeDisplay(item.priceUpdatedAt)}</span>
                   </div>
-                  <span class="text-[8.5px] text-gray-500 font-sans mt-0.5">(${item.priceSource || 'شاشة البورصة اللحظية'})</span>
+                  <span class="text-[11px] text-slate-300 font-sans mt-0.5 font-medium">(${item.priceSource || 'شاشة البورصة اللحظية'})</span>
                  </div>`
-              : `<span class="text-gray-500 font-normal">--</span>`}
+              : `<span class="text-slate-400 font-bold">--</span>`}
           </td>
 
           <!-- 3. Buy Price & Shares Quantity (متوسط الشراء والكمية) -->
@@ -1121,10 +1121,10 @@
               <div class="flex flex-col items-center gap-0.5 font-mono">
                 <span class="font-bold text-gray-200">${item.buyPrice ? Number(item.buyPrice).toFixed(2) + ' ج' : '--'}</span>
                 <span class="text-[10px] text-indigo-300 px-1.5 py-0.2 rounded bg-indigo-950/50 border border-indigo-800/40">${item.shares ? item.shares.toLocaleString('en-US') + ' سهم' : '--'}</span>
-                <span class="text-[9.5px] text-gray-500 font-sans">تكلفة: ${Math.round(cost).toLocaleString('en-US')} ج</span>
+                <span class="text-xs text-slate-300 font-sans font-medium">تكلفة: ${Math.round(cost).toLocaleString('en-US')} ج</span>
               </div>
             ` : `
-              <span class="text-gray-500 font-normal">--</span>
+              <span class="text-slate-400 font-bold">--</span>
             `}
           </td>
 
@@ -1132,23 +1132,23 @@
           <td class="py-3.5 px-3 text-center">
             ${!isCashOrFund ? `
               <div class="flex flex-col items-center gap-1">
-                <div class="font-mono font-black text-emerald-300 text-xs sm:text-sm">
+                <div class="font-mono font-black text-emerald-300 text-sm sm:text-base">
                   ${effectiveTarget1.toFixed(2)} <span class="text-[10px] text-gray-400 font-sans font-normal">ج</span>
                 </div>
                 <div class="flex items-center gap-1">
                   ${isTargetReached 
-                    ? `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-500 text-white animate-pulse shadow-sm">🎯 وصل للهدف!</span>`
-                    : `<span class="px-1.5 py-0.5 rounded text-[9px] font-mono font-semibold text-emerald-300 bg-emerald-950/80 border border-emerald-500/30">+${targetGainPct}% ربح</span>`
+                    ? `<span class="px-1.5 py-0.5 rounded text-xs font-bold bg-emerald-600 text-white animate-pulse shadow-sm">🎯 وصل للهدف!</span>`
+                    : `<span class="px-1.5 py-0.5 rounded text-xs font-mono font-bold text-emerald-300 bg-emerald-950/90 border border-emerald-500/40">+${targetGainPct}% ربح</span>`
                   }
-                  ${isCustomTarget ? `<span class="text-[8px] px-1 rounded bg-amber-500/20 text-amber-300 font-bold" title="رقم مخصص قمت بوضعه بنفسك">مخصص</span>` : ''}
+                  ${isCustomTarget ? `<span class="text-[10px] px-1.5 py-0.2 rounded bg-amber-500/30 text-amber-200 font-bold" title="رقم مخصص قمت بوضعه بنفسك">مخصص</span>` : ''}
                 </div>
-                <button onclick="openPriceLevelsModal('${item.ticker}')" class="text-[9.5px] text-emerald-400 hover:text-emerald-300 font-bold flex items-center justify-center gap-0.5 mt-0.5 underline cursor-pointer" title="فحص المعادلة والمصدر وتعديل الرقم">
+                <button onclick="openPriceLevelsModal('${item.ticker}')" class="text-xs text-emerald-300 hover:text-emerald-200 font-bold flex items-center justify-center gap-0.5 mt-0.5 underline cursor-pointer" title="فحص المعادلة والمصدر وتعديل الرقم">
                   <i data-lucide="info" class="w-3 h-3 text-emerald-400"></i>
                   <span>المصدر والضبط</span>
                 </button>
               </div>
             ` : `
-              <span class="text-gray-500 font-normal">--</span>
+              <span class="text-slate-400 font-bold">--</span>
             `}
           </td>
 
@@ -1156,32 +1156,32 @@
           <td class="py-3.5 px-3 text-center">
             ${!isCashOrFund ? `
               <div class="flex flex-col items-center gap-1">
-                <div class="font-mono font-black ${isStopBroken ? 'text-rose-400 animate-pulse' : 'text-rose-300'} text-xs sm:text-sm">
+                <div class="font-mono font-black ${isStopBroken ? 'text-rose-400 animate-pulse' : 'text-rose-300'} text-sm sm:text-base">
                   ${effectiveStopLoss.toFixed(2)} <span class="text-[10px] text-gray-400 font-sans font-normal">ج</span>
                 </div>
                 <div class="flex items-center gap-1">
                   ${evalResult.action === 'EMERGENCY_STOP_LOSS'
-                    ? `<span class="px-1.5 py-0.5 rounded text-[9px] font-black bg-rose-600 text-white animate-pulse shadow-sm" title="انهيار حاد: نفذ الخروج فوراً">🚨 خروج طارئ!</span>`
+                    ? `<span class="px-1.5 py-0.5 rounded text-xs font-black bg-rose-600 text-white animate-pulse shadow-sm" title="انهيار حاد: نفذ الخروج فوراً">🚨 خروج طارئ!</span>`
                     : (evalResult.action === 'INTRADAY_DIP_WATCH'
-                      ? `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40" title="كسر لحظي أثناء الجلسة: انتظر تأكيد إغلاق 02:30 م">🟡 كسر لحظي (انتظر)</span>`
+                      ? `<span class="px-1.5 py-0.5 rounded text-xs font-bold bg-amber-500/30 text-amber-200 border border-amber-500/50" title="كسر لحظي أثناء الجلسة: انتظر تأكيد إغلاق 02:30 م">🟡 كسر لحظي (انتظر)</span>`
                       : (evalResult.action === 'CORE_BUFFER_WATCH'
-                        ? `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-blue-500/20 text-blue-300 border border-blue-500/40" title="سهم قيادي استثماري: مستقر ضمن وسادة الأمان أعلى S2">🛡️ وسادة أمان</span>`
+                        ? `<span class="px-1.5 py-0.5 rounded text-xs font-bold bg-blue-500/30 text-blue-200 border border-blue-500/50" title="سهم قيادي استثماري: مستقر ضمن وسادة الأمان أعلى S2">🛡️ وسادة أمان</span>`
                         : (isStopBroken 
-                          ? `<span class="px-1.5 py-0.5 rounded text-[9px] font-black bg-rose-600 text-white shadow-sm" title="تم تأكيد كسر الدعم بالإغلاق">🔴 تأكيد كسر S1</span>`
-                          : `<span class="px-1.5 py-0.5 rounded text-[9px] font-mono font-semibold text-rose-300 bg-rose-950/80 border border-rose-500/30">أمان ${stopLossBuffer}%</span>`
+                          ? `<span class="px-1.5 py-0.5 rounded text-xs font-black bg-rose-600 text-white shadow-sm" title="تم تأكيد كسر الدعم بالإغلاق">🔴 تأكيد كسر S1</span>`
+                          : `<span class="px-1.5 py-0.5 rounded text-xs font-mono font-bold text-rose-300 bg-rose-950/90 border border-rose-500/40">أمان ${stopLossBuffer}%</span>`
                         )
                       )
                     )
                   }
-                  ${isCustomStop ? `<span class="text-[8px] px-1 rounded bg-amber-500/20 text-amber-300 font-bold" title="رقم مخصص قمت بوضعه بنفسك">مخصص</span>` : ''}
+                  ${isCustomStop ? `<span class="text-[10px] px-1.5 py-0.2 rounded bg-amber-500/30 text-amber-200 font-bold" title="رقم مخصص قمت بوضعه بنفسك">مخصص</span>` : ''}
                 </div>
-                <button onclick="openPriceLevelsModal('${item.ticker}')" class="text-[9.5px] text-rose-400 hover:text-rose-300 font-bold flex items-center justify-center gap-0.5 mt-0.5 underline cursor-pointer" title="فحص المعادلة والمصدر وتعديل الرقم">
+                <button onclick="openPriceLevelsModal('${item.ticker}')" class="text-xs text-rose-300 hover:text-rose-200 font-bold flex items-center justify-center gap-0.5 mt-0.5 underline cursor-pointer" title="فحص المعادلة والمصدر وتعديل الرقم">
                   <i data-lucide="info" class="w-3 h-3 text-rose-400"></i>
                   <span>المصدر والضبط</span>
                 </button>
               </div>
             ` : `
-              <span class="text-gray-500 font-normal">--</span>
+              <span class="text-slate-400 font-bold">--</span>
             `}
           </td>
 
@@ -1206,7 +1206,7 @@
             <div class="flex flex-col gap-1 items-start">
               <div class="flex items-center gap-1.5 flex-wrap">
                 <span class="px-2 py-0.5 rounded text-[10px] font-bold ${badgeActionColor}">${badgeActionText}</span>
-                <button onclick="openAuditModal('${item.ticker}')" class="text-[9.5px] px-2 py-0.5 rounded bg-emerald-950/70 hover:bg-emerald-900 border border-emerald-500/40 text-emerald-300 font-bold flex items-center gap-1 transition cursor-pointer" title="تقرير الاقتراح والمصادر الاستثمارية">
+                <button onclick="openAuditModal('${item.ticker}')" class="text-xs px-2 py-0.5 rounded bg-emerald-950/70 hover:bg-emerald-900 border border-emerald-500/40 text-emerald-300 font-bold flex items-center gap-1 transition cursor-pointer" title="تقرير الاقتراح والمصادر الاستثمارية">
                   <i data-lucide="file-text" class="w-3 h-3 text-emerald-400"></i>
                   <span>تقرير الاقتراح 📊</span>
                 </button>
@@ -1215,16 +1215,16 @@
                   <span>سقف وقاع 🎯</span>
                 </button>
               </div>
-              <div class="text-[10.5px] text-gray-300 leading-tight">
+              <div class="text-xs text-slate-200 leading-normal font-medium">
                 ${item.advice || ''}
               </div>
               ${fund.operationalStability ? `
-                <div class="mt-1 flex items-center gap-1 text-[9.5px] font-sans font-semibold px-2 py-0.5 rounded border ${fund.pe ? 'text-emerald-300 bg-emerald-950/40 border-emerald-800/40' : 'text-amber-300 bg-amber-950/40 border-amber-800/40'}" title="فحص الأرباح التشغيلية">
+                <div class="mt-1 flex items-center gap-1 text-[11px] font-sans font-bold px-2 py-0.5 rounded border ${fund.pe ? 'text-emerald-300 bg-emerald-950/40 border-emerald-800/40' : 'text-amber-300 bg-amber-950/40 border-amber-800/40'}" title="فحص الأرباح التشغيلية">
                   <i data-lucide="${fund.pe ? 'shield-check' : 'clock'}" class="w-3 h-3 ${fund.pe ? 'text-emerald-400' : 'text-amber-400'} shrink-0"></i>
                   <span>${fund.operationalStability}</span>
                 </div>
               ` : `
-                <div class="mt-1 flex items-center gap-1 text-[9.5px] font-sans font-semibold px-2 py-0.5 rounded border text-amber-300 bg-amber-950/40 border-amber-800/40" title="فحص الأرباح التشغيلية">
+                <div class="mt-1 flex items-center gap-1 text-[11px] font-sans font-bold px-2 py-0.5 rounded border text-amber-300 bg-amber-950/40 border-amber-800/40" title="فحص الأرباح التشغيلية">
                   <i data-lucide="clock" class="w-3 h-3 text-amber-400 shrink-0"></i>
                   <span>⏳ بانتظار الإفصاح المالي المعتمد لبيانات التشغيل</span>
                 </div>
@@ -1695,22 +1695,22 @@
             <div class="p-2 rounded-lg bg-gray-950/80 border border-gray-800">
               <span class="text-[10px] text-gray-400 block font-sans">مكرر الربحية (P/E)</span>
               <span class="font-bold text-sm ${fund.pe ? 'text-emerald-400' : 'text-amber-400'}">${fund.pe ? fund.pe : 'معلق'}</span>
-              <span class="text-[9px] text-gray-500 block font-sans">سعر السهم / ربحه</span>
+              <span class="text-xs text-slate-300 block font-sans font-medium">سعر السهم / ربحه</span>
             </div>
             <div class="p-2 rounded-lg bg-gray-950/80 border border-gray-800">
               <span class="text-[10px] text-gray-400 block font-sans">متوسط قطاع (${fund.sector || stock.sector || 'السوق'})</span>
               <span class="font-bold text-sm text-cyan-300">${fund.sectorPe ? fund.sectorPe : '--'}</span>
-              <span class="text-[9px] text-gray-500 block font-sans">متوسط شركات القطاع</span>
+              <span class="text-xs text-slate-300 block font-sans font-medium">متوسط شركات القطاع</span>
             </div>
             <div class="p-2 rounded-lg bg-gray-950/80 border border-gray-800">
               <span class="text-[10px] text-gray-400 block font-sans">ربح السهم السنوي (EPS)</span>
               <span class="font-bold text-sm ${fund.eps ? 'text-white' : 'text-gray-400'}">${fund.eps ? fund.eps + ' ج' : 'معلق'}</span>
-              <span class="text-[9px] text-gray-500 block font-sans">نصيب السهم من الربح</span>
+              <span class="text-xs text-slate-300 block font-sans font-medium">نصيب السهم من الربح</span>
             </div>
             <div class="p-2 rounded-lg bg-gray-950/80 border border-gray-800">
               <span class="text-[10px] text-gray-400 block font-sans">هامش التشغيل (Op Margin)</span>
               <span class="font-bold text-sm text-indigo-300">${fund.operatingMargin !== undefined && fund.operatingMargin !== null ? fund.operatingMargin + '%' : (fund.netMargin ? fund.netMargin + '% صافي' : '--')}</span>
-              <span class="text-[9px] text-gray-500 block font-sans">قوة الأرباح التشغيلية</span>
+              <span class="text-xs text-slate-300 block font-sans font-medium">قوة الأرباح التشغيلية</span>
             </div>
           </div>
 
@@ -1776,22 +1776,22 @@
             <div class="p-2 rounded-lg bg-gray-950/80 border border-indigo-500/30">
               <span class="text-[10px] text-gray-400 block font-sans">الدعم الثاني (S2)</span>
               <span class="font-bold text-sm text-indigo-400">${stock.pivotS2 || (stock.pivotS1 ? (stock.pivotS1 * 0.95).toFixed(2) : '--')} ج</span>
-              <span class="text-[9px] text-gray-500 block font-sans">وسادة الأمان القصوى</span>
+              <span class="text-xs text-slate-300 block font-sans font-medium">وسادة الأمان القصوى</span>
             </div>
             <div class="p-2 rounded-lg bg-gray-950/80 border border-cyan-500/30">
               <span class="text-[10px] text-gray-400 block font-sans">الدعم الأول (S1)</span>
               <span class="font-bold text-sm text-cyan-400">${stock.pivotS1 || stock.support || '--'} ج</span>
-              <span class="text-[9px] text-gray-500 block font-sans">قاع الأمان الأقرب</span>
+              <span class="text-xs text-slate-300 block font-sans font-medium">قاع الأمان الأقرب</span>
             </div>
             <div class="p-2 rounded-lg bg-gray-950/80 border border-emerald-500/30">
               <span class="text-[10px] text-gray-400 block font-sans">المقاومة الأولى (R1)</span>
               <span class="font-bold text-sm text-emerald-400">${stock.pivotR1 || stock.target1 || '--'} ج</span>
-              <span class="text-[9px] text-gray-500 block font-sans">مستهدف جني الأرباح</span>
+              <span class="text-xs text-slate-300 block font-sans font-medium">مستهدف جني الأرباح</span>
             </div>
             <div class="p-2 rounded-lg bg-gray-950/80 border border-amber-500/30">
               <span class="text-[10px] text-gray-400 block font-sans">المقاومة الثانية (R2)</span>
               <span class="font-bold text-sm text-amber-300">${stock.pivotR2 || (stock.pivotR1 ? (stock.pivotR1 * 1.05).toFixed(2) : '--')} ج</span>
-              <span class="text-[9px] text-gray-500 block font-sans">المستهدف الصاعد الممتد</span>
+              <span class="text-xs text-slate-300 block font-sans font-medium">المستهدف الصاعد الممتد</span>
             </div>
           </div>
 
@@ -1857,17 +1857,17 @@
             <div class="p-2 rounded-lg bg-gray-950/80 border border-gray-800">
               <span class="text-[10px] text-gray-400 block font-sans">حجم التداول اليومي</span>
               <span class="font-bold text-xs text-white">${techEvidence.volumeFormatted}</span>
-              <span class="text-[9px] text-gray-500 block font-sans">عدد الأسهم المنفذة</span>
+              <span class="text-xs text-slate-300 block font-sans font-medium">عدد الأسهم المنفذة</span>
             </div>
             <div class="p-2 rounded-lg bg-gray-950/80 border border-gray-800">
               <span class="text-[10px] text-gray-400 block font-sans">قيمة التداول بالجلسة</span>
               <span class="font-bold text-xs text-emerald-400">${techEvidence.tradedValFormatted}</span>
-              <span class="text-[9px] text-gray-500 block font-sans">السيولة النقدية المتدفقة</span>
+              <span class="text-xs text-slate-300 block font-sans font-medium">السيولة النقدية المتدفقة</span>
             </div>
             <div class="p-2 rounded-lg bg-gray-950/80 border border-gray-800">
               <span class="text-[10px] text-gray-400 block font-sans">مضاعف التدفق المؤسسي</span>
               <span class="font-bold text-xs text-purple-300">${techEvidence.rvol}x</span>
-              <span class="text-[9px] ${techEvidence.rvolBadgeColor} px-1.5 py-0.2 rounded mt-0.5 inline-block font-sans text-[8.5px]">${techEvidence.rvolStatusText}</span>
+              <span class="text-[9px] ${techEvidence.rvolBadgeColor} px-1.5 py-0.2 rounded mt-0.5 inline-block font-sans text-[11px]">${techEvidence.rvolStatusText}</span>
             </div>
           </div>
           ` : ''}
@@ -1930,17 +1930,17 @@
             <div class="p-2 rounded-lg bg-gray-950/80 border border-gray-800">
               <span class="text-[10px] text-gray-400 block font-sans">وقف الخسارة الصارم</span>
               <span class="font-bold text-sm text-rose-400">${stock.stopLoss || stock.pivotS1 || '--'} ج</span>
-              <span class="text-[9px] text-gray-500 block font-sans">خط الدفاع الأخير</span>
+              <span class="text-xs text-slate-300 block font-sans font-medium">خط الدفاع الأخير</span>
             </div>
             <div class="p-2 rounded-lg bg-gray-950/80 border border-gray-800">
               <span class="text-[10px] text-gray-400 block font-sans">نسبة العائد للمخاطرة (R/R)</span>
               <span class="font-bold text-sm text-emerald-400">${stock.rrDisplay || '1 : 2.2'}</span>
-              <span class="text-[9px] text-gray-500 block font-sans">مكسب متوقع مقابل المخاطرة</span>
+              <span class="text-xs text-slate-300 block font-sans font-medium">مكسب متوقع مقابل المخاطرة</span>
             </div>
             <div class="p-2 rounded-lg bg-gray-950/80 border border-gray-800">
               <span class="text-[10px] text-gray-400 block font-sans">حد المخاطرة في الصفقة</span>
               <span class="font-bold text-sm text-cyan-300">أقصى 2.0%</span>
-              <span class="text-[9px] text-gray-500 block font-sans">من إجمالي رأس مال المحفظة</span>
+              <span class="text-xs text-slate-300 block font-sans font-medium">من إجمالي رأس مال المحفظة</span>
             </div>
           </div>
 
@@ -2303,7 +2303,7 @@
                         <i data-lucide="shield-alert" class="w-3 h-3 text-gray-500 shrink-0"></i>
                         <span>قيد تدقيق القوائم المالية الرسمية</span>
                       </span>
-                      <span class="text-gray-500 font-mono shrink-0">EPS: معلق</span>
+                      <span class="text-slate-400 font-mono shrink-0">EPS: معلق</span>
                     </div>
                   </div>
                 `;
@@ -2338,15 +2338,15 @@
 
             <div class="grid grid-cols-3 gap-1.5 text-center text-[10px] mb-2 bg-gray-950/50 p-2 rounded-xl border border-gray-800/80">
               <div>
-                <span class="text-gray-400 block text-[9px]" title="سعر الدعم الأول الذي إذا تماسك فوقه السهم يبدأ بالصعود">الدعم S1 (سعر الأمان)</span>
+                <span class="text-slate-300 block text-xs font-medium" title="سعر الدعم الأول الذي إذا تماسك فوقه السهم يبدأ بالصعود">الدعم S1 (سعر الأمان)</span>
                 <span class="font-bold text-white font-mono">${item.support}</span>
               </div>
               <div>
-                <span class="text-gray-400 block text-[9px]" title="مستوى المقاومة والهدف السعري الأول المتوقع">المقاومة R1 (الهدف الأول)</span>
+                <span class="text-slate-300 block text-xs font-medium" title="مستوى المقاومة والهدف السعري الأول المتوقع">المقاومة R1 (الهدف الأول)</span>
                 <span class="font-bold text-emerald-400 font-mono">${item.target1}</span>
               </div>
               <div>
-                <span class="text-gray-400 block text-[9px]" title="سعر الخروج الحامي لرأس المال لو هبط السهم دونه">وقف الخسارة (حماية رأس المال)</span>
+                <span class="text-slate-300 block text-xs font-medium" title="سعر الخروج الحامي لرأس المال لو هبط السهم دونه">وقف الخسارة (حماية رأس المال)</span>
                 <span class="font-bold text-rose-400 font-mono">${item.stopLoss}</span>
               </div>
             </div>

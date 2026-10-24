@@ -962,7 +962,7 @@
     // ============================================================
     // Real-Time System Auto-Update Engine
     // ============================================================
-    const LOCAL_APP_VERSION = '2.6.0';
+    const LOCAL_APP_VERSION = '2.6.1';
     window.LOCAL_APP_VERSION = LOCAL_APP_VERSION;
 
     let isUpdateBannerDismissed = false;

@@ -228,7 +228,7 @@
 
       <!-- Modal Footer -->
       <div class="pt-3 border-t border-gray-800 flex items-center justify-between shrink-0">
-        <span class="text-[11px] text-gray-500">يتم الحفظ التلقائي في جهازك وإعادة حساب الأسعار اللحظية فوراً ✅</span>
+        <span class="text-xs text-slate-300 font-medium">يتم الحفظ التلقائي في جهازك وإعادة حساب الأسعار اللحظية فوراً ✅</span>
         <button onclick="closeThndrSyncModal()" class="px-4 py-1.5 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-300 font-bold text-xs transition cursor-pointer">
           إغلاق
         </button>
@@ -269,7 +269,7 @@
           <div class="p-3 bg-gray-950/80 rounded-xl border border-indigo-500/30 space-y-2">
             <div class="text-[11px] font-bold text-indigo-300 flex items-center justify-between">
               <span>بيانات الأسهم والأسعار (Shares & Prices):</span>
-              <span class="text-[10px] text-gray-500">حساب تلقائي للقيمة والأرباح</span>
+              <span class="text-xs text-slate-300">حساب تلقائي للقيمة والأرباح</span>
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
               <div>
@@ -478,7 +478,7 @@
           <div class="bg-gray-950 p-3.5 rounded-xl border border-gray-800 space-y-2">
             <div class="flex items-center justify-between">
               <label class="font-bold text-gray-300 text-[11px]">متوسط سعر الشراء (ج.م):</label>
-              <span class="text-[10px] text-gray-500">سعر التكلفة للسهم</span>
+              <span class="text-xs text-slate-300">سعر التكلفة للسهم</span>
             </div>
             
             <input type="number" id="ft-input-buy-price" min="0.01" step="0.01" inputmode="decimal" onfocus="this.select()" oninput="recalcFineTunePreview()" onchange="recalcFineTunePreview()" placeholder="مثال: 43.02" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-white font-mono font-bold text-sm focus:border-indigo-400 focus:outline-none">
@@ -491,7 +491,7 @@
 
             <!-- Quick Piastre (+/-) Steppers including Single Piastre (بالقرش) -->
             <div class="flex items-center justify-between gap-1 pt-1 border-t border-gray-800/80">
-              <span class="text-[9px] text-gray-400">ضبط سريع:</span>
+              <span class="text-xs text-slate-300 font-bold">ضبط سريع:</span>
               <div class="flex items-center gap-1">
                 <button type="button" onclick="adjustFineTunePrice('ft-input-buy-price', -0.10)" class="px-1.5 py-0.5 rounded bg-gray-800 hover:bg-gray-700 text-gray-300 font-mono text-[10px] cursor-pointer" title="إنقاص 10 قروش">-10ق</button>
                 <button type="button" onclick="adjustFineTunePrice('ft-input-buy-price', -0.01)" class="px-2 py-0.5 rounded bg-indigo-950/60 hover:bg-indigo-900/60 text-indigo-300 border border-indigo-500/40 font-mono font-bold text-[10px] cursor-pointer" title="إنقاص قرش واحد فقط">-1ق</button>
@@ -518,7 +518,7 @@
 
             <!-- Quick Piastre (+/-) Steppers including Single Piastre (بالقرش) -->
             <div class="flex items-center justify-between gap-1 pt-1 border-t border-gray-800/80">
-              <span class="text-[9px] text-gray-400">ضبط سريع:</span>
+              <span class="text-xs text-slate-300 font-bold">ضبط سريع:</span>
               <div class="flex items-center gap-1">
                 <button type="button" onclick="adjustFineTunePrice('ft-input-current-price', -0.10)" class="px-1.5 py-0.5 rounded bg-gray-800 hover:bg-gray-700 text-gray-300 font-mono text-[10px] cursor-pointer" title="إنقاص 10 قروش">-10ق</button>
                 <button type="button" onclick="adjustFineTunePrice('ft-input-current-price', -0.01)" class="px-2 py-0.5 rounded bg-emerald-950/60 hover:bg-emerald-900/60 text-emerald-300 border border-emerald-500/40 font-mono font-bold text-[10px] cursor-pointer" title="إنقاص قرش واحد فقط">-1ق</button>
@@ -534,8 +534,8 @@
                 <span id="ft-price-updated-at">آخر تحديث: اليوم</span>
               </span>
               <div class="flex items-center gap-2">
-                <span id="ft-price-source-badge" class="px-1.5 py-0.5 rounded text-[9px] bg-cyan-500/20 text-cyan-300 font-bold">شاشة البورصة</span>
-                <button type="button" onclick="fetchSingleStockLivePrice()" class="text-[9px] text-cyan-400 hover:text-cyan-300 underline font-bold flex items-center gap-0.5 cursor-pointer" title="سحب السعر اللحظي الحالي من البورصة لهذا السهم">
+                <span id="ft-price-source-badge" class="px-1.5 py-0.5 rounded text-xs bg-cyan-500/20 text-cyan-300 font-bold">شاشة البورصة</span>
+                <button type="button" onclick="fetchSingleStockLivePrice()" class="text-xs text-cyan-400 hover:text-cyan-300 underline font-bold flex items-center gap-0.5 cursor-pointer" title="سحب السعر اللحظي الحالي من البورصة لهذا السهم">
                   <span>سحب السعر اللحظي ⚡</span>
                 </button>
               </div>
@@ -566,19 +566,19 @@
             <div class="bg-gray-900/90 p-2.5 rounded-xl border border-gray-800 flex flex-col justify-between">
               <span class="text-gray-400 block text-[10px]">1. اشتريت بكام؟ (التكلفة):</span>
               <span class="font-bold text-gray-200 font-mono text-xs sm:text-sm my-0.5" id="ft-preview-cost">0 ج.م</span>
-              <span class="text-[9px] text-gray-500 block font-mono" id="ft-preview-cost-detail">0 سهم @ 0 ج</span>
+              <span class="text-xs text-gray-500 block font-mono" id="ft-preview-cost-detail">0 سهم @ 0 ج</span>
             </div>
 
             <div class="bg-gray-900/90 p-2.5 rounded-xl border border-gray-800 flex flex-col justify-between">
               <span class="text-gray-400 block text-[10px]">2. بقى بكام؟ (القيمة الآن):</span>
               <span class="font-bold text-white font-mono text-xs sm:text-sm my-0.5" id="ft-preview-value">0 ج.م</span>
-              <span class="text-[9px] text-cyan-400/90 block font-mono" id="ft-preview-val-detail">0 سهم @ 0 ج</span>
+              <span class="text-xs text-cyan-400/90 block font-mono" id="ft-preview-val-detail">0 سهم @ 0 ج</span>
             </div>
 
             <div class="bg-gray-900/90 p-2.5 rounded-xl border border-gray-800 flex flex-col justify-between">
               <span class="text-gray-400 block text-[10px]">3. التطور والفرق (المكسب):</span>
               <span class="font-bold font-mono text-xs sm:text-sm my-0.5" id="ft-preview-profit">0 ج.م</span>
-              <span class="text-[9px] font-mono block" id="ft-preview-return-pct">0.00%</span>
+              <span class="text-xs font-mono block" id="ft-preview-return-pct">0.00%</span>
             </div>
           </div>
         </div>
@@ -662,19 +662,19 @@
             <div class="bg-gray-900/90 p-2.5 rounded-xl border border-gray-800">
               <span class="text-gray-400 text-[10px] block font-sans">عدد الأسهم للبيع</span>
               <span class="text-base font-bold text-amber-300" id="rot-sell-shares-count">5 أسهم</span>
-              <span class="text-[9px] text-gray-500 block font-sans mt-0.5" id="rot-sell-shares-pct">(حوالي 30% من الكمية)</span>
+              <span class="text-xs text-gray-500 block font-sans mt-0.5" id="rot-sell-shares-pct">(حوالي 30% من الكمية)</span>
             </div>
 
             <div class="bg-gray-900/90 p-2.5 rounded-xl border border-emerald-500/30" id="rot-cash-card">
               <span class="text-emerald-400 text-[10px] block font-sans" id="rot-cash-generated-label">كاش مضمون يدخل حسابك</span>
               <span class="text-base font-bold text-emerald-300" id="rot-cash-generated">4,350 ج.م</span>
-              <span class="text-[9px] text-emerald-400/80 block font-sans mt-0.5" id="rot-realized-profit-pill">منها 775 ج ربح صافي محقق</span>
+              <span class="text-xs text-emerald-400/80 block font-sans mt-0.5" id="rot-realized-profit-pill">منها 775 ج ربح صافي محقق</span>
             </div>
 
             <div class="bg-gray-900/90 p-2.5 rounded-xl border border-gray-800">
               <span class="text-gray-400 text-[10px] block font-sans">الأسهم المتبقية المستمرة</span>
               <span class="text-base font-bold text-indigo-300" id="rot-remaining-shares">12 سهم</span>
-              <span class="text-[9px] text-gray-500 block font-sans mt-0.5" id="rot-remaining-value">بقيمة 10,440 ج (أصل دائم)</span>
+              <span class="text-xs text-gray-500 block font-sans mt-0.5" id="rot-remaining-value">بقيمة 10,440 ج (أصل دائم)</span>
             </div>
           </div>
         </div>
@@ -779,7 +779,7 @@
             <i data-lucide="shield-check" class="w-4 h-4 text-emerald-400 shrink-0"></i>
             <span id="rot-sanity-shield-text">تم الفحص عبر AI Sanity Shield: تم التحقق من المنطق الرياضي والتوصية (خالٍ من أي تعارض).</span>
           </div>
-          <span class="text-[9px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-mono font-bold shrink-0">100% Verified</span>
+          <span class="text-xs px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-mono font-bold shrink-0">100% Verified</span>
         </div>
       </div>
 
