@@ -155,21 +155,39 @@ export default async function handler(req, res) {
         verified_source: 'شاشة ومؤشرات البورصة الفنية الحية'
     });
 
-    // Autonomous Background Push Alert Dispatch if critical breakdown is detected
+    // Autonomous Background Push Alert Dispatch (Breakdowns & Profit Targets)
+    const host = req.headers?.['x-forwarded-host'] || req.headers?.host;
+    const proto = req.headers?.['x-forwarded-proto'] || 'https';
+    const baseUrl = (host && !host.includes('localhost')) ? `${proto}://${host}` : 'https://egx-ai-copilot.vercel.app';
+
     const criticals = findings.filter(f => f.action === 'STOP_LOSS_WARNING' || f.alert_level === 'CRITICAL_RISK');
+    const profitTargets = findings.filter(f => f.action === 'TAKE_PROFIT_R1' || f.alert_level === 'POSITIVE_CATALYST');
+
+    let pushAlert = null;
     if (criticals.length > 0) {
+      const c = criticals[0];
+      pushAlert = {
+        title: `🚨 تنبيه كسر دعم فني (${c.ticker})`,
+        body: `${c.advice} (السعر اللحظي: ${c.price})`,
+        url: '/',
+        tag: `egx-stop-${c.ticker}`
+      };
+    } else if (profitTargets.length > 0) {
+      const p = profitTargets[0];
+      pushAlert = {
+        title: `🎯 تنبيه بلوغ مستهدف جني الأرباح (${p.ticker})`,
+        body: `${p.advice} (السعر اللحظي: ${p.price})`,
+        url: '/',
+        tag: `egx-target-${p.ticker}`
+      };
+    }
+
+    if (pushAlert) {
       try {
-        const firstCrit = criticals[0];
-        const host = req.headers?.['x-forwarded-host'] || req.headers?.host || 'localhost:3000';
-        const proto = req.headers?.['x-forwarded-proto'] || 'https';
-        fetch(`${proto}://${host}/api/send-push`, {
+        await fetch(`${baseUrl}/api/send-push`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            title: `🚨 تنبيه كسر دعم فني في البورصة (${firstCrit.ticker})`,
-            body: `${firstCrit.advice} (السعر الحالي: ${firstCrit.price})`,
-            url: '/'
-          })
+          body: JSON.stringify(pushAlert)
         }).catch(() => {});
       } catch (pushErr) {
         console.warn('Autonomous push dispatch notice:', pushErr.message);

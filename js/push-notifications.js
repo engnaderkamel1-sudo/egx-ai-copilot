@@ -106,7 +106,21 @@
 
       // Check current subscription in PushManager
       if ('PushManager' in window && swRegistration.pushManager) {
-        const subscription = await swRegistration.pushManager.getSubscription();
+        let subscription = await swRegistration.pushManager.getSubscription();
+        if (!subscription && Notification.permission === 'granted') {
+          // Auto-subscribe immediately on Android if permission was granted previously
+          try {
+            const convertedKey = urlBase64ToUint8Array(VAPID_PUBLIC_KEY);
+            subscription = await swRegistration.pushManager.subscribe({
+              userVisibleOnly: true,
+              applicationServerKey: convertedKey
+            });
+            console.log('✅ Android Device Auto-Subscribed to Cloud Push:', subscription.endpoint);
+          } catch (autoSubErr) {
+            console.warn('Auto subscribe error on Android:', autoSubErr);
+          }
+        }
+
         if (subscription) {
           isSubscribed = true;
           // Silently sync with server to ensure this device stays in the cloud push list

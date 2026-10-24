@@ -34,10 +34,11 @@ self.addEventListener('push', (event) => {
     body: payload.body || '',
     icon: '/icon-192.png',
     badge: '/badge-72.png',
-    vibrate: [200, 100, 200, 100, 200],
+    vibrate: [300, 150, 300, 150, 300],
     data: { url: payload.url || '/' },
     tag: payload.tag || 'egx-market-alert',
     renotify: true,
+    requireInteraction: true,
     dir: 'rtl',
     lang: 'ar'
   };
