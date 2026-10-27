@@ -524,6 +524,32 @@
         stopLoss: '98.00 ج',
         liquidityStatus: 'ممتازة في ثندر',
         tags: ['volume_surge', 'egx30']
+      },
+      {
+        ticker: 'CCAP',
+        name: 'القلعة للاستشارات المالية',
+        index: 'egx30',
+        sector: 'استثمار مباشر وطاقة',
+        price: 2.72,
+        high: 2.78,
+        low: 2.64,
+        close: 2.72,
+        changePct: '+2.25%',
+        volumeMultiplier: '2.6x',
+        catalyst: 'إعادة هيكلة ديون الشركة بالبنوك وتدفقات أرباح المصرية للتكرير (ERC)',
+        type: 'استثمار استراتيجي وطاقة • تعافي قوي',
+        score: 91,
+        support: '2.62 ج',
+        target1: '3.15 ج',
+        target2: '3.60 ج',
+        stopLoss: '2.50 ج',
+        liquidityStatus: 'سيولة قياسية يومية في ثندر',
+        tags: ['volume_surge', 'egx30'],
+        pe: 6.8,
+        sectorPe: 11.5,
+        peVsSectorPct: -40.8,
+        eps: 0.40,
+        operationalStability: 'أرباح تشغيلية متنامية بعد تسوية الديون'
       }
     ];
 

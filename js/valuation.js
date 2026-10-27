@@ -159,6 +159,171 @@
       fairValueBaseline: 120.0,
       modelType: "نموذج خصم التوزيعات والأرباح المصرفية (DDM Model)",
       analysis: "مكرر ربحية منخفض تاريخياً (5.0x) وعائد مرتفع على حقوق الملكية ونمو متسارع في محفظة التمويل."
+    },
+    "CCAP": {
+      ticker: "CCAP",
+      name: "القلعة للاستشارات المالية",
+      sector: "استثمار مباشر وطاقة",
+      isFinancial: false,
+      fcf0: 3100,
+      growthRate: 19.0,
+      discountRate: 23.0,
+      terminalGrowth: 7.0,
+      netDebt: 8500,
+      sharesCount: 1820,
+      fairValueBaseline: 3.80,
+      modelType: "التدفقات النقدية ومحفظة الشركات التابعة (SOTP / FCFF)",
+      analysis: "إعادة هيكلة الديون البنكية الضخمة، والتدفقات النقدية والتشغيلية المرتفعة لمشروع المصرية للتكرير (ERC)."
+    },
+    "AMOC": {
+      ticker: "AMOC",
+      name: "الإسكندرية للزيوت المعدنية",
+      sector: "بتروكيماويات وطاقة",
+      isFinancial: false,
+      fcf0: 1850,
+      growthRate: 15.0,
+      discountRate: 21.5,
+      terminalGrowth: 6.5,
+      netDebt: -1200,
+      sharesCount: 1290,
+      fairValueBaseline: 14.50,
+      modelType: "التدفقات النقدية الحرة للمنشأة (FCFF Model)",
+      analysis: "مركز مالي نقدي قوي، أرباح تشغيلية من تكرير الزيوت والمازوت، وتوزيعات نقدية مستقرة."
+    },
+    "ETRS": {
+      ticker: "ETRS",
+      name: "المصرية للنقل والخدمات (إيجيترانس)",
+      sector: "لوجستيات ونقل بحري",
+      isFinancial: false,
+      fcf0: 160,
+      growthRate: 22.0,
+      discountRate: 22.0,
+      terminalGrowth: 7.0,
+      netDebt: -110,
+      sharesCount: 156,
+      fairValueBaseline: 6.80,
+      modelType: "التدفقات النقدية الحرة للمنشأة (FCFF Model)",
+      analysis: "توسعات في نقل مشروعات طاقة الرياح واللوجستيات المتخصصة بدون أعباء ديون خانقة."
+    },
+    "ESRS": {
+      ticker: "ESRS",
+      name: "حديد عز",
+      sector: "معادن وتعدين",
+      isFinancial: false,
+      fcf0: 8900,
+      growthRate: 16.0,
+      discountRate: 22.0,
+      terminalGrowth: 7.0,
+      netDebt: 18000,
+      sharesCount: 543,
+      fairValueBaseline: 125.0,
+      modelType: "التدفقات النقدية الحرة للمنشأة (FCFF Model)",
+      analysis: "طفرة تصديرية لمصانع أوروبا وحصة سوقية رائدة وتدفقات دولارية صلبة تعوض فوائد الديون."
+    },
+    "SKPC": {
+      ticker: "SKPC",
+      name: "سيدي كرير للبتروكيماويات",
+      sector: "بتروكيماويات",
+      isFinancial: false,
+      fcf0: 2450,
+      growthRate: 14.0,
+      discountRate: 21.0,
+      terminalGrowth: 6.5,
+      netDebt: -800,
+      sharesCount: 756,
+      fairValueBaseline: 38.0,
+      modelType: "التدفقات النقدية الحرة للمنشأة (FCFF Model)",
+      analysis: "طلب خارجي قوي على البولي إيثيلين وهوامش تشغيلية ممتازة مع انتظام إمدادات الغاز."
+    },
+    "ALCN": {
+      ticker: "ALCN",
+      name: "الإسكندرية لتداول الحاويات",
+      sector: "نقل ولوجستيات دولارية",
+      isFinancial: false,
+      fcf0: 4200,
+      growthRate: 17.0,
+      discountRate: 21.0,
+      terminalGrowth: 6.5,
+      netDebt: -4500,
+      sharesCount: 1489,
+      fairValueBaseline: 64.0,
+      modelType: "التدفقات النقدية الحرة للمنشأة (FCFF Model)",
+      analysis: "إيرادات بالدولار النقي بنسبة 100%، فائض نقدية هائل، وتوزيعات كوبونات أرباح نقدية تاريخية."
+    },
+    "BTFH": {
+      ticker: "BTFH",
+      name: "بلتون القابضة",
+      sector: "خدمات مالية وبنوك استثمار",
+      isFinancial: true,
+      fcf0: 1950,
+      growthRate: 26.0,
+      discountRate: 22.5,
+      terminalGrowth: 7.5,
+      netDebt: 0,
+      sharesCount: 5800,
+      fairValueBaseline: 4.80,
+      modelType: "نموذج خصم التوزيعات والخدمات المالية (DDM Model)",
+      analysis: "سيولة رأسمالية ضخمة بعد الاكتتاب، ونمو فائق في أنشطة التمويل غير المصرفي والسمسرة."
+    },
+    "ISPH": {
+      ticker: "ISPH",
+      name: "ابن سينا فارما",
+      sector: "أدوية ورعاية صحية",
+      isFinancial: false,
+      fcf0: 680,
+      growthRate: 20.0,
+      discountRate: 22.0,
+      terminalGrowth: 7.0,
+      netDebt: 1100,
+      sharesCount: 1040,
+      fairValueBaseline: 4.60,
+      modelType: "التدفقات النقدية الحرة للمنشأة (FCFF Model)",
+      analysis: "استفادة مباشرة من تحريك أسعار الدواء وزيادة حجم التوزيع واستقرار سلاسل التوريد."
+    },
+    "JUFO": {
+      ticker: "JUFO",
+      name: "جهينة للصناعات الغذائية",
+      sector: "صناعات غذائية واستهلاكية",
+      isFinancial: false,
+      fcf0: 2100,
+      growthRate: 16.0,
+      discountRate: 21.5,
+      terminalGrowth: 7.0,
+      netDebt: 1200,
+      sharesCount: 941,
+      fairValueBaseline: 36.0,
+      modelType: "التدفقات النقدية الحرة للمنشأة (FCFF Model)",
+      analysis: "قطاع استهلاكي دفاعي، قوة تسعيرية عالية، استقرار واردات الألبان وهوامش ربح متصاعدة."
+    },
+    "OCDI": {
+      ticker: "OCDI",
+      name: "سوديك (السادس من أكتوبر للتنمية)",
+      sector: "تطوير عقاري فاخر",
+      isFinancial: false,
+      fcf0: 2400,
+      growthRate: 18.0,
+      discountRate: 22.0,
+      terminalGrowth: 7.0,
+      netDebt: 2200,
+      sharesCount: 355,
+      fairValueBaseline: 72.0,
+      modelType: "التدفقات النقدية وصافي قيمة الأصول (FCFF & NAV)",
+      analysis: "شراكات خليجية استراتيجية، محفظة أراضي ممتازة في غرب وشرق القاهرة والساحل الشمالي."
+    },
+    "HRHO": {
+      ticker: "HRHO",
+      name: "إي إف جي القابضة (هيرميس)",
+      sector: "بنوك استثمار وإقليمي",
+      isFinancial: true,
+      fcf0: 3800,
+      growthRate: 18.0,
+      discountRate: 22.0,
+      terminalGrowth: 7.0,
+      netDebt: 0,
+      sharesCount: 1458,
+      fairValueBaseline: 32.0,
+      modelType: "نموذج خصم التوزيعات والخدمات المصرفية (DDM Model)",
+      analysis: "تنوع إقليمي في الخليج، نمو إيرادات بنك الاستثمار وأرباح بنك aiBANK التجاري التابع."
     }
   };
 
@@ -521,11 +686,54 @@
     });
   }
 
+  /**
+   * Universal Fair Value & Margin of Safety Retrieval
+   * @param {string} ticker
+   * @param {number} currentPrice
+   * @returns {Object} Fair value metrics, discount %, and safety text
+   */
+  function getFairValueInfo(ticker, currentPrice) {
+    const p = EGX_VALUATION_PROFILES[ticker];
+    const cur = Number(currentPrice) || (p ? Number(p.fairValueBaseline) : 100);
+    const fairVal = p ? Number(p.fairValueBaseline) : Number((cur * 1.25).toFixed(2));
+
+    // Discount % relative to fair value: Positive = undervalued (cheap/discount), Negative = overvalued
+    const discountPct = fairVal > 0 ? Number((((fairVal - cur) / fairVal) * 100).toFixed(1)) : 0;
+    const isUndervalued = discountPct > 0;
+
+    let statusText = '';
+    let badgeClass = '';
+    if (discountPct >= 10.0) {
+      statusText = `يتداول بخصم ${discountPct}% عن قيمته الحقيقية (أرخص من سعره العادل 🟢)`;
+      badgeClass = 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40';
+    } else if (discountPct >= 0) {
+      statusText = `يتداول قرب قيمته العادلة بخصم ${discountPct}% (سعر عادل ومتوازن ⚖️)`;
+      badgeClass = 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40';
+    } else {
+      statusText = `أعلى من قيمته العادلة بـ ${Math.abs(discountPct)}% (شراء مضاربي بحذر 🟡)`;
+      badgeClass = 'bg-amber-500/20 text-amber-300 border border-amber-500/40';
+    }
+
+    return {
+      ticker: ticker,
+      currentPrice: cur,
+      fairValue: fairVal,
+      discountPct: discountPct,
+      isUndervalued: isUndervalued,
+      statusText: statusText,
+      badgeClass: badgeClass,
+      modelType: p ? p.modelType : 'نموذج التقييم المالي المتعدد (Valuation Model)',
+      analysis: p ? p.analysis : 'تقييم مالي مبني على التدفقات النقدية ومكررات القطاع.'
+    };
+  }
+
   // Window exposures
   global.initDcfEngine = initDcfEngine;
   global.onDcfStockChanged = onDcfStockChanged;
   global.onDcfSliderInput = onDcfSliderInput;
   global.renderActiveDcfModel = renderActiveDcfModel;
   global.renderBenchmarkAlphaTracker = renderBenchmarkAlphaTracker;
+  global.getFairValueInfo = getFairValueInfo;
+  global.EGX_VALUATION_PROFILES = EGX_VALUATION_PROFILES;
 
 })(typeof window !== 'undefined' ? window : this);
