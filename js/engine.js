@@ -546,12 +546,8 @@
       }
 
       // Recognized Core stocks in EGX30 with solid fundamentals / dividends
-      const coreTickers = ['COMI', 'SWDY', 'ABUK', 'CLHO', 'EGAL', 'ORAS', 'MFPC', 'CIEB', 'ADIB', 'HDBK', 'TMGH'];
-      if (coreTickers.includes(asset.ticker)) {
-        return true;
-      }
-
-      return !cat.includes('egx70');
+      const coreTickers = ['COMI', 'SWDY', 'ABUK', 'CLHO', 'EGAL', 'ORAS', 'MFPC', 'CIEB', 'ADIB', 'HDBK', 'TMGH', 'ALCN', 'JUFO', 'OCDI', 'HRHO', 'ESRS', 'ETEL', 'ORWE'];
+      return coreTickers.includes(asset.ticker);
     },
 
     /**
@@ -1418,11 +1414,11 @@
         const fvInfo = (typeof window !== 'undefined' && typeof window.getFairValueInfo === 'function')
           ? window.getFairValueInfo(item.ticker, curPrice)
           : {
-              fairValue: Number((curPrice * 1.25).toFixed(2)),
-              discountPct: 20.0,
-              isUndervalued: true,
-              statusText: 'يتداول بخصم 20% عن قيمته الحقيقية (أرخص من سعره العادل 🟢)',
-              badgeClass: 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+              fairValue: null,
+              discountPct: null,
+              isUndervalued: false,
+              statusText: 'بانتظار دراسة القيمة العادلة المعتمدة (دون تخمين)',
+              badgeClass: 'bg-slate-800 text-slate-300 border border-slate-700'
             };
 
         const isSupportBroken = !!(item.isSupportBroken || (pivotS1 > 0 && curPrice < pivotS1));
@@ -1692,8 +1688,8 @@
 
       // Category 4: MARKET OPPORTUNITIES (From fullMarketRadar - stocks not owned)
       const ownedTickers = new Set(portfolioData.map(p => p.ticker));
-      const marketOpportunities = fullMarketRadar
-        .filter(m => m.ticker && !ownedTickers.has(m.ticker) && (Number(m.score) >= 80))
+      const allMappedOpportunities = fullMarketRadar
+        .filter(m => m.ticker && !ownedTickers.has(m.ticker) && (Number(m.score) >= 75))
         .map(m => {
           const mPrice = Number(m.price || m.close) || 0;
 
@@ -1705,11 +1701,11 @@
           const fvInfo = (typeof window !== 'undefined' && typeof window.getFairValueInfo === 'function')
             ? window.getFairValueInfo(m.ticker, mPrice)
             : {
-                fairValue: Number((mPrice * 1.25).toFixed(2)),
-                discountPct: 20.0,
-                isUndervalued: true,
-                statusText: 'يتداول بخصم 20% عن قيمته الحقيقية (هامش أمان ممتاز للشراء 🟢)',
-                badgeClass: 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+                fairValue: null,
+                discountPct: null,
+                isUndervalued: false,
+                statusText: 'بانتظار دراسة القيمة العادلة المعتمدة (دون تخمين)',
+                badgeClass: 'bg-slate-800 text-slate-300 border border-slate-700'
               };
 
           // Precise Execution Plan ("أشتري على كام؟")
@@ -1810,9 +1806,27 @@
             sectorPe: m.sectorPe || null,
             operationalStability: m.operationalStability || null
           };
-        })
-        .sort((a, b) => (b.totalOpportunityScore || 0) - (a.totalOpportunityScore || 0))
-        .slice(0, 4);
+        });
+
+      // Split into Core Long-Term vs Satellite Tactical Opportunities
+      // Core Gate: isCore === true, must have audited positive fair value discount, and not low liquidity
+      const coreOpportunities = allMappedOpportunities
+        .filter(item => item.isCore && item.fairValue !== null && item.fairValueDiscountPct > 0 && item.liquidityTier !== 'LOW_CAUTION')
+        .sort((a, b) => (Number(b.fairValueDiscountPct) || 0) - (Number(a.fairValueDiscountPct) || 0))
+        .slice(0, 4)
+        .map((item, idx) => ({ ...item, subCategory: 'CORE', subRank: idx + 1 }));
+
+      // Satellite Gate: Turnaround / Speculative / High Beta / EGX70 momentum
+      const satelliteOpportunities = allMappedOpportunities
+        .filter(item => !item.isCore || item.fairValue === null || item.fairValueDiscountPct <= 0)
+        .sort((a, b) => (b.score || 0) - (a.score || 0))
+        .slice(0, 4)
+        .map((item, idx) => ({ ...item, subCategory: 'SATELLITE', subRank: idx + 1 }));
+
+      // Unified array with properties so both simple array and segmented UI work flawlessly
+      const marketOpportunities = [...coreOpportunities, ...satelliteOpportunities];
+      marketOpportunities.coreOpportunities = coreOpportunities;
+      marketOpportunities.satelliteOpportunities = satelliteOpportunities;
 
       // Legacy Candidates for backward compatibility with existing callers/tests
       let buyCandidate = accumulation[0] || null;

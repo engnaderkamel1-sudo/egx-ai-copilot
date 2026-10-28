@@ -43,7 +43,8 @@ const EGX_DICTIONARY = {
   "ETRS": { name: "إيجيترانس", sector: "شحن ولوجستيات", index: "egx70", quality: "لوجستيات طاقة الرياح والمشاريع الكبرى" },
   "CIEB": { name: "بنك كريدي أجريكول مصر", sector: "بنوك وخدمات مالية", index: "egx30", quality: "كفاية رأس مال عالية وتوزيع نقدي دوري" },
   "ADIB": { name: "مصرف أبو ظبي الإسلامي مصر", sector: "بنوك وصيرفة إسلامية", index: "egx30", quality: "أسرع البنوك نمواً في الأرباح" },
-  "EMFD": { name: "إعمار مصر للتنمية", sector: "تطوير عقاري وإنشاءات", index: "egx30", quality: "تدفقات دولارية ومشاريع عقارية فاخرة" }
+  "EMFD": { name: "إعمار مصر للتنمية", sector: "تطوير عقاري وإنشاءات", index: "egx30", quality: "تدفقات دولارية ومشاريع عقارية فاخرة" },
+  "RUBX": { name: "روبكس للبلاستيك والأكريلك", sector: "صناعات بلاستيكية وأدوات صحية", index: "egx70", quality: "شركة صناعية متخصصة في البلاستيك والأدوات الصحية - سيولة وتداول محدود" }
 };
 
 // Official Mutual Funds Benchmark & Dynamic Daily Accrual NAV Engine
@@ -495,8 +496,8 @@ function parseTechnicalRecord(item) {
     catalyst: catalyst,
     type: type,
     score: calculatedScore,
-    liquidityStatus: `سيولة ممتازة في ثندر (${turnoverMillions} مليون ج)`,
-    tags: [safetyTag, dict.index || 'egx30', ...(isDividendChampion ? ['dividend_champion'] : []), ...(rvolTag === 'institutional_surge' ? ['institutional_surge'] : [])],
+    liquidityStatus: (tradedValue >= 20000000 ? `سيولة قيادية ممتازة في ثندر (${turnoverMillions} مليون ج • خروج ودخول فوري)` : (tradedValue >= 5000000 ? `سيولة نشطة ومستقرة في ثندر (${turnoverMillions} مليون ج)` : (tradedValue >= 1500000 ? `سيولة متوسطة في ثندر (${turnoverMillions} مليون ج)` : `⚠️ سيولة ضعيفة وتداول محدود (${turnoverMillions} مليون ج • احذر صعوبة التخارج السريع)`))),
+    tags: [safetyTag, dict.index || 'egx70', ...(isDividendChampion ? ['dividend_champion'] : []), ...(rvolTag === 'institutional_surge' ? ['institutional_surge'] : [])],
     // Institutional Relative Volume (RVol)
     rvol: rvol,
     avgVolume30: avgVolume30,

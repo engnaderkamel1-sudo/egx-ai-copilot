@@ -694,11 +694,25 @@
    */
   function getFairValueInfo(ticker, currentPrice) {
     const p = EGX_VALUATION_PROFILES[ticker];
-    const cur = Number(currentPrice) || (p ? Number(p.fairValueBaseline) : 100);
-    const fairVal = p ? Number(p.fairValueBaseline) : Number((cur * 1.25).toFixed(2));
+    const cur = Number(currentPrice) || (p ? Number(p.fairValueBaseline) : 0);
+    const fairVal = p ? Number(p.fairValueBaseline) : null;
+
+    if (!fairVal || fairVal <= 0) {
+      return {
+        ticker: ticker,
+        currentPrice: cur,
+        fairValue: null,
+        discountPct: null,
+        isUndervalued: false,
+        statusText: 'بانتظار دراسة القيمة العادلة المعتمدة (دون تخمين)',
+        badgeClass: 'bg-slate-800 text-slate-300 border border-slate-700',
+        modelType: 'نموذج التقييم المالي (قيد الإفصاح المعتمد)',
+        analysis: 'لا توجد قيمة عادلة افتراضية؛ التقييم يتطلب دراسة تدفقات نقدية رسمية معتمدة.'
+      };
+    }
 
     // Discount % relative to fair value: Positive = undervalued (cheap/discount), Negative = overvalued
-    const discountPct = fairVal > 0 ? Number((((fairVal - cur) / fairVal) * 100).toFixed(1)) : 0;
+    const discountPct = Number((((fairVal - cur) / fairVal) * 100).toFixed(1));
     const isUndervalued = discountPct > 0;
 
     let statusText = '';
@@ -722,8 +736,8 @@
       isUndervalued: isUndervalued,
       statusText: statusText,
       badgeClass: badgeClass,
-      modelType: p ? p.modelType : 'نموذج التقييم المالي المتعدد (Valuation Model)',
-      analysis: p ? p.analysis : 'تقييم مالي مبني على التدفقات النقدية ومكررات القطاع.'
+      modelType: p.modelType,
+      analysis: p.analysis
     };
   }
 

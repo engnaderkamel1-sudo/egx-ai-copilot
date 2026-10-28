@@ -292,7 +292,7 @@
         : ((typeof getFairValueInfo === 'function') ? getFairValueInfo(item.ticker, curPrice).fairValue : (curPrice * 0.95));
       const fvDiscount = (item.fairValueDiscountPct !== undefined && item.fairValueDiscountPct !== null)
         ? item.fairValueDiscountPct
-        : (fv > 0 ? Number((((fv - curPrice) / fv) * 100).toFixed(1)) : 0);
+        : (fv && fv > 0 ? Number((((fv - curPrice) / fv) * 100).toFixed(1)) : null);
       const isOverValued = fvDiscount < 0;
 
       const suggestedSell = item.suggestedSellPrice || curPrice;
@@ -329,7 +329,7 @@
                 </div>
                 <div>
                   <span class="text-[11px] text-gray-400 block font-medium">السعر العادل المالي الحقيقي</span>
-                  <strong class="text-sm font-bold text-white font-mono">${Number(fv).toFixed(2)} ج</strong>
+                  <strong class="text-sm font-bold text-white font-mono">${fv ? `${Number(fv).toFixed(2)} ج` : 'قيد الإفصاح المالي المعتمد'}</strong>
                 </div>
               </div>
               <div>
@@ -415,11 +415,11 @@
       const curPrice = Number(item.currentPrice) || 0;
       const fv = (item.fairValue !== undefined && item.fairValue !== null)
         ? item.fairValue
-        : ((typeof getFairValueInfo === 'function') ? getFairValueInfo(item.ticker, curPrice).fairValue : (curPrice * 1.25));
+        : ((typeof getFairValueInfo === 'function') ? getFairValueInfo(item.ticker, curPrice).fairValue : null);
       const fvDiscount = (item.fairValueDiscountPct !== undefined && item.fairValueDiscountPct !== null)
         ? item.fairValueDiscountPct
-        : (fv > 0 ? Number((((fv - curPrice) / fv) * 100).toFixed(1)) : 0);
-      const isUnderValued = fvDiscount > 0;
+        : (fv && fv > 0 ? Number((((fv - curPrice) / fv) * 100).toFixed(1)) : null);
+      const isUnderValued = fvDiscount !== null && fvDiscount > 0;
 
       const suggestedExit = item.suggestedExitPrice || (item.isConfirmedExit ? Number((curPrice * 0.998).toFixed(2)) : Number((item.supportPrice || curPrice * 0.98).toFixed(2)));
       const savedCash = item.savedCash || Math.round((item.shares || 0) * curPrice);
@@ -454,7 +454,7 @@
                 </div>
                 <div>
                   <span class="text-[11px] text-gray-400 block font-medium">السعر العادل المالي الحقيقي</span>
-                  <strong class="text-sm font-bold text-white font-mono">${Number(fv).toFixed(2)} ج</strong>
+                  <strong class="text-sm font-bold text-white font-mono">${fv ? `${Number(fv).toFixed(2)} ج` : 'قيد الإفصاح المالي المعتمد'}</strong>
                 </div>
               </div>
               <div>
@@ -542,11 +542,11 @@
 
       const fv = (item.fairValue !== undefined && item.fairValue !== null)
         ? item.fairValue
-        : ((typeof getFairValueInfo === 'function') ? getFairValueInfo(item.ticker, curPrice).fairValue : (curPrice * 1.25));
+        : ((typeof getFairValueInfo === 'function') ? getFairValueInfo(item.ticker, curPrice).fairValue : null);
       const fvDiscount = (item.fairValueDiscountPct !== undefined && item.fairValueDiscountPct !== null)
         ? item.fairValueDiscountPct
-        : (fv > 0 ? Number((((fv - curPrice) / fv) * 100).toFixed(1)) : 0);
-      const isUnderValued = fvDiscount > 0;
+        : (fv && fv > 0 ? Number((((fv - curPrice) / fv) * 100).toFixed(1)) : null);
+      const isUnderValued = fvDiscount !== null && fvDiscount > 0;
 
       return `
         <div class="bg-gradient-to-br from-gray-950 via-slate-900 to-gray-950 border-2 border-emerald-500/50 hover:border-emerald-500/80 rounded-2xl overflow-hidden shadow-xl transition-all">
@@ -578,12 +578,12 @@
                 </div>
                 <div>
                   <span class="text-[11px] text-gray-400 block font-medium">السعر العادل المالي الحقيقي</span>
-                  <strong class="text-sm font-bold text-white font-mono">${Number(fv).toFixed(2)} ج</strong>
+                  <strong class="text-sm font-bold text-white font-mono">${fv ? `${Number(fv).toFixed(2)} ج` : 'قيد الإفصاح المالي المعتمد'}</strong>
                 </div>
               </div>
               <div>
-                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold ${isUnderValued ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40' : 'bg-amber-500/20 text-amber-300 border border-amber-500/40'}">
-                  <i data-lucide="${isUnderValued ? 'check-circle' : 'alert-circle'}" class="w-3.5 h-3.5"></i>
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold ${fv ? (isUnderValued ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40' : 'bg-amber-500/20 text-amber-300 border border-amber-500/40') : 'bg-slate-800 text-slate-300 border border-slate-700'}">
+                  <i data-lucide="${fv ? (isUnderValued ? 'check-circle' : 'alert-circle') : 'clock'}" class="w-3.5 h-3.5"></i>
                   <span>${isUnderValued ? `يتداول بخصم ${fvDiscount}% عن قيمته الحقيقية (أرخص من سعره العادل 🟢)` : `أعلى من قيمته العادلة بـ ${Math.abs(fvDiscount)}% 🟡`}</span>
                 </span>
               </div>
@@ -675,11 +675,11 @@
       // Fair value retrieval or fallback
       const fv = (item.fairValue !== undefined && item.fairValue !== null)
         ? item.fairValue
-        : ((typeof getFairValueInfo === 'function') ? getFairValueInfo(item.ticker, curPrice).fairValue : (curPrice * 1.25));
+        : ((typeof getFairValueInfo === 'function') ? getFairValueInfo(item.ticker, curPrice).fairValue : null);
       const fvDiscount = (item.fairValueDiscountPct !== undefined && item.fairValueDiscountPct !== null)
         ? item.fairValueDiscountPct
-        : (fv > 0 ? Number((((fv - curPrice) / fv) * 100).toFixed(1)) : 0);
-      const isUnderValued = fvDiscount > 0;
+        : (fv && fv > 0 ? Number((((fv - curPrice) / fv) * 100).toFixed(1)) : null);
+      const isUnderValued = fvDiscount !== null && fvDiscount > 0;
 
       // Tranche calculation fallback
       const sharesToBuy = item.suggestedShares || (suggestedBuy > 0 ? Math.floor(2500 / suggestedBuy) : 0);
@@ -722,13 +722,13 @@
                 </div>
                 <div>
                   <span class="text-[11px] text-gray-400 block font-medium">السعر العادل المالي الحقيقي</span>
-                  <strong class="text-sm font-bold text-white font-mono">${Number(fv).toFixed(2)} ج</strong>
+                  <strong class="text-sm font-bold text-white font-mono">${fv ? `${Number(fv).toFixed(2)} ج` : 'قيد الإفصاح المالي المعتمد'}</strong>
                 </div>
               </div>
               <div>
-                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold ${isUnderValued ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40' : 'bg-amber-500/20 text-amber-300 border border-amber-500/40'}">
-                  <i data-lucide="${isUnderValued ? 'check-circle' : 'alert-circle'}" class="w-3.5 h-3.5"></i>
-                  <span>${isUnderValued ? `يتداول بخصم ${fvDiscount}% عن قيمته الحقيقية (أرخص من سعره العادل 🟢)` : `أعلى من قيمته العادلة بـ ${Math.abs(fvDiscount)}% (شراء بحذر 🟡)`}</span>
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold ${fv ? (isUnderValued ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40' : 'bg-amber-500/20 text-amber-300 border border-amber-500/40') : 'bg-slate-800 text-slate-300 border border-slate-700'}">
+                  <i data-lucide="${fv ? (isUnderValued ? 'check-circle' : 'alert-circle') : 'clock'}" class="w-3.5 h-3.5"></i>
+                  <span>${fv ? (isUnderValued ? `يتداول بخصم ${fvDiscount}% عن قيمته الحقيقية (أرخص من سعره العادل 🟢)` : `أعلى من قيمته العادلة بـ ${Math.abs(fvDiscount)}% (شراء بحذر 🟡)`) : 'بانتظار دراسة القيمة العادلة المعتمدة (دون تخمين)'}</span>
                 </span>
               </div>
             </div>
@@ -851,11 +851,11 @@
       const curPrice = Number(item.currentPrice) || 0;
       const fv = (item.fairValue !== undefined && item.fairValue !== null)
         ? item.fairValue
-        : ((typeof getFairValueInfo === 'function') ? getFairValueInfo(item.ticker, curPrice).fairValue : (curPrice * 1.25));
+        : ((typeof getFairValueInfo === 'function') ? getFairValueInfo(item.ticker, curPrice).fairValue : null);
       const fvDiscount = (item.fairValueDiscountPct !== undefined && item.fairValueDiscountPct !== null)
         ? item.fairValueDiscountPct
-        : (fv > 0 ? Number((((fv - curPrice) / fv) * 100).toFixed(1)) : 0);
-      const isUnderValued = fvDiscount > 0;
+        : (fv && fv > 0 ? Number((((fv - curPrice) / fv) * 100).toFixed(1)) : null);
+      const isUnderValued = fvDiscount !== null && fvDiscount > 0;
 
       return `
         <div class="bg-gradient-to-br from-gray-950 via-slate-900 to-gray-950 border-2 border-blue-500/60 hover:border-blue-500/90 rounded-2xl overflow-hidden shadow-xl transition-all">
@@ -887,12 +887,12 @@
                 </div>
                 <div>
                   <span class="text-[11px] text-gray-400 block font-medium">السعر العادل المالي الحقيقي</span>
-                  <strong class="text-sm font-bold text-white font-mono">${Number(fv).toFixed(2)} ج</strong>
+                  <strong class="text-sm font-bold text-white font-mono">${fv ? `${Number(fv).toFixed(2)} ج` : 'قيد الإفصاح المالي المعتمد'}</strong>
                 </div>
               </div>
               <div>
-                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold ${isUnderValued ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40' : 'bg-amber-500/20 text-amber-300 border border-amber-500/40'}">
-                  <i data-lucide="${isUnderValued ? 'check-circle' : 'alert-circle'}" class="w-3.5 h-3.5"></i>
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold ${fv ? (isUnderValued ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40' : 'bg-amber-500/20 text-amber-300 border border-amber-500/40') : 'bg-slate-800 text-slate-300 border border-slate-700'}">
+                  <i data-lucide="${fv ? (isUnderValued ? 'check-circle' : 'alert-circle') : 'clock'}" class="w-3.5 h-3.5"></i>
                   <span>${isUnderValued ? `يتداول بخصم ${fvDiscount}% عن قيمته الحقيقية (صعود آمن ومستمر 🟢)` : `أعلى من قيمته العادلة بـ ${Math.abs(fvDiscount)}% (ارفع الأمان لحبس القمة 🟡)`}</span>
                 </span>
               </div>
@@ -950,11 +950,11 @@
       const curPrice = Number(item.currentPrice) || 0;
       const fv = (item.fairValue !== undefined && item.fairValue !== null)
         ? item.fairValue
-        : ((typeof getFairValueInfo === 'function') ? getFairValueInfo(item.ticker, curPrice).fairValue : (curPrice * 1.25));
+        : ((typeof getFairValueInfo === 'function') ? getFairValueInfo(item.ticker, curPrice).fairValue : null);
       const fvDiscount = (item.fairValueDiscountPct !== undefined && item.fairValueDiscountPct !== null)
         ? item.fairValueDiscountPct
-        : (fv > 0 ? Number((((fv - curPrice) / fv) * 100).toFixed(1)) : 0);
-      const isUnderValued = fvDiscount > 0;
+        : (fv && fv > 0 ? Number((((fv - curPrice) / fv) * 100).toFixed(1)) : null);
+      const isUnderValued = fvDiscount !== null && fvDiscount > 0;
 
       return `
         <div class="bg-gradient-to-br from-gray-950 via-slate-900 to-gray-950 border-2 border-slate-800 hover:border-slate-700 rounded-2xl overflow-hidden shadow-xl transition-all">
@@ -986,7 +986,7 @@
                 </div>
                 <div>
                   <span class="text-[11px] text-gray-400 block font-medium">السعر العادل المالي الحقيقي</span>
-                  <strong class="text-sm font-bold text-white font-mono">${Number(fv).toFixed(2)} ج</strong>
+                  <strong class="text-sm font-bold text-white font-mono">${fv ? `${Number(fv).toFixed(2)} ج` : 'قيد الإفصاح المالي المعتمد'}</strong>
                 </div>
               </div>
               <div>
@@ -1328,6 +1328,78 @@
           </div>
         `;
       } else {
+        if (activeCat === 'marketOpportunities') {
+          const coreList = activeList.filter(item => item.subCategory === 'CORE' || item.isCore);
+          const satList = activeList.filter(item => item.subCategory === 'SATELLITE' || !item.isCore);
+
+          cardsHtml = `
+            <!-- Segment 1: Core Long-Term Investment (النواة الآمنة) -->
+            <div class="space-y-3.5 mb-6">
+              <div class="bg-gradient-to-r from-emerald-950/80 via-slate-900 to-gray-950 border-2 border-emerald-500/50 rounded-2xl p-4 shadow-xl">
+                <div class="flex items-center justify-between flex-wrap gap-2">
+                  <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 font-bold shrink-0">
+                      🛡️
+                    </div>
+                    <div>
+                      <h3 class="text-sm sm:text-base font-black text-white flex items-center gap-2">
+                        <span>فرص استثمار طويل الأجل • النواة الآمنة</span>
+                        <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-bold">حوكمة معتمدة 100%</span>
+                      </h3>
+                      <p class="text-[11px] text-gray-400">شركات قيادية ذات أرباح تشغيلية مثبتة وتوزيعات نقدية، وتتداول بأقل من قيمتها العادلة الحقيقية دون أي تخمين.</p>
+                    </div>
+                  </div>
+                  <span class="text-xs font-mono font-bold text-emerald-300 bg-black/50 px-2.5 py-1 rounded-lg border border-emerald-500/30">
+                    ${coreList.length} فرص معتمدة
+                  </span>
+                </div>
+              </div>
+
+              ${coreList.length > 0 ? `
+                <div class="flex flex-col gap-3.5">
+                  ${coreList.map((item, idx) => renderMarketOpportunityCard(item, idx + 1)).join('')}
+                </div>
+              ` : `
+                <div class="bg-gray-950/60 border border-gray-800 rounded-xl p-4 text-center text-xs text-gray-400">
+                  لا توجد حالياً أسهم قيادية دفاعية تتداول بخصم كافٍ عن قيمتها العادلة؛ الاحتفاظ بالسيولة في صندوق الأمان هو القرار الاستثماري الحكيم لحين ظهور تصحيح سعري آمن.
+                </div>
+              `}
+            </div>
+
+            <!-- Segment 2: Speculative Tactical Satellites (رادار المضاربات والطفرات) -->
+            <div class="space-y-3.5 pt-4 border-t border-gray-800/80">
+              <div class="bg-gradient-to-r from-amber-950/60 via-slate-900 to-gray-950 border border-amber-500/40 rounded-2xl p-4 shadow-xl">
+                <div class="flex items-center justify-between flex-wrap gap-2">
+                  <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 font-bold shrink-0">
+                      ⚡
+                    </div>
+                    <div>
+                      <h3 class="text-sm sm:text-base font-black text-amber-300 flex items-center gap-2">
+                        <span>رادار المضاربات والطفرات السريعة • مخاطرة مرتفعة</span>
+                        <span class="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold">للمضارب فقط</span>
+                      </h3>
+                      <p class="text-[11px] text-gray-400">أسهم ذات تذبذب سعري حاد وزخم سريع؛ تتطلب وقف خسارة صارم ولا تناسب الاستثمار طويل الأجل (شريحة قصوى 10% من المحفظة).</p>
+                    </div>
+                  </div>
+                  <span class="text-xs font-mono font-bold text-amber-300 bg-black/50 px-2.5 py-1 rounded-lg border border-amber-500/30">
+                    ${satList.length} أسهم رصد
+                  </span>
+                </div>
+              </div>
+
+              ${satList.length > 0 ? `
+                <div class="flex flex-col gap-3.5">
+                  ${satList.map((item, idx) => renderMarketOpportunityCard(item, idx + 1)).join('')}
+                </div>
+              ` : `
+                <div class="bg-gray-950/60 border border-gray-800 rounded-xl p-4 text-center text-xs text-gray-400">
+                  لا توجد أسهم مضاربة مستوفية لشروط الزخم الآمن حالياً.
+                </div>
+              `}
+            </div>
+          `;
+        } else {
         // Render vertical stack of cards
         cardsHtml = `
           <div class="flex flex-col gap-3.5">
