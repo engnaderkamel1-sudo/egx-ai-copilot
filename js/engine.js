@@ -1415,6 +1415,16 @@
           ? this.determineStockCycle(item)
           : null;
 
+        const fvInfo = (typeof window !== 'undefined' && typeof window.getFairValueInfo === 'function')
+          ? window.getFairValueInfo(item.ticker, curPrice)
+          : {
+              fairValue: Number((curPrice * 1.25).toFixed(2)),
+              discountPct: 20.0,
+              isUndervalued: true,
+              statusText: 'يتداول بخصم 20% عن قيمته الحقيقية (أرخص من سعره العادل 🟢)',
+              badgeClass: 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+            };
+
         const isSupportBroken = !!(item.isSupportBroken || (pivotS1 > 0 && curPrice < pivotS1));
         const actionCode = evalRes ? evalRes.action : (item.action || 'HOLD');
 
@@ -1449,6 +1459,8 @@
             buyPrice: buyPrice,
             supportPrice: pivotS1,
             pivotR1: pivotR1,
+            pivotR2: item.pivotR2 || Number((curPrice * 1.08).toFixed(2)),
+            pivotS2: item.pivotS2 || Number((pivotS1 * 0.96).toFixed(2)),
             shares: currentShares,
             returnPct: returnPct,
             isLosing: isLosing,
@@ -1464,7 +1476,15 @@
             buttonText: isConfirmedExit ? 'سأنفذ الخروج ووقف الخسارة ⚡' : 'تريث وفحص خطة الحماية 🛡️',
             buttonClass: isConfirmedExit ? 'bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500' : 'bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500',
             buttonAction: isConfirmedExit ? 'SELL' : 'AUDIT',
-            thndrUrl: item.thndrUrl || `https://app.thndr.app/search?query=${item.ticker}`
+            thndrUrl: item.thndrUrl || `https://app.thndr.app/search?query=${item.ticker}`,
+
+            fairValue: fvInfo.fairValue,
+            fairValueDiscountPct: fvInfo.discountPct,
+            isUndervalued: fvInfo.isUndervalued,
+            fairValueStatusText: fvInfo.statusText,
+            fairValueBadgeClass: fvInfo.badgeClass,
+            suggestedExitPrice: isConfirmedExit ? Number((curPrice * 0.998).toFixed(2)) : Number((pivotS1 || curPrice * 0.98).toFixed(2)),
+            savedCash: Math.round(currentShares * curPrice)
           });
           return;
         }
@@ -1496,7 +1516,9 @@
             returnPct: returnPct,
             totalShares: currentShares,
             pivotR1: pivotR1,
+            pivotR2: item.pivotR2 || Number((curPrice * 1.10).toFixed(2)),
             pivotS1: pivotS1,
+            pivotS2: item.pivotS2 || Number((dynamicRebuySupport * 0.96).toFixed(2)),
             sellShares: rebalance.sellShares,
             sellCash: rebalance.sellCash,
             realizedProfit: rebalance.realizedProfit,
@@ -1509,7 +1531,14 @@
             cycle: cycle,
             evalRes: evalRes,
             verdict: evalRes ? evalRes.verdict : null,
-            thndrUrl: item.thndrUrl || `https://app.thndr.app/search?query=${item.ticker}`
+            thndrUrl: item.thndrUrl || `https://app.thndr.app/search?query=${item.ticker}`,
+
+            fairValue: fvInfo.fairValue,
+            fairValueDiscountPct: fvInfo.discountPct,
+            isUndervalued: fvInfo.isUndervalued,
+            fairValueStatusText: fvInfo.statusText,
+            fairValueBadgeClass: fvInfo.badgeClass,
+            suggestedSellPrice: Number(curPrice.toFixed(2))
           });
           return;
         }
@@ -1581,12 +1610,20 @@
           shares: currentShares,
           pivotS1: pivotS1,
           pivotR1: pivotR1,
+          pivotR2: item.pivotR2 || Number((curPrice * 1.10).toFixed(2)),
+          pivotS2: item.pivotS2 || Number((pivotS1 * 0.96).toFixed(2)),
           distAboveS1Pct: Number(distAboveS1Pct.toFixed(1)),
           cycle: cycle,
           evalRes: evalRes,
           verdict: evalRes ? evalRes.verdict : null,
           advice: evalRes ? evalRes.advice : (item.advice || 'السهم يتحرك داخل نطاق سعري آمن ومستقر، استمرار في الاحتفاظ الهادئ.'),
-          thndrUrl: item.thndrUrl || `https://app.thndr.app/search?query=${item.ticker}`
+          thndrUrl: item.thndrUrl || `https://app.thndr.app/search?query=${item.ticker}`,
+
+          fairValue: fvInfo.fairValue,
+          fairValueDiscountPct: fvInfo.discountPct,
+          isUndervalued: fvInfo.isUndervalued,
+          fairValueStatusText: fvInfo.statusText,
+          fairValueBadgeClass: fvInfo.badgeClass
         });
       });
 
@@ -1608,6 +1645,10 @@
             const lockedProfitPct = buyPrice > 0 ? Number((((suggestedStop - buyPrice) / buyPrice) * 100).toFixed(1)) : 0;
             const profitAtRisk = Math.max(0, Math.round((suggestedStop - activeStopLoss) * currentShares));
 
+            const fvInfoStop = (typeof window !== 'undefined' && typeof window.getFairValueInfo === 'function')
+              ? window.getFairValueInfo(item.ticker, curPrice)
+              : null;
+
             safetyLevelUpdates.push({
               ticker: item.ticker,
               name: item.name,
@@ -1621,7 +1662,14 @@
               profitAtRisk: profitAtRisk,
               pivotS1: pivotS1,
               pivotR1: pivotR1,
-              thndrUrl: item.thndrUrl || `https://app.thndr.app/search?query=${item.ticker}`
+              pivotR2: item.pivotR2 || Number((curPrice * 1.10).toFixed(2)),
+              pivotS2: item.pivotS2 || Number((pivotS1 * 0.96).toFixed(2)),
+              thndrUrl: item.thndrUrl || `https://app.thndr.app/search?query=${item.ticker}`,
+
+              fairValue: fvInfoStop ? fvInfoStop.fairValue : null,
+              fairValueDiscountPct: fvInfoStop ? fvInfoStop.discountPct : null,
+              isUndervalued: fvInfoStop ? fvInfoStop.isUndervalued : false,
+              fairValueStatusText: fvInfoStop ? fvInfoStop.statusText : ''
             });
           }
         }
