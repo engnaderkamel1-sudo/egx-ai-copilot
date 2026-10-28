@@ -357,6 +357,7 @@
               fullMarketRadar = data.radar;
               renderRadarGrid();
               populateRiskStockDropdown();
+              if (typeof renderDailyActionHub === 'function') renderDailyActionHub();
             } catch (radarErr) {
               console.warn('Radar render non-fatal warning:', radarErr);
             }
@@ -962,7 +963,7 @@
     // ============================================================
     // Real-Time System Auto-Update Engine
     // ============================================================
-    const LOCAL_APP_VERSION = '2.7.2';
+    const LOCAL_APP_VERSION = '2.7.3';
     window.LOCAL_APP_VERSION = LOCAL_APP_VERSION;
 
     let isUpdateBannerDismissed = false;

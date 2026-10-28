@@ -546,7 +546,7 @@
       }
 
       // Recognized Core stocks in EGX30 with solid fundamentals / dividends
-      const coreTickers = ['COMI', 'SWDY', 'ABUK', 'CLHO', 'EGAL', 'ORAS', 'MFPC', 'CIEB', 'ADIB', 'HDBK', 'TMGH', 'ALCN', 'JUFO', 'OCDI', 'HRHO', 'ESRS', 'ETEL', 'ORWE'];
+      const coreTickers = ['COMI', 'SWDY', 'ABUK', 'CLHO', 'EGAL', 'ORAS', 'MFPC', 'CIEB', 'ADIB', 'HDBK', 'TMGH', 'ALCN', 'JUFO', 'OCDI', 'HRHO', 'ESRS', 'ETEL', 'ORWE', 'PHDC', 'EMFD', 'PHAR', 'GBCO'];
       return coreTickers.includes(asset.ticker);
     },
 
