@@ -695,7 +695,7 @@
       const isYellow = timingLight.code === 'YELLOW';
 
       return `
-        <div class="bg-gradient-to-r ${timingLight.headerBg || 'from-gray-950 via-slate-900 to-gray-950'} border-2 ${isRed ? 'border-rose-500/80 shadow-rose-950/50' : (isOverbought ? 'border-amber-500/80 shadow-amber-950/50' : (isPullback || isGreen ? 'border-emerald-500/80 shadow-emerald-950/50' : 'border-yellow-500/60 shadow-yellow-950/40'))} rounded-2xl p-4 sm:p-5 shadow-2xl mb-5 transition-all">
+        <div class="bg-gradient-to-r ${timingLight.headerBg || 'from-gray-950 via-slate-900 to-gray-950'} border-2 ${isRed ? 'border-rose-500/80 shadow-rose-950/50' : (isOverbought ? 'border-amber-500/80 shadow-amber-950/50' : (isPullback || isGreen ? 'border-emerald-500/80 shadow-emerald-950/50' : 'border-yellow-500/60 shadow-yellow-950/40'))} rounded-2xl p-4 sm:p-5 shadow-2xl mb-3 transition-all">
           <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
             
             <div class="space-y-2.5">
@@ -1463,8 +1463,6 @@
           const timingLight = activeList.timingLight || (typeof window !== 'undefined' && window.lastActionPlan && window.lastActionPlan.marketTimingLight) || ((typeof EGX_Engine !== 'undefined' && typeof EGX_Engine.getMarketTimingLight === 'function') ? EGX_Engine.getMarketTimingLight() : null);
 
           cardsHtml = `
-            ${renderMarketReadinessBanner(timingLight)}
-
             <!-- Segment 1: Core Long-Term Investment (النواة الآمنة) -->
             <div class="space-y-3.5 mb-6">
               <div class="bg-gradient-to-r from-emerald-950/80 via-slate-900 to-gray-950 border-2 border-emerald-500/50 rounded-2xl p-4 shadow-xl">
@@ -1617,6 +1615,9 @@
               </div>
             `).join('');
           })()}
+
+          <!-- Permanent Global Market Readiness & Action Posture Banner -->
+          ${renderMarketReadinessBanner((hubData && hubData.marketTimingLight) || ((typeof EGX_Engine !== 'undefined' && typeof EGX_Engine.getMarketTimingLight === 'function') ? EGX_Engine.getMarketTimingLight() : null))}
 
           <!-- 6 Categorized Action Tabs -->
           <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 overflow-x-auto pb-1">
