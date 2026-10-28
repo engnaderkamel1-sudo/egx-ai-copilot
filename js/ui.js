@@ -690,13 +690,16 @@
           
           <!-- Card Header -->
           <div class="${isHero ? 'bg-gradient-to-r from-amber-950/80 via-slate-950 to-cyan-950/80 border-b border-amber-500/40' : 'bg-cyan-950/60 border-b border-cyan-500/30'} p-3.5 flex items-center justify-between flex-wrap gap-2">
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-2 flex-wrap">
               <span class="w-2.5 h-2.5 rounded-full ${isHero ? 'bg-amber-400 animate-ping' : 'bg-cyan-400 animate-pulse'}"></span>
               <span class="text-xs sm:text-sm font-black ${isHero ? 'text-amber-300' : 'text-cyan-300'}">
                 ${isHero ? '⭐ فرصة اليوم الأولى الذهبية' : `فرصة #${rank}`} • ${item.name} (${item.ticker})
               </span>
               <span class="text-[10px] px-2 py-0.5 rounded-full bg-slate-900/80 text-gray-300 border border-gray-700 font-bold">
                 ${item.sector}
+              </span>
+              <span class="text-[10px] px-2.5 py-0.5 rounded-full font-bold ${item.assetProfileBadgeClass || (item.isCore ? 'bg-emerald-950/80 text-emerald-300 border border-emerald-500/40' : 'bg-amber-950/80 text-amber-300 border border-amber-500/40')}">
+                ${item.assetProfileLabel || (item.isCore ? 'سهم قيادي دفاعي • أمان واستثمار طويل الأجل' : 'سهم طفرة ومضاربة • تذبذب ومخاطرة مرتفعة')}
               </span>
             </div>
             <div class="flex items-center gap-2">
@@ -727,6 +730,28 @@
                   <i data-lucide="${isUnderValued ? 'check-circle' : 'alert-circle'}" class="w-3.5 h-3.5"></i>
                   <span>${isUnderValued ? `يتداول بخصم ${fvDiscount}% عن قيمته الحقيقية (أرخص من سعره العادل 🟢)` : `أعلى من قيمته العادلة بـ ${Math.abs(fvDiscount)}% (شراء بحذر 🟡)`}</span>
                 </span>
+              </div>
+            </div>
+
+            <!-- Beginner Investor Decision Box ("دليل المستشار للمستثمر المبتدئ") -->
+            <div class="bg-gradient-to-r from-blue-950/40 via-slate-900 to-indigo-950/30 border border-blue-500/40 rounded-xl p-3 space-y-2 text-xs">
+              <div class="flex items-center justify-between flex-wrap gap-2 border-b border-blue-500/20 pb-1.5">
+                <div class="flex items-center gap-1.5 font-bold text-blue-300">
+                  <i data-lucide="help-circle" class="w-4 h-4 text-blue-400"></i>
+                  <span>دليل المستشار للمبتدئ • هل يناسبك هذا السهم؟</span>
+                </div>
+                <span class="text-[11px] font-black px-2 py-0.5 rounded-md ${item.isCore ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'}">
+                  ${item.recommendationVerdict || (item.isCore ? 'استثمار أمان طويل الأجل 🟢' : 'مضاربة وزخم بحذر 🟡')}
+                </span>
+              </div>
+              <div class="space-y-1.5 text-gray-300 text-[11.5px] leading-relaxed">
+                <p>• <strong>طبيعة السهم:</strong> ${item.beginnerSuitability || (item.isCore ? 'سهم قيادي صلب ذو أرباح تشغيلية قوية وتوزيعات نقدية، ملائم جداً لمستثمر طويل الأجل يبحث عن راحة البال والأمان المالي.' : 'سهم عالي التذبذب والمضاربة؛ غير مخصص للاستثمار الدفاعي الهادئ، ويتطلب مراقبة وقف الخسارة وعدم المخاطرة بسيولة كبيرة به.')}</p>
+                <div class="flex items-center justify-between flex-wrap gap-2 pt-0.5 border-t border-gray-800/60">
+                  <span class="text-gray-400">• <strong>الحد الأقصى للشراء في المحفظة:</strong> لا تتجاوز <strong class="text-amber-300 font-mono">${item.maxPortfolioWeightPct || (item.isCore ? 25 : 10)}%</strong> من إجمالي سيولتك.</span>
+                  <span class="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded ${item.liquidityBadgeClass || 'text-emerald-300 bg-emerald-950/50 border border-emerald-500/30'}">
+                    ${item.liquidityBadge || '🟢 سيولة ممتازة • خروج ودخول فوري بنقرة زر'}
+                  </span>
+                </div>
               </div>
             </div>
 

@@ -1731,6 +1731,35 @@
           const suggestedShares = suggestedBuyPrice > 0 ? Math.floor(suggestedCash / suggestedBuyPrice) : 0;
           const actualTrancheSpend = Math.round(suggestedShares * suggestedBuyPrice);
 
+          const isCore = (typeof this.isCoreAsset === 'function') ? this.isCoreAsset(m) : (m.index === 'egx30');
+          const assetProfileType = isCore ? 'CORE_DEFENSIVE' : 'SATELLITE_SPECULATIVE';
+          const assetProfileLabel = isCore ? 'سهم قيادي دفاعي • أمان واستثمار طويل الأجل' : 'سهم طفرة ومضاربة • تذبذب ومخاطرة مرتفعة';
+          const assetProfileBadgeClass = isCore ? 'bg-emerald-950/80 text-emerald-300 border border-emerald-500/40' : 'bg-amber-950/80 text-amber-300 border border-amber-500/40';
+          const beginnerSuitability = isCore
+            ? 'سهم قيادي صلب ذو أرباح تشغيلية قوية وتوزيعات نقدية، ملائم جداً لمستثمر طويل الأجل يبحث عن راحة البال والأمان المالي.'
+            : 'سهم عالي التذبذب والمضاربة؛ غير مخصص للاستثمار الدفاعي الهادئ، ويتطلب مراقبة وقف الخسارة وعدم المخاطرة بسيولة كبيرة به.';
+          const maxPortfolioWeightPct = isCore ? 25 : 10;
+          const recommendationVerdict = isCore ? 'استثمار أمان طويل الأجل 🟢' : 'مضاربة وزخم بحذر 🟡';
+
+          // Liquidity analysis & safe execution status
+          const rawLiq = String(m.liquidityStatus || '');
+          const isSuperLiquid = rawLiq.includes('ممتازة') || rawLiq.includes('قياسية') || ['COMI', 'SWDY', 'CCAP', 'TMGH', 'BTFH', 'ABUK'].includes(m.ticker);
+          const isModerateLiquid = rawLiq.includes('نشطة') || rawLiq.includes('عالية');
+          const liquidityTier = isSuperLiquid ? 'EXCELLENT' : (isModerateLiquid ? 'GOOD' : 'LOW_CAUTION');
+          const liquidityBadge = isSuperLiquid
+            ? '🟢 سيولة ممتازة • خروج ودخول فوري بنقرة زر'
+            : (isModerateLiquid ? '🟢 سيولة نشطة ومستقرة' : '⚠️ تنبيه سيولة: تداول متواضع (احذر صعوبة البيع السريع)');
+          const liquidityBadgeClass = isSuperLiquid
+            ? 'text-emerald-300 bg-emerald-950/50 border border-emerald-500/30'
+            : (isModerateLiquid ? 'text-cyan-300 bg-cyan-950/50 border border-cyan-500/30' : 'text-amber-300 bg-amber-950/50 border border-amber-500/30');
+
+          // Smart Ranking Score (Prevents overvalued stocks from ever taking the #1 Golden Spot)
+          const discountWeight = fvInfo.discountPct > 0 ? (fvInfo.discountPct * 1.5) : (fvInfo.discountPct * 3.0);
+          const coreBonus = isCore ? 20 : 0;
+          const liqBonus = (liquidityTier === 'EXCELLENT') ? 10 : (liquidityTier === 'GOOD' ? 5 : -15);
+          const technicalMomentum = (Number(m.score) || 85) * 0.4;
+          const totalOpportunityScore = Number((discountWeight + coreBonus + liqBonus + technicalMomentum).toFixed(1));
+
           return {
             ticker: m.ticker,
             name: m.name,
@@ -1739,6 +1768,17 @@
             price: mPrice,
             changePct: m.changePct || '0.0%',
             score: Number(m.score) || 85,
+            totalOpportunityScore: totalOpportunityScore,
+            isCore: isCore,
+            assetProfileType: assetProfileType,
+            assetProfileLabel: assetProfileLabel,
+            assetProfileBadgeClass: assetProfileBadgeClass,
+            beginnerSuitability: beginnerSuitability,
+            maxPortfolioWeightPct: maxPortfolioWeightPct,
+            recommendationVerdict: recommendationVerdict,
+            liquidityTier: liquidityTier,
+            liquidityBadge: liquidityBadge,
+            liquidityBadgeClass: liquidityBadgeClass,
             target1: m.target1 || numTarget1.toFixed(2) + ' ج',
             target2: m.target2 || numTarget2.toFixed(2) + ' ج',
             support: m.support || numSupport.toFixed(2) + ' ج',
@@ -1771,7 +1811,7 @@
             operationalStability: m.operationalStability || null
           };
         })
-        .sort((a, b) => (b.score || 0) - (a.score || 0))
+        .sort((a, b) => (b.totalOpportunityScore || 0) - (a.totalOpportunityScore || 0))
         .slice(0, 4);
 
       // Legacy Candidates for backward compatibility with existing callers/tests
