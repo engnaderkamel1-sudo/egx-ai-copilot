@@ -1689,7 +1689,12 @@
       // Category 4: MARKET OPPORTUNITIES (From fullMarketRadar - stocks not owned)
       const ownedTickers = new Set(portfolioData.map(p => p.ticker));
       const allMappedOpportunities = fullMarketRadar
-        .filter(m => m.ticker && !ownedTickers.has(m.ticker) && (Number(m.score) >= 75))
+        .filter(m => {
+          if (!m.ticker || ownedTickers.has(m.ticker)) return false;
+          const isCore = (typeof this.isCoreAsset === 'function') ? this.isCoreAsset(m) : false;
+          const minScore = isCore ? 50 : 75;
+          return (Number(m.score) || 0) >= minScore;
+        })
         .map(m => {
           const mPrice = Number(m.price || m.close) || 0;
 
@@ -1818,7 +1823,7 @@
 
       // Satellite Gate: Turnaround / Speculative / High Beta / EGX70 momentum
       const satelliteOpportunities = allMappedOpportunities
-        .filter(item => !item.isCore || item.fairValue === null || item.fairValueDiscountPct <= 0)
+        .filter(item => (!item.isCore || item.fairValue === null || item.fairValueDiscountPct <= 0) && (Number(item.score) >= 75))
         .sort((a, b) => (b.score || 0) - (a.score || 0))
         .slice(0, 4)
         .map((item, idx) => ({ ...item, subCategory: 'SATELLITE', subRank: idx + 1 }));
