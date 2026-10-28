@@ -1141,6 +1141,92 @@
     /**
      * Compute clean, integer-based Rebalance details with EGX brokerage commission deduction
      */
+    /**
+     * Real-time 3-Tier Market Timing Traffic Light (Green / Yellow / Red)
+     * Protects user against broad market crashes and falling knives before placing buy orders.
+     */
+    getMarketTimingLight: function (marketRegime, fullMarketRadar) {
+      let regimeCode = 'NORMAL_CONSOLIDATION';
+      if (typeof marketRegime === 'string') {
+        regimeCode = marketRegime;
+      } else if (marketRegime && typeof marketRegime === 'object') {
+        regimeCode = marketRegime.regime || 'NORMAL_CONSOLIDATION';
+      } else if (typeof window !== 'undefined' && typeof window.getMarketRegimeCode === 'function') {
+        regimeCode = window.getMarketRegimeCode();
+      }
+
+      let advancingPct = 50;
+      let avgMarketChange = 0;
+      const radarList = Array.isArray(fullMarketRadar) && fullMarketRadar.length > 0 
+        ? fullMarketRadar 
+        : ((typeof window !== 'undefined' && Array.isArray(window.fullMarketRadar)) ? window.fullMarketRadar : []);
+
+      if (radarList.length > 0) {
+        let advancing = 0;
+        let sumChange = 0;
+        radarList.forEach(s => {
+          const c = s.changeNum !== undefined ? s.changeNum : parseFloat(String(s.changePct || '0').replace('%', ''));
+          if (c > 0) advancing++;
+          sumChange += (c || 0);
+        });
+        advancingPct = Number(((advancing / radarList.length) * 100).toFixed(1));
+        avgMarketChange = Number((sumChange / radarList.length).toFixed(2));
+      }
+
+      const isRed = regimeCode === 'SYSTEMIC_SHOCK' || advancingPct < 20 || avgMarketChange <= -2.5;
+      const isGreen = !isRed && (regimeCode === 'BULLISH_EXPANSION' || (advancingPct >= 60 && avgMarketChange >= 1.0));
+
+      if (isRed) {
+        return {
+          code: 'RED',
+          label: 'إشارة حمراء • تجميد الشراء لحماية رأس المال',
+          badgeText: '🔴 ضوء أحمر • الشراء مجمد',
+          badgeClass: 'bg-rose-500/20 text-rose-300 border border-rose-500/40 animate-pulse',
+          headerBg: 'from-rose-950/80 via-slate-950 to-gray-950',
+          title: 'السوق في حالة ضغط بيعي عام أو صدمة سعرية',
+          advice: 'يُحظر الشراء أو التبريد في المسارات الهابطة؛ وفر السيولة النقدية كاملة لحين استقرار وتماسك القاع.',
+          allowBuying: false,
+          cashMultiplier: 0.0,
+          regimeCode: 'SYSTEMIC_SHOCK',
+          advancingPct: advancingPct,
+          avgMarketChange: avgMarketChange
+        };
+      }
+
+      if (isGreen) {
+        return {
+          code: 'GREEN',
+          label: 'إشارة خضراء • وقت مثالي وآمن للشراء',
+          badgeText: '🟢 ضوء أخضر • وقت مناسب للشراء',
+          badgeClass: 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40',
+          headerBg: 'from-emerald-950/80 via-slate-950 to-gray-950',
+          title: 'السوق في مسار صاعد وزخم شرائي إيجابي',
+          advice: 'الوقت آمن ومناسب للتنفيذ بالأمر المحدد عند الارتدادات والدعوم لأسهم النواة ذات القيمة العادلة المعتمدة.',
+          allowBuying: true,
+          cashMultiplier: 1.0,
+          regimeCode: 'BULLISH_EXPANSION',
+          advancingPct: advancingPct,
+          avgMarketChange: avgMarketChange
+        };
+      }
+
+      const isPullback = regimeCode === 'HEALTHY_CORRECTION' || avgMarketChange < 0;
+      return {
+        code: 'YELLOW',
+        label: isPullback ? 'إشارة صفراء • تصحيح هادئ وشراء انتقائي حذر' : 'إشارة صفراء • تداول متوازن وتجميع تدريجي',
+        badgeText: '🟡 ضوء أصفر • شراء انتقائي حذر',
+        badgeClass: 'bg-amber-500/20 text-amber-300 border border-amber-500/40',
+        headerBg: 'from-amber-950/70 via-slate-950 to-gray-950',
+        title: isPullback ? 'السوق يمر بتصحيح فني هادئ وجني أرباح صحي' : 'السوق يتحرك في نطاق عرضي متوازن',
+        advice: 'الشراء مسموح بحصص مدروسة وبالأمر المحدد فقط عند مستويات الدعم الصلبة لأسهم النواة القيادية ذات الخصم، مع حجز كاش إضافي.',
+        allowBuying: true,
+        cashMultiplier: 0.6,
+        regimeCode: isPullback ? 'HEALTHY_CORRECTION' : 'NORMAL_CONSOLIDATION',
+        advancingPct: advancingPct,
+        avgMarketChange: avgMarketChange
+      };
+    },
+
     calculateRebalance: function (totalShares, currentPrice, buyPrice, ratio, supportPrice) {
       totalShares = parseInt(totalShares, 10) || 0;
       currentPrice = Number(currentPrice) || 0;
@@ -1381,6 +1467,9 @@
       const marketRegime = (typeof window !== 'undefined' && typeof window.getMarketRegimeCode === 'function') 
         ? window.getMarketRegimeCode() 
         : 'NORMAL';
+      const timingLight = (typeof this.getMarketTimingLight === 'function')
+        ? this.getMarketTimingLight(marketRegime, fullMarketRadar)
+        : { code: 'YELLOW', allowBuying: true, cashMultiplier: 0.6 };
 
       // -------------------------------------------------------------
       // Categorization Arrays for the Prioritized Hub Categories
@@ -1728,8 +1817,10 @@
           const riskRewardRatio = stopLossRiskPct > 0 ? Number((target1GainPct / stopLossRiskPct).toFixed(1)) : 3.0;
 
           const availableCash = (totalDryPowder && totalDryPowder > 0) ? totalDryPowder : 10000;
-          const suggestedCash = Math.min(5000, Math.max(1000, Math.round(availableCash * 0.25)));
-          const suggestedShares = suggestedBuyPrice > 0 ? Math.floor(suggestedCash / suggestedBuyPrice) : 0;
+          const cashMultiplier = (timingLight && timingLight.cashMultiplier !== undefined) ? timingLight.cashMultiplier : 1.0;
+          const baseCash = Math.min(5000, Math.max(1000, Math.round(availableCash * 0.25)));
+          const suggestedCash = (timingLight && timingLight.code === 'RED') ? 0 : Math.max(500, Math.round(baseCash * (cashMultiplier > 0 ? cashMultiplier : 1)));
+          const suggestedShares = (timingLight && timingLight.code === 'RED') ? 0 : (suggestedBuyPrice > 0 ? Math.floor(suggestedCash / suggestedBuyPrice) : 0);
           const actualTrancheSpend = Math.round(suggestedShares * suggestedBuyPrice);
 
           const isCore = (typeof this.isCoreAsset === 'function') ? this.isCoreAsset(m) : (m.index === 'egx30');
@@ -1832,6 +1923,7 @@
       const marketOpportunities = [...coreOpportunities, ...satelliteOpportunities];
       marketOpportunities.coreOpportunities = coreOpportunities;
       marketOpportunities.satelliteOpportunities = satelliteOpportunities;
+      marketOpportunities.timingLight = timingLight;
 
       // Legacy Candidates for backward compatibility with existing callers/tests
       let buyCandidate = accumulation[0] || null;
@@ -1902,6 +1994,7 @@
         buyCandidate,
         profitCandidate,
         safetyAlert,
+        marketTimingLight: timingLight,
         categories: {
           profitTaking,
           riskDefense,
