@@ -603,6 +603,12 @@
                 </div>
               </div>
 
+              <!-- Mandatory Limit Order Reminder -->
+              <div class="bg-amber-500/15 border border-amber-500/40 rounded-xl p-2.5 flex items-center gap-2 text-xs text-amber-200 font-bold shadow-sm">
+                <span class="text-base shrink-0">📌</span>
+                <span class="leading-relaxed">تنبيه إلزامي للمستثمر: اختر دائماً في تطبيق ثندر <strong>(أمر بسعر محدد • Limit Order)</strong> وضع سعر التزويد عند <strong>${Number(suggestedBuy).toFixed(2)} ج</strong> ولا تشترِ بسعر السوق المباشر.</span>
+              </div>
+
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-gray-300 pt-1">
                 <div class="flex items-center gap-1.5">
                   <span class="text-gray-400 font-medium">• نطاق الشراء الآمن:</span>
@@ -648,7 +654,7 @@
             <div class="flex items-center gap-2 flex-wrap pt-1">
               <a href="${item.thndrUrl}" target="_blank" rel="noopener noreferrer" class="flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 text-white font-black text-xs sm:text-sm flex items-center justify-center gap-2 transition shadow-xl shadow-emerald-950/50 cursor-pointer">
                 <i data-lucide="external-link" class="w-4 h-4"></i>
-                <span>تنفيذ الشراء في تطبيق ثندر 🚀</span>
+                <span>تنفيذ تزويد بأمر محدد (${Number(suggestedBuy).toFixed(2)} ج) في ثندر 🚀</span>
               </a>
               <button onclick="openTradeModal('${item.ticker}', 'BUY', ${item.sharesToBuy}, ${Number(suggestedBuy).toFixed(2)})" class="py-3 px-4 rounded-xl bg-gray-900 hover:bg-gray-800 text-cyan-300 font-bold text-xs flex items-center justify-center gap-1.5 border border-cyan-500/40 cursor-pointer">
                 <i data-lucide="plus-circle" class="w-4 h-4"></i>
@@ -769,6 +775,12 @@
                 </div>
               </div>
 
+              <!-- Mandatory Limit Order Reminder -->
+              <div class="bg-amber-500/15 border border-amber-500/40 rounded-xl p-2.5 flex items-center gap-2 text-xs text-amber-200 font-bold shadow-sm">
+                <span class="text-base shrink-0">📌</span>
+                <span class="leading-relaxed">تنبيه إلزامي للمستثمر: اختر دائماً في تطبيق ثندر <strong>(أمر بسعر محدد • Limit Order)</strong> وضع سعر الشراء عند <strong>${Number(suggestedBuy).toFixed(2)} ج</strong> ولا تشترِ بسعر السوق المباشر.</span>
+              </div>
+
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-gray-300 pt-1">
                 <div class="flex items-center gap-1.5">
                   <span class="text-gray-400 font-medium">• نطاق الشراء الآمن:</span>
@@ -831,7 +843,7 @@
             <div class="flex items-center gap-2 flex-wrap pt-1">
               <a href="${item.thndrUrl}" target="_blank" rel="noopener noreferrer" class="flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 text-white font-black text-xs sm:text-sm flex items-center justify-center gap-2 transition shadow-xl shadow-emerald-950/50 cursor-pointer">
                 <i data-lucide="external-link" class="w-4 h-4"></i>
-                <span>فتح السهم وتنفيذ الشراء في تطبيق ثندر 🚀</span>
+                <span>تنفيذ شراء بأمر محدد (${Number(suggestedBuy).toFixed(2)} ج) في ثندر 🚀</span>
               </a>
               <button onclick="openTradeModal('${item.ticker}', 'BUY', ${sharesToBuy}, ${Number(suggestedBuy).toFixed(2)})" class="py-3 px-4 rounded-xl bg-gray-900 hover:bg-gray-800 text-cyan-300 font-bold text-xs flex items-center justify-center gap-1.5 border border-cyan-500/40 cursor-pointer">
                 <i data-lucide="plus-circle" class="w-4 h-4"></i>

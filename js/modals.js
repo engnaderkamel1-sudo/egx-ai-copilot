@@ -53,6 +53,12 @@
             </div>
           </div>
 
+          <!-- Limit Order Mandatory Reminder -->
+          <div class="p-2.5 rounded-xl bg-amber-500/15 border border-amber-500/40 flex items-center gap-2 text-[11px] text-amber-200 font-bold">
+            <span class="text-base shrink-0">📌</span>
+            <span>قاعدة الشراء الآمن: تأكد دائماً في تطبيق ثندر من اختيار <strong>(أمر بسعر محدد • Limit Order)</strong> ولا تنفذ بسعر السوق المباشر.</span>
+          </div>
+
           <!-- Quantity & Price Inputs -->
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
