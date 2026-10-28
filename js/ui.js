@@ -1421,6 +1421,7 @@
           </div>
         `;
       }
+      }
 
       container.innerHTML = `
         <div class="daily-hub-banner bg-gradient-to-br from-gray-900 via-slate-900 to-gray-950 border-2 border-emerald-500/30 rounded-2xl p-4 sm:p-5 shadow-2xl space-y-4">
@@ -2866,9 +2867,9 @@
                   <div class="flex items-center justify-between">
                     <span class="text-gray-300 font-semibold flex items-center gap-1">
                       <span>💎 السعر العادل:</span>
-                      <strong class="text-white font-mono font-bold">${fvObj ? fvObj.fairValue.toFixed(2) + ' ج' : '--'}</strong>
+                      <strong class="text-white font-mono font-bold">${(fvObj && fvObj.fairValue !== null) ? `${Number(fvObj.fairValue).toFixed(2)} ج` : 'قيد الإفصاح المعتمد'}</strong>
                     </span>
-                    ${fvObj ? `
+                    ${(fvObj && fvObj.fairValue !== null && fvObj.discountPct !== null) ? `
                       <span class="px-1.5 py-0.5 rounded font-bold ${fvObj.isUndervalued ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'}">
                         ${fvObj.isUndervalued ? `خصم ${fvObj.discountPct}% 🟢` : `+${Math.abs(fvObj.discountPct)}% 🟡`}
                       </span>
