@@ -1173,18 +1173,18 @@
         avgMarketChange = Number((sumChange / radarList.length).toFixed(2));
       }
 
+      // 1. Red Shock / Systemic Crisis
       const isRed = regimeCode === 'SYSTEMIC_SHOCK' || advancingPct < 20 || avgMarketChange <= -2.5;
-      const isGreen = !isRed && (regimeCode === 'BULLISH_EXPANSION' || (advancingPct >= 60 && avgMarketChange >= 1.0));
-
       if (isRed) {
         return {
           code: 'RED',
-          label: 'إشارة حمراء • تجميد الشراء لحماية رأس المال',
-          badgeText: '🔴 ضوء أحمر • الشراء مجمد',
+          stageName: 'صدمة وهبوط ذعري شامل',
+          actionVerb: 'تجميد الشراء كلياً • حجز السيولة وحماية المحفظة',
+          badgeText: '🔴 صدمة بيعية • تجميد الشراء كلياً',
           badgeClass: 'bg-rose-500/20 text-rose-300 border border-rose-500/40 animate-pulse',
           headerBg: 'from-rose-950/80 via-slate-950 to-gray-950',
-          title: 'السوق في حالة ضغط بيعي عام أو صدمة سعرية',
-          advice: 'يُحظر الشراء أو التبريد في المسارات الهابطة؛ وفر السيولة النقدية كاملة لحين استقرار وتماسك القاع.',
+          title: 'السوق يمر بضغط بيعي ذعري واسع أو صدمة عامة',
+          advice: 'يُحظر الشراء أو التبريد في المسارات الهابطة لتفادي السكاكين الساقطة؛ الفعل السليم هو تجميد الشراء والاحتفاظ بالسيولة حتى استقرار وتماسك القاع.',
           allowBuying: false,
           cashMultiplier: 0.0,
           regimeCode: 'SYSTEMIC_SHOCK',
@@ -1193,15 +1193,58 @@
         };
       }
 
+      // 2. Overextended Topping / Peak Euphoria
+      const isOverbought = advancingPct >= 75 || avgMarketChange >= 2.0;
+      if (isOverbought) {
+        return {
+          code: 'OVERBOUGHT',
+          stageName: 'قمم وزخم متضخم وتشبع شرائي',
+          actionVerb: 'جني وتأمين الأرباح • حظر ملاحقة الأسعار بالقمم',
+          badgeText: '🟠 قمم وتشبع • جني وتأمين الأرباح',
+          badgeClass: 'bg-amber-600/20 text-amber-300 border border-amber-500/40',
+          headerBg: 'from-amber-950/80 via-slate-950 to-gray-950',
+          title: 'السوق في مناطق قمم وتشبع شرائي متضخم',
+          advice: 'يُحظر الشراء هنا لتفادي مصائد القمم وملاحقة الأسعار المرتفعة؛ الفعل السليم الآن هو جني الأرباح وتأمين المكاسب.',
+          allowBuying: false,
+          cashMultiplier: 0.0,
+          regimeCode: 'OVERBOUGHT',
+          advancingPct: advancingPct,
+          avgMarketChange: avgMarketChange
+        };
+      }
+
+      // 3. Healthy Pullback / Dip Accumulation
+      const isPullback = regimeCode === 'HEALTHY_CORRECTION' || (advancingPct >= 25 && advancingPct <= 45 && avgMarketChange < 0);
+      if (isPullback) {
+        return {
+          code: 'PULLBACK',
+          stageName: 'تصحيح هادئ وقيعان فنية متماسكة',
+          actionVerb: 'تجميع هادئ تدريجي • اقتناص الخصومات بالأمر المحدد',
+          badgeText: '🟢 قاع وتصحيح هادئ • تجميع تدريجي بالأمر المحدد',
+          badgeClass: 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40',
+          headerBg: 'from-emerald-950/80 via-slate-950 to-gray-950',
+          title: 'السوق يمر بهبوط تصحيحي صحي وتماسك عند الدعوم',
+          advice: 'هذا هو التوقيت الذهبي لبناء المراكز؛ الفعل السليم هو التجميع الهادئ بالدفعات في الأسهم القيادية المقومة بأقل من قيمتها العادلة.',
+          allowBuying: true,
+          cashMultiplier: 0.8,
+          regimeCode: 'HEALTHY_CORRECTION',
+          advancingPct: advancingPct,
+          avgMarketChange: avgMarketChange
+        };
+      }
+
+      // 4. Bullish Expansion / Balanced Momentum
+      const isGreen = regimeCode === 'BULLISH_EXPANSION' || (advancingPct >= 55 && avgMarketChange >= 0.5);
       if (isGreen) {
         return {
           code: 'GREEN',
-          label: 'إشارة خضراء • وقت مثالي وآمن للشراء',
-          badgeText: '🟢 ضوء أخضر • وقت مناسب للشراء',
+          stageName: 'مسار صاعد وزخم شرائي متزن',
+          actionVerb: 'شراء بالأمر المحدد عند الارتدادات • ركوب الاتجاه الصاعد',
+          badgeText: '🟢 صعود متزن • شراء بالأمر المحدد عند الدعوم',
           badgeClass: 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40',
           headerBg: 'from-emerald-950/80 via-slate-950 to-gray-950',
-          title: 'السوق في مسار صاعد وزخم شرائي إيجابي',
-          advice: 'الوقت آمن ومناسب للتنفيذ بالأمر المحدد عند الارتدادات والدعوم لأسهم النواة ذات القيمة العادلة المعتمدة.',
+          title: 'السوق في مسار صاعد وزخم شرائي متزن',
+          advice: 'تدفق سيولة إيجابي واختراق صحي؛ الفعل السليم هو الشراء الانتقائي بأمر محدد عند نقاط الارتداد دون ملاحقة الأسعار.',
           allowBuying: true,
           cashMultiplier: 1.0,
           regimeCode: 'BULLISH_EXPANSION',
@@ -1210,18 +1253,19 @@
         };
       }
 
-      const isPullback = regimeCode === 'HEALTHY_CORRECTION' || avgMarketChange < 0;
+      // 5. Normal Consolidation / Balanced Range
       return {
         code: 'YELLOW',
-        label: isPullback ? 'إشارة صفراء • تصحيح هادئ وشراء انتقائي حذر' : 'إشارة صفراء • تداول متوازن وتجميع تدريجي',
-        badgeText: '🟡 ضوء أصفر • شراء انتقائي حذر',
+        stageName: 'تداول عرضي متوازن ومتذبذب',
+        actionVerb: 'مراقبة وتريث • انتقائية صارمة للنواة الآمنة فقط',
+        badgeText: '🟡 تداول متوازن • مراقبة وتريث وانتقائية',
         badgeClass: 'bg-amber-500/20 text-amber-300 border border-amber-500/40',
         headerBg: 'from-amber-950/70 via-slate-950 to-gray-950',
-        title: isPullback ? 'السوق يمر بتصحيح فني هادئ وجني أرباح صحي' : 'السوق يتحرك في نطاق عرضي متوازن',
-        advice: 'الشراء مسموح بحصص مدروسة وبالأمر المحدد فقط عند مستويات الدعم الصلبة لأسهم النواة القيادية ذات الخصم، مع حجز كاش إضافي.',
+        title: 'السوق يتحرك في نطاق عرضي متذبذب دون اتجاه صريح',
+        advice: 'تذبذب متوازن؛ الفعل السليم هو التريث وحجز نصف السيولة كاش، والشراء فقط في سهم قيادي ذي خصم حقيقي بالأمر المحدد.',
         allowBuying: true,
         cashMultiplier: 0.6,
-        regimeCode: isPullback ? 'HEALTHY_CORRECTION' : 'NORMAL_CONSOLIDATION',
+        regimeCode: 'NORMAL_CONSOLIDATION',
         advancingPct: advancingPct,
         avgMarketChange: avgMarketChange
       };
@@ -1513,74 +1557,13 @@
         const isSupportBroken = !!(item.isSupportBroken || (pivotS1 > 0 && curPrice < pivotS1));
         const actionCode = evalRes ? evalRes.action : (item.action || 'HOLD');
 
-        // 1. RISK & DEFENSE CATEGORY CRITERIA:
-        // Broken support, confirmed stop loss, intraday dip, emergency, or defensive hold (falling knife)
-        const isRiskDefense = isSupportBroken || 
-          actionCode === 'STOP_LOSS_CONFIRMED' || 
-          actionCode === 'EMERGENCY_STOP_LOSS' || 
-          actionCode === 'INTRADAY_DIP_WATCH' || 
-          actionCode === 'CORE_BUFFER_WATCH' || 
-          actionCode === 'DEFENSIVE_HOLD' ||
-          actionCode === 'TRAILING_PROTECT' ||
-          (evalRes && evalRes.alertLevel === 'CRITICAL_RISK');
-
-        if (isRiskDefense) {
-          const isConfirmedExit = actionCode === 'STOP_LOSS_CONFIRMED' || actionCode === 'EMERGENCY_STOP_LOSS';
-          const isDip = actionCode === 'INTRADAY_DIP_WATCH' || actionCode === 'CORE_BUFFER_WATCH' || actionCode === 'DEFENSIVE_HOLD' || actionCode === 'TRAILING_PROTECT';
-
-          // Urgency score calculation for sorting (higher score = top urgency)
-          let urgencyScore = 50;
-          if (actionCode === 'EMERGENCY_STOP_LOSS') urgencyScore = 100;
-          else if (actionCode === 'STOP_LOSS_CONFIRMED') urgencyScore = 90;
-          else if (actionCode === 'INTRADAY_DIP_WATCH') urgencyScore = 80;
-          else if (actionCode === 'DEFENSIVE_HOLD') urgencyScore = 70 + Math.min(20, Math.abs(returnPct));
-          else if (actionCode === 'TRAILING_PROTECT') urgencyScore = 65;
-          else urgencyScore = 60 + Math.min(15, Math.abs(returnPct));
-
-          riskDefense.push({
-            ticker: item.ticker,
-            name: item.name,
-            currentPrice: curPrice,
-            buyPrice: buyPrice,
-            supportPrice: pivotS1,
-            pivotR1: pivotR1,
-            pivotR2: item.pivotR2 || Number((curPrice * 1.08).toFixed(2)),
-            pivotS2: item.pivotS2 || Number((pivotS1 * 0.96).toFixed(2)),
-            shares: currentShares,
-            returnPct: returnPct,
-            isLosing: isLosing,
-            isConfirmedExit: isConfirmedExit,
-            isDip: isDip,
-            urgencyScore: urgencyScore,
-            cycle: cycle,
-            evalRes: evalRes,
-            verdict: evalRes ? evalRes.verdict : null,
-            badgeText: evalRes ? evalRes.badgeText : (isConfirmedExit ? 'تأكيد كسر الدعم بالإغلاق' : 'تريث ومراقبة الدعم'),
-            badgeClass: isConfirmedExit ? 'bg-rose-950/80 text-rose-300 border border-rose-500/40' : 'bg-amber-950/80 text-amber-300 border border-amber-500/40',
-            advice: evalRes ? evalRes.advice : (item.advice || `السعر الحالي (${curPrice.toFixed(2)} ج) دون مستوى الدعم S1 (${pivotS1.toFixed(2)} ج). تريث وراقب تماسك الجلسة.`),
-            buttonText: isConfirmedExit ? 'سأنفذ الخروج ووقف الخسارة ⚡' : 'تريث وفحص خطة الحماية 🛡️',
-            buttonClass: isConfirmedExit ? 'bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500' : 'bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500',
-            buttonAction: isConfirmedExit ? 'SELL' : 'AUDIT',
-            thndrUrl: item.thndrUrl || `https://app.thndr.app/search?query=${item.ticker}`,
-
-            fairValue: fvInfo.fairValue,
-            fairValueDiscountPct: fvInfo.discountPct,
-            isUndervalued: fvInfo.isUndervalued,
-            fairValueStatusText: fvInfo.statusText,
-            fairValueBadgeClass: fvInfo.badgeClass,
-            suggestedExitPrice: isConfirmedExit ? Number((curPrice * 0.998).toFixed(2)) : Number((pivotS1 || curPrice * 0.98).toFixed(2)),
-            savedCash: Math.round(currentShares * curPrice)
-          });
-          return;
-        }
-
-        // 2. PROFIT-TAKING CATEGORY CRITERIA:
-        // Owned stock with solid gain (returnPct >= 10) OR reaching resistance R1 OR rebalance candidate
-        const isProfitTaking = returnPct >= 10 || actionCode === 'REBALANCE_CANDIDATE' || (pivotR1 > 0 && curPrice >= pivotR1);
-        if (isProfitTaking && !isLosing) {
+        // 1. PROFIT-TAKING CATEGORY CRITERIA (Evaluated first for winning positions!)
+        // Any owned position with solid profit (returnPct >= 10) OR reaching resistance R1 OR rebalance candidate
+        const isProfitTaking = !isLosing && (returnPct >= 10 || actionCode === 'REBALANCE_CANDIDATE' || (pivotR1 > 0 && curPrice >= pivotR1));
+        if (isProfitTaking) {
           // Dynamic Support Level Anchor:
           // If the stock has broken above R1 or gained heavily, the realistic pullback support
-          // is NOT the ancient S1 (e.g. 78 EGP), but the new breakout retest / dynamic trailing stop level (e.g. 91.18 EGP)!
+          // is NOT the ancient S1, but the new breakout retest / dynamic trailing stop level!
           let dynamicRebuySupport = (curPrice >= pivotR1 && pivotR1 > 0)
             ? Number((curPrice * 0.97).toFixed(2))
             : (Number(pivotS1) || Number((curPrice * 0.92).toFixed(2)));
@@ -1624,6 +1607,67 @@
             fairValueStatusText: fvInfo.statusText,
             fairValueBadgeClass: fvInfo.badgeClass,
             suggestedSellPrice: Number(curPrice.toFixed(2))
+          });
+          return;
+        }
+
+        // 2. RISK & DEFENSE CATEGORY CRITERIA:
+        // STRICTLY for losing positions or emergency capital preservation! Winning positions are NEVER put in riskDefense!
+        const isRiskDefense = isLosing && (
+          isSupportBroken || 
+          actionCode === 'STOP_LOSS_CONFIRMED' || 
+          actionCode === 'EMERGENCY_STOP_LOSS' || 
+          actionCode === 'INTRADAY_DIP_WATCH' || 
+          actionCode === 'CORE_BUFFER_WATCH' || 
+          actionCode === 'DEFENSIVE_HOLD' ||
+          (evalRes && evalRes.alertLevel === 'CRITICAL_RISK')
+        );
+
+        if (isRiskDefense) {
+          const isConfirmedExit = actionCode === 'STOP_LOSS_CONFIRMED' || actionCode === 'EMERGENCY_STOP_LOSS';
+          const isDip = actionCode === 'INTRADAY_DIP_WATCH' || actionCode === 'CORE_BUFFER_WATCH' || actionCode === 'DEFENSIVE_HOLD';
+
+          // Urgency score calculation for sorting (higher score = top urgency)
+          let urgencyScore = 50;
+          if (actionCode === 'EMERGENCY_STOP_LOSS') urgencyScore = 100;
+          else if (actionCode === 'STOP_LOSS_CONFIRMED') urgencyScore = 90;
+          else if (actionCode === 'INTRADAY_DIP_WATCH') urgencyScore = 80;
+          else if (actionCode === 'DEFENSIVE_HOLD') urgencyScore = 70 + Math.min(20, Math.abs(returnPct));
+          else urgencyScore = 60 + Math.min(15, Math.abs(returnPct));
+
+          riskDefense.push({
+            ticker: item.ticker,
+            name: item.name,
+            currentPrice: curPrice,
+            buyPrice: buyPrice,
+            supportPrice: pivotS1,
+            pivotR1: pivotR1,
+            pivotR2: item.pivotR2 || Number((curPrice * 1.08).toFixed(2)),
+            pivotS2: item.pivotS2 || Number((pivotS1 * 0.96).toFixed(2)),
+            shares: currentShares,
+            returnPct: returnPct,
+            isLosing: isLosing,
+            isConfirmedExit: isConfirmedExit,
+            isDip: isDip,
+            urgencyScore: urgencyScore,
+            cycle: cycle,
+            evalRes: evalRes,
+            verdict: evalRes ? evalRes.verdict : null,
+            badgeText: evalRes ? evalRes.badgeText : (isConfirmedExit ? 'تأكيد كسر الدعم بالإغلاق' : 'تريث ومراقبة الدعم'),
+            badgeClass: isConfirmedExit ? 'bg-rose-950/80 text-rose-300 border border-rose-500/40' : 'bg-amber-950/80 text-amber-300 border border-amber-500/40',
+            advice: evalRes ? evalRes.advice : (item.advice || `السعر الحالي (${curPrice.toFixed(2)} ج) دون مستوى الدعم S1 (${pivotS1.toFixed(2)} ج). تريث وراقب تماسك الجلسة.`),
+            buttonText: isConfirmedExit ? 'سأنفذ الخروج ووقف الخسارة ⚡' : 'تريث وفحص خطة الحماية 🛡️',
+            buttonClass: isConfirmedExit ? 'bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500' : 'bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500',
+            buttonAction: isConfirmedExit ? 'SELL' : 'AUDIT',
+            thndrUrl: item.thndrUrl || `https://app.thndr.app/search?query=${item.ticker}`,
+
+            fairValue: fvInfo.fairValue,
+            fairValueDiscountPct: fvInfo.discountPct,
+            isUndervalued: fvInfo.isUndervalued,
+            fairValueStatusText: fvInfo.statusText,
+            fairValueBadgeClass: fvInfo.badgeClass,
+            suggestedExitPrice: isConfirmedExit ? Number((curPrice * 0.998).toFixed(2)) : Number((pivotS1 || curPrice * 0.98).toFixed(2)),
+            savedCash: Math.round(currentShares * curPrice)
           });
           return;
         }
