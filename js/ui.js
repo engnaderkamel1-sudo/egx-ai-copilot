@@ -299,7 +299,7 @@
       const dynamicTrailingStop = item.suggestedTrailingStop || Number((curPrice * 0.97).toFixed(2));
 
       return `
-        <div class="bg-gradient-to-br from-gray-950 via-slate-900 to-gray-950 border-2 border-amber-500/60 hover:border-amber-500/90 rounded-2xl overflow-hidden shadow-xl transition-all">
+        <div class="action-card profit-card bg-gradient-to-br from-gray-950 via-slate-900 to-gray-950 border-2 border-amber-500/60 hover:border-amber-500/90 rounded-2xl overflow-hidden shadow-xl transition-all">
           <div class="bg-amber-950/70 border-b border-amber-500/40 p-3.5 flex items-center justify-between flex-wrap gap-2">
             <div class="flex items-center gap-2">
               <span class="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse"></span>
@@ -341,14 +341,14 @@
             </div>
 
             <!-- Execution Box ("أبيع على كام؟") -->
-            <div class="bg-gradient-to-r from-amber-950/40 via-gray-950 to-orange-950/30 border-2 border-amber-500/50 rounded-xl p-3.5 space-y-2">
+            <div class="execution-box execution-sell-box bg-gradient-to-r from-amber-950/40 via-gray-950 to-orange-950/30 border-2 border-amber-500/50 rounded-xl p-3.5 space-y-2">
               <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-amber-500/20 pb-2">
                 <div class="flex items-center gap-2">
                   <span class="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse"></span>
                   <span class="text-xs sm:text-sm font-extrabold text-amber-300">🎯 سعر وضع أمر جني الأرباح المقترح:</span>
                 </div>
                 <div class="text-right sm:text-left">
-                  <span class="text-base sm:text-lg font-black text-amber-300 font-mono bg-black/60 px-3 py-0.5 rounded-lg border border-amber-500/40 inline-block">
+                  <span class="execution-price-pill execution-sell-pill text-base sm:text-lg font-black text-amber-300 font-mono bg-black/60 px-3 py-0.5 rounded-lg border border-amber-500/40 inline-block">
                     ضع أمر بيع جزئي عند: ${Number(suggestedSell).toFixed(2)} ج
                   </span>
                 </div>
@@ -425,7 +425,7 @@
       const savedCash = item.savedCash || Math.round((item.shares || 0) * curPrice);
 
       return `
-        <div class="bg-gradient-to-br from-gray-950 via-slate-900 to-gray-950 border-2 ${item.isConfirmedExit ? 'border-rose-500/60 hover:border-rose-500/90' : 'border-amber-500/60 hover:border-amber-500/90'} rounded-2xl overflow-hidden shadow-xl transition-all">
+        <div class="action-card risk-card bg-gradient-to-br from-gray-950 via-slate-900 to-gray-950 border-2 ${item.isConfirmedExit ? 'border-rose-500/60 hover:border-rose-500/90' : 'border-amber-500/60 hover:border-amber-500/90'} rounded-2xl overflow-hidden shadow-xl transition-all">
           <div class="${item.isConfirmedExit ? 'bg-rose-950/70 border-rose-500/40' : 'bg-amber-950/70 border-amber-500/40'} border-b p-3.5 flex items-center justify-between flex-wrap gap-2">
             <div class="flex items-center gap-2">
               <span class="w-2.5 h-2.5 rounded-full ${item.isConfirmedExit ? 'bg-rose-500 animate-ping' : 'bg-amber-400 animate-pulse'}"></span>
@@ -551,7 +551,7 @@
       const isUnderValued = fvDiscount !== null && fvDiscount > 0;
 
       return `
-        <div class="bg-gradient-to-br from-gray-950 via-slate-900 to-gray-950 border-2 border-emerald-500/50 hover:border-emerald-500/80 rounded-2xl overflow-hidden shadow-xl transition-all">
+        <div class="action-card accumulation-card bg-gradient-to-br from-gray-950 via-slate-900 to-gray-950 border-2 border-emerald-500/50 hover:border-emerald-500/80 rounded-2xl overflow-hidden shadow-xl transition-all">
           <div class="bg-emerald-950/70 border-b border-emerald-500/30 p-3.5 flex items-center justify-between flex-wrap gap-2">
             <div class="flex items-center gap-2">
               <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
@@ -592,14 +592,14 @@
             </div>
 
             <!-- Execution Box ("أشتري على كام؟") -->
-            <div class="bg-gradient-to-r from-amber-950/40 via-gray-950 to-emerald-950/30 border-2 border-amber-500/50 rounded-xl p-3.5 space-y-2">
+            <div class="execution-box execution-buy-box bg-gradient-to-r from-amber-950/40 via-gray-950 to-emerald-950/30 border-2 border-amber-500/50 rounded-xl p-3.5 space-y-2">
               <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-amber-500/20 pb-2">
                 <div class="flex items-center gap-2">
                   <span class="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse"></span>
                   <span class="text-xs sm:text-sm font-extrabold text-amber-300">🎯 سعر وضع أمر التزويد المقترح:</span>
                 </div>
                 <div class="text-right sm:text-left">
-                  <span class="text-base sm:text-lg font-black text-amber-300 font-mono bg-black/60 px-3 py-0.5 rounded-lg border border-amber-500/40 inline-block">
+                  <span class="execution-price-pill execution-buy-pill text-base sm:text-lg font-black text-amber-300 font-mono bg-black/60 px-3 py-0.5 rounded-lg border border-amber-500/40 inline-block">
                     ضع أمر الشراء عند: ${Number(suggestedBuy).toFixed(2)} ج
                   </span>
                 </div>
@@ -695,7 +695,7 @@
       const isYellow = timingLight.code === 'YELLOW';
 
       return `
-        <div class="bg-gradient-to-r ${timingLight.headerBg || 'from-gray-950 via-slate-900 to-gray-950'} border-2 ${isRed ? 'border-rose-500/80 shadow-rose-950/50' : (isOverbought ? 'border-amber-500/80 shadow-amber-950/50' : (isPullback || isGreen ? 'border-emerald-500/80 shadow-emerald-950/50' : 'border-yellow-500/60 shadow-yellow-950/40'))} rounded-2xl p-4 sm:p-5 shadow-2xl mb-3 transition-all">
+        <div class="market-readiness-banner bg-gradient-to-r ${timingLight.headerBg || 'from-gray-950 via-slate-900 to-gray-950'} border-2 ${isRed ? 'border-rose-500/80 shadow-rose-950/50' : (isOverbought ? 'border-amber-500/80 shadow-amber-950/50' : (isPullback || isGreen ? 'border-emerald-500/80 shadow-emerald-950/50' : 'border-yellow-500/60 shadow-yellow-950/40'))} rounded-2xl p-4 sm:p-5 shadow-2xl mb-3 transition-all" data-market-code="${timingLight.code}">
           <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
             
             <div class="space-y-2.5">
@@ -710,9 +710,9 @@
               </div>
 
               <!-- Actionable Posture Banner -->
-              <div class="bg-black/60 border border-gray-700/80 rounded-xl p-2.5 flex items-center gap-2 text-xs sm:text-sm">
-                <span class="text-amber-400 font-bold shrink-0">🎯 الفعل الاستثماري المطلوب:</span>
-                <span class="text-white font-extrabold text-xs sm:text-sm tracking-wide">${timingLight.actionVerb || timingLight.badgeText}</span>
+              <div class="market-posture-box bg-black/60 border border-gray-700/80 rounded-xl p-2.5 flex items-center gap-2 text-xs sm:text-sm">
+                <span class="market-posture-label text-amber-400 font-bold shrink-0">🎯 الفعل الاستثماري المطلوب:</span>
+                <span class="market-posture-verb text-white font-extrabold text-xs sm:text-sm tracking-wide">${timingLight.actionVerb || timingLight.badgeText}</span>
               </div>
 
               <h4 class="text-sm sm:text-base font-extrabold ${isRed ? 'text-rose-300' : (isOverbought ? 'text-amber-300' : (isPullback || isGreen ? 'text-emerald-300' : 'text-amber-200'))}">
@@ -725,37 +725,37 @@
             </div>
 
             <!-- 4-Stage Action Traffic Light Widget -->
-            <div class="bg-black/80 border border-gray-800 rounded-2xl p-3 flex md:flex-col items-center justify-center gap-2.5 shrink-0 shadow-inner">
+            <div class="market-traffic-widget bg-black/80 border border-gray-800 rounded-2xl p-3 flex md:flex-col items-center justify-center gap-2.5 shrink-0 shadow-inner">
               <div class="flex items-center gap-3 md:flex-col">
                 <!-- Red Light: Crisis / Shock -->
-                <div class="flex items-center gap-1.5" title="إشارة حمراء: هبوط ذعري أو ضغط بيعي عام (تجميد الشراء كلياً)">
+                <div class="flex items-center gap-1.5 stage-red" title="إشارة حمراء: هبوط ذعري أو ضغط بيعي عام (تجميد الشراء كلياً)">
                   <span class="w-3.5 h-3.5 rounded-full ${isRed ? 'bg-rose-500 shadow-lg shadow-rose-500/80 animate-ping' : 'bg-rose-950/50 border border-rose-900/50 opacity-40'}"></span>
-                  <span class="text-[10px] font-bold ${isRed ? 'text-rose-400 font-black' : 'text-gray-600'} hidden md:inline">هبوط ذعري</span>
+                  <span class="text-[10px] font-bold ${isRed ? 'text-rose-400 font-black active-stage' : 'text-gray-600 inactive-stage'} hidden md:inline">هبوط ذعري</span>
                 </div>
 
                 <!-- Orange Light: Topping / Overbought -->
-                <div class="flex items-center gap-1.5" title="إشارة برتقالية: قمم وتشبع شرائي (جني وتأمين أرباح • حظر الشراء بالقمم)">
+                <div class="flex items-center gap-1.5 stage-orange" title="إشارة برتقالية: قمم وتشبع شرائي (جني وتأمين أرباح • حظر الشراء بالقمم)">
                   <span class="w-3.5 h-3.5 rounded-full ${isOverbought ? 'bg-amber-500 shadow-lg shadow-amber-500/80 animate-ping' : 'bg-amber-950/50 border border-amber-900/50 opacity-40'}"></span>
-                  <span class="text-[10px] font-bold ${isOverbought ? 'text-amber-300 font-black' : 'text-gray-600'} hidden md:inline">قمم وتشبع</span>
+                  <span class="text-[10px] font-bold ${isOverbought ? 'text-amber-300 font-black active-stage' : 'text-gray-600 inactive-stage'} hidden md:inline">قمم وتشبع</span>
                 </div>
 
                 <!-- Yellow Light: Consolidation -->
-                <div class="flex items-center gap-1.5" title="إشارة صفراء: تداول عرضي متوازن (مراقبة وتريث وانتقائية)">
+                <div class="flex items-center gap-1.5 stage-yellow" title="إشارة صفراء: تداول عرضي متوازن (مراقبة وتريث وانتقائية)">
                   <span class="w-3.5 h-3.5 rounded-full ${isYellow ? 'bg-yellow-400 shadow-lg shadow-yellow-400/80 animate-pulse' : 'bg-yellow-950/50 border border-yellow-900/50 opacity-40'}"></span>
-                  <span class="text-[10px] font-bold ${isYellow ? 'text-yellow-300 font-black' : 'text-gray-600'} hidden md:inline">تداول متوازن</span>
+                  <span class="text-[10px] font-bold ${isYellow ? 'text-yellow-300 font-black active-stage' : 'text-gray-600 inactive-stage'} hidden md:inline">تداول متوازن</span>
                 </div>
 
                 <!-- Green Light: Pullback Accumulation or Balanced Momentum -->
-                <div class="flex items-center gap-1.5" title="إشارة خضراء: قاع وتصحيح هادئ أو صعود متزن (تجميع هادئ بالأمر المحدد)">
+                <div class="flex items-center gap-1.5 stage-green" title="إشارة خضراء: قاع وتصحيح هادئ أو صعود متزن (تجميع هادئ بالأمر المحدد)">
                   <span class="w-3.5 h-3.5 rounded-full ${(isPullback || isGreen) ? 'bg-emerald-400 shadow-lg shadow-emerald-400/80 animate-pulse' : 'bg-emerald-950/50 border border-emerald-900/50 opacity-40'}"></span>
-                  <span class="text-[10px] font-bold ${(isPullback || isGreen) ? 'text-emerald-300 font-black' : 'text-gray-600'} hidden md:inline">${isPullback ? 'قاع وتجميع' : 'صعود متزن'}</span>
+                  <span class="text-[10px] font-bold ${(isPullback || isGreen) ? 'text-emerald-300 font-black active-stage' : 'text-gray-600 inactive-stage'} hidden md:inline">${isPullback ? 'قاع وتجميع' : 'صعود متزن'}</span>
                 </div>
               </div>
             </div>
 
           </div>
 
-          <div class="mt-3.5 pt-3 border-t border-gray-800/80 flex items-center justify-between flex-wrap gap-2 text-[11px]">
+          <div class="market-readiness-footer mt-3.5 pt-3 border-t border-gray-800/80 flex items-center justify-between flex-wrap gap-2 text-[11px]">
             <div class="flex items-center gap-2 text-gray-400">
               <span class="text-emerald-400">🛡️ حوكمة السيولة:</span>
               <span>${(isRed || isOverbought) ? 'الاحتفاظ بنسبة ١٠٠٪ كاش حر وعدم الاستعجال في الشراء' : (isYellow ? 'تخصيص حصص هادئة وحجز كاش احتياطي لأي تراجعات إضافية' : 'تجميع هادئ تدريجي مع الالتزام بأمر الشراء المحدد عند الدعم')}</span>
@@ -793,10 +793,10 @@
       const trancheCash = item.actualTrancheSpend || Math.round(sharesToBuy * suggestedBuy);
 
       return `
-        <div class="bg-gradient-to-br from-gray-950 via-slate-900 to-gray-950 border-2 ${isHero ? 'border-amber-500/80 shadow-2xl shadow-amber-500/10' : 'border-cyan-500/40 hover:border-cyan-500/70 shadow-xl'} rounded-2xl overflow-hidden transition-all">
+        <div class="action-card market-opp-card bg-gradient-to-br from-gray-950 via-slate-900 to-gray-950 border-2 ${isHero ? 'border-amber-500/80 shadow-2xl shadow-amber-500/10 hero-card' : 'border-cyan-500/40 hover:border-cyan-500/70 shadow-xl'} rounded-2xl overflow-hidden transition-all">
           
           <!-- Card Header -->
-          <div class="${isHero ? 'bg-gradient-to-r from-amber-950/80 via-slate-950 to-cyan-950/80 border-b border-amber-500/40' : 'bg-cyan-950/60 border-b border-cyan-500/30'} p-3.5 flex items-center justify-between flex-wrap gap-2">
+          <div class="card-header ${isHero ? 'bg-gradient-to-r from-amber-950/80 via-slate-950 to-cyan-950/80 border-b border-amber-500/40' : 'bg-cyan-950/60 border-b border-cyan-500/30'} p-3.5 flex items-center justify-between flex-wrap gap-2">
             <div class="flex items-center gap-2 flex-wrap">
               <span class="w-2.5 h-2.5 rounded-full ${isHero ? 'bg-amber-400 animate-ping' : 'bg-cyan-400 animate-pulse'}"></span>
               <span class="text-xs sm:text-sm font-black ${isHero ? 'text-amber-300' : 'text-cyan-300'}">
@@ -810,7 +810,7 @@
               </span>
             </div>
             <div class="flex items-center gap-2">
-              <span class="font-mono font-black text-xs sm:text-sm text-white bg-slate-950 border ${isHero ? 'border-amber-500/40 text-amber-300' : 'border-cyan-500/30 text-white'} px-2.5 py-1 rounded-lg">
+              <span class="card-header-price font-mono font-black text-xs sm:text-sm text-white bg-slate-950 border ${isHero ? 'border-amber-500/40 text-amber-300' : 'border-cyan-500/30 text-white'} px-2.5 py-1 rounded-lg">
                 ${curPrice.toFixed(2)} ج (${item.changePct})
               </span>
               <span class="text-[10px] px-2 py-1 rounded-lg bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-bold">
@@ -872,14 +872,14 @@
             </div>
 
             <!-- 2. The Golden Execution Box ("أشتري على كام؟") -->
-            <div class="bg-gradient-to-r from-amber-950/40 via-gray-950 to-emerald-950/30 border-2 border-amber-500/50 rounded-xl p-3.5 space-y-2">
+            <div class="execution-box execution-buy-box bg-gradient-to-r from-amber-950/40 via-gray-950 to-emerald-950/30 border-2 border-amber-500/50 rounded-xl p-3.5 space-y-2">
               <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-amber-500/20 pb-2">
                 <div class="flex items-center gap-2">
                   <span class="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse"></span>
-                  <span class="text-xs sm:text-sm font-extrabold text-amber-300">🎯 سعر وضع الأمر المقترح (أشتري على كام في ثندر؟):</span>
+                  <span class="execution-box-title text-xs sm:text-sm font-extrabold text-amber-300">🎯 سعر وضع الأمر المقترح (أشتري على كام في ثندر؟):</span>
                 </div>
                 <div class="text-right sm:text-left">
-                  <span class="text-base sm:text-lg font-black text-amber-300 font-mono bg-black/60 px-3 py-0.5 rounded-lg border border-amber-500/40 inline-block">
+                  <span class="execution-price-pill execution-buy-pill text-base sm:text-lg font-black text-amber-300 font-mono bg-black/60 px-3 py-0.5 rounded-lg border border-amber-500/40 inline-block">
                     ضع أمر الشراء عند: ${Number(suggestedBuy).toFixed(2)} ج
                   </span>
                 </div>
@@ -937,7 +937,7 @@
                   <span class="text-gray-300 font-medium">الشريحة الأولى المقترحة (25% من السيولة):</span>
                 </div>
                 <div class="font-mono text-xs">
-                  اشترِ <strong class="text-white font-bold bg-black/60 px-2 py-0.5 rounded border border-gray-700">${sharesToBuy} سهماً</strong> بتكلفة تقريبية <strong class="text-emerald-400 font-bold">${Number(trancheCash).toLocaleString('en-US')} ج.م</strong>
+                  اشترِ <strong class="tranche-shares-pill text-white font-bold bg-black/60 px-2 py-0.5 rounded border border-gray-700">${sharesToBuy} سهماً</strong> بتكلفة تقريبية <strong class="text-emerald-400 font-bold">${Number(trancheCash).toLocaleString('en-US')} ج.م</strong>
                 </div>
               </div>
             ` : ''}
@@ -987,7 +987,7 @@
       const isUnderValued = fvDiscount !== null && fvDiscount > 0;
 
       return `
-        <div class="bg-gradient-to-br from-gray-950 via-slate-900 to-gray-950 border-2 border-blue-500/60 hover:border-blue-500/90 rounded-2xl overflow-hidden shadow-xl transition-all">
+        <div class="action-card safety-update-card bg-gradient-to-br from-gray-950 via-slate-900 to-gray-950 border-2 border-blue-500/60 hover:border-blue-500/90 rounded-2xl overflow-hidden shadow-xl transition-all">
           <div class="bg-blue-950/70 border-b border-blue-500/40 p-3.5 flex items-center justify-between flex-wrap gap-2">
             <div class="flex items-center gap-2">
               <span class="w-2.5 h-2.5 rounded-full bg-blue-400 animate-pulse"></span>
@@ -1086,7 +1086,7 @@
       const isUnderValued = fvDiscount !== null && fvDiscount > 0;
 
       return `
-        <div class="bg-gradient-to-br from-gray-950 via-slate-900 to-gray-950 border-2 border-slate-800 hover:border-slate-700 rounded-2xl overflow-hidden shadow-xl transition-all">
+        <div class="action-card wait-card bg-gradient-to-br from-gray-950 via-slate-900 to-gray-950 border-2 border-slate-800 hover:border-slate-700 rounded-2xl overflow-hidden shadow-xl transition-all">
           <div class="bg-slate-900/90 border-b border-slate-800 p-3.5 flex items-center justify-between flex-wrap gap-2">
             <div class="flex items-center gap-2">
               <span class="w-2.5 h-2.5 rounded-full bg-slate-400"></span>
@@ -1465,7 +1465,7 @@
           cardsHtml = `
             <!-- Segment 1: Core Long-Term Investment (النواة الآمنة) -->
             <div class="space-y-3.5 mb-6">
-              <div class="bg-gradient-to-r from-emerald-950/80 via-slate-900 to-gray-950 border-2 border-emerald-500/50 rounded-2xl p-4 shadow-xl">
+              <div class="segment-banner-core bg-gradient-to-r from-emerald-950/80 via-slate-900 to-gray-950 border-2 border-emerald-500/50 rounded-2xl p-4 shadow-xl">
                 <div class="flex items-center justify-between flex-wrap gap-2">
                   <div class="flex items-center gap-2.5">
                     <div class="w-8 h-8 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 font-bold shrink-0">
@@ -1479,7 +1479,7 @@
                       <p class="text-[11px] text-gray-400">شركات قيادية ذات أرباح تشغيلية مثبتة وتوزيعات نقدية، وتتداول بأقل من قيمتها العادلة الحقيقية دون أي تخمين.</p>
                     </div>
                   </div>
-                  <span class="text-xs font-mono font-bold text-emerald-300 bg-black/50 px-2.5 py-1 rounded-lg border border-emerald-500/30">
+                  <span class="segment-core-badge text-xs font-mono font-bold text-emerald-300 bg-black/50 px-2.5 py-1 rounded-lg border border-emerald-500/30">
                     ${coreList.length} فرص معتمدة
                   </span>
                 </div>
@@ -1498,7 +1498,7 @@
 
             <!-- Segment 2: Speculative Tactical Satellites (رادار المضاربات والطفرات) -->
             <div class="space-y-3.5 pt-4 border-t border-gray-800/80">
-              <div class="bg-gradient-to-r from-amber-950/60 via-slate-900 to-gray-950 border border-amber-500/40 rounded-2xl p-4 shadow-xl">
+              <div class="segment-banner-sat bg-gradient-to-r from-amber-950/60 via-slate-900 to-gray-950 border border-amber-500/40 rounded-2xl p-4 shadow-xl">
                 <div class="flex items-center justify-between flex-wrap gap-2">
                   <div class="flex items-center gap-2.5">
                     <div class="w-8 h-8 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 font-bold shrink-0">
@@ -1512,7 +1512,7 @@
                       <p class="text-[11px] text-gray-400">أسهم ذات تذبذب سعري حاد وزخم سريع؛ تتطلب وقف خسارة صارم ولا تناسب الاستثمار طويل الأجل (شريحة قصوى 10% من المحفظة).</p>
                     </div>
                   </div>
-                  <span class="text-xs font-mono font-bold text-amber-300 bg-black/50 px-2.5 py-1 rounded-lg border border-amber-500/30">
+                  <span class="segment-sat-badge text-xs font-mono font-bold text-amber-300 bg-black/50 px-2.5 py-1 rounded-lg border border-amber-500/30">
                     ${satList.length} أسهم رصد
                   </span>
                 </div>

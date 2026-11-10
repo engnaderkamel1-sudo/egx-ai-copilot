@@ -1019,6 +1019,500 @@
       border-color: #e2e8f0 !important;
     }
 
+    
+    /* ============================================================ */
+    /* UI/UX Pro Max: Color Harmony, High Contrast & Anti-Gray Fix */
+    /* ============================================================ */
+
+    /* 1. Universal Neutralize of Hardcoded Dark bg-black Elements */
+    html.light [class*="bg-black"]:not(button):not(a),
+    html:not(.dark) [class*="bg-black"]:not(button):not(a) {
+      background-color: #f1f5f9 !important;
+      border-color: #cbd5e1 !important;
+      color: #0f172a !important;
+    }
+    html.light [class*="bg-black"]:not(button):not(a) *,
+    html:not(.dark) [class*="bg-black"]:not(button):not(a) * {
+      color: #0f172a !important;
+    }
+
+    /* 2. Market Timing & Readiness Guardrail Banner (High Contrast Harmony) */
+    html.light .market-readiness-banner,
+    html:not(.dark) .market-readiness-banner {
+      background-image: none !important;
+      background-color: #ffffff !important;
+      box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.08) !important;
+    }
+    html.light .market-readiness-banner[data-market-code="OVERBOUGHT"],
+    html:not(.dark) .market-readiness-banner[data-market-code="OVERBOUGHT"] {
+      background: linear-gradient(135deg, #fffbeb 0%, #ffffff 40%, #fef3c7 100%) !important;
+      border: 2px solid #f59e0b !important;
+      box-shadow: 0 4px 24px -2px rgba(245, 158, 11, 0.15) !important;
+    }
+    html.light .market-readiness-banner[data-market-code="RED"],
+    html:not(.dark) .market-readiness-banner[data-market-code="RED"] {
+      background: linear-gradient(135deg, #fff1f2 0%, #ffffff 40%, #ffe4e6 100%) !important;
+      border: 2px solid #ef4444 !important;
+      box-shadow: 0 4px 24px -2px rgba(239, 68, 68, 0.15) !important;
+    }
+    html.light .market-readiness-banner[data-market-code="PULLBACK"],
+    html.light .market-readiness-banner[data-market-code="GREEN"],
+    html:not(.dark) .market-readiness-banner[data-market-code="PULLBACK"],
+    html:not(.dark) .market-readiness-banner[data-market-code="GREEN"] {
+      background: linear-gradient(135deg, #ecfdf5 0%, #ffffff 40%, #d1fae5 100%) !important;
+      border: 2px solid #10b981 !important;
+      box-shadow: 0 4px 24px -2px rgba(16, 185, 129, 0.15) !important;
+    }
+    html.light .market-readiness-banner[data-market-code="YELLOW"],
+    html:not(.dark) .market-readiness-banner[data-market-code="YELLOW"] {
+      background: linear-gradient(135deg, #fefce8 0%, #ffffff 40%, #fef9c3 100%) !important;
+      border: 2px solid #eab308 !important;
+      box-shadow: 0 4px 24px -2px rgba(234, 179, 8, 0.12) !important;
+    }
+
+    /* Market Banner Header & Title */
+    html.light .market-readiness-header-label,
+    html:not(.dark) .market-readiness-header-label {
+      color: #0f172a !important;
+      font-weight: 900 !important;
+    }
+    html.light .market-readiness-banner[data-market-code="OVERBOUGHT"] .market-readiness-title,
+    html:not(.dark) .market-readiness-banner[data-market-code="OVERBOUGHT"] .market-readiness-title {
+      color: #92400e !important;
+      font-weight: 900 !important;
+    }
+    html.light .market-readiness-banner[data-market-code="RED"] .market-readiness-title,
+    html:not(.dark) .market-readiness-banner[data-market-code="RED"] .market-readiness-title {
+      color: #991b1b !important;
+      font-weight: 900 !important;
+    }
+    html.light .market-readiness-banner[data-market-code="PULLBACK"] .market-readiness-title,
+    html.light .market-readiness-banner[data-market-code="GREEN"] .market-readiness-title,
+    html:not(.dark) .market-readiness-banner[data-market-code="PULLBACK"] .market-readiness-title,
+    html:not(.dark) .market-readiness-banner[data-market-code="GREEN"] .market-readiness-title {
+      color: #065f46 !important;
+      font-weight: 900 !important;
+    }
+    html.light .market-readiness-banner[data-market-code="YELLOW"] .market-readiness-title,
+    html:not(.dark) .market-readiness-banner[data-market-code="YELLOW"] .market-readiness-title {
+      color: #854d0e !important;
+      font-weight: 900 !important;
+    }
+
+    /* Actionable Posture Banner (Never dark grey!) */
+    html.light .market-posture-box,
+    html:not(.dark) .market-posture-box {
+      background-color: #ffffff !important;
+      border: 1.5px solid #cbd5e1 !important;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04) !important;
+    }
+    html.light .market-readiness-banner[data-market-code="OVERBOUGHT"] .market-posture-box,
+    html:not(.dark) .market-readiness-banner[data-market-code="OVERBOUGHT"] .market-posture-box {
+      background-color: #fff7ed !important;
+      border-color: #fb923c !important;
+    }
+    html.light .market-readiness-banner[data-market-code="OVERBOUGHT"] .market-posture-label,
+    html:not(.dark) .market-readiness-banner[data-market-code="OVERBOUGHT"] .market-posture-label {
+      color: #c2410c !important;
+      font-weight: 800 !important;
+    }
+    html.light .market-readiness-banner[data-market-code="OVERBOUGHT"] .market-posture-verb,
+    html:not(.dark) .market-readiness-banner[data-market-code="OVERBOUGHT"] .market-posture-verb {
+      color: #7c2d12 !important;
+      font-weight: 900 !important;
+    }
+
+    html.light .market-readiness-banner[data-market-code="RED"] .market-posture-box,
+    html:not(.dark) .market-readiness-banner[data-market-code="RED"] .market-posture-box {
+      background-color: #fef2f2 !important;
+      border-color: #f87171 !important;
+    }
+    html.light .market-readiness-banner[data-market-code="RED"] .market-posture-label,
+    html:not(.dark) .market-readiness-banner[data-market-code="RED"] .market-posture-label {
+      color: #b91c1c !important;
+      font-weight: 800 !important;
+    }
+    html.light .market-readiness-banner[data-market-code="RED"] .market-posture-verb,
+    html:not(.dark) .market-readiness-banner[data-market-code="RED"] .market-posture-verb {
+      color: #991b1b !important;
+      font-weight: 900 !important;
+    }
+
+    html.light .market-readiness-banner[data-market-code="PULLBACK"] .market-posture-box,
+    html.light .market-readiness-banner[data-market-code="GREEN"] .market-posture-box,
+    html:not(.dark) .market-readiness-banner[data-market-code="PULLBACK"] .market-posture-box,
+    html:not(.dark) .market-readiness-banner[data-market-code="GREEN"] .market-posture-box {
+      background-color: #f0fdf4 !important;
+      border-color: #4ade80 !important;
+    }
+    html.light .market-readiness-banner[data-market-code="PULLBACK"] .market-posture-label,
+    html.light .market-readiness-banner[data-market-code="GREEN"] .market-posture-label,
+    html:not(.dark) .market-readiness-banner[data-market-code="PULLBACK"] .market-posture-label,
+    html:not(.dark) .market-readiness-banner[data-market-code="GREEN"] .market-posture-label {
+      color: #15803d !important;
+      font-weight: 800 !important;
+    }
+    html.light .market-readiness-banner[data-market-code="PULLBACK"] .market-posture-verb,
+    html.light .market-readiness-banner[data-market-code="GREEN"] .market-posture-verb,
+    html:not(.dark) .market-readiness-banner[data-market-code="PULLBACK"] .market-posture-verb,
+    html:not(.dark) .market-readiness-banner[data-market-code="GREEN"] .market-posture-verb {
+      color: #14532d !important;
+      font-weight: 900 !important;
+    }
+
+    html.light .market-readiness-banner[data-market-code="YELLOW"] .market-posture-box,
+    html:not(.dark) .market-readiness-banner[data-market-code="YELLOW"] .market-posture-box {
+      background-color: #fefce8 !important;
+      border-color: #facc15 !important;
+    }
+    html.light .market-readiness-banner[data-market-code="YELLOW"] .market-posture-label,
+    html:not(.dark) .market-readiness-banner[data-market-code="YELLOW"] .market-posture-label {
+      color: #a16207 !important;
+      font-weight: 800 !important;
+    }
+    html.light .market-readiness-banner[data-market-code="YELLOW"] .market-posture-verb,
+    html:not(.dark) .market-readiness-banner[data-market-code="YELLOW"] .market-posture-verb {
+      color: #713f12 !important;
+      font-weight: 900 !important;
+    }
+
+    /* Traffic Light Widget (Clean High-Contrast Container) */
+    html.light .market-traffic-widget,
+    html:not(.dark) .market-traffic-widget {
+      background-color: #ffffff !important;
+      border: 1.5px solid #cbd5e1 !important;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05) !important;
+    }
+    html.light .market-traffic-widget .inactive-stage,
+    html:not(.dark) .market-traffic-widget .inactive-stage {
+      color: #64748b !important;
+      font-weight: 600 !important;
+    }
+    html.light .market-traffic-widget .active-stage,
+    html:not(.dark) .market-traffic-widget .active-stage {
+      font-weight: 900 !important;
+    }
+    html.light .market-traffic-widget .stage-red .active-stage,
+    html:not(.dark) .market-traffic-widget .stage-red .active-stage {
+      color: #dc2626 !important;
+    }
+    html.light .market-traffic-widget .stage-orange .active-stage,
+    html:not(.dark) .market-traffic-widget .stage-orange .active-stage {
+      color: #ea580c !important;
+    }
+    html.light .market-traffic-widget .stage-yellow .active-stage,
+    html:not(.dark) .market-traffic-widget .stage-yellow .active-stage {
+      color: #ca8a04 !important;
+    }
+    html.light .market-traffic-widget .stage-green .active-stage,
+    html:not(.dark) .market-traffic-widget .stage-green .active-stage {
+      color: #16a34a !important;
+    }
+
+    /* Market Readiness Advice & Footer */
+    html.light .market-readiness-advice,
+    html:not(.dark) .market-readiness-advice {
+      color: #334155 !important;
+      font-weight: 600 !important;
+    }
+    html.light .market-readiness-footer,
+    html:not(.dark) .market-readiness-footer {
+      border-color: rgba(203, 213, 225, 0.8) !important;
+      color: #475569 !important;
+    }
+    html.light .market-readiness-footer *,
+    html:not(.dark) .market-readiness-footer * {
+      color: #475569 !important;
+    }
+
+    /* ============================================================ */
+    /* UI/UX Pro Max: Action Hub Tabs & Segment Banners             */
+    /* ============================================================ */
+    html.light .category-tab-btn,
+    html:not(.dark) .category-tab-btn {
+      background-color: #ffffff !important;
+      border-color: #e2e8f0 !important;
+      color: #334155 !important;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+    }
+    html.light .category-tab-btn:hover,
+    html:not(.dark) .category-tab-btn:hover {
+      background-color: #f8fafc !important;
+      border-color: #cbd5e1 !important;
+      color: #0f172a !important;
+    }
+    html.light .category-tab-btn.border-cyan-500,
+    html:not(.dark) .category-tab-btn.border-cyan-500 {
+      background-color: #f0f9ff !important;
+      border-color: #0284c7 !important;
+      color: #0369a1 !important;
+      box-shadow: 0 4px 14px rgba(2, 132, 199, 0.15) !important;
+    }
+    html.light .category-tab-btn.border-amber-500,
+    html:not(.dark) .category-tab-btn.border-amber-500 {
+      background-color: #fffbeb !important;
+      border-color: #f59e0b !important;
+      color: #92400e !important;
+      box-shadow: 0 4px 14px rgba(245, 158, 11, 0.15) !important;
+    }
+    html.light .category-tab-btn.border-rose-500,
+    html:not(.dark) .category-tab-btn.border-rose-500 {
+      background-color: #fff1f2 !important;
+      border-color: #ef4444 !important;
+      color: #991b1b !important;
+      box-shadow: 0 4px 14px rgba(239, 68, 68, 0.15) !important;
+    }
+    html.light .category-tab-btn.border-blue-500,
+    html:not(.dark) .category-tab-btn.border-blue-500 {
+      background-color: #eff6ff !important;
+      border-color: #3b82f6 !important;
+      color: #1e40af !important;
+      box-shadow: 0 4px 14px rgba(59, 130, 246, 0.15) !important;
+    }
+    html.light .category-tab-btn.border-emerald-500,
+    html:not(.dark) .category-tab-btn.border-emerald-500 {
+      background-color: #ecfdf5 !important;
+      border-color: #10b981 !important;
+      color: #065f46 !important;
+      box-shadow: 0 4px 14px rgba(16, 185, 129, 0.15) !important;
+    }
+    html.light .category-tab-btn.border-slate-500,
+    html:not(.dark) .category-tab-btn.border-slate-500 {
+      background-color: #f1f5f9 !important;
+      border-color: #64748b !important;
+      color: #1e293b !important;
+      box-shadow: 0 4px 14px rgba(100, 116, 139, 0.12) !important;
+    }
+
+    /* Segment Banners (Core & Satellites) */
+    html.light .segment-banner-core,
+    html:not(.dark) .segment-banner-core {
+      background: linear-gradient(135deg, #ecfdf5 0%, #f0fdf4 50%, #ffffff 100%) !important;
+      border: 2px solid #86efac !important;
+      box-shadow: 0 4px 16px rgba(16, 185, 129, 0.1) !important;
+    }
+    html.light .segment-banner-core h3,
+    html:not(.dark) .segment-banner-core h3 {
+      color: #064e3b !important;
+      font-weight: 900 !important;
+    }
+    html.light .segment-banner-core p,
+    html:not(.dark) .segment-banner-core p {
+      color: #047857 !important;
+      font-weight: 500 !important;
+    }
+    html.light .segment-core-badge,
+    html:not(.dark) .segment-core-badge {
+      background-color: #d1fae5 !important;
+      color: #065f46 !important;
+      border: 1.5px solid #6ee7b7 !important;
+      font-weight: 800 !important;
+    }
+
+    html.light .segment-banner-sat,
+    html:not(.dark) .segment-banner-sat {
+      background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 50%, #ffffff 100%) !important;
+      border: 2px solid #fde68a !important;
+      box-shadow: 0 4px 16px rgba(245, 158, 11, 0.1) !important;
+    }
+    html.light .segment-banner-sat h3,
+    html:not(.dark) .segment-banner-sat h3 {
+      color: #78350f !important;
+      font-weight: 900 !important;
+    }
+    html.light .segment-banner-sat p,
+    html:not(.dark) .segment-banner-sat p {
+      color: #92400e !important;
+      font-weight: 500 !important;
+    }
+    html.light .segment-sat-badge,
+    html:not(.dark) .segment-sat-badge {
+      background-color: #fef3c7 !important;
+      color: #78350f !important;
+      border: 1.5px solid #fcd34d !important;
+      font-weight: 800 !important;
+    }
+
+    /* ============================================================ */
+    /* UI/UX Pro Max: Action Cards & Financial Decision Grids       */
+    /* ============================================================ */
+    html.light .action-card,
+    html:not(.dark) .action-card {
+      background-image: none !important;
+      background-color: #ffffff !important;
+      border: 1.5px solid #cbd5e1 !important;
+      box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.06), 0 2px 6px -1px rgba(15, 23, 42, 0.04) !important;
+    }
+    html.light .action-card.hero-card,
+    html:not(.dark) .action-card.hero-card {
+      border: 2px solid #f59e0b !important;
+      box-shadow: 0 8px 30px rgba(245, 158, 11, 0.15) !important;
+    }
+
+    /* Card Header */
+    html.light .action-card .card-header,
+    html:not(.dark) .action-card .card-header {
+      background-image: none !important;
+      background-color: #f8fafc !important;
+      border-bottom: 1.5px solid #e2e8f0 !important;
+    }
+    html.light .action-card.hero-card .card-header,
+    html:not(.dark) .action-card.hero-card .card-header {
+      background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 40%, #ffffff 100%) !important;
+      border-bottom: 2px solid #fde68a !important;
+    }
+    html.light .action-card.hero-card .card-header h4,
+    html.light .action-card.hero-card .card-header span,
+    html:not(.dark) .action-card.hero-card .card-header h4,
+    html:not(.dark) .action-card.hero-card .card-header span {
+      color: #78350f !important;
+    }
+    html.light .action-card .card-header-price,
+    html:not(.dark) .action-card .card-header-price {
+      background-color: #ffffff !important;
+      border: 1.5px solid #cbd5e1 !important;
+      color: #0f172a !important;
+      font-weight: 800 !important;
+    }
+
+    /* Card Sub Boxes (Fair value, Tranche, Catalyst) */
+    html.light .card-sub-box,
+    html:not(.dark) .card-sub-box {
+      background-color: #f8fafc !important;
+      border: 1.5px solid #e2e8f0 !important;
+    }
+    html.light .tranche-shares-pill,
+    html:not(.dark) .tranche-shares-pill {
+      background-color: #e2e8f0 !important;
+      border: 1px solid #cbd5e1 !important;
+      color: #0f172a !important;
+      font-weight: 800 !important;
+    }
+    html.light .catalyst-notes-box,
+    html:not(.dark) .catalyst-notes-box {
+      background-color: #f8fafc !important;
+      border: 1.5px solid #e2e8f0 !important;
+      color: #334155 !important;
+    }
+    html.light .catalyst-notes-box strong,
+    html:not(.dark) .catalyst-notes-box strong {
+      color: #0f172a !important;
+    }
+    html.light .beginner-guide-box,
+    html:not(.dark) .beginner-guide-box {
+      background-color: #f0fdf4 !important;
+      border: 1.5px solid #a7f3d0 !important;
+      color: #1e293b !important;
+    }
+    html.light .beginner-guide-box strong,
+    html:not(.dark) .beginner-guide-box strong {
+      color: #064e3b !important;
+    }
+
+    /* Execution Boxes & Solid High-Contrast Pills */
+    html.light .execution-buy-box,
+    html:not(.dark) .execution-buy-box {
+      background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 50%, #ecfdf5 100%) !important;
+      border: 2px solid #86efac !important;
+    }
+    html.light .execution-buy-box .execution-box-title,
+    html:not(.dark) .execution-buy-box .execution-box-title {
+      color: #166534 !important;
+      font-weight: 900 !important;
+    }
+    html.light .execution-buy-pill,
+    html:not(.dark) .execution-buy-pill {
+      background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+      border: 1px solid #059669 !important;
+      color: #ffffff !important;
+      box-shadow: 0 4px 12px rgba(5, 150, 105, 0.25) !important;
+    }
+    html.light .execution-buy-pill *,
+    html:not(.dark) .execution-buy-pill * {
+      color: #ffffff !important;
+    }
+
+    html.light .execution-sell-box,
+    html:not(.dark) .execution-sell-box {
+      background: linear-gradient(135deg, #fffbeb 0%, #ffffff 50%, #fef3c7 100%) !important;
+      border: 2px solid #fde68a !important;
+    }
+    html.light .execution-sell-box .execution-box-title,
+    html:not(.dark) .execution-sell-box .execution-box-title {
+      color: #92400e !important;
+      font-weight: 900 !important;
+    }
+    html.light .execution-sell-pill,
+    html:not(.dark) .execution-sell-pill {
+      background: linear-gradient(135deg, #d97706 0%, #b45309 100%) !important;
+      border: 1px solid #d97706 !important;
+      color: #ffffff !important;
+      box-shadow: 0 4px 12px rgba(217, 119, 6, 0.25) !important;
+    }
+    html.light .execution-sell-pill *,
+    html:not(.dark) .execution-sell-pill * {
+      color: #ffffff !important;
+    }
+
+    html.light .execution-risk-box,
+    html:not(.dark) .execution-risk-box {
+      background: linear-gradient(135deg, #fff1f2 0%, #ffffff 50%, #ffe4e6 100%) !important;
+      border: 2px solid #fca5a5 !important;
+    }
+    html.light .execution-stop-pill,
+    html:not(.dark) .execution-stop-pill {
+      background: linear-gradient(135deg, #e11d48 0%, #be123c 100%) !important;
+      border: 1px solid #e11d48 !important;
+      color: #ffffff !important;
+      box-shadow: 0 4px 12px rgba(225, 29, 72, 0.25) !important;
+    }
+    html.light .execution-stop-pill *,
+    html:not(.dark) .execution-stop-pill * {
+      color: #ffffff !important;
+    }
+
+    html.light .execution-safety-box,
+    html:not(.dark) .execution-safety-box {
+      background: linear-gradient(135deg, #eff6ff 0%, #ffffff 50%, #dbeafe 100%) !important;
+      border: 2px solid #93c5fd !important;
+    }
+
+    /* Targets & Stops Stat Tiles */
+    html.light .stat-tile,
+    html:not(.dark) .stat-tile {
+      background-color: #ffffff !important;
+      border: 1.5px solid #e2e8f0 !important;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+    }
+    html.light .stat-tile span:first-child,
+    html:not(.dark) .stat-tile span:first-child {
+      color: #64748b !important;
+      font-weight: 600 !important;
+    }
+
+    /* Secondary Card Action Buttons */
+    html.light .action-btn-secondary,
+    html:not(.dark) .action-btn-secondary {
+      background-color: #ffffff !important;
+      border: 1.5px solid #cbd5e1 !important;
+      color: #0284c7 !important;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+    }
+    html.light .action-btn-secondary:hover,
+    html:not(.dark) .action-btn-secondary:hover {
+      background-color: #f0f9ff !important;
+      border-color: #0284c7 !important;
+      color: #0369a1 !important;
+    }
+    html.light .action-btn-secondary *,
+    html:not(.dark) .action-btn-secondary * {
+      color: #0284c7 !important;
+    }
+    html.light .action-btn-secondary:hover *,
+    html:not(.dark) .action-btn-secondary:hover * {
+      color: #0369a1 !important;
+    }
+
     /* ============================================================ */
     /* Dark Theme System (High Contrast & Saturated Readability)   */
     /* ============================================================ */
