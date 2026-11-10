@@ -1,0 +1,270 @@
+981:     }
+982: 
+983:     // Render Portfolio Table
+984:     function renderPortfolioTable() {
+985:       const tbody = document.getElementById('portfolio-table-body');
+986:       tbody.innerHTML = '';
+987: 
+988:       const shockContainer = document.getElementById('systemic-shock-banner');
+989:       if (shockContainer) {
+990:         if (getMarketRegimeCode() === 'SYSTEMIC_SHOCK') {
+991:           shockContainer.classList.remove('hidden');
+992:           shockContainer.innerHTML = `
+993:             <div class="p-3 mb-3 rounded-xl bg-rose-950/40 border border-rose-500/40 text-rose-300 text-xs flex items-center justify-between gap-2 animate-pulse">
+994:               <div class="flex items-center gap-2">
+995:                 <i data-lucide="alert-octagon" class="w-4 h-4 text-rose-400"></i>
+996:                 <span class="font-bold">⚠️ إنذار هبوط ذعري شامل (Systemic Shock Alert): السوق يشهد تراجعاً حاداً؛ تم تجميد صفقات الشراء عند الدعوم للحفاظ على السيولة.</span>
+997:               </div>
+998:               <span class="px-2 py-0.5 rounded bg-rose-500/20 text-[10px] font-mono font-bold">تجميد الشراء</span>
+999:             </div>
+1000:           `;
+1001:           if (window.lucide) lucide.createIcons();
+1002:         } else {
+1003:           shockContainer.classList.add('hidden');
+1004:           shockContainer.innerHTML = '';
+1005:         }
+1006:       }
+1007: 
+1008:       const totalWealth = portfolioData.reduce((acc, cur) => acc + cur.value, 0);
+1009: 
+1010:       portfolioData.forEach((item, index) => {
+1011:         if (typeof AiSanityShield !== 'undefined' && typeof AiSanityShield.auditAsset === 'function') {
+1012:           AiSanityShield.auditAsset(item);
+1013:         }
+1014:         const evalResult = (typeof EGX_Engine !== 'undefined') 
+1015:           ? EGX_Engine.evaluateAsset(item, getMarketRegimeCode()) 
+1016:           : { isLosing: (item.profit || 0) < 0, badgeText: 'احتفاظ', badgeColor: 'bg-gray-800 text-gray-300' };
+1017: 
+1018:         const cycle = (typeof EGX_Engine !== 'undefined' && typeof EGX_Engine.determineStockCycle === 'function')
+1019:           ? EGX_Engine.determineStockCycle(item)
+1020:           : { stage: 2, shortBadge: 'مسار صاعد 🟡', badgeClass: 'bg-cyan-950/70 text-cyan-300 border border-cyan-500/50' };
+1021: 
+1022:         const isCash = item.ticker === 'CASH' || item.isCashReserve;
+1023:         const isNeutral = isCash || Math.abs(item.profit || 0) < 0.01;
+1024:         const isPositive = !isNeutral && (item.profit > 0);
+1025:         const colorClass = isNeutral ? 'text-gray-400' : (isPositive ? 'text-emerald-400' : 'text-rose-400');
+1026:         const bgBadgeClass = isNeutral 
+1027:           ? 'bg-gray-800/60 text-gray-400 border-gray-700/60' 
+1028:           : (isPositive ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border-rose-500/20');
+1029:         const badgeActionText = evalResult.badgeText;
+1030:         const badgeActionColor = evalResult.badgeColor;
+1031: 
+1032:         const weightPct = totalWealth > 0 ? ((item.value / totalWealth) * 100).toFixed(1) : 0;
+1033:         const cost = item.value - item.profit;
+1034: 
+1035:         // Custom Levels & Technical Anchors
+1036:         const customLevels = (typeof EGX_Portfolio !== 'undefined' && typeof EGX_Portfolio.getCustomLevels === 'function') 
+1037:           ? EGX_Portfolio.getCustomLevels(item.ticker) 
+1038:           : null;
+1039: 
+1040:         const isCashOrFund = item.ticker === 'CASH' || item.ticker === 'NCS' || item.ticker === 'BSB' || item.isCashReserve;
+1041:         const curPrice = Number(item.currentPrice) || Number(item.buyPrice) || 0;
+1042:         const buyPrice = Number(item.buyPrice) || curPrice;
+1043: 
+1044:         // Effective Target 1 (Profit Ceiling)
+1045:         const standardTarget1 = Number(item.pivotR1 || item.target1) || Number((curPrice * 1.15).toFixed(2));
+1046:         const effectiveTarget1 = (customLevels && customLevels.customTarget1) ? customLevels.customTarget1 : standardTarget1;
+1047:         const isCustomTarget = !!(customLevels && customLevels.customTarget1);
+1048:         const targetGainPct = curPrice > 0 ? (((effectiveTarget1 - curPrice) / curPrice) * 100).toFixed(1) : 0;
+1049:         const isTargetReached = !isCashOrFund && curPrice >= effectiveTarget1;
+1050: 
+1051:         // Effective Stop Loss (Safety Floor)
+1052:         const standardStopLoss = Number(item.pivotS1 || item.stopLoss) || Number((curPrice * 0.90).toFixed(2));
+1053:         const effectiveStopLoss = (customLevels && customLevels.customStopLoss) ? customLevels.customStopLoss : standardStopLoss;
+1054:         const isCustomStop = !!(customLevels && customLevels.customStopLoss);
+1055:         const stopLossBuffer = curPrice > 0 ? (((curPrice - effectiveStopLoss) / curPrice) * 100).toFixed(1) : 0;
+1056:         const isStopBroken = !isCashOrFund && curPrice < effectiveStopLoss;
+1057: 
+1058:         const fund = (item.pe ? item : (typeof EGX_Portfolio !== 'undefined' && typeof EGX_Portfolio.getFundamentals === 'function' ? EGX_Portfolio.getFundamentals(item.ticker) : null)) || item;
+1059: 
+1060:         const tr = document.createElement('tr');
+1061:         tr.className = 'hover:bg-gray-800/40 transition';
+1062:         tr.innerHTML = `
+1063:           <!-- 1. Stock / Symbol -->
+1064:           <td class="py-3.5 px-3">
+1065:             <div class="flex items-center gap-2">
+1066:               <div class="w-8 h-8 rounded-lg bg-gray-800 border border-gray-700 flex items-center justify-center font-bold text-xs text-white shrink-0">
+1067:                 ${item.ticker}
+1068:               </div>
+1069:               <div>
+1070:                 <div class="font-bold text-white text-xs sm:text-sm">${item.name}</div>
+1071:                 <div class="text-[10px] text-gray-400">${item.category}</div>
+1072:                 ${item.ticker !== 'CASH' ? `
+1073:                   <div class="mt-1.5 flex items-center gap-1.5 flex-wrap">
+1074:                     <span class="px-2 py-0.5 rounded text-[10px] font-bold ${cycle.badgeClass}" title="${cycle.advice || ''}">
+1075:                       ${cycle.shortBadge}
+1076:                     </span>
+1077:                     ${fund.pe ? `
+1078:                       <span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-cyan-950/80 border border-cyan-800/60 text-cyan-300 flex items-center gap-1 shadow-sm" title="مكرر ربحية السهم: ${fund.pe} | متوسط القطاع: ${fund.sectorPe || '--'}">
+1079:                         <i data-lucide="scale" class="w-3 h-3 text-cyan-400"></i>
+1080:                         <span>P/E: <strong class="text-white">${fund.pe}</strong></span>
+1081:                         <span class="text-gray-400 font-sans">| قطاع:</span>
+1082:                         <strong class="text-cyan-300">${fund.sectorPe || '--'}</strong>
+1083:                       </span>
+1084:                       ${fund.peVsSectorPct !== undefined && fund.peVsSectorPct !== null ? `
+1085:                         <span class="px-1.5 py-0.5 rounded text-[9.5px] font-bold ${fund.peVsSectorPct <= 0 ? 'bg-emerald-950/90 text-emerald-300 border border-emerald-800/60' : 'bg-amber-950/90 text-amber-300 border border-amber-800/60'}" title="${fund.valuationStatus || ''}">
+1086:                           ${fund.peVsSectorPct < 0 ? `أرخص ${Math.abs(fund.peVsSectorPct)}% 🟢` : (fund.peVsSectorPct > 0 ? `أعلى +${fund.peVsSectorPct}% 🟡` : 'مماثل للقطاع ⚖️')}
+1087:                         </span>
+1088:                       ` : ''}
+1089:                     ` : `
+1090:                       <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-950/80 border border-amber-800/60 text-amber-300 flex items-center gap-1 shadow-sm" title="لم تعلن الشركة بعد نتائج أعمالها المعتمدة أو قيد التدقيق الرسمي">
+1091:                         <i data-lucide="clock" class="w-3 h-3 text-amber-400"></i>
+1092:                         <span>⏳ بانتظار الإفصاح</span>
+1093:                       </span>
+1094:                     `}
+1095:                   </div>
+1096:                 ` : ''}
+1097:               </div>
+1098:             </div>
+1099:           </td>
+1100: 
+1101:           <!-- 2. Live Market Price per Share (سعر السهم اللحظي بالبورصة) -->
+1102:           <td class="py-3.5 px-3 text-center">
+1103:             ${item.currentPrice && item.ticker !== 'CASH' && item.ticker !== 'NCS' && item.ticker !== 'BSB' 
+1104:               ? `<div class="inline-flex flex-col items-center">
+1105:                   <div class="bg-cyan-950/50 border border-cyan-800/60 px-2.5 py-1 rounded-lg inline-block font-mono font-bold text-cyan-300 text-xs sm:text-sm shadow-sm">
+1106:                     <span>${Number(item.currentPrice).toFixed(2)}</span>
+1107:                     <span class="text-[10px] text-gray-400 font-sans">ج</span>
+1108:                   </div>
+1109:                   <div class="flex items-center gap-1 mt-1 text-[9px] text-gray-400 font-mono">
+1110:                     <span class="w-1.5 h-1.5 rounded-full ${item.priceSource && item.priceSource.includes('يدوي') ? 'bg-amber-400' : 'bg-emerald-400 animate-pulse'}"></span>
+1111:                     <span>آخر تحديث: ${formatDateTimeDisplay(item.priceUpdatedAt)}</span>
+1112:                   </div>
+1113:                   <span class="text-[8.5px] text-gray-500 font-sans mt-0.5">(${item.priceSource || 'شاشة البورصة اللحظية'})</span>
+1114:                  </div>`
+1115:               : `<span class="text-gray-500 font-normal">--</span>`}
+1116:           </td>
+1117: 
+1118:           <!-- 3. Buy Price & Shares Quantity (متوسط الشراء والكمية) -->
+1119:           <td class="py-3.5 px-3 text-center text-xs">
+1120:             ${item.ticker !== 'CASH' ? `
+1121:               <div class="flex flex-col items-center gap-0.5 font-mono">
+1122:                 <span class="font-bold text-gray-200">${item.buyPrice ? Number(item.buyPrice).toFixed(2) + ' ج' : '--'}</span>
+1123:                 <span class="text-[10px] text-indigo-300 px-1.5 py-0.2 rounded bg-indigo-950/50 border border-indigo-800/40">${item.shares ? item.shares.toLocaleString('en-US') + ' سهم' : '--'}</span>
+1124:                 <span class="text-[9.5px] text-gray-500 font-sans">تكلفة: ${Math.round(cost).toLocaleString('en-US')} ج</span>
+1125:               </div>
+1126:             ` : `
+1127:               <span class="text-gray-500 font-normal">--</span>
+1128:             `}
+1129:           </td>
+1130: 
+1131:           <!-- 4. Target 1 (سقف المكاسب الأول - بيع للربح) -->
+1132:           <td class="py-3.5 px-3 text-center">
+1133:             ${!isCashOrFund ? `
+1134:               <div class="flex flex-col items-center gap-1">
+1135:                 <div class="font-mono font-black text-emerald-300 text-xs sm:text-sm">
+1136:                   ${effectiveTarget1.toFixed(2)} <span class="text-[10px] text-gray-400 font-sans font-normal">ج</span>
+1137:                 </div>
+1138:                 <div class="flex items-center gap-1">
+1139:                   ${isTargetReached 
+1140:                     ? `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-500 text-white animate-pulse shadow-sm">🎯 وصل للهدف!</span>`
+1141:                     : `<span class="px-1.5 py-0.5 rounded text-[9px] font-mono font-semibold text-emerald-300 bg-emerald-950/80 border border-emerald-500/30">+${targetGainPct}% ربح</span>`
+1142:                   }
+1143:                   ${isCustomTarget ? `<span class="text-[8px] px-1 rounded bg-amber-500/20 text-amber-300 font-bold" title="رقم مخصص قمت بوضعه بنفسك">مخصص</span>` : ''}
+1144:                 </div>
+1145:                 <button onclick="openPriceLevelsModal('${item.ticker}')" class="text-[9.5px] text-emerald-400 hover:text-emerald-300 font-bold flex items-center justify-center gap-0.5 mt-0.5 underline cursor-pointer" title="فحص المعادلة والمصدر وتعديل الرقم">
+1146:                   <i data-lucide="info" class="w-3 h-3 text-emerald-400"></i>
+1147:                   <span>المصدر والضبط</span>
+1148:                 </button>
+1149:               </div>
+1150:             ` : `
+1151:               <span class="text-gray-500 font-normal">--</span>
+1152:             `}
+1153:           </td>
+1154: 
+1155:           <!-- 5. Stop Loss (حد الخسارة الأدنى - قاع الأمان) -->
+1156:           <td class="py-3.5 px-3 text-center">
+1157:             ${!isCashOrFund ? `
+1158:               <div class="flex flex-col items-center gap-1">
+1159:                 <div class="font-mono font-black ${isStopBroken ? 'text-rose-400 animate-pulse' : 'text-rose-300'} text-xs sm:text-sm">
+1160:                   ${effectiveStopLoss.toFixed(2)} <span class="text-[10px] text-gray-400 font-sans font-normal">ج</span>
+1161:                 </div>
+1162:                 <div class="flex items-center gap-1">
+1163:                   ${evalResult.action === 'EMERGENCY_STOP_LOSS'
+1164:                     ? `<span class="px-1.5 py-0.5 rounded text-[9px] font-black bg-rose-600 text-white animate-pulse shadow-sm" title="انهيار حاد: نفذ الخروج فوراً">🚨 خروج طارئ!</span>`
+1165:                     : (evalResult.action === 'INTRADAY_DIP_WATCH'
+1166:                       ? `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40" title="كسر لحظي أثناء الجلسة: انتظر تأكيد إغلاق 02:30 م">🟡 كسر لحظي (انتظر)</span>`
+1167:                       : (evalResult.action === 'CORE_BUFFER_WATCH'
+1168:                         ? `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-blue-500/20 text-blue-300 border border-blue-500/40" title="سهم قيادي استثماري: مستقر ضمن وسادة الأمان أعلى S2">🛡️ وسادة أمان</span>`
+1169:                         : (isStopBroken 
+1170:                           ? `<span class="px-1.5 py-0.5 rounded text-[9px] font-black bg-rose-600 text-white shadow-sm" title="تم تأكيد كسر الدعم بالإغلاق">🔴 تأكيد كسر S1</span>`
+1171:                           : `<span class="px-1.5 py-0.5 rounded text-[9px] font-mono font-semibold text-rose-300 bg-rose-950/80 border border-rose-500/30">أمان ${stopLossBuffer}%</span>`
+1172:                         )
+1173:                       )
+1174:                     )
+1175:                   }
+1176:                   ${isCustomStop ? `<span class="text-[8px] px-1 rounded bg-amber-500/20 text-amber-300 font-bold" title="رقم مخصص قمت بوضعه بنفسك">مخصص</span>` : ''}
+1177:                 </div>
+1178:                 <button onclick="openPriceLevelsModal('${item.ticker}')" class="text-[9.5px] text-rose-400 hover:text-rose-300 font-bold flex items-center justify-center gap-0.5 mt-0.5 underline cursor-pointer" title="فحص المعادلة والمصدر وتعديل الرقم">
+1179:                   <i data-lucide="info" class="w-3 h-3 text-rose-400"></i>
+1180:                   <span>المصدر والضبط</span>
+1181:                 </button>
+1182:               </div>
+1183:             ` : `
+1184:               <span class="text-gray-500 font-normal">--</span>
+1185:             `}
+1186:           </td>
+1187: 
+1188:           <!-- 6. Total Market Value & Profit / Performance (القيمة والأرباح) -->
+1189:           <td class="py-3.5 px-3 text-xs sm:text-sm">
+1190:             <div class="font-mono font-bold text-white">
+1191:               ${Math.round(item.value).toLocaleString('en-US')} <span class="text-[10px] text-gray-400 font-sans">ج.م</span>
+1192:             </div>
+1193:             <div class="mt-0.5 flex items-center gap-1 font-mono text-[10px]">
+1194:               ${isNeutral
+1195:                 ? `<span class="px-1.5 py-0.2 rounded border ${bgBadgeClass} text-gray-400">سيولة حرة</span>`
+1196:                 : `<span class="px-1.5 py-0.2 rounded border ${bgBadgeClass} flex items-center gap-0.5">
+1197:                      <i data-lucide="${isPositive ? 'trending-up' : 'trending-down'}" class="w-3 h-3"></i>
+1198:                      <span>${isPositive ? '+' : ''}${item.returnPct.toFixed(2)}% (${isPositive ? '+' : ''}${Math.round(item.profit).toLocaleString('en-US')} ج)</span>
+1199:                    </span>`
+1200:               }
+1201:             </div>
+1202:           </td>
+1203: 
+1204:           <!-- 7. Advisor Advice & Decision Freshness -->
+1205:           <td class="py-3.5 px-3 text-xs text-gray-300">
+1206:             <div class="flex flex-col gap-1 items-start">
+1207:               <div class="flex items-center gap-1.5 flex-wrap">
+1208:                 <span class="px-2 py-0.5 rounded text-[10px] font-bold ${badgeActionColor}">${badgeActionText}</span>
+1209:                 <button onclick="openAuditModal('${item.ticker}')" class="text-[9.5px] px-2 py-0.5 rounded bg-emerald-950/70 hover:bg-emerald-900 border border-emerald-500/40 text-emerald-300 font-bold flex items-center gap-1 transition cursor-pointer" title="تقرير الاقتراح والمصادر الاستثمارية">
+1210:                   <i data-lucide="file-text" class="w-3 h-3 text-emerald-400"></i>
+1211:                   <span>تقرير الاقتراح 📊</span>
+1212:                 </button>
+1213:                 <button onclick="openPriceLevelsModal('${item.ticker}')" class="text-[10px] text-cyan-400 hover:text-cyan-300 font-bold underline flex items-center gap-0.5 shrink-0" title="بطاقة الأمان وفحص المصادر">
+1214:                   <i data-lucide="crosshair" class="w-3 h-3 text-emerald-400"></i>
+1215:                   <span>سقف وقاع 🎯</span>
+1216:                 </button>
+1217:               </div>
+1218:               <div class="text-[10.5px] text-gray-300 leading-tight">
+1219:                 ${item.advice || ''}
+1220:               </div>
+1221:               ${fund.operationalStability ? `
+1222:                 <div class="mt-1 flex items-center gap-1 text-[9.5px] font-sans font-semibold px-2 py-0.5 rounded border ${fund.pe ? 'text-emerald-300 bg-emerald-950/40 border-emerald-800/40' : 'text-amber-300 bg-amber-950/40 border-amber-800/40'}" title="فحص الأرباح التشغيلية">
+1223:                   <i data-lucide="${fund.pe ? 'shield-check' : 'clock'}" class="w-3 h-3 ${fund.pe ? 'text-emerald-400' : 'text-amber-400'} shrink-0"></i>
+1224:                   <span>${fund.operationalStability}</span>
+1225:                 </div>
+1226:               ` : `
+1227:                 <div class="mt-1 flex items-center gap-1 text-[9.5px] font-sans font-semibold px-2 py-0.5 rounded border text-amber-300 bg-amber-950/40 border-amber-800/40" title="فحص الأرباح التشغيلية">
+1228:                   <i data-lucide="clock" class="w-3 h-3 text-amber-400 shrink-0"></i>
+1229:                   <span>⏳ بانتظار الإفصاح المالي المعتمد لبيانات التشغيل</span>
+1230:                 </div>
+1231:               `}
+1232:             </div>
+1233:           </td>
+1234: 
+1235:           <!-- 8. Quick Actions (إجراء سريع) -->
+1236:           <td class="py-3.5 px-3 text-center">
+1237:             <div class="flex items-center justify-center gap-1">
+1238:               ${item.ticker !== 'CASH' ? `
+1239:                 <button onclick="openAuditModal('${item.ticker}')" class="p-1.5 rounded-xl bg-emerald-600/30 hover:bg-emerald-600 border border-emerald-500/40 text-emerald-300 hover:text-white transition shadow cursor-pointer" title="تقرير الاقتراح والمصادر 📊">
+1240:                   <i data-lucide="file-text" class="w-3.5 h-3.5 text-emerald-400"></i>
+1241:                 </button>
+1242:               ` : ''}
+1243:               <button onclick="openPriceLevelsModal('${item.ticker}')" class="p-1.5 rounded-xl bg-gray-800 hover:bg-gray-700 text-cyan-300 hover:text-white transition" title="فحص المصدر وضبط حدود السعر">
+1244:                 <i data-lucide="crosshair" class="w-3.5 h-3.5 text-cyan-400"></i>
+1245:               </button>
+1246:               <button onclick="openFineTuneModal(${index})" class="p-1.5 rounded-xl bg-indigo-600/30 hover:bg-indigo-600 border border-indigo-500/40 text-indigo-300 hover:text-white transition" title="تعديل عدد الأسهم أو سعر الشراء">
+1247:                 <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+1248:               </button>
+1249:             </div>
+1250:           </td>

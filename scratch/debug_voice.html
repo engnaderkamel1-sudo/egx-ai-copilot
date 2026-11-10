@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head><meta charset="utf-8"></head>
+<body>
+<script src="../js/voice-assistant.js"></script>
+<script>
+  const str = 'سهم طلعت مصطفى';
+  console.log('RAW: ' + str);
+  console.log('NORMALIZED: ' + window.lookupDynamicStock('طلعت مصطفى'));
+  const res = window.parseEgyptianVoiceCommand(str);
+  console.log('PARSE_RESULT: ' + JSON.stringify(res));
+</script>
+</body>
+</html>

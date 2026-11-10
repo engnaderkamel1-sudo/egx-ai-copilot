@@ -2526,6 +2526,104 @@
           </div>
           ` : ''}
 
+          <!-- Technical Consensus Voting Scorecard (Benchmark from Investing / TradingView) -->
+          ${techEvidence ? `
+          <div class="p-3.5 rounded-xl bg-gradient-to-br from-gray-900 to-gray-950 border border-emerald-500/30 space-y-3">
+            <div class="flex items-center justify-between flex-wrap gap-2">
+              <div class="flex items-center gap-2">
+                <i data-lucide="check-check" class="w-4 h-4 text-emerald-400"></i>
+                <span class="text-xs font-bold text-white">لوحة تصويت المؤشرات الفنية المجمعة:</span>
+              </div>
+              <span class="px-3 py-1 rounded-lg text-xs ${techEvidence.techConsensusBadge} shadow-sm">
+                الإشارة المجمعة: ${techEvidence.techConsensusText}
+              </span>
+            </div>
+
+            <!-- Visual 3-Stat Voting Counters -->
+            <div class="grid grid-cols-3 gap-2 text-center font-mono">
+              <div class="p-2 rounded-lg bg-emerald-950/50 border border-emerald-500/40">
+                <span class="text-[10px] text-emerald-300 block font-sans font-bold">إشارات الشراء (Buy)</span>
+                <span class="font-black text-base text-emerald-400">${techEvidence.techBuyVotes}</span>
+                <span class="text-[9.5px] text-emerald-200/70 block font-sans">مؤشرات تدعم الصعود</span>
+              </div>
+              <div class="p-2 rounded-lg bg-gray-900 border border-gray-700">
+                <span class="text-[10px] text-gray-300 block font-sans font-bold">إشارات الحياد (Neutral)</span>
+                <span class="font-black text-base text-gray-300">${techEvidence.techNeutralVotes}</span>
+                <span class="text-[9.5px] text-gray-400 block font-sans">مؤشرات في منطقة توازن</span>
+              </div>
+              <div class="p-2 rounded-lg bg-rose-950/50 border border-rose-500/40">
+                <span class="text-[10px] text-rose-300 block font-sans font-bold">إشارات البيع (Sell)</span>
+                <span class="font-black text-base text-rose-400">${techEvidence.techSellVotes}</span>
+                <span class="text-[9.5px] text-rose-200/70 block font-sans">مؤشرات تنذر بالتصحيح</span>
+              </div>
+            </div>
+
+            <!-- Voting Ratio Visual Bar -->
+            ${(() => {
+              const totalV = Math.max(1, (techEvidence.techBuyVotes || 0) + (techEvidence.techNeutralVotes || 0) + (techEvidence.techSellVotes || 0));
+              const buyW = Math.round(((techEvidence.techBuyVotes || 0) / totalV) * 100);
+              const neuW = Math.round(((techEvidence.techNeutralVotes || 0) / totalV) * 100);
+              const sellW = Math.max(0, 100 - buyW - neuW);
+              return `
+                <div class="space-y-1">
+                  <div class="w-full bg-gray-950 h-2.5 rounded-full overflow-hidden flex border border-gray-800">
+                    <div class="bg-emerald-500 h-full transition-all duration-500" style="width: ${buyW}%" title="شراء: ${buyW}%"></div>
+                    <div class="bg-gray-600 h-full transition-all duration-500" style="width: ${neuW}%" title="حياد: ${neuW}%"></div>
+                    <div class="bg-rose-500 h-full transition-all duration-500" style="width: ${sellW}%" title="بيع: ${sellW}%"></div>
+                  </div>
+                  <div class="flex justify-between text-[9.5px] text-gray-400 font-sans px-1">
+                    <span class="text-emerald-400 font-bold">المتوسطات المتحركة: ${techEvidence.maBuyCount} شراء / ${techEvidence.maSellCount} بيع</span>
+                    <span class="text-cyan-400 font-bold">مؤشرات التذبذب: ${techEvidence.oscBuyCount} شراء / ${techEvidence.oscSellCount} بيع</span>
+                  </div>
+                </div>
+              `;
+            })()}
+          </div>
+          ` : ''}
+
+          <!-- ADX Trend Strength & ATR Volatility Risk Guard -->
+          ${techEvidence ? `
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <!-- Box 1: ADX Trend Strength -->
+            <div class="p-3 rounded-xl bg-gray-900/90 border border-gray-800 space-y-1.5">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-white flex items-center gap-1.5">
+                  <i data-lucide="compass" class="w-3.5 h-3.5 text-cyan-400"></i>
+                  <span>قوة الاتجاه (ADX - 14):</span>
+                </span>
+                <span class="px-2 py-0.5 rounded font-mono font-bold text-xs ${techEvidence.adxBadgeColor}">
+                  ${techEvidence.adx}
+                </span>
+              </div>
+              <div class="text-[11px] text-gray-300 font-sans font-medium">
+                • التقييم: <strong class="text-cyan-300">${techEvidence.adxStatus}</strong>
+              </div>
+              <p class="text-[10px] text-gray-400 font-sans leading-relaxed">
+                يقيس مصداقية حركة السعر؛ الرقم أعلى من 25 يؤكد وجود اتجاه صاعد حقيقي يستحق استثمار الأموال، بينما دون 20 ينبه لحركة عرضية ضعيفة.
+              </p>
+            </div>
+
+            <!-- Box 2: ATR Volatility & Safe Buffer Stop -->
+            <div class="p-3 rounded-xl bg-gray-900/90 border border-gray-800 space-y-1.5">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-white flex items-center gap-1.5">
+                  <i data-lucide="shield-alert" class="w-3.5 h-3.5 text-amber-400"></i>
+                  <span>التذبذب الحقيقي (ATR - 14):</span>
+                </span>
+                <span class="px-2 py-0.5 rounded font-mono font-bold text-xs bg-amber-950/80 text-amber-300 border border-amber-500/40">
+                  ${techEvidence.atr} ج (${techEvidence.atrPct}%)
+                </span>
+              </div>
+              <div class="text-[11px] text-gray-300 font-sans font-medium">
+                • حاجز التذبذب الآمن: <strong class="text-amber-300 font-mono">${techEvidence.atrStopLoss} ج</strong>
+              </div>
+              <p class="text-[10px] text-gray-400 font-sans leading-relaxed">
+                يحسب مدى حركة السهم اليومية؛ يمنع خروجك الخاطئ أثناء التذبذب الطبيعي لجلسات التداول في البورصة المصرية.
+              </p>
+            </div>
+          </div>
+          ` : ''}
+
           <!-- Smart Copilot Numerical Evidence Box -->
           ${techEvidence ? `
           <div class="p-3.5 rounded-xl bg-gradient-to-br from-gray-900 to-gray-950 border border-cyan-500/30 space-y-2.5">
@@ -2919,6 +3017,17 @@
                 <span class="text-[10px] font-bold px-2 py-0.5 rounded-md ${item.rvolBadge || 'bg-slate-800 text-slate-300 border border-slate-700'} flex items-center gap-1" title="${item.rvolStatus || 'مؤشر السيولة المؤسسية'}">
                   <i data-lucide="activity" class="w-3 h-3"></i>
                   <span>RVol: ${item.rvol}x</span>
+                </span>
+              ` : ''}
+              ${item.techConsensusText ? `
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded-md ${item.techConsensusBadge || 'bg-emerald-950/80 text-emerald-300 border border-emerald-500/40'} flex items-center gap-1" title="تصويت المؤشرات الفنية والمتوسطات المتحركة">
+                  <i data-lucide="check-check" class="w-3 h-3"></i>
+                  <span>تصويت: ${item.techConsensusText}</span>
+                </span>
+              ` : ''}
+              ${item.adx ? `
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-900 text-slate-300 border border-slate-700 flex items-center gap-1" title="مؤشر قوة الاتجاه ADX">
+                  <span>ADX: ${item.adx}</span>
                 </span>
               ` : ''}
               ${(item.isDividendChampion || (item.dividendYield && item.dividendYield > 0)) ? `

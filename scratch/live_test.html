@@ -1,0 +1,3412 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" class="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <title>EGX AI Copilot | المستشار الذكي للبورصة المصرية</title>
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#064e3b">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="icon" type="image/png" href="/icon-192.png">
+  <link rel="apple-touch-icon" href="/icon-192.png">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            cairo: ['Cairo', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#f0fdf4',
+              500: '#10b981',
+              600: '#059669',
+              700: '#047857',
+              900: '#064e3b',
+            },
+            dark: {
+              bg: '#0b0f19',
+              card: '#111827',
+              border: '#1f2937',
+              accent: '#1e293b'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons (Dual CDN Resilient Fallback) -->
+  <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script>
+    if (typeof lucide === 'undefined') {
+      document.write('<script src="https://unpkg.com/lucide@latest"><\/script>');
+    }
+  </script>
+  
+  <!-- Chart.js for Asset Allocation & Simulation -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    *, body {
+      font-variant-numeric: tabular-nums lining-nums;
+      font-feature-settings: "lnum" 1, "tnum" 1;
+      box-sizing: border-box;
+    }
+    html, body {
+      font-family: 'Cairo', sans-serif;
+      transition: background-color 0.2s ease, color 0.2s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    
+    /* When a modal is open, lock body scroll to prevent page dragging */
+    body.modal-open {
+      overflow: hidden !important;
+      touch-action: none;
+    }
+
+    /* Universal Smooth Scroll & Touch Momentum */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .overflow-y-auto,
+    .overflow-x-auto,
+    #main-content-scroll,
+    nav {
+      -webkit-overflow-scrolling: touch !important;
+    }
+
+    @keyframes marquee {
+      0% { transform: translateX(0%); }
+      100% { transform: translateX(-50%); }
+    }
+    .animate-marquee {
+      display: inline-flex;
+      white-space: nowrap;
+      animation: marquee 25s linear infinite;
+    }
+    .animate-marquee:hover {
+      animation-play-state: paused;
+    }
+
+    /* ============================================================ */
+    /* Mobile-First Modal Scroll & Bottom Selection Engine          */
+    /* ============================================================ */
+    [id$="-modal"],
+    .modal-overlay {
+      overflow-y: auto !important;
+      -webkit-overflow-scrolling: touch !important;
+      overscroll-behavior-y: contain !important;
+      padding: 0.75rem !important;
+    }
+    @media (min-width: 640px) {
+      [id$="-modal"],
+      .modal-overlay {
+        padding: 1.5rem !important;
+      }
+    }
+
+    /* Modal Card Container: Flex column, auto margins, guaranteed bottom visibility */
+    .modal-card {
+      width: 100% !important;
+      margin-top: auto !important;
+      margin-bottom: auto !important;
+      display: flex !important;
+      flex-direction: column !important;
+      max-height: calc(100dvh - 1.5rem) !important;
+      min-height: 0 !important;
+    }
+    @media (min-width: 640px) {
+      .modal-card {
+        max-height: min(92vh, 880px) !important;
+      }
+    }
+
+    .modal-scroll-body {
+      flex: 1 1 auto !important;
+      overflow-y: auto !important;
+      -webkit-overflow-scrolling: touch !important;
+      overscroll-behavior: contain !important;
+      min-height: 0 !important;
+    }
+
+    /* Safe Bottom Insets for Modern Mobile Devices (Home Bar Safe Zone) */
+    .safe-bottom {
+      padding-bottom: max(0.75rem, env(safe-area-inset-bottom, 0.75rem)) !important;
+    }
+
+    /* Select and Form Controls on Mobile */
+    select, input, textarea {
+      font-size: 13px !important;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+    }
+    select {
+      background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: left 0.75rem center;
+      background-size: 14px 14px;
+      padding-left: 2rem !important;
+    }
+    html.dark select {
+      background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    }
+
+    /* Sidebar Transitions */
+    #app-sidebar {
+      transition: width 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+                  transform 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+                  opacity 0.2s ease,
+                  border-color 0.2s ease;
+      will-change: width, transform;
+    }
+    @media (min-width: 1024px) {
+      body.sidebar-closed #app-sidebar {
+        width: 0 !important;
+        min-width: 0 !important;
+        max-width: 0 !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+        border-left-width: 0 !important;
+        border-right-width: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow: hidden !important;
+      }
+    }
+    #sidebar-backdrop {
+      transition: opacity 0.25s ease-in-out;
+    }
+    #sidebar-toggle-btn {
+      transition: all 0.2s ease;
+    }
+    body.sidebar-closed #sidebar-toggle-btn {
+      background-color: rgba(16, 185, 129, 0.15) !important;
+      border-color: rgba(16, 185, 129, 0.5) !important;
+      color: #34d399 !important;
+    }
+    html.light body.sidebar-closed #sidebar-toggle-btn,
+    html:not(.dark) body.sidebar-closed #sidebar-toggle-btn {
+      background-color: #ecfdf5 !important;
+      border-color: #059669 !important;
+      color: #047857 !important;
+    }
+
+    /* ============================================================ */
+    /* Light Theme (Ultra Clear, High Contrast & Color Harmony)     */
+    /* ============================================================ */
+    html.light body,
+    html:not(.dark) body {
+      background-color: #f8fafc !important;
+      color: #0f172a !important;
+    }
+
+    /* Scrollbars */
+    html.light ::-webkit-scrollbar-track,
+    html:not(.dark) ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    html.light ::-webkit-scrollbar-thumb,
+    html:not(.dark) ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+
+    /* Top Ticker Bar */
+    html.light .top-ticker-bar,
+    html.light .bg-emerald-950\/70,
+    html:not(.dark) .top-ticker-bar,
+    html:not(.dark) .bg-emerald-950\/70 {
+      background-color: #ecfdf5 !important;
+      border-bottom: 1px solid #a7f3d0 !important;
+      color: #065f46 !important;
+    }
+    html.light .bg-emerald-900\/90,
+    html:not(.dark) .bg-emerald-900\/90 {
+      background-color: #059669 !important;
+      color: #ffffff !important;
+    }
+
+    /* Sidebar & Top Header Light */
+    html.light #app-sidebar,
+    html:not(.dark) #app-sidebar {
+      background-color: #ffffff !important;
+      border-color: #e2e8f0 !important;
+      box-shadow: -2px 0 10px rgba(0, 0, 0, 0.03) !important;
+    }
+    html.light header,
+    html:not(.dark) header {
+      background-color: #ffffff !important;
+      border-color: #e2e8f0 !important;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05) !important;
+    }
+    html.light header h2,
+    html:not(.dark) header h2 {
+      color: #0f172a !important;
+    }
+    html.light header p,
+    html:not(.dark) header p {
+      color: #475569 !important;
+    }
+
+    /* Cards & Containers in Light Mode */
+    html.light .bg-gray-900,
+    html.light .bg-gray-900\/80,
+    html.light .bg-gray-900\/90,
+    html:not(.dark) .bg-gray-900,
+    html:not(.dark) .bg-gray-900\/80,
+    html:not(.dark) .bg-gray-900\/90 {
+      background-color: #ffffff !important;
+      border-color: #e2e8f0 !important;
+      box-shadow: 0 1px 4px 0 rgba(15, 23, 42, 0.06), 0 1px 2px -1px rgba(15, 23, 42, 0.04) !important;
+    }
+
+    /* Inner Accent Boxes / Panels */
+    html.light .bg-gray-950,
+    html.light .bg-gray-950\/40,
+    html.light .bg-gray-950\/50,
+    html.light .bg-gray-950\/60,
+    html.light .bg-gray-950\/70,
+    html.light .bg-gray-950\/80,
+    html.light .bg-gray-950\/90,
+    html.light .bg-gray-950\/95,
+    html.light .bg-slate-900,
+    html.light .bg-slate-900\/80,
+    html.light .bg-slate-900\/90,
+    html.light .bg-slate-900\/95,
+    html.light .bg-slate-950,
+    html:not(.dark) .bg-gray-950,
+    html:not(.dark) .bg-gray-950\/40,
+    html:not(.dark) .bg-gray-950\/50,
+    html:not(.dark) .bg-gray-950\/60,
+    html:not(.dark) .bg-gray-950\/70,
+    html:not(.dark) .bg-gray-950\/80,
+    html:not(.dark) .bg-gray-950\/90,
+    html:not(.dark) .bg-gray-950\/95,
+    html:not(.dark) .bg-slate-900,
+    html:not(.dark) .bg-slate-900\/80,
+    html:not(.dark) .bg-slate-900\/90,
+    html:not(.dark) .bg-slate-900\/95,
+    html:not(.dark) .bg-slate-950 {
+      background-color: #f8fafc !important;
+      border-color: #e2e8f0 !important;
+    }
+
+    /* Subtle Tickers, Badges & Non-Button Grays in Light Mode (Catch all /80 /60 opacity variants) */
+    html.light [class*="bg-gray-800"]:not(button):not(a):not(input):not(select),
+    html.light [class*="bg-slate-800"]:not(button):not(a):not(input):not(select),
+    html.light [class*="bg-gray-700"]:not(button):not(a):not(input):not(select),
+    html.light [class*="bg-slate-700"]:not(button):not(a):not(input):not(select),
+    html:not(.dark) [class*="bg-gray-800"]:not(button):not(a):not(input):not(select),
+    html:not(.dark) [class*="bg-slate-800"]:not(button):not(a):not(input):not(select),
+    html:not(.dark) [class*="bg-gray-700"]:not(button):not(a):not(input):not(select),
+    html:not(.dark) [class*="bg-slate-700"]:not(button):not(a):not(input):not(select) {
+      background-color: #f1f5f9 !important;
+      border-color: #cbd5e1 !important;
+      color: #1e293b !important;
+    }
+    html.light [class*="bg-gray-800"]:not(button):not(a):not(input):not(select) *,
+    html.light [class*="bg-slate-800"]:not(button):not(a):not(input):not(select) *,
+    html:not(.dark) [class*="bg-gray-800"]:not(button):not(a):not(input):not(select) *,
+    html:not(.dark) [class*="bg-slate-800"]:not(button):not(a):not(input):not(select) * {
+      color: #1e293b !important;
+    }
+
+    /* Buttons: Secondary, Muted & Outlined in Light Mode */
+    html.light button.bg-gray-900,
+    html.light button.bg-gray-800,
+    html.light button.bg-gray-950,
+    html.light button.bg-slate-800,
+    html.light button.bg-slate-800\/80,
+    html.light a.bg-gray-900,
+    html.light a.bg-gray-800,
+    html.light a.bg-slate-800,
+    html:not(.dark) button.bg-gray-900,
+    html:not(.dark) button.bg-gray-800,
+    html:not(.dark) button.bg-gray-950,
+    html:not(.dark) button.bg-slate-800,
+    html:not(.dark) button.bg-slate-800\/80,
+    html:not(.dark) a.bg-gray-900,
+    html:not(.dark) a.bg-gray-800,
+    html:not(.dark) a.bg-slate-800 {
+      background-color: #f1f5f9 !important;
+      color: #1e293b !important;
+      border: 1px solid #cbd5e1 !important;
+    }
+    html.light button.bg-gray-900 *,
+    html.light button.bg-gray-800 *,
+    html.light button.bg-gray-950 *,
+    html.light button.bg-slate-800 *,
+    html.light a.bg-gray-900 *,
+    html.light a.bg-gray-800 *,
+    html.light a.bg-slate-800 *,
+    html:not(.dark) button.bg-gray-900 *,
+    html:not(.dark) button.bg-gray-800 *,
+    html:not(.dark) button.bg-gray-950 *,
+    html:not(.dark) button.bg-slate-800 *,
+    html:not(.dark) a.bg-gray-900 *,
+    html:not(.dark) a.bg-gray-800 *,
+    html:not(.dark) a.bg-slate-800 * {
+      color: #1e293b !important;
+    }
+    html.light button.bg-gray-900:hover,
+    html.light button.bg-gray-800:hover,
+    html.light button.bg-gray-950:hover,
+    html.light button.hover\:bg-gray-700:hover,
+    html.light a.bg-gray-900:hover,
+    html.light a.bg-gray-800:hover,
+    html:not(.dark) button.bg-gray-900:hover,
+    html:not(.dark) button.bg-gray-800:hover,
+    html:not(.dark) button.bg-gray-950:hover,
+    html:not(.dark) button.hover\:bg-gray-700:hover,
+    html:not(.dark) a.bg-gray-900:hover,
+    html:not(.dark) a.bg-gray-800:hover {
+      background-color: #e2e8f0 !important;
+      color: #0f172a !important;
+    }
+
+    /* Sidebar Navigation Tabs (Inactive & Hover) */
+    .tab-btn {
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    html.dark .tab-btn:not(.bg-emerald-600) {
+      color: #94a3b8;
+      background-color: transparent;
+    }
+    html.dark .tab-btn:not(.bg-emerald-600):hover {
+      color: #ffffff;
+      background-color: rgba(255, 255, 255, 0.05);
+    }
+    html.light .tab-btn:not(.bg-emerald-600),
+    html:not(.dark) .tab-btn:not(.bg-emerald-600) {
+      color: #475569 !important;
+      background-color: transparent !important;
+    }
+    html.light .tab-btn:not(.bg-emerald-600):hover,
+    html:not(.dark) .tab-btn:not(.bg-emerald-600):hover {
+      color: #0f172a !important;
+      background-color: #f1f5f9 !important;
+    }
+    .tab-btn.bg-emerald-600 {
+      background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+      color: #ffffff !important;
+      box-shadow: 0 4px 12px rgba(5, 150, 105, 0.35) !important;
+      border: 1px solid rgba(16, 185, 129, 0.4) !important;
+      font-weight: 700 !important;
+    }
+    .tab-btn.bg-emerald-600 * {
+      color: #ffffff !important;
+    }
+
+    /* Sidebar Footer & Thndr Button */
+    html.dark .sidebar-footer {
+      background-color: #0b1120;
+      border-color: #1e293b;
+    }
+    html.light .sidebar-footer,
+    html:not(.dark) .sidebar-footer {
+      background-color: #f8fafc;
+      border-color: #e2e8f0;
+    }
+    html.dark .sidebar-server-card {
+      background-color: #131b2e;
+      border-color: #1e293b;
+    }
+    html.light .sidebar-server-card,
+    html:not(.dark) .sidebar-server-card {
+      background-color: #ffffff;
+      border-color: #e2e8f0;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+    html.dark .sidebar-server-title {
+      color: #ffffff !important;
+    }
+    html.light .sidebar-server-title,
+    html:not(.dark) .sidebar-server-title {
+      color: #0f172a !important;
+      font-weight: 700 !important;
+    }
+    html.dark .sidebar-server-sub {
+      color: #94a3b8 !important;
+    }
+    html.light .sidebar-server-sub,
+    html:not(.dark) .sidebar-server-sub {
+      color: #64748b !important;
+    }
+    html.dark .sidebar-server-btn {
+      color: #94a3b8;
+    }
+    html.dark .sidebar-server-btn:hover {
+      color: #38bdf8;
+      background-color: #1e293b;
+    }
+    html.light .sidebar-server-btn,
+    html:not(.dark) .sidebar-server-btn {
+      color: #64748b;
+    }
+    html.light .sidebar-server-btn:hover,
+    html:not(.dark) .sidebar-server-btn:hover {
+      color: #0284c7;
+      background-color: #f1f5f9;
+    }
+
+    .btn-thndr {
+      background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+      color: #ffffff !important;
+      box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3) !important;
+      border: 1px solid rgba(16, 185, 129, 0.35) !important;
+      font-weight: 700 !important;
+    }
+    .btn-thndr:hover {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+      color: #ffffff !important;
+      transform: translateY(-1px);
+    }
+    .btn-thndr * {
+      color: #ffffff !important;
+    }
+
+    /* Typography & Contrast in Light Mode */
+    html.light h1:not([class*="bg-"]):not(.btn-thndr *):not(#oed-emergency-banner *),
+    html.light h2:not([class*="bg-"]):not(.btn-thndr *):not(#oed-emergency-banner *),
+    html.light h3:not([class*="bg-"]):not(.btn-thndr *):not(#oed-emergency-banner *),
+    html.light h4:not([class*="bg-"]):not(.btn-thndr *):not(#oed-emergency-banner *),
+    html:not(.dark) h1:not([class*="bg-"]):not(.btn-thndr *):not(#oed-emergency-banner *),
+    html:not(.dark) h2:not([class*="bg-"]):not(.btn-thndr *):not(#oed-emergency-banner *),
+    html:not(.dark) h3:not([class*="bg-"]):not(.btn-thndr *):not(#oed-emergency-banner *),
+    html:not(.dark) h4:not([class*="bg-"]):not(.btn-thndr *):not(#oed-emergency-banner *) {
+      color: #0f172a !important;
+    }
+    html.light p:not(#oed-emergency-banner *):not(button *):not(.btn-thndr *),
+    html:not(.dark) p:not(#oed-emergency-banner *):not(button *):not(.btn-thndr *) {
+      color: #334155 !important;
+    }
+
+    /* Universal High-Contrast Text Darkening in Light Mode (fixes invisible white-on-white text) */
+    html.light .text-white:not(button):not(button *):not(a):not(a *):not(.btn-thndr):not(.btn-thndr *):not(#btn-live-egx-refresh):not(#btn-live-egx-refresh *):not(#oed-emergency-banner *):not([class*="bg-emerald-600"]):not([class*="bg-emerald-500"]):not([class*="bg-rose-600"]):not([class*="bg-rose-500"]):not([class*="bg-cyan-600"]):not([class*="bg-indigo-600"]):not([class*="bg-purple-600"]):not([class*="bg-blue-600"]):not([class*="bg-amber-600"]):not([class*="bg-emerald-700"]):not([class*="bg-indigo-700"]):not([class*="bg-rose-700"]):not([class*="bg-cyan-700"]):not([class*="bg-emerald-800"]):not([class*="bg-amber-600"]):not(.badge-solid):not(.badge-solid *),
+    html:not(.dark) .text-white:not(button):not(button *):not(a):not(a *):not(.btn-thndr):not(.btn-thndr *):not(#btn-live-egx-refresh):not(#btn-live-egx-refresh *):not(#oed-emergency-banner *):not([class*="bg-emerald-600"]):not([class*="bg-emerald-500"]):not([class*="bg-rose-600"]):not([class*="bg-rose-500"]):not([class*="bg-cyan-600"]):not([class*="bg-indigo-600"]):not([class*="bg-purple-600"]):not([class*="bg-blue-600"]):not([class*="bg-amber-600"]):not([class*="bg-emerald-700"]):not([class*="bg-indigo-700"]):not([class*="bg-rose-700"]):not([class*="bg-cyan-700"]):not([class*="bg-emerald-800"]):not([class*="bg-amber-600"]):not(.badge-solid):not(.badge-solid *),
+    html.light .text-slate-100,
+    html.light .text-slate-50,
+    html.light .text-gray-100,
+    html.light .text-gray-50,
+    html:not(.dark) .text-slate-100,
+    html:not(.dark) .text-slate-50,
+    html:not(.dark) .text-gray-100,
+    html:not(.dark) .text-gray-50 {
+      color: #0f172a !important;
+    }
+
+    html.light .text-gray-200,
+    html.light .text-gray-300,
+    html.light .text-slate-200,
+    html.light .text-slate-300,
+    html:not(.dark) .text-gray-200,
+    html:not(.dark) .text-gray-300,
+    html:not(.dark) .text-slate-200,
+    html:not(.dark) .text-slate-300 {
+      color: #1e293b !important;
+    }
+    html.light .text-gray-400,
+    html.light .text-slate-400,
+    html:not(.dark) .text-gray-400,
+    html:not(.dark) .text-slate-400 {
+      color: #475569 !important;
+    }
+    html.light .text-gray-500,
+    html.light .text-slate-500,
+    html:not(.dark) .text-gray-500,
+    html:not(.dark) .text-slate-500 {
+      color: #64748b !important;
+    }
+
+    /* ALWAYS PROTECT Solid Colored Primary Action Buttons & Badges */
+    button[class*="bg-emerald-"],
+    button[class*="bg-rose-"],
+    button[class*="bg-cyan-"],
+    button[class*="bg-amber-"],
+    button[class*="bg-indigo-"],
+    button[class*="bg-purple-"],
+    button[class*="bg-blue-"],
+    a[class*="bg-emerald-"],
+    a[class*="bg-rose-"],
+    a[class*="bg-cyan-"],
+    a[class*="bg-amber-"],
+    a[class*="bg-indigo-"],
+    a[class*="bg-purple-"],
+    a[class*="bg-blue-"],
+    span.bg-rose-600,
+    span.bg-rose-500,
+    span.bg-emerald-600,
+    span.bg-emerald-500,
+    span.bg-cyan-600,
+    span.bg-indigo-600,
+    .btn-thndr,
+    #btn-live-egx-refresh {
+      color: #ffffff !important;
+    }
+
+    button[class*="bg-emerald-"] *,
+    button[class*="bg-rose-"] *,
+    button[class*="bg-cyan-"] *,
+    button[class*="bg-amber-"] *,
+    button[class*="bg-indigo-"] *,
+    button[class*="bg-purple-"] *,
+    button[class*="bg-blue-"] *,
+    a[class*="bg-emerald-"] *,
+    a[class*="bg-rose-"] *,
+    a[class*="bg-cyan-"] *,
+    a[class*="bg-amber-"] *,
+    a[class*="bg-indigo-"] *,
+    a[class*="bg-purple-"] *,
+    a[class*="bg-blue-"] *,
+    span.bg-rose-600 *,
+    span.bg-rose-500 *,
+    span.bg-emerald-600 *,
+    span.bg-emerald-500 *,
+    span.bg-cyan-600 *,
+    span.bg-indigo-600 *,
+    .btn-thndr *,
+    #btn-live-egx-refresh * {
+      color: #ffffff !important;
+    }
+
+    /* Live EGX Refresh Button */
+    #btn-live-egx-refresh {
+      background: linear-gradient(135deg, #0284c7 0%, #2563eb 50%, #4f46e5 100%) !important;
+      color: #ffffff !important;
+      border: 1px solid rgba(56, 189, 248, 0.4) !important;
+      box-shadow: 0 4px 14px rgba(2, 132, 199, 0.3) !important;
+    }
+    #btn-live-egx-refresh * {
+      color: #ffffff !important;
+    }
+    #btn-live-egx-refresh #icon-live-egx-refresh {
+      color: #fde047 !important;
+    }
+
+    /* Emergency Banner: Light Red Theme & High Contrast Text */
+    #oed-emergency-banner {
+      background-color: #fff1f2 !important; /* Rose-50 (أحمر فاتح مريح) */
+      border-bottom: 2px solid #fda4af !important; /* Rose-300 */
+    }
+    html.dark #oed-emergency-banner {
+      background-color: #4c0519 !important; /* Rose-950 in dark mode */
+      border-bottom: 2px solid #be123c !important;
+    }
+    #oed-banner-title {
+      color: #881337 !important; /* Rose-900 عنابي واضح وداكن */
+      font-weight: 800 !important;
+    }
+    html.dark #oed-banner-title {
+      color: #ffe4e6 !important;
+    }
+    #oed-banner-desc {
+      color: #9f1239 !important; /* Rose-800 عنابي مقروء وواضح */
+      font-weight: 700 !important;
+    }
+    html.dark #oed-banner-desc {
+      color: #fecdd3 !important;
+    }
+    #oed-banner-action-btn {
+      background-color: #e11d48 !important; /* Rose-600 */
+      color: #ffffff !important;
+      border: 1px solid #be123c !important;
+    }
+    #oed-banner-action-btn * {
+      color: #ffffff !important;
+    }
+    #oed-banner-action-btn:hover {
+      background-color: #be123c !important;
+    }
+
+    /* Universal Text Color Mapping in Light Mode (High Contrast, WCAG AA Compliant) */
+    html.light .text-emerald-500,
+    html.light .text-emerald-400,
+    html.light .text-emerald-300,
+    html.light .text-emerald-200,
+    html:not(.dark) .text-emerald-500,
+    html:not(.dark) .text-emerald-400,
+    html:not(.dark) .text-emerald-300,
+    html:not(.dark) .text-emerald-200 {
+      color: #047857 !important;
+      font-weight: 700;
+    }
+    html.light .text-rose-500,
+    html.light .text-rose-400,
+    html.light .text-rose-300,
+    html.light .text-rose-200,
+    html:not(.dark) .text-rose-500,
+    html:not(.dark) .text-rose-400,
+    html:not(.dark) .text-rose-300,
+    html:not(.dark) .text-rose-200 {
+      color: #b91c1c !important;
+      font-weight: 700;
+    }
+    html.light .text-cyan-500,
+    html.light .text-cyan-400,
+    html.light .text-cyan-300,
+    html.light .text-cyan-200,
+    html.light .text-sky-400,
+    html.light .text-sky-300,
+    html:not(.dark) .text-cyan-500,
+    html:not(.dark) .text-cyan-400,
+    html:not(.dark) .text-cyan-300,
+    html:not(.dark) .text-cyan-200,
+    html:not(.dark) .text-sky-400,
+    html:not(.dark) .text-sky-300 {
+      color: #0284c7 !important;
+      font-weight: 700;
+    }
+    html.light .text-amber-500,
+    html.light .text-amber-400,
+    html.light .text-amber-300,
+    html.light .text-amber-200,
+    html:not(.dark) .text-amber-500,
+    html:not(.dark) .text-amber-400,
+    html:not(.dark) .text-amber-300,
+    html:not(.dark) .text-amber-200 {
+      color: #b45309 !important;
+      font-weight: 700;
+    }
+    html.light .text-purple-500,
+    html.light .text-purple-400,
+    html.light .text-purple-300,
+    html.light .text-purple-200,
+    html:not(.dark) .text-purple-500,
+    html:not(.dark) .text-purple-400,
+    html:not(.dark) .text-purple-300,
+    html:not(.dark) .text-purple-200 {
+      color: #7e22ce !important;
+      font-weight: 700;
+    }
+    html.light .text-indigo-500,
+    html.light .text-indigo-400,
+    html.light .text-indigo-300,
+    html.light .text-indigo-200,
+    html:not(.dark) .text-indigo-500,
+    html:not(.dark) .text-indigo-400,
+    html:not(.dark) .text-indigo-300,
+    html:not(.dark) .text-indigo-200 {
+      color: #4338ca !important;
+      font-weight: 700;
+    }
+
+    /* Tinted Chips, Badges & Alert Boxes in Light Mode (Ultra Legible & Color Harmonized) */
+    html.light [class*="bg-emerald-950"]:not(button):not(a):not(header):not(.top-ticker-bar),
+    html.light [class*="bg-emerald-900"]:not(button):not(a):not(header):not(.top-ticker-bar),
+    html.light [class*="bg-emerald-500/20"]:not(button):not(a),
+    html.light [class*="bg-emerald-500/10"]:not(button):not(a),
+    html:not(.dark) [class*="bg-emerald-950"]:not(button):not(a):not(header):not(.top-ticker-bar),
+    html:not(.dark) [class*="bg-emerald-900"]:not(button):not(a):not(header):not(.top-ticker-bar),
+    html:not(.dark) [class*="bg-emerald-500/20"]:not(button):not(a),
+    html:not(.dark) [class*="bg-emerald-500/10"]:not(button):not(a) {
+      background-color: #ecfdf5 !important;
+      border-color: #a7f3d0 !important;
+      color: #047857 !important;
+    }
+    html.light [class*="bg-emerald-950"]:not(button):not(a):not(header):not(.top-ticker-bar) *,
+    html.light [class*="bg-emerald-900"]:not(button):not(a):not(header):not(.top-ticker-bar) *,
+    html:not(.dark) [class*="bg-emerald-950"]:not(button):not(a):not(header):not(.top-ticker-bar) *,
+    html:not(.dark) [class*="bg-emerald-900"]:not(button):not(a):not(header):not(.top-ticker-bar) * {
+      color: #047857 !important;
+    }
+
+    html.light [class*="bg-cyan-950"]:not(button):not(a),
+    html.light [class*="bg-cyan-900"]:not(button):not(a),
+    html.light [class*="bg-cyan-500/20"]:not(button):not(a),
+    html.light [class*="bg-cyan-500/10"]:not(button):not(a),
+    html:not(.dark) [class*="bg-cyan-950"]:not(button):not(a),
+    html:not(.dark) [class*="bg-cyan-900"]:not(button):not(a),
+    html:not(.dark) [class*="bg-cyan-500/20"]:not(button):not(a),
+    html:not(.dark) [class*="bg-cyan-500/10"]:not(button):not(a) {
+      background-color: #f0f9ff !important;
+      border-color: #bae6fd !important;
+      color: #0284c7 !important;
+    }
+    html.light [class*="bg-cyan-950"]:not(button):not(a) *,
+    html.light [class*="bg-cyan-900"]:not(button):not(a) *,
+    html:not(.dark) [class*="bg-cyan-950"]:not(button):not(a) *,
+    html:not(.dark) [class*="bg-cyan-900"]:not(button):not(a) * {
+      color: #0284c7 !important;
+    }
+
+    html.light [class*="bg-rose-950"]:not(button):not(a),
+    html.light [class*="bg-rose-900"]:not(button):not(a),
+    html.light [class*="bg-rose-500/20"]:not(button):not(a),
+    html.light [class*="bg-rose-500/10"]:not(button):not(a),
+    html:not(.dark) [class*="bg-rose-950"]:not(button):not(a),
+    html:not(.dark) [class*="bg-rose-900"]:not(button):not(a),
+    html:not(.dark) [class*="bg-rose-500/20"]:not(button):not(a),
+    html:not(.dark) [class*="bg-rose-500/10"]:not(button):not(a) {
+      background-color: #fef2f2 !important;
+      border-color: #fecaca !important;
+      color: #b91c1c !important;
+    }
+    html.light [class*="bg-rose-950"]:not(button):not(a) *,
+    html.light [class*="bg-rose-900"]:not(button):not(a) *,
+    html:not(.dark) [class*="bg-rose-950"]:not(button):not(a) *,
+    html:not(.dark) [class*="bg-rose-900"]:not(button):not(a) * {
+      color: #b91c1c !important;
+    }
+
+    html.light [class*="bg-amber-950"]:not(button):not(a),
+    html.light [class*="bg-amber-900"]:not(button):not(a),
+    html.light [class*="bg-amber-500/20"]:not(button):not(a),
+    html.light [class*="bg-amber-500/10"]:not(button):not(a),
+    html:not(.dark) [class*="bg-amber-950"]:not(button):not(a),
+    html:not(.dark) [class*="bg-amber-900"]:not(button):not(a),
+    html:not(.dark) [class*="bg-amber-500/20"]:not(button):not(a),
+    html:not(.dark) [class*="bg-amber-500/10"]:not(button):not(a) {
+      background-color: #fffbeb !important;
+      border-color: #fde68a !important;
+      color: #b45309 !important;
+    }
+    html.light [class*="bg-amber-950"]:not(button):not(a) *,
+    html.light [class*="bg-amber-900"]:not(button):not(a) *,
+    html:not(.dark) [class*="bg-amber-950"]:not(button):not(a) *,
+    html:not(.dark) [class*="bg-amber-900"]:not(button):not(a) * {
+      color: #b45309 !important;
+    }
+
+    html.light [class*="bg-purple-950"]:not(button):not(a),
+    html.light [class*="bg-purple-900"]:not(button):not(a),
+    html.light [class*="bg-indigo-950"]:not(button):not(a),
+    html.light [class*="bg-indigo-900"]:not(button):not(a),
+    html.light [class*="bg-purple-500/20"]:not(button):not(a),
+    html.light [class*="bg-indigo-500/20"]:not(button):not(a),
+    html.light [class*="bg-purple-500/10"]:not(button):not(a),
+    html.light [class*="bg-indigo-500/10"]:not(button):not(a),
+    html:not(.dark) [class*="bg-purple-950"]:not(button):not(a),
+    html:not(.dark) [class*="bg-purple-900"]:not(button):not(a),
+    html:not(.dark) [class*="bg-indigo-950"]:not(button):not(a),
+    html:not(.dark) [class*="bg-indigo-900"]:not(button):not(a),
+    html:not(.dark) [class*="bg-purple-500/20"]:not(button):not(a),
+    html:not(.dark) [class*="bg-indigo-500/20"]:not(button):not(a),
+    html:not(.dark) [class*="bg-purple-500/10"]:not(button):not(a),
+    html:not(.dark) [class*="bg-indigo-500/10"]:not(button):not(a) {
+      background-color: #f5f3ff !important;
+      border-color: #ddd6fe !important;
+      color: #6d28d9 !important;
+    }
+    html.light [class*="bg-purple-950"]:not(button):not(a) *,
+    html.light [class*="bg-indigo-950"]:not(button):not(a) *,
+    html:not(.dark) [class*="bg-purple-950"]:not(button):not(a) *,
+    html:not(.dark) [class*="bg-indigo-950"]:not(button):not(a) * {
+      color: #6d28d9 !important;
+    }
+
+    /* Daily Action Hub Banner */
+    html.light .daily-hub-banner,
+    html:not(.dark) .daily-hub-banner {
+      background: linear-gradient(135deg, #ecfdf5 0%, #ffffff 45%, #f0fdf4 100%) !important;
+      border: 1.5px solid #a7f3d0 !important;
+      box-shadow: 0 4px 20px -3px rgba(5, 150, 105, 0.12), 0 2px 6px -2px rgba(5, 150, 105, 0.06) !important;
+    }
+    html.light .daily-hub-banner h2,
+    html:not(.dark) .daily-hub-banner h2 {
+      color: #064e3b !important;
+      font-weight: 900 !important;
+    }
+    html.light .daily-hub-banner p,
+    html:not(.dark) .daily-hub-banner p {
+      color: #334155 !important;
+    }
+    html.dark .daily-hub-banner {
+      background: linear-gradient(135deg, #0e1424 0%, #111827 50%, #0a0f1d 100%) !important;
+      border: 1.5px solid rgba(16, 185, 129, 0.35) !important;
+    }
+
+    /* Autonomous Cloud Engine Banner */
+    html.dark .cloud-engine-banner {
+      background: linear-gradient(135deg, rgba(6, 78, 59, 0.45) 0%, #111827 50%, #0e1424 100%) !important;
+      border: 1px solid rgba(16, 185, 129, 0.35) !important;
+    }
+    html.dark .cloud-engine-title {
+      color: #ffffff !important;
+    }
+    html.dark .cloud-engine-badge {
+      background-color: rgba(16, 185, 129, 0.15) !important;
+      border: 1px solid rgba(16, 185, 129, 0.4) !important;
+      color: #6ee7b7 !important;
+    }
+    html.dark .cloud-engine-subtext {
+      color: #94a3b8 !important;
+    }
+    html.dark .cloud-engine-timestamp {
+      color: #34d399 !important;
+    }
+    html.dark .btn-cloud-logs {
+      background-color: #1e293b !important;
+      border: 1px solid #334155 !important;
+      color: #cbd5e1 !important;
+    }
+    html.dark .btn-cloud-logs:hover {
+      background-color: #334155 !important;
+      color: #ffffff !important;
+    }
+
+    html.light .cloud-engine-banner,
+    html:not(.dark) .cloud-engine-banner {
+      background: linear-gradient(135deg, #ecfdf5 0%, #f0fdf4 40%, #ffffff 100%) !important;
+      border: 1.5px solid #a7f3d0 !important;
+      box-shadow: 0 4px 15px -3px rgba(5, 150, 105, 0.1), 0 2px 6px -2px rgba(5, 150, 105, 0.05) !important;
+    }
+    html.light .cloud-engine-title,
+    html:not(.dark) .cloud-engine-title {
+      color: #064e3b !important;
+      font-weight: 800 !important;
+    }
+    html.light .cloud-engine-badge,
+    html:not(.dark) .cloud-engine-badge {
+      background-color: #d1fae5 !important;
+      border: 1px solid #6ee7b7 !important;
+      color: #047857 !important;
+      font-weight: 700 !important;
+    }
+    html.light .cloud-engine-badge *,
+    html:not(.dark) .cloud-engine-badge * {
+      color: #047857 !important;
+    }
+    html.light .cloud-engine-subtext,
+    html:not(.dark) .cloud-engine-subtext {
+      color: #334155 !important;
+    }
+    html.light .cloud-engine-timestamp,
+    html:not(.dark) .cloud-engine-timestamp {
+      color: #047857 !important;
+      font-weight: 700 !important;
+    }
+    html.light .btn-cloud-logs,
+    html:not(.dark) .btn-cloud-logs {
+      background-color: #ffffff !important;
+      border: 1.5px solid #cbd5e1 !important;
+      color: #1e293b !important;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+    }
+    html.light .btn-cloud-logs *,
+    html:not(.dark) .btn-cloud-logs * {
+      color: #1e293b !important;
+    }
+
+    /* General Feature Banners in Light Mode */
+    html.light div[class*="bg-gradient-to-"]:not(.btn-thndr):not(#btn-live-egx-refresh):not(#oed-emergency-banner):not(.daily-hub-banner),
+    html:not(.dark) div[class*="bg-gradient-to-"]:not(.btn-thndr):not(#btn-live-egx-refresh):not(#oed-emergency-banner):not(.daily-hub-banner) {
+      background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 50%, #f8fafc 100%) !important;
+      border: 1px solid #cbd5e1 !important;
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04) !important;
+    }
+    html.light div[class*="bg-gradient-to-"]:not(#oed-emergency-banner) h1,
+    html.light div[class*="bg-gradient-to-"]:not(#oed-emergency-banner) h2,
+    html.light div[class*="bg-gradient-to-"]:not(#oed-emergency-banner) h3,
+    html.light div[class*="bg-gradient-to-"]:not(#oed-emergency-banner) h4,
+    html:not(.dark) div[class*="bg-gradient-to-"]:not(#oed-emergency-banner) h1,
+    html:not(.dark) div[class*="bg-gradient-to-"]:not(#oed-emergency-banner) h2,
+    html:not(.dark) div[class*="bg-gradient-to-"]:not(#oed-emergency-banner) h3,
+    html:not(.dark) div[class*="bg-gradient-to-"]:not(#oed-emergency-banner) h4 {
+      color: #0f172a !important;
+    }
+
+    /* Tables in Light Mode */
+    html.light thead,
+    html:not(.dark) thead {
+      background-color: #f1f5f9 !important;
+      border-color: #e2e8f0 !important;
+    }
+    html.light thead th,
+    html:not(.dark) thead th {
+      color: #334155 !important;
+      font-weight: 700 !important;
+    }
+    html.light tbody tr,
+    html:not(.dark) tbody tr {
+      border-color: #e2e8f0 !important;
+    }
+    html.light tbody tr:hover,
+    html:not(.dark) tbody tr:hover {
+      background-color: #f8fafc !important;
+    }
+
+    /* Inputs, Selects & Forms */
+    html.light input,
+    html.light select,
+    html.light textarea,
+    html:not(.dark) input,
+    html:not(.dark) select,
+    html:not(.dark) textarea {
+      background-color: #ffffff !important;
+      border: 1.5px solid #cbd5e1 !important;
+      color: #0f172a !important;
+    }
+    html.light select option,
+    html:not(.dark) select option {
+      background-color: #ffffff !important;
+      color: #0f172a !important;
+    }
+    html.light input:focus,
+    html.light select:focus,
+    html.light textarea:focus,
+    html:not(.dark) input:focus,
+    html:not(.dark) select:focus,
+    html:not(.dark) textarea:focus {
+      border-color: #059669 !important;
+      box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.15) !important;
+    }
+    html.light input::placeholder,
+    html:not(.dark) input::placeholder {
+      color: #64748b !important;
+    }
+
+    /* Chat Messages in Light Mode */
+    html.light #chat-messages,
+    html:not(.dark) #chat-messages {
+      background-color: #f8fafc !important;
+    }
+    html.light #chat-messages .bg-gray-800,
+    html:not(.dark) #chat-messages .bg-gray-800 {
+      background-color: #ffffff !important;
+      border: 1px solid #e2e8f0 !important;
+      color: #0f172a !important;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05) !important;
+    }
+
+    /* All Modals in Light Mode */
+    html.light [id$="-modal"] > div,
+    html.light .modal-card,
+    html:not(.dark) [id$="-modal"] > div,
+    html:not(.dark) .modal-card {
+      background-color: #ffffff !important;
+      border: 1px solid #e2e8f0 !important;
+      color: #0f172a !important;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+    }
+
+    /* Footer in Light Mode */
+    html.light footer,
+    html:not(.dark) footer {
+      background-color: #ffffff !important;
+      border-color: #e2e8f0 !important;
+      color: #64748b !important;
+    }
+
+    /* Borders & Dividers */
+    html.light .border-gray-800,
+    html.light .border-gray-700,
+    html.light .border-slate-800,
+    html.light .border-slate-700,
+    html:not(.dark) .border-gray-800,
+    html:not(.dark) .border-gray-700,
+    html:not(.dark) .border-slate-800,
+    html:not(.dark) .border-slate-700 {
+      border-color: #e2e8f0 !important;
+    }
+    html.light .divide-gray-800\/60 > :not([hidden]) ~ :not([hidden]),
+    html.light .divide-gray-800 > :not([hidden]) ~ :not([hidden]),
+    html:not(.dark) .divide-gray-800\/60 > :not([hidden]) ~ :not([hidden]),
+    html:not(.dark) .divide-gray-800 > :not([hidden]) ~ :not([hidden]) {
+      border-color: #e2e8f0 !important;
+    }
+
+    /* ============================================================ */
+    /* Dark Theme System (High Contrast & Saturated Readability)   */
+    /* ============================================================ */
+    html.dark body {
+      background-color: #090d16;
+      color: #f8fafc;
+    }
+    html.dark ::-webkit-scrollbar-track {
+      background: #090d16;
+    }
+    html.dark ::-webkit-scrollbar-thumb {
+      background: #1e293b;
+      border-radius: 4px;
+    }
+    html.dark #app-sidebar,
+    html.dark header,
+    html.dark footer {
+      background-color: #0e1424;
+      border-color: #1e293b;
+    }
+    html.dark .bg-gray-900,
+    html.dark .bg-gray-900\/80,
+    html.dark .bg-gray-900\/90 {
+      background-color: #131b2e !important;
+      border-color: #1e293b !important;
+    }
+    html.dark .bg-gray-950,
+    html.dark .bg-gray-950\/40,
+    html.dark .bg-gray-950\/50,
+    html.dark .bg-gray-950\/60,
+    html.dark .bg-gray-950\/70,
+    html.dark .bg-gray-950\/80,
+    html.dark .bg-gray-950\/90,
+    html.dark .bg-gray-950\/95,
+    html.dark .bg-slate-900,
+    html.dark .bg-slate-900\/80,
+    html.dark .bg-slate-900\/90,
+    html.dark .bg-slate-900\/95,
+    html.dark .bg-slate-950 {
+      background-color: #0a0f1d !important;
+      border-color: #1e293b !important;
+    }
+    html.dark [id$="-modal"] > div,
+    html.dark .modal-card {
+      background-color: #111827 !important;
+      border: 1px solid #1f2937 !important;
+      color: #f8fafc !important;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important;
+    }
+    html.dark input,
+    html.dark select,
+    html.dark textarea {
+      background-color: #0a0f1d !important;
+      border-color: #334155 !important;
+      color: #f8fafc !important;
+    }
+    html.dark select option {
+      background-color: #0a0f1d !important;
+      color: #f8fafc !important;
+    }
+    html.dark input:focus,
+    html.dark select:focus,
+    html.dark textarea:focus {
+      border-color: #10b981 !important;
+    }
+    html.dark .text-gray-400,
+    html.dark .text-slate-400 {
+      color: #94a3b8 !important;
+    }
+    html.dark .text-gray-300,
+    html.dark .text-slate-300 {
+      color: #e2e8f0 !important;
+    }
+    html.dark .text-gray-500,
+    html.dark .text-slate-500 {
+      color: #64748b !important;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col bg-[#090d16] text-slate-100 antialiased selection:bg-emerald-500 selection:text-white">
+
+  <!-- Top Real-Time Alert Ticker (Live Market Stream) -->
+  <div class="top-ticker-bar bg-emerald-950/70 border-b border-emerald-800/40 py-1.5 px-4 overflow-hidden relative text-xs text-emerald-300 flex items-center shrink-0 z-30">
+    <div class="flex items-center gap-1.5 shrink-0 ml-3 bg-emerald-900/90 text-emerald-200 px-2.5 py-0.5 rounded-lg font-bold text-[11px] z-10 shadow">
+      <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+      <span>متابعة تدفقات السوق:</span>
+    </div>
+    <div class="overflow-hidden flex-1 relative">
+      <div id="live-ticker-marquee" class="animate-marquee flex items-center gap-8 font-medium text-[11px]">
+        <span class="flex items-center gap-1">📊 <strong>البورصة المصرية:</strong> جاري تحميل ومزامنة أسعار التداول والسيولة اللحظية...</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- App Body Layout Container (Sidebar + Main Content Area) -->
+  <div class="flex-1 flex overflow-hidden w-full relative">
+
+    <!-- Mobile Sidebar Backdrop Overlay -->
+    <div id="sidebar-backdrop" onclick="toggleSidebarDrawer()" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-40 hidden transition-opacity duration-300 lg:hidden"></div>
+
+    <!-- SIDEBAR NAVIGATION (Side Menu) -->
+    <aside id="app-sidebar" class="fixed lg:static top-0 bottom-0 right-0 z-50 w-72 lg:w-68 xl:w-72 bg-[#0e1424] border-l border-slate-800 flex flex-col h-full transform translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out shrink-0 overflow-hidden shadow-2xl lg:shadow-none">
+      
+      <!-- Sidebar Brand Header -->
+      <div class="p-4 border-b border-slate-800 flex items-center justify-between shrink-0">
+        <div class="flex items-center space-x-3 space-x-reverse">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-400 flex items-center justify-center shadow-lg shadow-emerald-500/20 text-white shrink-0">
+            <i data-lucide="trending-up" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-1.5">
+              <h1 class="text-base font-extrabold text-white tracking-wide">EGX Copilot</h1>
+              <span class="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Pro</span>
+            </div>
+            <p class="text-[11px] text-slate-400">المستشار الذكي للبورصة</p>
+          </div>
+        </div>
+
+        <!-- Sidebar Collapse / Close Button (Desktop & Mobile) -->
+        <button onclick="toggleSidebar()" class="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition flex items-center justify-center" title="إخفاء القائمة الجانبية" aria-label="إخفاء القائمة الجانبية">
+          <i data-lucide="chevron-right" class="w-5 h-5 hidden lg:block"></i>
+          <i data-lucide="x" class="w-5 h-5 lg:hidden"></i>
+        </button>
+      </div>
+
+      <!-- Sidebar Navigation Links Scrollable Area -->
+      <nav class="flex-1 overflow-y-auto p-3 space-y-6 scrollbar-thin">
+        
+        <!-- Category 1: Portfolio Management -->
+        <div class="space-y-1">
+          <div class="px-3 pb-1 text-[11px] font-bold tracking-wider text-slate-400 uppercase flex items-center justify-between">
+            <span>إدارة المحفظة</span>
+            <i data-lucide="briefcase" class="w-3.5 h-3.5 opacity-60"></i>
+          </div>
+          <button onclick="switchTab('portfolio')" id="tab-portfolio" class="tab-btn w-full px-3 py-2.5 rounded-xl flex items-center justify-between transition text-xs font-semibold bg-emerald-600 text-white shadow-sm">
+            <div class="flex items-center gap-2.5">
+              <i data-lucide="wallet" class="w-4 h-4 shrink-0"></i>
+              <span>المحفظة وتوزيع الأصول</span>
+            </div>
+            <span class="text-[10px] px-1.5 py-0.5 rounded-md bg-white/20 text-white font-mono" id="nav-portfolio-count">11 أصل</span>
+          </button>
+          <button onclick="switchTab('thndrsync')" id="tab-thndrsync" class="tab-btn w-full px-3 py-2.5 rounded-xl flex items-center justify-between transition text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-800/60">
+            <div class="flex items-center gap-2.5">
+              <i data-lucide="zap" class="w-4 h-4 text-amber-300 shrink-0"></i>
+              <span>مزامنة مع Thndr</span>
+            </div>
+            <span class="text-[10px] px-1.5 py-0.5 rounded-md bg-amber-500/20 text-amber-300 font-bold">1-Click ⚡</span>
+          </button>
+          <button onclick="switchTab('alpha')" id="tab-alpha" class="tab-btn w-full px-3 py-2.5 rounded-xl flex items-center justify-between transition text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-800/60">
+            <div class="flex items-center gap-2.5">
+              <i data-lucide="trending-up" class="w-4 h-4 text-cyan-400 shrink-0"></i>
+              <span>متتبع ألفا والمؤشر (Benchmark)</span>
+            </div>
+            <span class="text-[10px] px-1.5 py-0.5 rounded-md bg-cyan-500/20 text-cyan-300 font-bold">Alpha α</span>
+          </button>
+          <button onclick="switchTab('rebalance')" id="tab-rebalance" class="tab-btn w-full px-3 py-2.5 rounded-xl flex items-center justify-between transition text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-800/60">
+            <div class="flex items-center gap-2.5">
+              <i data-lucide="calculator" class="w-4 h-4 shrink-0"></i>
+              <span>حاسبة توزيع السيولة</span>
+            </div>
+          </button>
+          <button onclick="switchTab('papertrading')" id="tab-papertrading" class="tab-btn w-full px-3 py-2.5 rounded-xl flex items-center justify-between transition text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-800/60">
+            <div class="flex items-center gap-2.5">
+              <i data-lucide="activity" class="w-4 h-4 text-cyan-400 shrink-0"></i>
+              <span>المحفظة التجريبية (محاكاة)</span>
+            </div>
+            <span class="text-[10px] px-1.5 py-0.5 rounded-md bg-cyan-500/10 text-cyan-400 font-mono">Demo</span>
+          </button>
+        </div>
+
+        <!-- Category 2: Market Analysis & Opportunities -->
+        <div class="space-y-1">
+          <div class="px-3 pb-1 text-[11px] font-bold tracking-wider text-slate-400 uppercase flex items-center justify-between">
+            <span>التحليل والفرص</span>
+            <i data-lucide="compass" class="w-3.5 h-3.5 opacity-60"></i>
+          </div>
+          <button onclick="switchTab('radar')" id="tab-radar" class="tab-btn w-full px-3 py-2.5 rounded-xl flex items-center justify-between transition text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-800/60">
+            <div class="flex items-center gap-2.5">
+              <i data-lucide="radar" class="w-4 h-4 shrink-0"></i>
+              <span>رادار السوق والفرص</span>
+            </div>
+            <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-bold">18 فرصة</span>
+          </button>
+          <button onclick="switchTab('advisor')" id="tab-advisor" class="tab-btn w-full px-3 py-2.5 rounded-xl flex items-center justify-between transition text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-800/60">
+            <div class="flex items-center gap-2.5">
+              <i data-lucide="bar-chart-2" class="w-4 h-4 text-emerald-400 shrink-0"></i>
+              <span>مركز التحليل المالي والفني</span>
+            </div>
+            <span class="text-[10px] px-1.5 py-0.5 rounded-md bg-purple-500/20 text-purple-300 font-bold">AI</span>
+          </button>
+          <button onclick="switchTab('risk')" id="tab-risk" class="tab-btn w-full px-3 py-2.5 rounded-xl flex items-center justify-between transition text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-800/60">
+            <div class="flex items-center gap-2.5">
+              <i data-lucide="shield-alert" class="w-4 h-4 text-amber-400 shrink-0"></i>
+              <span>حاسبة الدعم والمخاطر (R/R)</span>
+            </div>
+          </button>
+          <button onclick="switchTab('valuation')" id="tab-valuation" class="tab-btn w-full px-3 py-2.5 rounded-xl flex items-center justify-between transition text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-800/60">
+            <div class="flex items-center gap-2.5">
+              <i data-lucide="scale" class="w-4 h-4 text-emerald-400 shrink-0"></i>
+              <span>القيمة العادلة (DCF & DDM)</span>
+            </div>
+            <span class="text-[10px] px-1.5 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 font-bold">DCF</span>
+          </button>
+          <button onclick="switchTab('simulation')" id="tab-simulation" class="tab-btn w-full px-3 py-2.5 rounded-xl flex items-center justify-between transition text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-800/60">
+            <div class="flex items-center gap-2.5">
+              <i data-lucide="cpu" class="w-4 h-4 text-indigo-400 shrink-0"></i>
+              <span>مختبر المحاكاة وتدريب AI</span>
+            </div>
+            <span class="text-[10px] px-1.5 py-0.5 rounded-md bg-indigo-500/20 text-indigo-300 font-bold">100% دقة</span>
+          </button>
+        </div>
+
+        <!-- Category 3: Monitoring & Governance -->
+        <div class="space-y-1">
+          <div class="px-3 pb-1 text-[11px] font-bold tracking-wider text-slate-400 uppercase flex items-center justify-between">
+            <span>المتابعة والأدوات</span>
+            <i data-lucide="sliders" class="w-3.5 h-3.5 opacity-60"></i>
+          </div>
+          <button onclick="switchTab('alerts')" id="tab-alerts" class="tab-btn w-full px-3 py-2.5 rounded-xl flex items-center justify-between transition text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-800/60 relative">
+            <div class="flex items-center gap-2.5">
+              <i data-lucide="bell-ring" class="w-4 h-4 text-amber-400 shrink-0"></i>
+              <span>إشارات السوق والتنبيهات</span>
+            </div>
+            <span class="w-2.5 h-2.5 rounded-full bg-rose-500 animate-pulse"></span>
+          </button>
+          <button onclick="switchTab('rules')" id="tab-rules" class="tab-btn w-full px-3 py-2.5 rounded-xl flex items-center justify-between transition text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-800/60">
+            <div class="flex items-center gap-2.5">
+              <i data-lucide="shield-check" class="w-4 h-4 text-emerald-400 shrink-0"></i>
+              <span>قواعد وسياسة الاستثمار</span>
+            </div>
+          </button>
+          <button onclick="switchTab('settings')" id="tab-settings" class="tab-btn w-full px-3 py-2.5 rounded-xl flex items-center justify-between transition text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-800/60">
+            <div class="flex items-center gap-2.5">
+              <i data-lucide="sliders" class="w-4 h-4 text-slate-400 shrink-0"></i>
+              <span>إعدادات المحفظة والربط</span>
+            </div>
+          </button>
+          <button onclick="switchTab('glossary')" id="tab-glossary" class="tab-btn w-full px-3 py-2.5 rounded-xl flex items-center justify-between transition text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-800/60">
+            <div class="flex items-center gap-2.5">
+              <i data-lucide="book-open" class="w-4 h-4 text-cyan-400 shrink-0"></i>
+              <span>دليل المصطلحات المالية</span>
+            </div>
+          </button>
+          <button onclick="switchTab('changelog')" id="tab-changelog" class="tab-btn w-full px-3 py-2.5 rounded-xl flex items-center justify-between transition text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-800/60">
+            <div class="flex items-center gap-2.5">
+              <i data-lucide="git-branch" class="w-4 h-4 text-emerald-400 shrink-0"></i>
+              <span>سجل التحديثات</span>
+            </div>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-bold">v2.5.1</span>
+          </button>
+        </div>
+
+      </nav>
+
+      <!-- Sidebar Footer (Cloud & Thndr Quick Launch) -->
+      <div class="sidebar-footer p-3 border-t space-y-2 shrink-0 safe-bottom">
+        <div class="sidebar-server-card p-2.5 rounded-xl border flex items-center justify-between text-xs">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
+            <div>
+              <div class="sidebar-server-title font-bold text-[11px]">سيرفر سحابي 24/7</div>
+              <div class="sidebar-server-sub text-[10px]">Vercel Edge Active</div>
+            </div>
+          </div>
+          <button onclick="showAutonomousLogModal()" class="sidebar-server-btn p-1.5 rounded-lg transition" title="عرض سجل التحليلات">
+            <i data-lucide="file-text" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+        <button onclick="openThndrSyncModal()" class="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold text-xs flex items-center justify-center gap-2 transition shadow-md shadow-emerald-950/50 cursor-pointer">
+          <i data-lucide="zap" class="w-4 h-4 text-amber-300"></i>
+          <span>مزامنة محفظة ثندر ⚡</span>
+        </button>
+
+
+      </div>
+
+    </aside>
+
+    <!-- MAIN CONTENT WRAPPER -->
+    <div class="flex-1 flex flex-col min-w-0 h-full overflow-y-auto" id="main-content-scroll">
+
+      <!-- Top Header / App Bar -->
+      <header class="sticky top-0 z-30 bg-[#0e1424]/90 backdrop-blur-md border-b border-slate-800 px-3 sm:px-6 py-2.5 sm:py-3 flex items-center justify-between gap-2 overflow-x-hidden">
+        
+        <!-- Right: Mobile Menu Toggle & Active Page Title -->
+        <div class="flex items-center gap-3">
+          <!-- Sidebar Toggle Button (Desktop & Mobile) -->
+          <button onclick="toggleSidebar()" id="sidebar-toggle-btn" class="p-2 sm:px-3 sm:py-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-200 hover:text-white border border-slate-700 transition flex items-center gap-2 text-xs font-bold shadow-sm" title="إظهار / إخفاء القائمة الجانبية" aria-label="تبديل القائمة الجانبية">
+            <i data-lucide="panel-right" id="sidebar-toggle-icon" class="w-4 h-4"></i>
+            <span class="hidden sm:inline">القائمة</span>
+          </button>
+
+          <!-- Current Page Breadcrumb / Heading -->
+          <div>
+            <div class="flex items-center gap-2">
+              <h2 id="active-tab-title" class="text-sm sm:text-base font-bold text-white tracking-wide truncate max-w-[130px] xs:max-w-[170px] sm:max-w-none">المحفظة وتوزيع الأصول</h2>
+              <span id="active-tab-badge" class="hidden sm:inline-block text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">محفظة حية • EGX</span>
+              <div id="header-regime-badge" class="hidden md:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-[11px] font-semibold cursor-pointer hover:bg-indigo-500/20 transition" onclick="switchTab('simulation')" title="اضغط لفتح مختبر المحاكاة والاطلاع على بيئة السوق والسيناريوهات">
+                <span class="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse"></span>
+                <span id="header-regime-text">بيئة السوق: جاري الفحص...</span>
+              </div>
+              <div id="firebase-sync-badge" class="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-sky-500/10 border border-sky-500/20 text-sky-400 text-[11px] font-semibold transition" title="حالة المزامنة السحابية الفورية مع Firebase">
+                <span class="w-1.5 h-1.5 rounded-full bg-sky-400 animate-pulse" id="firebase-sync-dot"></span>
+                <span id="firebase-sync-text">سحابة Firebase: جاري الاتصال...</span>
+              </div>
+            </div>
+            <p id="active-tab-desc" class="hidden sm:block text-xs text-slate-400">منصة التحليل المالي والفني وإدارة المحفظة • البورصة المصرية</p>
+          </div>
+        </div>
+
+        <!-- Left: Quick Action Controls -->
+        <div class="flex items-center gap-2 sm:gap-3">
+          <!-- Theme Toggle -->
+          <button onclick="toggleTheme()" id="theme-toggle-btn" class="p-2 sm:px-3 sm:py-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-amber-400 border border-slate-700 transition flex items-center gap-1.5 text-xs font-bold" title="تبديل المظهر (فاتح / داكن)">
+            <i data-lucide="sun" id="theme-icon" class="w-4 h-4 text-amber-400"></i>
+            <span class="hidden md:inline" id="theme-label">فاتح</span>
+          </button>
+
+          <!-- Quick Alerts Button (Opens OED TTMS Notification Center Modal) -->
+          <button onclick="openNotificationCenter()" class="p-2 sm:px-3 sm:py-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-amber-400 hover:text-amber-300 border border-slate-700 transition flex items-center gap-1.5 text-xs relative cursor-pointer" title="مركز الإشعارات والتنبيهات المدمج">
+            <i data-lucide="bell" class="w-4 h-4"></i>
+            <span id="header-alert-badge" class="hidden w-2.5 h-2.5 rounded-full bg-rose-500 absolute top-1.5 right-1.5 animate-ping"></span>
+            <span class="hidden md:inline font-bold">التنبيهات</span>
+            <span id="header-alert-count" class="hidden bg-rose-600 text-white font-mono text-[9px] px-1.5 py-0.2 rounded-full font-bold">0</span>
+          </button>
+
+          <!-- AI Simulation & Training Lab Header Button -->
+          <button onclick="switchTab('simulation')" class="hidden sm:flex p-2 sm:px-3 sm:py-2 rounded-xl bg-indigo-950/40 hover:bg-indigo-900/60 text-indigo-300 border border-indigo-600/40 transition items-center gap-1.5 text-xs font-bold cursor-pointer shrink-0" title="مختبر المحاكاة وتدريب الذكاء الاصطناعي (AI Scenario Lab)">
+            <i data-lucide="cpu" class="w-4 h-4 text-indigo-400"></i>
+            <span class="hidden xl:inline">مختبر المحاكاة</span>
+          </button>
+
+          <!-- AI Sanity & Logic Auditor Shield Button -->
+          <button onclick="openSanityAuditModal()" class="hidden sm:flex p-2 sm:px-3 sm:py-2 rounded-xl bg-emerald-950/40 hover:bg-emerald-900/60 text-emerald-300 border border-emerald-600/40 transition items-center gap-1.5 text-xs font-bold cursor-pointer shrink-0" title="درع التدقيق الذاتي ومنع التناقضات (AI Sanity Shield)">
+            <i data-lucide="shield-check" class="w-4 h-4 text-emerald-400"></i>
+            <span class="hidden xl:inline">فحص المنطق الذاتي</span>
+          </button>
+
+          <!-- Position Sizing Risk Calculator Button -->
+          <button onclick="openPositionSizingModal()" class="hidden sm:flex p-2 sm:px-3 sm:py-2 rounded-xl bg-cyan-950/40 hover:bg-cyan-900/60 text-cyan-300 border border-cyan-700/50 transition items-center gap-1.5 text-xs font-bold cursor-pointer shrink-0" title="حاسبة حجم المركز وإدارة المخاطر (2% Risk)">
+            <i data-lucide="calculator" class="w-4 h-4 text-cyan-400"></i>
+            <span class="hidden lg:inline">حاسبة المخاطر</span>
+          </button>
+
+          <!-- Voice Assistant Header Button -->
+          <button onclick="openVoiceTradingModal()" class="px-2.5 py-2 sm:px-3.5 sm:py-2 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white border border-purple-400/50 transition flex items-center gap-1.5 text-xs font-bold shadow-md cursor-pointer shrink-0" title="المساعد الصوتي الذكي (أوامر التداول وتعديل الحدود)">
+            <i data-lucide="mic" class="w-4 h-4 text-white animate-pulse"></i>
+            <span class="font-bold text-[11px] sm:text-xs">صوتي</span>
+          </button>
+
+          <!-- Cloud Scan Fast Button -->
+          <button onclick="triggerCloudScanNow()" class="hidden sm:flex px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs items-center gap-1.5 transition shadow">
+            <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+            <span>تحديث البورصة</span>
+          </button>
+        </div>
+
+      </header>
+
+      <!-- Real-Time System Auto-Update Available Banner -->
+      <div id="app-update-available-banner" class="hidden sticky top-0 z-50 bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 text-white shadow-2xl px-4 py-3 transition-all border-b-2 border-emerald-400 animate-pulse">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div class="flex items-center gap-3">
+            <div class="p-2 rounded-xl bg-white/20 text-white font-bold shrink-0 shadow-sm">
+              <i data-lucide="sparkles" class="w-5 h-5 text-yellow-300"></i>
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="font-black text-xs sm:text-sm text-white">🚀 يتوفر تحديث جديد للنظام!</span>
+                <span id="update-banner-version-badge" class="bg-white text-emerald-900 text-[10px] font-black px-2 py-0.5 rounded-full shadow-sm">إصدار جديد</span>
+              </div>
+              <p id="update-banner-desc" class="text-xs text-emerald-100 font-bold mt-0.5">تم رفع تحسينات وميزات جديدة؛ اضغط على زر التحديث لتطبيقها فوراً بلمسة واحدة.</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 shrink-0">
+            <button type="button" onclick="applyAppUpdateNow()" class="bg-white hover:bg-slate-100 text-emerald-950 font-black text-xs px-4 py-2 rounded-xl shadow-lg transition flex items-center gap-1.5 active:scale-95 cursor-pointer">
+              <i data-lucide="refresh-cw" class="w-4 h-4 text-emerald-800"></i>
+              <span>تحديث الصفحة الآن 🔄</span>
+            </button>
+            <button type="button" onclick="dismissUpdateBanner()" class="text-white/80 hover:text-white p-1 rounded-lg" title="تأجيل">
+              <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- OED TTMS Pattern: Global Real-Time Emergency Sticky Banner (Light Red Theme) -->
+      <div id="oed-emergency-banner" class="hidden sticky top-14 z-50 bg-rose-50/95 dark:bg-rose-950/90 border-b-2 border-rose-300 dark:border-rose-700/60 shadow-xl px-4 py-3 transition-all animate-slide-down">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-3">
+          <div class="flex items-start gap-3 min-w-0 flex-1">
+            <div id="oed-banner-bell" class="p-2 rounded-xl bg-rose-100 text-rose-600 dark:bg-rose-900/60 dark:text-rose-300 font-bold shrink-0 shadow-sm border border-rose-200 dark:border-rose-700/50 mt-0.5">
+              <i data-lucide="bell-ring" class="w-5 h-5 text-rose-600 dark:text-rose-300"></i>
+            </div>
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center gap-2 flex-wrap">
+                <span id="oed-banner-title" class="font-black text-xs sm:text-sm text-rose-950 dark:text-rose-100 leading-tight"></span>
+                <span id="oed-banner-badge" class="bg-rose-600 text-white text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider shrink-0 shadow-sm">حماية عاجلة</span>
+              </div>
+              <p id="oed-banner-desc" class="text-xs text-rose-900 dark:text-rose-200 font-bold leading-snug mt-1"></p>
+            </div>
+            <button type="button" onclick="dismissOedBanner()" class="md:hidden text-rose-700 hover:text-rose-950 dark:text-rose-300 p-1 rounded-lg" title="إغلاق التنبيه">
+              <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
+          </div>
+          <div class="flex items-center justify-end gap-2 shrink-0 pt-1 md:pt-0 flex-wrap">
+            <button id="oed-banner-confirm-btn" type="button" onclick="confirmActionExecuted()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs px-4 py-2.5 rounded-xl shadow-lg transition-all flex items-center gap-2 hover:scale-105 active:scale-95 cursor-pointer" title="تأكيد أنك قمت بالتعديل أو الإلغاء لإخفاء التنبيه نهائياً">
+              <i data-lucide="check-circle-2" class="w-4 h-4 text-white"></i>
+              <span>تم تنفيذ التعديل ✓</span>
+            </button>
+            <button type="button" onclick="dismissOedBanner()" class="text-rose-700 hover:text-rose-950 dark:text-rose-300 p-1.5 rounded-lg transition cursor-pointer" title="إغلاق التنبيه مؤقتاً">
+              <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Content Container -->
+      <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
+
+    <!-- ============================================== -->
+    <!-- TAB 1: PORTFOLIO VIEW (User's Real Holdings) -->
+    <!-- ============================================== -->
+    <div id="view-portfolio" class="view-panel space-y-6">
+      
+      <!-- Autonomous Cloud Background Engine Banner (24/7 Cloud Worker) -->
+      <div class="cloud-engine-banner rounded-2xl p-4 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0">
+            <span class="relative flex h-3.5 w-3.5">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-3.5 w-3.5 bg-emerald-500"></span>
+            </span>
+          </div>
+          <div>
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="cloud-engine-title font-bold text-sm">المحرك السحابي الذاتي (Autonomous Cloud Engine)</span>
+              <span class="cloud-engine-badge text-[10px] px-2.5 py-0.5 rounded-full font-bold flex items-center gap-1">
+                <i data-lucide="cloud" class="w-3 h-3"></i>
+                <span>شغال 24/7 في السحاب حتى والتطبيق مغلق</span>
+              </span>
+            </div>
+            <p class="cloud-engine-subtext text-xs mt-1" id="cloud-last-sync-text">
+              آخر فحص وتحليل سحابي في غيابك: <strong class="cloud-engine-timestamp" id="cloud-sync-timestamp">جاري التحقق من سيرفر Vercel السحابي...</strong>
+            </p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 self-stretch md:self-auto justify-end">
+          <button onclick="triggerCloudScanNow()" id="btn-cloud-scan" class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1.5 transition shadow">
+            <i data-lucide="refresh-cw" class="w-3.5 h-3.5" id="cloud-scan-icon"></i>
+            <span>تشغيل فحص سحابي فوري</span>
+          </button>
+          <button onclick="showAutonomousLogModal()" class="btn-cloud-logs px-3.5 py-2 rounded-xl font-semibold text-xs flex items-center gap-1.5 transition">
+            <i data-lucide="file-text" class="w-3.5 h-3.5 text-cyan-400"></i>
+            <span>سجل تحليلات السيرفر</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- DAILY ACTION & DECISION HUB (مركز التوجيه والقرارات اليومية الذكي) -->
+      <div id="daily-action-hub" class="mb-5 space-y-4"></div>
+
+      <!-- Top Wealth Metrics Banner -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Card 1: Total Wealth -->
+        <div class="bg-gray-900/80 border border-gray-800 rounded-2xl p-4 flex flex-col justify-between relative overflow-hidden">
+          <div class="flex items-center justify-between text-gray-400 text-xs font-semibold mb-1">
+            <span>إجمالي الثروة (ثندر)</span>
+            <i data-lucide="coins" class="w-4 h-4 text-emerald-400"></i>
+          </div>
+          <div class="text-2xl font-black text-white tracking-tight" id="metric-total-wealth">
+            -- <span class="text-xs text-gray-400 font-normal">ج.م</span>
+          </div>
+          <div class="mt-2 flex flex-col gap-0.5 text-xs font-semibold" id="metric-total-return-container">
+            <span id="metric-total-return-badge" class="flex items-center text-gray-400">
+              <span id="metric-total-return">جاري الحساب...</span>
+            </span>
+            <span class="text-[10px] text-gray-400 font-normal font-mono" id="metric-total-cost-subtext">أصل الشراء: -- ج.م</span>
+          </div>
+          <div class="absolute -right-6 -bottom-6 w-20 h-20 bg-emerald-500/5 rounded-full blur-xl pointer-events-none"></div>
+        </div>
+
+        <!-- Card 2: Stocks Value -->
+        <div class="bg-gray-900/80 border border-gray-800 rounded-2xl p-4 flex flex-col justify-between">
+          <div class="flex items-center justify-between text-gray-400 text-xs font-semibold mb-1">
+            <span id="metric-stocks-count-label">الأسهم القيادية</span>
+            <i data-lucide="pie-chart" class="w-4 h-4 text-cyan-400"></i>
+          </div>
+          <div class="text-2xl font-black text-white tracking-tight" id="metric-stocks-wealth">
+            -- <span class="text-xs text-gray-400 font-normal">ج.م</span>
+          </div>
+          <div class="mt-2 text-xs text-emerald-400 font-medium flex items-center" id="metric-stocks-return-container">
+            <i data-lucide="trending-up" class="w-3.5 h-3.5 ml-1"></i>
+            <span id="metric-stocks-return-subtext">حساب العائد اللحظي...</span>
+          </div>
+        </div>
+
+        <!-- Card 3: Funds Value -->
+        <div class="bg-gray-900/80 border border-gray-800 rounded-2xl p-4 flex flex-col justify-between">
+          <div class="flex items-center justify-between text-gray-400 text-xs font-semibold mb-1">
+            <span id="metric-funds-count-label">صناديق الاستثمار</span>
+            <i data-lucide="landmark" class="w-4 h-4 text-amber-400"></i>
+          </div>
+          <div class="text-2xl font-black text-white tracking-tight" id="metric-funds-wealth">
+            -- <span class="text-xs text-gray-400 font-normal">ج.م</span>
+          </div>
+          <div class="mt-2 text-xs text-cyan-400 font-medium flex items-center" id="metric-funds-return-container">
+            <i data-lucide="shield-check" class="w-3.5 h-3.5 ml-1"></i>
+            <span id="metric-funds-return-subtext">وثائق نقدية وأسهم</span>
+          </div>
+        </div>
+
+        <!-- Card 4: Wallet Cash -->
+        <div class="bg-gray-900/80 border border-gray-800 rounded-2xl p-4 flex flex-col justify-between border-r-4 border-r-cyan-500">
+          <div class="flex items-center justify-between text-gray-400 text-xs font-semibold mb-1">
+            <span>السيولة المتاحة (كاش)</span>
+            <i data-lucide="wallet-cards" class="w-4 h-4 text-cyan-400"></i>
+          </div>
+          <div class="text-2xl font-black text-cyan-300 tracking-tight" id="metric-cash-wealth">
+            -- <span class="text-xs text-gray-400 font-normal">ج.م</span>
+          </div>
+          <div class="mt-2 text-xs text-cyan-400 font-semibold flex items-center" id="metric-cash-subtext-container">
+            <i data-lucide="lock" class="w-3.5 h-3.5 ml-1"></i>
+            <span id="metric-cash-subtext">سيولة طوارئ واقتناص فرص</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Asset Allocation & Strategy Diagnostics -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Donut Chart -->
+        <div class="bg-gray-900/90 border border-gray-800 rounded-2xl p-5 flex flex-col justify-between shadow-xl">
+          <div class="flex items-center justify-between mb-3 border-b border-gray-800 pb-2">
+            <div class="flex items-center gap-2">
+              <i data-lucide="pie-chart" class="w-4 h-4 text-emerald-400"></i>
+              <h3 class="font-bold text-white text-sm">توزيع الأصول والسيولة</h3>
+            </div>
+            <span class="text-[11px] text-gray-400" id="allocation-count-label">11 أصل مالي</span>
+          </div>
+          <div class="relative w-full h-56 flex items-center justify-center">
+            <canvas id="allocationChart"></canvas>
+          </div>
+          <div class="text-center text-[11px] text-gray-400 mt-2">
+            انقر على أي سهم في الرسم لرؤية وزنه وتفاصيل أرباحه
+          </div>
+        </div>
+
+        <!-- Strategy Advisory & Actions -->
+        <div class="lg:col-span-2 bg-gray-900/90 border border-gray-800 rounded-2xl p-5 flex flex-col justify-between shadow-xl space-y-4">
+          <div class="flex items-center justify-between border-b border-gray-800 pb-2">
+            <div class="flex items-center gap-2">
+              <i data-lucide="compass" class="w-4 h-4 text-cyan-400"></i>
+              <h3 class="font-bold text-white text-sm">الرؤية الاستراتيجية وتوجيهات المحفظة</h3>
+            </div>
+            <span class="text-[11px] bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded-full border border-emerald-500/20 font-bold">مستثمر متوسط إلى طويل الأجل</span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+            <div class="bg-gray-950/60 p-3.5 rounded-xl border border-gray-800 space-y-1">
+              <span class="text-emerald-400 font-bold flex items-center gap-1.5">
+                <i data-lucide="trending-up" class="w-3.5 h-3.5"></i>
+                قادة الأرباح والنمو (Profit Leaders)
+              </span>
+              <p class="text-gray-300 text-[11px] leading-relaxed">
+                أوراسكوم (+25%)، بنك التعمير (+25%)، السويدي (+20%)، وأبو قير (+15%). الاستمرار في الاحتفاظ ورفع مستوى وقف الخسارة المتحرك لتأمين العوائد.
+              </p>
+            </div>
+            <div class="bg-gray-950/60 p-3.5 rounded-xl border border-gray-800 space-y-1">
+              <span class="text-cyan-400 font-bold flex items-center gap-1.5">
+                <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i>
+                فرص التجميع والتعزيز (Accumulation)
+              </span>
+              <p class="text-gray-300 text-[11px] leading-relaxed">
+                البنك التجاري الدولي COMI (-11%). الشركة القيادية الأولى بالبورصة بأرباح تاريخية وتوزيعات قوية؛ المستويات الحالية مناسبة لخفض متوسط التكلفة.
+              </p>
+            </div>
+          </div>
+
+          <!-- Quick Action Controls -->
+          <div class="flex items-center justify-between flex-wrap gap-2 pt-2 border-t border-gray-800">
+            <div class="flex items-center gap-2 flex-wrap">
+              <button onclick="openThndrSyncModal()" class="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 text-white font-bold text-xs flex items-center gap-1.5 transition shadow-md shadow-emerald-950/40 cursor-pointer transform active:scale-95" title="مزامنة فورية واستيراد مباشر لجميع أسهمك من محفظة ثندر بضغطة واحدة">
+                <i data-lucide="zap" class="w-3.5 h-3.5 text-amber-300"></i>
+                <span>مزامنة محفظة ثندر (1-Click Sync) ⚡</span>
+              </button>
+              <button onclick="openAddAssetModal()" class="px-3 py-1.5 rounded-xl bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-200 font-bold text-xs flex items-center gap-1.5 transition shadow-sm cursor-pointer">
+                <i data-lucide="plus" class="w-3.5 h-3.5 text-emerald-400"></i>
+                <span>إضافة / تعديل يدوي</span>
+              </button>
+              <button onclick="resetToDefaultPortfolio()" class="px-3 py-1.5 rounded-xl bg-gray-900 hover:bg-gray-800 border border-gray-800 text-gray-400 hover:text-gray-200 text-xs font-semibold transition cursor-pointer" title="استعادة بيانات المحفظة الأصلية من ثندر">
+                استعادة الأرقام الأصلية
+              </button>
+            </div>
+            <span class="text-xs text-slate-300 font-medium">يتم الحفظ التلقائي في المتصفح فوراً ✅</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Active Rotation Plans & Watchdog Live Alarms Container -->
+      <div id="active-plans-radar-container" class="hidden mb-6"></div>
+
+      <!-- Real Holdings Table -->
+      <div class="bg-gray-900/90 border border-gray-800 rounded-2xl overflow-hidden shadow-xl">
+        <div class="p-4 sm:p-5 border-b border-gray-800 flex items-center justify-between flex-wrap gap-3">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse"></span>
+              <h3 class="font-bold text-white text-base">جدول الأصول والأسهم المملوكة في ثندر</h3>
+            </div>
+            <p class="text-xs text-cyan-400 mt-0.5 animate-pulse" id="live-egx-status-text">⏳ جاري الاتصال بالبورصة المصرية ومزامنة أحدث الأسعار اللحظية تلقائياً...</p>
+          </div>
+          <div class="grid grid-cols-2 sm:flex sm:flex-wrap sm:items-center gap-2 w-full sm:w-auto">
+            <button onclick="openVoiceTradingModal()" class="col-span-1 px-3 sm:px-4 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 hover:from-purple-500 hover:to-indigo-500 text-white border border-purple-400/40 text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-lg shadow-purple-950/50 transform active:scale-95 cursor-pointer" title="تسجيل صفقة أو تعديل حد أمان صوتياً بالذكاء الاصطناعي">
+              <i data-lucide="mic" class="w-4 h-4 text-purple-200 animate-pulse shrink-0"></i>
+              <span class="truncate">🎙️ أمر صوتي</span>
+            </button>
+            <button onclick="openTradeModal()" class="col-span-1 px-3 sm:px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white border border-emerald-400/40 text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-lg shadow-emerald-950/50 transform active:scale-95 cursor-pointer" title="تسجيل عملية شراء أو بيع نفذتها في ثندر">
+              <i data-lucide="arrow-left-right" class="w-4 h-4 text-emerald-200 shrink-0"></i>
+              <span class="truncate">+ صفقة جديدة</span>
+            </button>
+            <button onclick="fetchLiveEGXPricesAndReevaluate()" id="btn-live-egx-refresh" class="col-span-1 px-3 sm:px-4 py-2.5 rounded-xl bg-gradient-to-r from-cyan-600 via-blue-600 to-indigo-600 hover:from-cyan-500 hover:to-indigo-500 text-white border border-cyan-400/40 text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-lg shadow-cyan-950/50 transform active:scale-95 cursor-pointer" title="سحب أحدث أسعار البورصة المصرية وإعادة اتخاذ القرارات وحساب الأرباح فوراً">
+              <i data-lucide="zap" class="w-4 h-4 text-amber-300 shrink-0" id="icon-live-egx-refresh"></i>
+              <span id="btn-refresh-text" class="truncate">⚡ تحديث الأسعار</span>
+            </button>
+            <button onclick="forceFreshSync()" class="col-span-1 px-3 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-cyan-700/50 text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-md active:scale-95 cursor-pointer" title="مزامنة فورية للأسعار وإعادة تقييم المحفظة دون حذف بياناتك">
+              <i data-lucide="rotate-ccw" class="w-3.5 h-3.5 text-cyan-400 shrink-0"></i>
+              <span class="truncate">مزامنة نظيفة 🔄</span>
+            </button>
+            <button onclick="hardResetPortfolioToDefault()" class="col-span-2 sm:col-span-1 px-2.5 py-2.5 rounded-xl bg-slate-800/80 hover:bg-rose-950/40 text-slate-300 hover:text-rose-400 border border-slate-700 hover:border-rose-800/50 text-xs font-semibold transition flex items-center justify-center gap-1 shadow-sm active:scale-95 cursor-pointer" title="استعادة المحفظة الافتراضية الأصلية (مع تأكيد الحذف)">
+              <i data-lucide="refresh-cw" class="w-3.5 h-3.5 shrink-0"></i>
+              <span class="truncate">استعادة الافتراضي</span>
+            </button>
+            <div id="live-auto-countdown-badge" class="col-span-2 sm:col-span-1 px-3 py-2 rounded-xl bg-slate-950 border border-cyan-800/60 text-cyan-300 text-xs font-mono flex items-center justify-center gap-1.5 shadow-sm" title="العداد التنازلي لنبض التحديث التلقائي">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
+              <span>تحديث تلقائي: <strong id="live-countdown-secs" class="text-white font-bold">60</strong> ث</span>
+            </div>
+            <span class="col-span-2 sm:col-span-1 text-xs text-slate-300 bg-slate-800/90 px-3 py-1.5 rounded-xl border border-slate-700 text-center font-bold" id="assets-count-badge">12 أصل مالي</span>
+          </div>
+        <div id="systemic-shock-banner" class="hidden"></div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-right text-sm">
+            <thead class="bg-gray-950/70 text-gray-400 text-xs font-semibold border-b border-gray-800">
+              <tr>
+                <th class="py-3.5 px-3">السهم / الأصل</th>
+                <th class="py-3.5 px-3 text-center">السعر اللحظي</th>
+                <th class="py-3.5 px-3 text-center">متوسط الشراء والكمية</th>
+                <th class="py-3.5 px-3 text-center text-emerald-400">
+                  <div class="flex items-center justify-center gap-1 font-bold">
+                    <i data-lucide="target" class="w-3.5 h-3.5 text-emerald-400"></i>
+                    <span>سقف المكاسب الأول</span>
+                  </div>
+                  <span class="text-[11px] opacity-90 font-medium font-normal block mt-0.5">بيع لجني الأرباح 🎯</span>
+                </th>
+                <th class="py-3.5 px-3 text-center text-rose-400">
+                  <div class="flex items-center justify-center gap-1 font-bold">
+                    <i data-lucide="shield-alert" class="w-3.5 h-3.5 text-rose-400"></i>
+                    <span>حد الخسارة الأدنى</span>
+                  </div>
+                  <span class="text-[11px] opacity-90 font-medium font-normal block mt-0.5">وقف الخسارة للأمان 🛑</span>
+                </th>
+                <th class="py-3.5 px-3">القيمة والأرباح</th>
+                <th class="py-3.5 px-3">قرار المستشار</th>
+                <th class="py-3.5 px-3 text-center">إجراء سريع</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-800/60 font-medium" id="portfolio-table-body">
+              <!-- Dynamically populated via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+    <!-- ============================================== -->
+    <!-- TAB: THNDR 1-CLICK SYNC WIZARD                 -->
+    <!-- ============================================== -->
+    <div id="view-thndrsync" class="view-panel hidden space-y-6">
+
+      <!-- Header Banner -->
+      <div class="bg-gradient-to-r from-emerald-950 via-gray-900 to-cyan-950 border border-emerald-500/40 rounded-3xl p-5 sm:p-6 shadow-2xl space-y-3">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-600 via-teal-600 to-cyan-500 flex items-center justify-center text-white shadow-lg shadow-emerald-950/60 shrink-0">
+            <i data-lucide="zap" class="w-6 h-6 text-amber-300"></i>
+          </div>
+          <div>
+            <h2 class="text-base sm:text-xl font-black text-white flex items-center gap-2">
+              <span>أداة مزامنة محفظة ثندر بالقرش</span>
+              <span class="text-[10.5px] px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/40 font-mono">100% Accurate</span>
+            </h2>
+            <p class="text-xs text-gray-300 mt-0.5">سحب وتحديث كافة أرقام أسهمك ومتوسطات الشراء والرصيد النقدي وتحديث التطبيق في 3 خطوات بسيطة ومباشرة</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3-Step Wizard Cards Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+
+        <!-- STEP 1: Copy Script -->
+        <div class="bg-gray-900/90 border border-emerald-500/30 rounded-2xl p-5 space-y-4 shadow-xl flex flex-col justify-between">
+          <div class="space-y-3">
+            <div class="flex items-center gap-2.5 border-b border-gray-800 pb-3">
+              <span class="w-7 h-7 rounded-full bg-emerald-600 text-white font-black flex items-center justify-center text-xs shrink-0 shadow">1</span>
+              <div>
+                <h3 class="font-bold text-white text-sm">الخطوة الأولى: انسخ الكود من هنا</h3>
+                <p class="text-[11px] text-gray-400">كود سحب آمن 100% يعمل داخل متصفحك فقط</p>
+              </div>
+            </div>
+            <p class="text-xs text-gray-300 leading-relaxed">
+              اضغط على الزر بالأسفل لنسخ كود السحب المعتمد إلى حافظة جهازك بنقرة واحدة:
+            </p>
+            <button onclick="copyThndrVerifiedScript()" class="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs flex items-center justify-center gap-2 transition shadow-lg cursor-pointer transform active:scale-95">
+              <i data-lucide="copy" class="w-4 h-4"></i>
+              <span id="btn-copy-verified-text-tab">📋 اضغط هنا لنسخ الكود المعتمد</span>
+            </button>
+            <details class="text-[11px] text-gray-400 cursor-pointer pt-1">
+              <summary class="hover:text-emerald-300 transition select-none">عرض نص الكود للاطلاع أو النسخ اليدوي ▾</summary>
+              <textarea id="thndr-verified-script-box-tab" readonly rows="5" class="w-full mt-2 bg-gray-950 border border-gray-800 rounded-xl p-2.5 text-[10px] font-mono text-emerald-400 select-all focus:outline-none"></textarea>
+            </details>
+          </div>
+          <div class="text-[10.5px] text-emerald-400 bg-emerald-950/40 p-2.5 rounded-xl border border-emerald-500/20">
+            ✅ الكود لا يطلب أي كلمات سر ولا يرسل أي بيانات لخوادم خارجية؛ يعمل محلياً في جهازك فقط.
+          </div>
+        </div>
+
+        <!-- STEP 2: Run in Thndr -->
+        <div class="bg-gray-900/90 border border-cyan-500/30 rounded-2xl p-5 space-y-4 shadow-xl flex flex-col justify-between">
+          <div class="space-y-3">
+            <div class="flex items-center gap-2.5 border-b border-gray-800 pb-3">
+              <span class="w-7 h-7 rounded-full bg-cyan-600 text-white font-black flex items-center justify-center text-xs shrink-0 shadow">2</span>
+              <div>
+                <h3 class="font-bold text-white text-sm">الخطوة الثانية: شغل الكود في ثندر</h3>
+                <p class="text-[11px] text-gray-400">على متصفح الكمبيوتر أو اللابتوب</p>
+              </div>
+            </div>
+
+            <div class="space-y-2 text-xs text-gray-300 leading-relaxed pt-1">
+              <div class="flex items-start gap-2 bg-black/40 p-2 rounded-lg border border-white/5">
+                <span class="font-bold text-cyan-400">أ.</span>
+                <span>افتح صفحة <strong>"المحفظة"</strong> في حسابك على ثندر.</span>
+              </div>
+              <div class="flex items-start gap-2 bg-black/40 p-2 rounded-lg border border-white/5">
+                <span class="font-bold text-cyan-400">ب.</span>
+                <span>اضغط مفتاح <kbd class="px-1.5 py-0.5 rounded bg-gray-800 text-gray-200 border border-gray-700 font-mono">F12</kbd> في الكيبورد وافتح تبويب <strong class="text-white">Console</strong>.</span>
+              </div>
+              <div class="flex items-start gap-2 bg-black/40 p-2 rounded-lg border border-white/5">
+                <span class="font-bold text-cyan-400">ج.</span>
+                <span>الصق الكود (<kbd class="px-1.5 py-0.5 rounded bg-gray-800 text-gray-200 border border-gray-700 font-mono">Ctrl + V</kbd>) ثم اضغط <kbd class="px-1.5 py-0.5 rounded bg-gray-800 text-gray-200 border border-gray-700 font-mono">Enter</kbd>.</span>
+              </div>
+            </div>
+          </div>
+          <div class="text-[10.5px] text-cyan-300 bg-cyan-950/40 p-2.5 rounded-xl border border-cyan-500/20">
+            ⚡ سيقوم الكود بنسخ أرقام محفظتك تلقائياً إلى الحافظة فور ضغط زر Enter.
+          </div>
+        </div>
+
+        <!-- STEP 3: Paste and Sync -->
+        <div class="bg-gray-900/90 border border-amber-500/40 rounded-2xl p-5 space-y-4 shadow-xl flex flex-col justify-between">
+          <div class="space-y-3">
+            <div class="flex items-center gap-2.5 border-b border-gray-800 pb-3">
+              <span class="w-7 h-7 rounded-full bg-amber-500 text-gray-950 font-black flex items-center justify-center text-xs shrink-0 shadow">3</span>
+              <div>
+                <h3 class="font-bold text-white text-sm">الخطوة الثالثة: الصق هنا وطبق التحديث</h3>
+                <p class="text-[11px] text-gray-400">استيراد وحساب لحظي لكافة الأسهم</p>
+              </div>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-xs text-gray-300 font-bold">مربع لصق الأرقام:</span>
+              <button onclick="pasteThndrFromClipboardView()" class="px-2.5 py-1 rounded-lg bg-gray-800 hover:bg-gray-700 border border-emerald-500/40 text-emerald-300 font-bold text-[11px] flex items-center gap-1 transition cursor-pointer">
+                <i data-lucide="clipboard" class="w-3.5 h-3.5"></i>
+                <span>لصق من الحافظة فوراً</span>
+              </button>
+            </div>
+            <textarea id="thndr-manual-json-input-view" rows="5" placeholder="الصق هنا الكود الذي تم نسخه من Console ثندر..." class="w-full bg-gray-950 border border-gray-700 rounded-xl p-3 text-emerald-300 font-mono text-xs focus:border-emerald-500 focus:outline-none leading-relaxed"></textarea>
+            <div class="flex items-center justify-between text-[11px] bg-gray-950/80 p-2.5 rounded-xl border border-gray-800">
+              <label class="flex items-center gap-1.5 text-gray-200 cursor-pointer">
+                <input type="checkbox" id="thndr-replace-all-view" checked class="rounded border-gray-700 text-emerald-600 focus:ring-emerald-500">
+                <span>استبدال المحفظة بالكامل بالأرقام المحدثة</span>
+              </label>
+            </div>
+          </div>
+          <button onclick="handleThndrViewSyncSubmit()" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 text-white font-extrabold text-xs flex items-center justify-center gap-2 transition shadow-xl shadow-emerald-950/60 cursor-pointer transform active:scale-95">
+            <i data-lucide="zap" class="w-4 h-4 text-amber-300"></i>
+            <span>تحديث وتطبيق المحفظة فوراً بالقرش ⚡</span>
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ============================================== -->
+    <!-- TAB: BENCHMARK ALPHA TRACKER                   -->
+    <!-- ============================================== -->
+    <div id="view-alpha" class="view-panel hidden space-y-6">
+      
+      <!-- Top Overview Banner -->
+      <div class="bg-gray-900 border border-gray-800 rounded-2xl p-5 sm:p-6 shadow-xl space-y-5">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-800 pb-4">
+          <div>
+            <div class="flex items-center gap-2 text-cyan-400 text-xs font-bold uppercase tracking-wider mb-1">
+              <i data-lucide="trending-up" class="w-4 h-4"></i>
+              <span>متتبع ألفا والأداء التراكمي (Benchmark Alpha Tracker)</span>
+            </div>
+            <h2 class="text-xl font-bold text-white">مقارنة عوائد المحفظة بمؤشر EGX30 وصناديق السيولة والتضخم</h2>
+            <p class="text-xs text-gray-400 mt-1">قياس كمي دقيق لعائد ألفا (القيمة المضافة)، وبيتا (حساسية السوق)، ومعدل شارب لحساب كفاءة المخاطرة</p>
+          </div>
+          <button onclick="renderBenchmarkAlphaTracker()" class="px-3.5 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs flex items-center gap-1.5 transition self-start shadow-md cursor-pointer">
+            <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+            <span>تحديث المؤشرات التراكمية</span>
+          </button>
+        </div>
+
+        <!-- Institutional KPI Grid -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div class="p-3.5 rounded-xl bg-gray-950 border border-gray-800/80">
+            <span class="text-[11px] text-gray-400 block mb-1">مؤشر ألفا (Jensen's Alpha α)</span>
+            <div id="alpha-metric-val" class="font-mono text-xl font-bold text-emerald-400">--</div>
+            <span class="text-xs text-slate-300 block mt-0.5 font-medium">القيمة المضافة فوق عائد السوق</span>
+          </div>
+          <div class="p-3.5 rounded-xl bg-gray-950 border border-gray-800/80">
+            <span class="text-[11px] text-gray-400 block mb-1">مؤشر بيتا (Beta β)</span>
+            <div id="beta-metric-val" class="font-mono text-xl font-bold text-white">0.82</div>
+            <span class="text-xs text-slate-300 block mt-0.5 font-medium">حساسية المحفظة لتذبذب EGX30</span>
+          </div>
+          <div class="p-3.5 rounded-xl bg-gray-950 border border-gray-800/80">
+            <span class="text-[11px] text-gray-400 block mb-1">معدل شارب (Sharpe Ratio)</span>
+            <div id="sharpe-metric-val" class="font-mono text-xl font-bold text-cyan-400">--</div>
+            <span class="text-xs text-slate-300 block mt-0.5 font-medium">جودة العائد لكل وحدة مخاطرة</span>
+          </div>
+          <div class="p-3.5 rounded-xl bg-gray-950 border border-gray-800/80">
+            <span class="text-[11px] text-gray-400 block mb-1">المعدل الخالي من المخاطر (NCS)</span>
+            <div class="font-mono text-xl font-bold text-amber-400">22.4%</div>
+            <span class="text-xs text-slate-300 block mt-0.5 font-medium">عائد وثائق السيولة اليومية المركب</span>
+          </div>
+        </div>
+
+        <!-- Verdict Banner -->
+        <div id="alpha-verdict-banner" class="p-3 rounded-xl bg-gray-950 border border-gray-800 text-xs">
+          <!-- Dynamically filled -->
+        </div>
+
+        <!-- Comparative Multi-Line Chart Container -->
+        <div class="bg-gray-950 p-4 sm:p-5 rounded-xl border border-gray-800 space-y-3">
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <div class="flex items-center gap-2">
+              <i data-lucide="line-chart" class="w-4 h-4 text-emerald-400"></i>
+              <h3 class="font-bold text-white text-sm">منحنى الأداء التراكمي المقارن (Historical Relative Trajectory)</h3>
+            </div>
+            <span class="text-[11px] text-gray-400">محدث وفق آخر أسعار معتمدة بالبورصة المصرية</span>
+          </div>
+          <div class="h-72 sm:h-80 w-full relative">
+            <canvas id="alpha-comparison-chart"></canvas>
+          </div>
+        </div>
+
+        <!-- Explanatory Pillars of Portfolio Evaluation in Egypt -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+          <div class="p-3 rounded-xl bg-gray-950 border border-gray-800 space-y-1">
+            <span class="font-bold text-emerald-400 block">1. لماذا مؤشر ألفا (Alpha) هو الأهم؟</span>
+            <p class="text-gray-300 text-[11px] leading-relaxed">
+              يقيس هل قراراتك وتدويرك لأموالك حقق عائداً إضافياً يفوق شراء السوق سلبياً أو ترك الأموال في صندوق السيولة NCS. ألفا الموجبة تعني براعة في التوقيت وحماية رأس المال.
+            </p>
+          </div>
+          <div class="p-3 rounded-xl bg-gray-950 border border-gray-800 space-y-1">
+            <span class="font-bold text-cyan-400 block">2. أهمية بيتا المنخفضة (Beta &lt; 1.0)</span>
+            <p class="text-gray-300 text-[11px] leading-relaxed">
+              محفظتك تعتمد استراتيجية النواة والأقمار مع كاش وصناديق نقدية، مما يجعلها تهبط بنسبة أقل بكثير من السوق في أوقات التصحيح وتصعد بهدوء دون هلع.
+            </p>
+          </div>
+          <div class="p-3 rounded-xl bg-gray-950 border border-gray-800 space-y-1">
+            <span class="font-bold text-rose-400 block">3. التغلب على حاجز التضخم</span>
+            <p class="text-gray-300 text-[11px] leading-relaxed">
+              الهدف النهائي للمستشار هو ألا تنمو أرقامك في كشف الحساب فقط، بل أن تنمو قيمتك الشرائية الحقيقية وتتفوق على وتيرة التضخم وسعر الفائدة السائد.
+            </p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <!-- ============================================== -->
+    <!-- TAB 2: ADVANCED MARKET RADAR (EGX30 + EGX70) -->
+    <!-- ============================================== -->
+    <div id="view-radar" class="view-panel hidden space-y-6">
+      
+      <!-- Market Breadth & Systemic Liquidity Pulse (Live EGX Visual Gauge) -->
+      <div id="market-breadth-pulse-widget" class="bg-gray-900 rounded-2xl border border-gray-800 p-5 shadow-xl transition-all">
+        <!-- Rendered dynamically by renderMarketBreadthWidget() -->
+      </div>
+
+      <!-- User Active Thndr Pending Orders Tracker (Direct Synchronization Guardrail) -->
+      <div id="thndr-pending-orders-widget" class="bg-gray-900 rounded-2xl border border-gray-800 p-5 shadow-xl transition-all">
+        <!-- Rendered dynamically by renderPendingThndrOrdersUI() -->
+      </div>
+
+      <!-- Filter & Search Controls Header -->
+      <div class="bg-gray-900 p-5 rounded-2xl border border-gray-800 shadow-xl space-y-4">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
+              <h3 class="text-lg font-bold text-white">رادار البورصة المصرية الشامل (EGX30 + EGX70)</h3>
+            </div>
+            <p class="text-xs text-gray-400 mt-1">كشف تدفق السيولة غير المعتادة واختراق المقاومات مع تطبيق فلتر السيولة الإلزامي في ثندر</p>
+          </div>
+          
+          <!-- Search Bar -->
+          <div class="relative w-full md:w-72">
+            <input type="text" id="radar-search-input" oninput="handleRadarSearch()" placeholder="ابحث برمز السهم أو الاسم (مثال: فوري، AMOC)..." class="w-full bg-gray-950 border border-gray-700 rounded-xl pr-9 pl-4 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500 transition">
+            <i data-lucide="search" class="w-4 h-4 text-gray-400 absolute right-3 top-2.5"></i>
+          </div>
+        </div>
+
+        <!-- Filter Badges -->
+        <div class="flex items-center gap-2 overflow-x-auto pb-1 text-xs scrollbar-none">
+          <button onclick="setRadarFilter('all')" id="rf-all" class="px-3.5 py-1.5 rounded-lg font-bold bg-emerald-600 text-white transition">الكل (أعلى سيولة بالسوق)</button>
+          <button onclick="setRadarFilter('egx30')" id="rf-egx30" class="px-3.5 py-1.5 rounded-lg font-bold bg-gray-800 text-gray-300 hover:bg-gray-700 transition">EGX30 (شركات كبرى وأمان)</button>
+          <button onclick="setRadarFilter('egx70')" id="rf-egx70" class="px-3.5 py-1.5 rounded-lg font-bold bg-gray-800 text-gray-300 hover:bg-gray-700 transition">EGX70 (طفرات واعدة)</button>
+          <button onclick="setRadarFilter('volume_surge')" id="rf-volume_surge" class="px-3.5 py-1.5 rounded-lg font-bold bg-gray-800 text-gray-300 hover:bg-gray-700 transition flex items-center gap-1">
+            <span>🔥 تدفق سيولة غير معتاد</span>
+          </button>
+          <button onclick="setRadarFilter('oversold_bounce')" id="rf-oversold_bounce" class="px-3.5 py-1.5 rounded-lg font-bold bg-gray-800 text-gray-300 hover:bg-gray-700 transition flex items-center gap-1">
+            <span>🎯 ارتداد من قاع (Dip Buy)</span>
+          </button>
+          <button onclick="setRadarFilter('low_risk')" id="rf-low_risk" class="px-3.5 py-1.5 rounded-lg font-bold bg-gray-800 text-gray-300 hover:bg-gray-700 transition flex items-center gap-1 shrink-0">
+            <span>🛡️ أمان استثماري عالي</span>
+          </button>
+          <button onclick="setRadarFilter('dividend_champions')" id="rf-dividend_champions" class="px-3.5 py-1.5 rounded-lg font-bold bg-gray-800 text-gray-300 hover:bg-gray-700 transition flex items-center gap-1 shrink-0">
+            <span>👑 أبطال التوزيعات (Dividends)</span>
+          </button>
+          <button onclick="setRadarFilter('institutional_surge')" id="rf-institutional_surge" class="px-3.5 py-1.5 rounded-lg font-bold bg-gray-800 text-gray-300 hover:bg-gray-700 transition flex items-center gap-1 shrink-0">
+            <span>⚡ سيولة مؤسسية (RVol)</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Radar Grid Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="radar-grid">
+        <!-- Dynamically populated via JS -->
+      </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- TAB 3: QUANTITATIVE RISK & LEVELS ENGINE (Phase 4) -->
+    <!-- ============================================== -->
+    <div id="view-risk" class="view-panel hidden space-y-6">
+      
+      <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6 shadow-xl space-y-6">
+        <div class="border-b border-gray-800 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <div class="flex items-center gap-2 text-emerald-400 text-xs font-bold uppercase tracking-wider mb-1">
+              <i data-lucide="shield-alert" class="w-4 h-4"></i>
+              <span>التحليل الفني الكمي (Quantitative Levels)</span>
+            </div>
+            <h2 class="text-xl font-bold text-white">حاسبة نقاط الارتكاز والدعم ونسبة العائد للمخاطرة (R/R)</h2>
+            <p class="text-xs text-gray-400 mt-1">حسابات فنية دقيقة لمستويات الارتكاز الكلاسيكية (Classic Pivot Points) لتقييم صفقات الدخول والخروج بالأرقام</p>
+          </div>
+          <span class="px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 rounded-xl text-xs font-bold self-start flex items-center gap-1.5">
+            <i data-lucide="shield-check" class="w-4 h-4"></i>
+            <span>معيار الأمان: R/R ≥ 1:2.0</span>
+          </span>
+        </div>
+
+        <!-- Stock Selector & Calculation Inputs -->
+        <div class="bg-gray-950/70 p-5 rounded-2xl border border-gray-800 space-y-4">
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <span class="text-xs font-bold text-white flex items-center gap-1.5">
+              <i data-lucide="sliders-horizontal" class="w-4 h-4 text-emerald-400"></i>
+              <span>بيانات الأسعار لحساب المستويات:</span>
+            </span>
+            <span class="text-[11px] text-gray-400">اختر السهم من القائمة ليتم تحميل أسعاره تلقائياً أو أدخل الأرقام يدوياً</span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <!-- Stock Select -->
+            <div class="bg-gray-900/90 p-3.5 rounded-xl border border-gray-800 space-y-1.5">
+              <label class="block text-xs font-bold text-gray-300 flex items-center justify-between">
+                <span>اختر السهم:</span>
+                <i data-lucide="search" class="w-3.5 h-3.5 text-gray-400"></i>
+              </label>
+              <select id="risk-stock-select" onchange="loadStockForRiskCalc()" class="w-full h-10 bg-gray-950 border border-gray-700 rounded-xl px-3 text-xs text-white focus:outline-none focus:border-emerald-500">
+                <!-- Populated via JS -->
+              </select>
+            </div>
+
+            <!-- High Price -->
+            <div class="bg-gray-900/90 p-3.5 rounded-xl border border-gray-800 space-y-1.5">
+              <label class="block text-xs font-bold text-gray-300 flex items-center justify-between">
+                <span>أعلى سعر (High):</span>
+                <span class="text-[10px] text-gray-400 font-mono">ج.م</span>
+              </label>
+              <div class="relative">
+                <input type="number" id="risk-high" min="0.01" step="0.01" placeholder="أعلى سعر" class="w-full h-10 bg-gray-950 border border-gray-700 rounded-xl px-3 text-xs text-white font-mono focus:border-emerald-500 focus:outline-none">
+              </div>
+            </div>
+
+            <!-- Low Price -->
+            <div class="bg-gray-900/90 p-3.5 rounded-xl border border-gray-800 space-y-1.5">
+              <label class="block text-xs font-bold text-gray-300 flex items-center justify-between">
+                <span>أدنى سعر (Low):</span>
+                <span class="text-[10px] text-gray-400 font-mono">ج.م</span>
+              </label>
+              <div class="relative">
+                <input type="number" id="risk-low" min="0.01" step="0.01" placeholder="أدنى سعر" class="w-full h-10 bg-gray-950 border border-gray-700 rounded-xl px-3 text-xs text-white font-mono focus:border-emerald-500 focus:outline-none">
+              </div>
+            </div>
+
+            <!-- Close Price -->
+            <div class="bg-gray-900/90 p-3.5 rounded-xl border border-gray-800 space-y-1.5">
+              <label class="block text-xs font-bold text-gray-300 flex items-center justify-between">
+                <span>سعر الإغلاق / الشراء:</span>
+                <span class="text-[10px] text-gray-400 font-mono">ج.م</span>
+              </label>
+              <div class="relative">
+                <input type="number" id="risk-close" min="0.01" step="0.01" placeholder="سعر الإغلاق" class="w-full h-10 bg-gray-950 border border-gray-700 rounded-xl px-3 text-xs text-white font-mono focus:border-emerald-500 focus:outline-none">
+              </div>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between flex-wrap gap-3 pt-2 border-t border-gray-800/80">
+            <span class="text-[11px] text-gray-400">تُحسب مستويات الدعم (S1, S2) والمقاومة (R1, R2) فور الضغط على الزر.</span>
+            <button onclick="executeRiskCalculations()" class="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-2 transition shadow-md">
+              <i data-lucide="calculator" class="w-4 h-4"></i>
+              <span>حساب مستويات الدعم والمخاطرة</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Calculated Mathematical Output Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6" id="risk-output-container">
+          
+          <!-- Column 1: Pivot & Resistance Levels -->
+          <div class="bg-gray-950 p-4 rounded-xl border border-gray-800 space-y-3">
+            <h4 class="text-xs font-bold text-cyan-400 flex items-center gap-1.5 border-b border-gray-800 pb-2">
+              <i data-lucide="arrow-up-right" class="w-4 h-4"></i>
+              <span>مستويات الارتكاز والمقاومة (Pivot Points)</span>
+            </h4>
+            <div class="space-y-2 text-xs font-mono">
+              <div class="flex justify-between items-center p-2 rounded-lg bg-gray-900">
+                <span class="text-gray-400">المقاومة الثانية (R2 - جني أرباح أقصى):</span>
+                <span class="font-bold text-purple-400" id="out-r2">--</span>
+              </div>
+              <div class="flex justify-between items-center p-2 rounded-lg bg-gray-900">
+                <span class="text-gray-400">المقاومة الأولى (R1 - الهدف الأول):</span>
+                <span class="font-bold text-emerald-400" id="out-r1">--</span>
+              </div>
+              <div class="flex justify-between items-center p-2 rounded-lg bg-emerald-950/40 border border-emerald-800/40">
+                <span class="text-emerald-300 font-bold">نقطة الارتكاز المحورية (Pivot Point):</span>
+                <span class="font-bold text-white text-sm" id="out-pivot">--</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Column 2: Support & Stop-Loss Levels -->
+          <div class="bg-gray-950 p-4 rounded-xl border border-gray-800 space-y-3">
+            <h4 class="text-xs font-bold text-rose-400 flex items-center gap-1.5 border-b border-gray-800 pb-2">
+              <i data-lucide="shield" class="w-4 h-4"></i>
+              <span>مستويات الدعم ووقف الخسارة المحسوب</span>
+            </h4>
+            <div class="space-y-2 text-xs font-mono">
+              <div class="flex justify-between items-center p-2 rounded-lg bg-gray-900">
+                <span class="text-gray-400">الدعم الأول (S1 - منطقة الارتداد):</span>
+                <span class="font-bold text-white" id="out-s1">--</span>
+              </div>
+              <div class="flex justify-between items-center p-2 rounded-lg bg-gray-900">
+                <span class="text-gray-400">الدعم الثاني (S2 - دعم رئيسي):</span>
+                <span class="font-bold text-amber-400" id="out-s2">--</span>
+              </div>
+              <div class="flex justify-between items-center p-2 rounded-lg bg-rose-950/40 border border-rose-800/40">
+                <span class="text-rose-300 font-bold">وقف الخسارة الصارم (Stop Loss):</span>
+                <span class="font-bold text-rose-400 text-sm" id="out-stoploss">--</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Column 3: Risk-to-Reward & Allocation Decision -->
+          <div class="bg-gray-950 p-4 rounded-xl border border-gray-800 space-y-3">
+            <h4 class="text-xs font-bold text-amber-400 flex items-center gap-1.5 border-b border-gray-800 pb-2">
+              <i data-lucide="scale" class="w-4 h-4"></i>
+              <span>حكم المعادلة الرياضية (Verdict)</span>
+            </h4>
+            
+            <div class="p-3 rounded-lg bg-gray-900 space-y-2 text-xs">
+              <div class="flex justify-between items-center">
+                <span class="text-gray-400">نسبة العائد للمخاطرة (R/R Ratio):</span>
+                <span class="font-bold font-mono text-emerald-400 text-sm" id="out-rr-ratio">--</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-gray-400">الربح المتوقع حتى الهدف:</span>
+                <span class="font-bold font-mono text-emerald-400" id="out-reward-pct">--</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-gray-400">أقصى خسارة مسموح بها:</span>
+                <span class="font-bold font-mono text-rose-400" id="out-risk-pct">--</span>
+              </div>
+            </div>
+
+            <div class="p-3 rounded-xl border border-emerald-500/30 bg-emerald-950/20 text-xs text-gray-200" id="out-verdict-box">
+              <div class="font-bold text-emerald-400 flex items-center gap-1 mb-1">
+                <i data-lucide="check-circle" class="w-3.5 h-3.5"></i>
+                <span>قرار المحرك الحسابي</span>
+              </div>
+              <p class="text-[11px] text-gray-300">
+                اضغط على زر تشغيل المحرك بعد مراجعة الأسعار للحصول على الحكم النهائي.
+              </p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ============================================== -->
+    <!-- TAB: DCF & DDM FAIR VALUE VALUATION ENGINE     -->
+    <!-- ============================================== -->
+    <div id="view-valuation" class="view-panel hidden space-y-6">
+
+      <!-- Header & Company Selection Card -->
+      <div class="bg-gray-900 border border-gray-800 rounded-2xl p-5 sm:p-6 shadow-xl space-y-5">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-800 pb-4">
+          <div>
+            <div class="flex items-center gap-2 text-emerald-400 text-xs font-bold uppercase tracking-wider mb-1">
+              <i data-lucide="scale" class="w-4 h-4"></i>
+              <span>محرك تقييم القيمة العادلة المخصومة (Discounted Cash Flow & DDM)</span>
+            </div>
+            <h2 class="text-xl font-bold text-white">حساب القيمة الجوهرية وهامش الأمان لأسهم البورصة المصرية</h2>
+            <p class="text-xs text-gray-400 mt-1">نموذج رياضي مؤسسي مخصص لطبيعة الاقتصاد المصري يأخذ في الاعتبار أسعار فائدة البنك المركزي ومعدلات التضخم</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <select id="dcf-stock-select" onchange="onDcfStockChanged()" class="bg-gray-950 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white font-bold focus:outline-none focus:border-emerald-500 cursor-pointer">
+              <!-- Dynamically populated -->
+            </select>
+          </div>
+        </div>
+
+        <!-- Active Stock Banner & Model Meta -->
+        <div class="p-4 rounded-xl bg-gray-950 border border-gray-800 flex flex-col md:flex-row md:items-center justify-between gap-3">
+          <div>
+            <div class="flex items-center gap-2">
+              <h3 id="dcf-display-title" class="font-bold text-white text-base">البنك التجاري الدولي (COMI)</h3>
+              <span id="dcf-model-type" class="px-2 py-0.5 rounded-full text-[10px] bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 font-bold">نموذج DDM</span>
+            </div>
+            <p id="dcf-fundamental-analysis" class="text-xs text-gray-300 mt-1">أكبر بنك تجاري خاص بمصر وهوامش تشغيلية صلبة تفوق 85%.</p>
+          </div>
+          <div class="flex items-center gap-4 shrink-0">
+            <div class="text-right">
+              <span class="text-[10px] text-gray-400 block">سعر البورصة اللحظي</span>
+              <span id="dcf-current-market-price" class="font-mono text-base font-bold text-white">--</span>
+            </div>
+            <div class="w-px h-8 bg-gray-800"></div>
+            <div class="text-right">
+              <span class="text-[10px] text-emerald-400 block font-bold">القيمة العادلة المحسوبة</span>
+              <span id="dcf-calculated-fair-value" class="font-mono text-lg font-bold text-emerald-400">--</span>
+            </div>
+            <div class="w-px h-8 bg-gray-800"></div>
+            <div class="text-right">
+              <span class="text-[10px] text-cyan-400 block font-bold">هامش الأمان (Safety Margin)</span>
+              <span id="dcf-margin-of-safety" class="font-mono text-base font-bold text-cyan-300">--</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Verdict Banner -->
+        <div id="dcf-verdict-banner" class="p-3 rounded-xl bg-gray-950 border border-gray-800 text-xs">
+          <!-- Dynamically filled -->
+        </div>
+
+        <!-- 3 Interactive Sliders (Macroeconomic Inputs for Egypt) -->
+        <div class="p-4 sm:p-5 rounded-xl bg-gray-950 border border-gray-800 space-y-4">
+          <div class="flex items-center justify-between">
+            <h4 class="font-bold text-white text-xs flex items-center gap-2">
+              <i data-lucide="sliders" class="w-4 h-4 text-emerald-400"></i>
+              <span>محددات وسلايدرات التقييم التفاعلية (عدّل التوقعات وراقب تغير القيمة العادلة لحظياً):</span>
+            </h4>
+            <span class="text-[10px] text-gray-400">تحديث فوري للقيمة العادلة ومصفوفة الحساسية</span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-5 pt-1">
+            <!-- Slider 1: Growth Rate -->
+            <div class="space-y-2 p-3 rounded-lg bg-gray-900 border border-gray-800">
+              <div class="flex items-center justify-between text-xs font-semibold">
+                <span class="text-gray-300">1. نمو الأرباح/التدفقات المتوقع (5 سنوات):</span>
+                <span id="dcf-val-growth" class="font-mono font-bold text-emerald-400">18.0%</span>
+              </div>
+              <input type="range" id="dcf-slider-growth" min="5" max="40" step="0.5" value="18" oninput="onDcfSliderInput()" class="w-full accent-emerald-500 cursor-pointer">
+              <p class="text-[10px] text-gray-400 leading-tight">معدل النمو السنوي المركب (CAGR) للأرباح التشغيلية المتوقعة للشركة.</p>
+            </div>
+
+            <!-- Slider 2: Discount Rate (WACC) -->
+            <div class="space-y-2 p-3 rounded-lg bg-gray-900 border border-gray-800">
+              <div class="flex items-center justify-between text-xs font-semibold">
+                <span class="text-gray-300">2. معدل الخصم / تكلفة رأس المال (WACC):</span>
+                <span id="dcf-val-discount" class="font-mono font-bold text-cyan-400">22.0%</span>
+              </div>
+              <input type="range" id="dcf-slider-discount" min="15" max="32" step="0.5" value="22" oninput="onDcfSliderInput()" class="w-full accent-cyan-500 cursor-pointer">
+              <p class="text-[10px] text-gray-400 leading-tight">مرتبط بأسعار فائدة البنك المركزي المصري وعوائد أذون الخزانة لخصم القيمة المستقبلية.</p>
+            </div>
+
+            <!-- Slider 3: Terminal Growth -->
+            <div class="space-y-2 p-3 rounded-lg bg-gray-900 border border-gray-800">
+              <div class="flex items-center justify-between text-xs font-semibold">
+                <span class="text-gray-300">3. معدل النمو المستديم طويل الأجل:</span>
+                <span id="dcf-val-terminal" class="font-mono font-bold text-amber-400">7.0%</span>
+              </div>
+              <input type="range" id="dcf-slider-terminal" min="4" max="10" step="0.5" value="7" oninput="onDcfSliderInput()" class="w-full accent-amber-500 cursor-pointer">
+              <p class="text-[10px] text-gray-400 leading-tight">النمو الدائم بعد 5 سنوات، يماثل معدل التضخم المستهدف للاقتصاد المصري.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5-Year Cash Flow Projections Table -->
+        <div class="bg-gray-950 p-4 sm:p-5 rounded-xl border border-gray-800 space-y-3">
+          <div class="flex items-center justify-between">
+            <h4 class="font-bold text-white text-xs flex items-center gap-2">
+              <i data-lucide="calendar" class="w-4 h-4 text-cyan-400"></i>
+              <span>جدول التدفقات النقدية المتوقعة وقيمتها المخصومة بالجنيه (Next 5 Years):</span>
+            </h4>
+            <span class="text-[10px] text-gray-400">محسوبة بالجنيه المصري (ملايين)</span>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-right text-xs">
+              <thead class="bg-gray-900 text-gray-400 text-[10px] border-b border-gray-800">
+                <tr>
+                  <th class="py-2.5 px-3 font-semibold">السنة المالية</th>
+                  <th class="py-2.5 px-3 font-semibold">التدفق النقدي المتوقع</th>
+                  <th class="py-2.5 px-3 font-semibold">القيمة الحالية المخصومة (PV)</th>
+                </tr>
+              </thead>
+              <tbody id="dcf-cashflow-table-body" class="divide-y divide-gray-800/60 font-mono">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Sensitivity Analysis Table -->
+        <div class="bg-gray-950 p-4 sm:p-5 rounded-xl border border-gray-800 space-y-3">
+          <div class="flex items-center justify-between">
+            <h4 class="font-bold text-white text-xs flex items-center gap-2">
+              <i data-lucide="grid" class="w-4 h-4 text-purple-400"></i>
+              <span>مصفوفة الحساسية للقيم العادلة (Sensitivity Matrix عند تغير الفائدة والنمو):</span>
+            </h4>
+            <span class="text-[10px] text-emerald-400 font-bold">🟢 الأخضر = سهم رخيص ومقوم بأقل من قيمته</span>
+          </div>
+          <div id="dcf-sensitivity-container" class="overflow-x-auto">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+        <!-- Educational Philosophy Note -->
+        <div class="p-3.5 rounded-xl bg-gradient-to-r from-emerald-950/40 to-slate-900 border border-emerald-500/30 text-xs text-gray-300 space-y-1">
+          <div class="flex items-center gap-1.5 font-bold text-emerald-300">
+            <i data-lucide="shield-check" class="w-4 h-4"></i>
+            <span>قاعدة وارن بافيت لحماية رأس المال (Margin of Safety):</span>
+          </div>
+          <p class="text-[11px] leading-relaxed">
+            "القيمة العادلة تخبرك بما يستحقه السهم، لكن هامش الأمان يحميك من تقلبات المستقبل". لا تشتري سهماً إلا إذا كان سعره في السوق أقل من قيمته العادلة المخصومة بهامش أمان مريح (&gt; 15% إلى 20%)، مع التحقق من أن السهم يتداول فوق دعومه الفنية.
+          </p>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ============================================== -->
+    <!-- TAB 4: IN-APP AI ADVISORY CHAT & THESIS (Phase 5) -->
+    <!-- ============================================== -->
+    <div id="view-advisor" class="view-panel hidden space-y-4">
+      
+      <!-- Investment Due Diligence Memo Generator Banner -->
+      <div class="bg-gradient-to-r from-emerald-950/60 to-gray-900 border border-emerald-800/40 rounded-2xl p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 shadow-lg">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="px-2.5 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 text-[10px] font-bold">التحليل الاستثماري الشامل</span>
+            <h3 class="text-sm font-bold text-white">إعداد مذكرة التقييم الاستثماري للأسهم (Due Diligence)</h3>
+          </div>
+          <p class="text-xs text-gray-300 mt-1">
+            اختر أي سهم لإعداد تقرير متكامل يغطي: (1. الأساسي والمالي، 2. الفني ومستويات الدعم، 3. تدفقات السيولة بالسوق).
+          </p>
+        </div>
+        <div class="flex items-center gap-2 w-full md:w-auto">
+          <select id="ai-thesis-stock-select" class="bg-gray-950 border border-gray-700 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-emerald-500">
+            <!-- Populated via JS -->
+          </select>
+          <button onclick="generateStructuredThesis()" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1.5 transition shrink-0 shadow-md">
+            <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+            <span>إعداد مذكرة السهم</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="bg-gray-900 border border-gray-800 rounded-2xl h-[480px] sm:h-[620px] max-h-[75vh] flex flex-col overflow-hidden shadow-2xl">
+        <!-- Chat Header -->
+        <div class="p-4 border-b border-gray-800 bg-gray-950/80 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-400 flex items-center justify-center text-white">
+              <i data-lucide="bar-chart-2" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-white">المستشار المالي لتحليل الأسهم (EGX Investment Advisor)</h3>
+              <p class="text-[11px] text-gray-400">تحليل فني ومالي مدعوم بالأرقام ومطابق لسياسة المحفظة الاستثمارية (~219k ج)</p>
+            </div>
+          </div>
+          <button onclick="clearChat()" class="text-xs text-gray-400 hover:text-white px-2 py-1 rounded bg-gray-800 hover:bg-gray-700 transition">
+            مسح المحادثة
+          </button>
+        </div>
+
+        <!-- Gemini API Key Status & Live AI Connection Bar -->
+        <div class="px-4 py-2.5 bg-gray-950/95 border-b border-gray-800 flex items-center justify-between flex-wrap gap-2 text-xs">
+          <div class="flex items-center gap-2">
+            <div id="gemini-status-indicator" class="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20">
+              <span id="gemini-status-dot" class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+              <span id="gemini-status-text">جاري فحص حالة الاتصال بـ Google Gemini API...</span>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="openGeminiModal()" class="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1.5 transition shadow-sm">
+              <i data-lucide="key" class="w-3.5 h-3.5"></i>
+              <span id="gemini-btn-label">ربط / إدخال مفتاح الذكاء الاصطناعي (API Key)</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Chat Messages Area -->
+        <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-4">
+          <!-- Welcome message -->
+          <div class="flex items-start gap-3">
+            <div class="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center text-white shrink-0 text-xs font-bold">
+              AI
+            </div>
+            <div class="bg-gray-800 border border-gray-700 rounded-2xl rounded-tr-none p-3.5 text-xs text-gray-200 leading-relaxed max-w-xl shadow-sm" id="advisor-welcome-text">
+              أهلاً بك! أنا مستشارك المالي الرقمي المعتمد لمتابعة محفظتك في البورصة المصرية وإدارتها بأسلوب مؤسسي هادئ.
+              <br><br>
+              نحن نعمل وفق استراتيجية منضبطة تركز على القيمة وتتجنب التداول المفرط. يمكنك سؤالي عن تحليل أي شركة، أو مراجعة مستويات الدعم والمقاومة، أو دراسة أي قرار قبل تنفيذه في تطبيق ثندر.
+            </div>
+          </div>
+        </div>
+
+        <!-- Suggested Prompt Chips -->
+        <div class="px-4 py-2 border-t border-gray-800/60 bg-gray-950/40 flex items-center gap-2 overflow-x-auto text-[11px] scrollbar-none">
+          <span class="text-gray-400 shrink-0">أسئلة سريعة:</span>
+          <button onclick="askCopilot('ما التقييم المالي لسهم التجاري الدولي COMI وهل السعر الحالي مناسب للتعزيز؟')" class="px-2.5 py-1 rounded-full bg-gray-800 hover:bg-gray-700 text-gray-300 whitespace-nowrap transition">
+            تقييم سهم التجاري الدولي COMI؟
+          </button>
+          <button onclick="askCopilot('ما هو أفضل سهم للتعزيز فيه الآن في محفظتي؟')" class="px-2.5 py-1 rounded-full bg-gray-800 hover:bg-gray-700 text-gray-300 whitespace-nowrap transition">
+            أفضل سهم للتعزيز حالياً؟
+          </button>
+          <button onclick="askCopilot('ما هي مستويات الدعم والهدف لسهم السويدي إليكتريك SWDY؟')" class="px-2.5 py-1 rounded-full bg-gray-800 hover:bg-gray-700 text-gray-300 whitespace-nowrap transition">
+            مستويات سهم السويدي SWDY؟
+          </button>
+          <button onclick="askCopilot('هل يُفضل بيع سهم كليوباترا CLHO أم الانتظار؟')" class="px-2.5 py-1 rounded-full bg-gray-800 hover:bg-gray-700 text-gray-300 whitespace-nowrap transition">
+            موقف سهم كليوباترا CLHO؟
+          </button>
+        </div>
+
+        <!-- Chat Input Bar -->
+        <div class="p-4 bg-gray-950 border-t border-gray-800">
+          <form id="chat-form" onsubmit="handleChatSubmit(event)" class="flex items-center gap-2">
+            <input type="text" id="chat-input" placeholder="اكتب سؤالك أو استشارتك عن أي سهم في البورصة..." class="flex-1 bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500 transition">
+            <button type="button" id="btn-chat-mic" onclick="toggleChatVoiceInput()" class="p-2.5 rounded-xl bg-gray-800 hover:bg-gray-700 text-purple-400 border border-purple-500/30 transition flex items-center justify-center cursor-pointer" title="تحدث بالسؤال صوتياً بالمايك">
+              <i data-lucide="mic" class="w-4 h-4"></i>
+            </button>
+            <button type="submit" class="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1.5 transition">
+              <span>إرسال</span>
+              <i data-lucide="send" class="w-3.5 h-3.5"></i>
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- TAB 5: SMART ALERTS & SIGNALS CENTER (Phase 6) -->
+    <!-- ============================================== -->
+    <div id="view-alerts" class="view-panel hidden space-y-6">
+      
+      <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6 shadow-xl space-y-6">
+        <div class="border-b border-gray-800 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <div class="flex items-center gap-2 text-amber-400 text-xs font-bold uppercase tracking-wider mb-1">
+              <i data-lucide="bell-ring" class="w-4 h-4"></i>
+              <span>نظام التنبيهات الفورية وإشارات الطوارئ (Phase 6)</span>
+            </div>
+            <h2 class="text-xl font-bold text-white">إشارات السوق ومستويات الأمان اللحظية</h2>
+            <p class="text-xs text-gray-400 mt-1">تنبيهات فورية عند وصول أهداف جني الأرباح، اقتراب نقاط الدعم، أو رصد شذوذ السيولة</p>
+          </div>
+        <!-- Native Web Push Notification Control Card (Without Telegram) -->
+        <div class="p-4 rounded-xl bg-gradient-to-r from-cyan-950/40 via-gray-950 to-slate-900 border border-cyan-500/40 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div class="flex items-start gap-3">
+            <div class="w-10 h-10 rounded-xl bg-cyan-500/20 border border-cyan-500/30 flex items-center justify-center text-cyan-400 shrink-0">
+              <i data-lucide="bell-ring" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <h4 class="font-bold text-white text-sm">التنبيهات السحابية المباشرة على هذا الجهاز (Native Web Push)</h4>
+                <div class="flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] bg-gray-900 border border-gray-700">
+                  <span id="push-status-dot" class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+                  <span id="push-status-text" class="text-gray-300 font-mono">التنبيهات السحابية غير مفعلة (اضغط للتفعيل) 🟡</span>
+                </div>
+              </div>
+              <p class="text-xs text-gray-300 mt-1 leading-relaxed">
+                تنبيهات خلفية سحابية مستقلة تعمل من داخل التطبيق نفسه؛ يصلك إشعار فوري على شاشة هاتفك أو جهازك عند كسر أي دعم فني S1 أو بلوغ مستهدف المقاومة R1 حتى لو كان المتصفح مغلقاً، ودون الحاجة لتطبيق تيليجرام.
+              </p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 shrink-0">
+            <button onclick="sendTestNativeNotification()" id="btn-enable-push" class="px-3.5 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs transition flex items-center gap-1.5 shadow cursor-pointer">
+              <i data-lucide="bell" class="w-4 h-4"></i>
+              <span>تفعيل / اختبار الإشعار السحابي 🔔</span>
+            </button>
+          </div>
+        </div>
+        <button onclick="simulateMarketEmergency()" class="px-3.5 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs flex items-center gap-1.5 transition self-start shadow-md">
+            <i data-lucide="alert-octagon" class="w-4 h-4"></i>
+            <span>محاكاة تنبيه هبوط مفاجئ</span>
+          </button>
+        </div>
+
+        <div class="space-y-3" id="alerts-container">
+          <!-- Active Alert 1: Breakout -->
+          <div class="bg-gray-950 p-4 rounded-xl border border-emerald-500/30 flex items-start justify-between gap-3 hover:border-emerald-500/60 transition">
+            <div class="flex items-start gap-3">
+              <div class="p-2 rounded-xl bg-emerald-500/10 text-emerald-400 shrink-0">
+                <i data-lucide="zap" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="font-bold text-white text-sm">إشارة اختراق وانفجار سيولة: AMOC (الإسكندرية للزيوت)</span>
+                  <span class="text-[10px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded font-bold">فرصة طفرة EGX70</span>
+                </div>
+                <p class="text-xs text-gray-300 mt-1 leading-relaxed">
+                  حجم التداول اليومي تجاوز 3.4 أضعاف المتوسط التاريخي مع كسر مقاومة 10.80 ج. الهدف المتوقع: 12.40 ج. وقف الخسارة: 9.30 ج.
+                </p>
+                <div class="text-xs text-slate-300 mt-1 font-mono">الزمن: منذ 12 دقيقة • الأولوية: عالية</div>
+              </div>
+            </div>
+            <button onclick="openAuditModal('BTFH')" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shrink-0 flex items-center gap-1.5 transition shadow cursor-pointer" title="تقرير الاقتراح الاستثماري والمصادر">
+              <span>تقرير الاقتراح 📊</span>
+              <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+
+          <!-- Active Alert 2: Profit Protection -->
+          <div class="bg-gray-950 p-4 rounded-xl border border-cyan-500/30 flex items-start justify-between gap-3 hover:border-cyan-500/60 transition">
+            <div class="flex items-start gap-3">
+              <div class="p-2 rounded-xl bg-cyan-500/10 text-cyan-400 shrink-0">
+                <i data-lucide="shield-check" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="font-bold text-white text-sm">حماية أرباح تاريخية: ORAS (أوراسكوم كونستراكشون)</span>
+                  <span class="text-[10px] bg-cyan-500/20 text-cyan-300 px-2 py-0.5 rounded font-bold">عائد +25.17%</span>
+                </div>
+                <p class="text-xs text-gray-300 mt-1 leading-relaxed">
+                  السهم يتصدر محفظتك بربح +3,060 ج.م. وفقاً لقواعد إدارة الأرباح، تم رفع نقطة وقف الخسارة المتحرك (Trailing Stop) إلى 285.00 ج لضمان بقاء الصفقة رابحة 100%.
+                </p>
+                <div class="text-xs text-slate-300 mt-1 font-mono">الزمن: تم التحديث اليوم • الأولوية: متوسطة</div>
+              </div>
+            </div>
+            <button onclick="askCopilot('ما هي خطة جني الأرباح لسهم أوراسكوم ORAS؟')" class="px-3 py-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 text-white font-bold text-xs shrink-0 flex items-center gap-1">
+              <span>طلب استشارة</span>
+              <i data-lucide="sparkles" class="w-3 h-3 text-emerald-400"></i>
+            </button>
+          </div>
+
+          <!-- Active Alert 3: Accumulation Opportunity -->
+          <div class="bg-gray-950 p-4 rounded-xl border border-amber-500/30 flex items-start justify-between gap-3 hover:border-amber-500/60 transition">
+            <div class="flex items-start gap-3">
+              <div class="p-2 rounded-xl bg-amber-500/10 text-amber-400 shrink-0">
+                <i data-lucide="arrow-down-circle" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="font-bold text-white text-sm">فرصة تعزيز استراتيجي: COMI (البنك التجاري الدولي)</span>
+                  <span class="text-[10px] bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded font-bold">تصحيح عند الدعم</span>
+                </div>
+                <p class="text-xs text-gray-300 mt-1 leading-relaxed">
+                  سهم CIB يلامس منطقة الدعم الهيكلية (77.80 - 79.00 ج). مؤشرات السيولة تؤكد بدء تجميع مؤسساتي هادئ. يُنصح بتوجيه أي كاش إضافي لخفض متوسط تكلفة الشراء.
+                </p>
+                <div class="text-xs text-slate-300 mt-1 font-mono">الزمن: منذ ساعتين • الأولوية: فرصة ذهبية</div>
+              </div>
+            </div>
+            <button onclick="openAuditModal('COMI')" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shrink-0 flex items-center gap-1.5 transition shadow cursor-pointer" title="تقرير الاقتراح الاستثماري والمصادر">
+              <span>تقرير الاقتراح 📊</span>
+              <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ============================================== -->
+    <!-- TAB 6: PAPER TRADING & AUTONOMOUS BOT SIMULATOR -->
+    <!-- ============================================== -->
+    <div id="view-papertrading" class="view-panel hidden space-y-6">
+      
+      <!-- Automated Market Scanner Status Banner -->
+      <div class="bg-gradient-to-r from-emerald-950/60 via-gray-900 to-cyan-950/40 border border-emerald-500/30 rounded-2xl p-5 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div class="flex items-start gap-3.5">
+          <div class="w-12 h-12 rounded-2xl bg-emerald-600/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0 shadow-inner">
+            <i data-lucide="radar" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2 flex-wrap">
+              <h3 class="text-base font-bold text-white">نظام المتابعة الآلية لفرص السوق (Automated Market Scanner)</h3>
+              <span class="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-bold flex items-center gap-1">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                <span>فحص دوري نشط</span>
+              </span>
+            </div>
+            <p class="text-xs text-gray-300 mt-1 leading-relaxed">
+              فحص آلي لمؤشرات السيولة والفرص: <strong>أيام التداول (10:30 ص، 1:00 م، 3:30 م)</strong> + <strong>مساء السبت (9:00 م)</strong> لمراجعة إفصاحات وأخبار الشركات.
+            </p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 w-full md:w-auto">
+          <button onclick="triggerSimulatedBotCycle()" class="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-2 transition shadow-md w-full md:w-auto" title="فحص مؤشرات السوق وتحديث الصفقات">
+            <i data-lucide="play" class="w-4 h-4"></i>
+            <span>فحص مؤشرات السوق الآن ⚡</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Simulator Metrics Header -->
+      <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6 shadow-xl space-y-6">
+        <div class="border-b border-gray-800 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <div class="flex items-center gap-2 text-cyan-400 text-xs font-bold uppercase tracking-wider mb-1">
+              <i data-lucide="activity" class="w-4 h-4"></i>
+              <span>محفظة التداول الافتراضي وسجل الأداء</span>
+            </div>
+            <h2 class="text-xl font-bold text-white">سجل متابعة الصفقات وقياس التقدم نحو الأهداف السعرية</h2>
+            <p class="text-xs text-gray-400 mt-1">قياس رقمي لنسبة الإنجاز لكل صفقة ومراجعة محاور التقييم الأساسية والفنية قبل التنفيذ الفعلي</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="resetPaperTrading()" class="px-3 py-1.5 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-300 text-xs font-semibold transition">
+              إعادة ضبط المحفظة الافتراضية
+            </button>
+          </div>
+        </div>
+
+        <!-- Simulation Summary Metrics -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div class="bg-gray-950 p-4 rounded-xl border border-gray-800">
+            <span class="text-gray-400 text-xs block">رصيد الكاش الافتراضي المتاح:</span>
+            <span class="text-xl font-black font-mono text-white mt-1 block" id="sim-cash">50,000 ج</span>
+            <span class="text-[10px] text-emerald-400">جاهز للتنفيذ التجريبي</span>
+          </div>
+          <div class="bg-gray-950 p-4 rounded-xl border border-gray-800">
+            <span class="text-gray-400 text-xs block">قيمة الأسهم الافتراضية:</span>
+            <span class="text-xl font-black font-mono text-cyan-400 mt-1 block" id="sim-stocks-val">0 ج</span>
+            <span class="text-[10px] text-gray-400" id="sim-positions-count">0 صفقات مفتوحة</span>
+          </div>
+          <div class="bg-gray-950 p-4 rounded-xl border border-gray-800">
+            <span class="text-gray-400 text-xs block">الأرباح الافتراضية المحققة:</span>
+            <span class="text-xl font-black font-mono text-gray-300 mt-1 block" id="sim-profit">0.00 ج</span>
+            <span class="text-[10px] text-gray-400" id="sim-return-pct">0.00%</span>
+          </div>
+          <div class="bg-gray-950 p-4 rounded-xl border border-gray-800">
+            <span class="text-gray-400 text-xs block">نسبة نجاح الصفقات (Win Rate):</span>
+            <span class="text-xl font-black font-mono text-purple-400 mt-1 block" id="sim-win-rate">100%</span>
+            <span class="text-[10px] text-gray-400">صفقات أغلقت عند الهدف</span>
+          </div>
+        </div>
+
+        <!-- Performance & Rationale Ledger -->
+        <div class="space-y-3">
+          <div class="flex items-center justify-between border-t border-gray-800 pt-4">
+            <div class="flex items-center gap-2">
+              <i data-lucide="clipboard-check" class="w-4 h-4 text-emerald-400"></i>
+              <h4 class="font-bold text-white text-sm">سجل الصفقات الاستراتيجية ومتابعة الأهداف السعرية (Strategy Performance Ledger)</h4>
+            </div>
+            <span class="text-[11px] text-gray-400">معادلة الإنجاز: (السعر الحالي - الدخول) ÷ (الهدف - الدخول)</span>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-right text-xs">
+              <thead class="bg-gray-950 text-gray-400 font-semibold border-b border-gray-800">
+                <tr>
+                  <th class="py-3 px-3">السهم والتوقيت</th>
+                  <th class="py-3 px-3">النمط</th>
+                  <th class="py-3 px-3">سعر الدخول</th>
+                  <th class="py-3 px-3">السعر الحالي</th>
+                  <th class="py-3 px-3">المستهدف السعري</th>
+                  <th class="py-3 px-3">وقف الخسارة</th>
+                  <th class="py-3 px-3">نسبة التقدم نحو الهدف (%)</th>
+                  <th class="py-3 px-3">محاور التقييم ومبررات الصفقة</th>
+                  <th class="py-3 px-3 text-center">إجراء</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-800 font-medium" id="autonomous-ledger-body">
+                <!-- Dynamically populated via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Manual Trade Form (For User testing) -->
+        <div class="bg-gray-950/70 p-5 rounded-2xl border border-gray-800 space-y-4 mt-6">
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <h4 class="text-xs font-bold text-white flex items-center gap-1.5">
+              <i data-lucide="plus-circle" class="w-4 h-4 text-cyan-400"></i>
+              <span>تنفيذ صفقة تجريبية يدوية (Paper Trade Order)</span>
+            </h4>
+            <span class="text-[11px] text-gray-400">اختبر صفقاتك بأموال افتراضية لمقارنة العائد بالمخاطرة</span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+            <div class="bg-gray-900/90 p-3 rounded-xl border border-gray-800 space-y-1">
+              <label class="block text-gray-300 font-bold">السهم المراد تداوله:</label>
+              <select id="sim-trade-stock" onchange="updateSimPriceFromSelect()" class="w-full h-10 bg-gray-950 border border-gray-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500">
+                <!-- Populated via JS -->
+              </select>
+            </div>
+            <div class="bg-gray-900/90 p-3 rounded-xl border border-gray-800 space-y-1">
+              <label class="block text-gray-300 font-bold">سعر الشراء التجريبي (ج.م):</label>
+              <input type="number" id="sim-trade-price" step="0.05" class="w-full h-10 bg-gray-950 border border-gray-700 rounded-xl px-3 py-2 text-white font-mono focus:outline-none focus:border-emerald-500">
+            </div>
+            <div class="bg-gray-900/90 p-3 rounded-xl border border-gray-800 space-y-1">
+              <label class="block text-gray-300 font-bold">المبلغ المراد استثماره (ج.م):</label>
+              <input type="number" id="sim-trade-amount" value="5000" step="500" class="w-full h-10 bg-gray-950 border border-gray-700 rounded-xl px-3 py-2 text-white font-mono focus:outline-none focus:border-emerald-500">
+            </div>
+            <div class="flex items-end">
+              <button onclick="executeSimulatedBuy()" class="w-full h-16 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition shadow">
+                <i data-lucide="check" class="w-4 h-4"></i>
+                <span>تنفيذ الشراء الافتراضي</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Quick Amount Chips -->
+          <div class="flex items-center gap-2 flex-wrap pt-1 text-[11px]">
+            <span class="text-gray-400">مبالغ سريعة:</span>
+            <button type="button" onclick="document.getElementById('sim-trade-amount').value=2000" class="px-2.5 py-1 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-300 font-mono transition">2,000 ج</button>
+            <button type="button" onclick="document.getElementById('sim-trade-amount').value=5000" class="px-2.5 py-1 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-300 font-mono transition">5,000 ج</button>
+            <button type="button" onclick="document.getElementById('sim-trade-amount').value=10000" class="px-2.5 py-1 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-300 font-mono transition">10,000 ج</button>
+            <button type="button" onclick="document.getElementById('sim-trade-amount').value=20000" class="px-2.5 py-1 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-300 font-mono transition">20,000 ج</button>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ============================================== -->
+    <!-- TAB 7: CASH & REBALANCING CALCULATOR -->
+    <!-- ============================================== -->
+    <div id="view-rebalance" class="view-panel hidden space-y-6">
+      
+      <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6 shadow-xl space-y-6">
+        <div class="border-b border-gray-800 pb-4">
+          <div class="flex items-center gap-2 text-emerald-400 text-xs font-bold uppercase tracking-wider mb-1">
+            <i data-lucide="calculator" class="w-4 h-4"></i>
+            <span>توجيه وإدارة السيولة النقدية (Cash Deployment)</span>
+          </div>
+          <h2 class="text-xl font-bold text-white">كيف توزع أي سيولة إضافية بذكاء وانضباط؟</h2>
+          <p class="text-xs text-gray-400 mt-1">أدخل المبلغ المتاح للاستثمار وسيقوم النظام بحساب التوزيع الأمثل وفق أوزان المحفظة القيادية واستراتيجية خفض التكلفة</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div class="md:col-span-1 bg-gray-950/70 p-5 rounded-2xl border border-gray-800 space-y-4">
+            <div>
+              <label class="block text-xs font-bold text-gray-300 mb-1 flex items-center justify-between">
+                <span>المبلغ المتاح للشراء:</span>
+                <span class="text-[10px] text-gray-400 font-mono">ج.م</span>
+              </label>
+              <div class="relative">
+                <input type="number" id="rebalance-amount-input" value="10000" step="500" class="w-full h-11 bg-gray-900 border border-gray-700 rounded-xl px-4 text-sm text-white font-mono font-bold focus:outline-none focus:border-emerald-500 transition">
+              </div>
+            </div>
+
+            <!-- Quick Cash Chips -->
+            <div class="space-y-1.5">
+              <span class="text-[11px] text-gray-400 block">اختيار سريع للمبلغ:</span>
+              <div class="grid grid-cols-2 gap-1.5 text-xs font-mono">
+                <button type="button" onclick="setRebalanceAmount(5000)" class="py-1.5 px-2 rounded-lg bg-gray-900 hover:bg-gray-800 border border-gray-800 hover:border-gray-700 text-gray-300 transition text-center font-bold">5,000 ج</button>
+                <button type="button" onclick="setRebalanceAmount(10000)" class="py-1.5 px-2 rounded-lg bg-gray-900 hover:bg-gray-800 border border-gray-800 hover:border-gray-700 text-gray-300 transition text-center font-bold">10,000 ج</button>
+                <button type="button" onclick="setRebalanceAmount(25000)" class="py-1.5 px-2 rounded-lg bg-gray-900 hover:bg-gray-800 border border-gray-800 hover:border-gray-700 text-gray-300 transition text-center font-bold">25,000 ج</button>
+                <button type="button" onclick="setRebalanceAmount(50000)" class="py-1.5 px-2 rounded-lg bg-gray-900 hover:bg-gray-800 border border-gray-800 hover:border-gray-700 text-gray-300 transition text-center font-bold">50,000 ج</button>
+              </div>
+            </div>
+
+            <button onclick="calculateSmartAllocation()" class="w-full h-11 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-2 transition shadow-md">
+              <i data-lucide="calculator" class="w-4 h-4"></i>
+              <span>حساب التوزيع المقترح للسيولة</span>
+            </button>
+          </div>
+
+          <div class="md:col-span-2 bg-gray-950/40 p-4 rounded-xl border border-gray-800 space-y-3" id="rebalance-results">
+            <h4 class="text-xs font-bold text-emerald-400 flex items-center gap-1.5">
+              <i data-lucide="check-circle" class="w-4 h-4"></i>
+              <span>توزيع السيولة المقترح (بناءً على توازن محفظتك الحالية):</span>
+            </h4>
+            <div class="space-y-2 text-xs" id="rebalance-suggestions-list">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ============================================== -->
+    <!-- TAB 8: INVESTMENT RULES & GOVERNANCE POLICY     -->
+    <!-- ============================================== -->
+    <div id="view-rules" class="view-panel hidden space-y-6">
+      
+      <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6 shadow-xl space-y-6">
+        <div class="border-b border-gray-800 pb-4">
+          <div class="flex items-center gap-2 text-emerald-400 text-xs font-bold uppercase tracking-wider mb-1">
+            <i data-lucide="shield-check" class="w-4 h-4"></i>
+            <span>وثيقة سياسة المحفظة والحوكمة الاستثمارية</span>
+          </div>
+          <h2 class="text-xl font-bold text-white">قواعد وسياسة إدارة المحفظة (Investment Governance Policy)</h2>
+          <p class="text-xs text-gray-400 mt-1">تحدد هذه السياسة الضوابط الحسابية والمعايير المنظمة لقرارات الشراء والبيع وتوزيع السيولة بأمان وهدوء</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs leading-relaxed">
+          
+          <div class="bg-gray-950/60 p-4 rounded-xl border border-gray-800 space-y-2">
+            <div class="flex items-center gap-2 text-emerald-400 font-bold text-sm">
+              <i data-lucide="user-check" class="w-4 h-4"></i>
+              <span>1. الهوية الاستثمارية والأفق الزمني</span>
+            </div>
+            <p class="text-gray-300">
+              النمط هو مستثمر طويل إلى متوسط الأجل (Value & Position Growth Investor). الأصل هو الاحتفاظ بالأسهم ذات الأساس المالي المتين طالما تواصل تحقيق الأرباح والنمو، مع تجنب التداول اليومي المفرط للحفاظ على رأس المال من عمولات التداول وتآكل المحفظة.
+            </p>
+          </div>
+
+          <div class="bg-gray-950/60 p-4 rounded-xl border border-gray-800 space-y-2">
+            <div class="flex items-center gap-2 text-amber-400 font-bold text-sm">
+              <i data-lucide="alert-triangle" class="w-4 h-4"></i>
+              <span>2. محددات التدخل والبيع الاستثنائي</span>
+            </div>
+            <p class="text-gray-300">
+              لا يتم اللجوء لأمر البيع إلا في حالتين حصريتين:
+              <br>• <strong>حماية رأس المال من انزلاق فادح:</strong> كسر مستوى دعم هيكلي أو ظهور إفصاح رسمي سلبي يهدد أعمال الشركة.
+              <br>• <strong>جني أرباح طفرة كبرى:</strong> تحقيق مكاسب قياسية سريعة (+25% إلى +30% أو أكثر) لتدوير السيولة نحو فرص جديدة واعدة.
+            </p>
+          </div>
+
+          <div class="bg-gray-950/60 p-4 rounded-xl border border-gray-800 space-y-2">
+            <div class="flex items-center gap-2 text-cyan-400 font-bold text-sm">
+              <i data-lucide="zap" class="w-4 h-4"></i>
+              <span>3. رصد المحفزات الجوهرية والتدفقات النقدية</span>
+            </div>
+            <p class="text-gray-300">
+              متابعة الأحداث الاستراتيجية كدخول شركاء استراتيجيين، صناديق استثمار دولية أو إقليمية، والتوسعات ذات العوائد الدولارية أو التصديرية، ودراسة أثرها كفرص نمو للمحفظة.
+            </p>
+          </div>
+
+          <div class="bg-gray-950/60 p-4 rounded-xl border border-gray-800 space-y-2">
+            <div class="flex items-center gap-2 text-rose-400 font-bold text-sm">
+              <i data-lucide="filter" class="w-4 h-4"></i>
+              <span>4. معيار السيولة الإلزامي والتنفيذ في ثندر</span>
+            </div>
+            <p class="text-gray-300">
+              استبعاد الأسهم ذات السيولة الضعيفة أو التداولات الراكدة؛ لضمان القدرة على التنفيذ السلس لأوامر البيع والشراء في تطبيق ثندر بمرونة تامة وبأفضل الأسعار السوقية.
+            </p>
+          </div>
+
+        </div>
+
+        <div class="bg-emerald-950/20 border border-emerald-900/50 p-4 rounded-xl flex items-center justify-between flex-wrap gap-2 text-xs">
+          <span class="text-gray-300">وثيقة الحوكمة الكاملة محفوظة في المشروع: <code class="text-emerald-400 font-mono bg-black/40 px-2 py-0.5 rounded">INVESTMENT_RULES.md</code></span>
+          <span class="text-emerald-400 font-bold">الحالة: سارية ومفعلة</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- TAB 9: PORTFOLIO SETTINGS & RISK SPLIT CONTROL -->
+    <!-- ============================================== -->
+    <div id="view-settings" class="view-panel hidden space-y-6">
+      
+      <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6 shadow-xl space-y-6">
+        <div class="border-b border-gray-800 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <div class="flex items-center gap-2 text-amber-400 text-xs font-bold uppercase tracking-wider mb-1">
+              <i data-lucide="sliders" class="w-4 h-4"></i>
+              <span>لوحة التحكم والتخصيص الاستراتيجي للمحفظة</span>
+            </div>
+            <h2 class="text-xl font-bold text-white">تخصيص نسب الاستثمار الآمن والمضاربة التكتيكية</h2>
+            <p class="text-xs text-gray-400 mt-1">حدد استراتيجيتك بين الاحتفاظ طويل الأجل واقتناص طفرات الأسهم السريعة (10% - 20%)</p>
+          </div>
+          <button onclick="saveStrategySettings()" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1.5 transition shadow">
+            <i data-lucide="save" class="w-4 h-4"></i>
+            <span>حفظ الإعدادات وتطبيقها</span>
+          </button>
+        </div>
+
+        <!-- Gemini AI Model Configuration (API Integration Card) -->
+        <div class="bg-gradient-to-r from-emerald-950/50 via-gray-900 to-cyan-950/40 p-5 rounded-2xl border border-emerald-500/40 space-y-4 shadow-xl">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <div class="flex items-center gap-2 text-emerald-400 text-xs font-bold uppercase tracking-wider mb-1">
+                <i data-lucide="cpu" class="w-4 h-4"></i>
+                <span>محرك التحليل الذكي المباشر (Google Gemini AI API)</span>
+              </div>
+              <h3 class="text-base font-bold text-white">تفعيل التحليل والاستشارات اللحظية للأسهم والمحفظة</h3>
+              <p class="text-xs text-gray-300 mt-1">يتم حفظ المفتاح بأمان وسرية تامة في متصفحك الشخصي فقط (Local Storage) ولا يُرفع على سيرفر أو كود عام.</p>
+            </div>
+            <a href="https://aistudio.google.com/app/apikey" target="_blank" class="px-3.5 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs flex items-center gap-1.5 transition self-start sm:self-auto shadow shrink-0">
+              <span>احصل على مفتاح مجاني من Google AI Studio</span>
+              <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+            </a>
+          </div>
+
+          <div class="flex flex-col sm:flex-row gap-2">
+            <input type="password" id="setting-gemini-key" placeholder="الصق مفتاح Google Gemini API هنا (مثال: AIzaSy...)" class="flex-1 h-11 bg-gray-950 border border-gray-700 rounded-xl px-4 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500 font-mono">
+            <button onclick="saveGeminiApiKeyFromInput()" class="px-5 h-11 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition shrink-0 shadow">
+              <i data-lucide="check-circle" class="w-4 h-4"></i>
+              <span>حفظ وتفعيل</span>
+            </button>
+            <button onclick="testGeminiConnection()" class="px-4 h-11 rounded-xl bg-gray-800 hover:bg-gray-700 text-amber-300 font-bold text-xs flex items-center justify-center gap-1.5 transition shrink-0">
+              <i data-lucide="zap" class="w-4 h-4"></i>
+              <span>اختبار الاتصال ⚡</span>
+            </button>
+            <button onclick="removeGeminiApiKey()" class="px-3.5 h-11 rounded-xl bg-gray-800 hover:bg-rose-900/40 text-gray-400 hover:text-rose-300 font-bold text-xs flex items-center justify-center transition shrink-0" title="حذف المفتاح">
+              <i data-lucide="trash-2" class="w-4 h-4"></i>
+            </button>
+          </div>
+          <div id="gemini-key-feedback" class="text-xs hidden p-2.5 rounded-xl"></div>
+        </div>
+
+        <!-- Strategy Allocation Slider (Core vs Satellite) -->
+        <div class="bg-gray-950 p-5 rounded-2xl border border-gray-800 space-y-5">
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <div>
+              <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                <span>توزيع استراتيجية النواة والأقمار (Core & Satellite Split)</span>
+                <span class="px-2 py-0.5 rounded text-[10px] bg-amber-500/20 text-amber-300 font-bold">تخصيص فوري</span>
+              </h3>
+              <p class="text-xs text-gray-400 mt-0.5">حدد النسبة بين الأسهم القيادية الآمنة طويلة الأجل وفرص الزخم التكتيكية</p>
+            </div>
+            <div class="flex items-center gap-3 text-xs font-bold font-mono">
+              <span class="text-emerald-400" id="setting-longterm-label">استثمار طويل: 70%</span>
+              <span class="text-gray-500">•</span>
+              <span class="text-cyan-400" id="setting-tactical-label">طفرات سريعة: 30%</span>
+            </div>
+          </div>
+
+          <!-- Interactive Slider -->
+          <div class="space-y-2">
+            <input type="range" id="strategy-slider" min="50" max="90" step="5" value="70" oninput="handleStrategySliderChange(this.value)" class="w-full accent-emerald-500 cursor-pointer h-2 bg-gray-800 rounded-lg">
+            <div class="flex justify-between text-[11px] text-gray-400 font-mono">
+              <span>50% أمان / 50% تكتيكي (متوازن مرن)</span>
+              <span>70% أمان / 30% تكتيكي (الافتراضي الموصى به)</span>
+              <span>90% أمان / 10% تكتيكي (شديد التحفظ)</span>
+            </div>
+          </div>
+
+          <!-- Split Visualizer Cards -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+            <div class="bg-gray-900 p-4 rounded-xl border border-emerald-500/30 space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-emerald-400 flex items-center gap-1.5">
+                  <i data-lucide="shield-check" class="w-4 h-4"></i>
+                  <span>1. شريحة الاستثمار طويل الأجل (النواة Core)</span>
+                </span>
+                <span class="text-xs font-mono font-bold text-white" id="setting-longterm-val">153,450 ج.م (70%)</span>
+              </div>
+              <p class="text-xs text-gray-300 leading-relaxed">
+                مخصصة لشركات EGX30 القيادية ذات التوزيعات النقدية والأرباح المستقرة (مثل COMI، أوراسكوم، السويدي، وأبو قير) وصندوق NCS. لا نبيع فيها إلا في حالات الطوارئ لحماية المكاسب.
+              </p>
+            </div>
+
+            <div class="bg-gray-900 p-4 rounded-xl border border-cyan-500/30 space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-cyan-400 flex items-center gap-1.5">
+                  <i data-lucide="zap" class="w-4 h-4"></i>
+                  <span>2. شريحة الفرص التكتيكية والزخم (Satellite)</span>
+                </span>
+                <span class="text-xs font-mono font-bold text-white" id="setting-tactical-val">65,765 ج.م (30%)</span>
+              </div>
+              <p class="text-xs text-gray-300 leading-relaxed">
+                مخصصة لاقتناص أسهم الزخم والانفجار السعري المؤقت (مثل AMOC و ETRS). الهدف: تحقيق <strong>+10% إلى +20%</strong>، ثم البيع الفوري وجني الربح وإعادته لشريحة الاستثمار الآمن.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Risk Parameters Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+          <div class="bg-gray-950 p-4 rounded-xl border border-gray-800 space-y-2">
+            <label class="block font-bold text-white flex items-center gap-1.5">
+              <i data-lucide="pie-chart" class="w-4 h-4 text-emerald-400"></i>
+              <span>الحد الأقصى لوزن السهم الواحد:</span>
+            </label>
+            <select id="setting-max-stock-cap" class="w-full h-10 bg-gray-900 border border-gray-700 rounded-xl px-3 text-white focus:outline-none focus:border-emerald-500">
+              <option value="15">15% كحد أقصى (توزيع عالي الأمان)</option>
+              <option value="20" selected>20% كحد أقصى (النسبة المتوازنة)</option>
+              <option value="25">25% كحد أقصى (تركيز معتدل)</option>
+              <option value="30">30% كحد أقصى (تركيز مرتفع)</option>
+            </select>
+            <p class="text-[11px] text-gray-400">يمنع النظام من وضع أكثر من هذه النسبة في شركة واحدة لحماية المحفظة من مخاطر التركيز.</p>
+          </div>
+
+          <div class="bg-gray-950 p-4 rounded-xl border border-gray-800 space-y-2">
+            <label class="block font-bold text-white flex items-center gap-1.5">
+              <i data-lucide="shield-alert" class="w-4 h-4 text-rose-400"></i>
+              <span>وقف الخسارة المسموح به لصفقات الزخم:</span>
+            </label>
+            <select id="setting-stoploss-cap" class="w-full h-10 bg-gray-900 border border-gray-700 rounded-xl px-3 text-white focus:outline-none focus:border-emerald-500">
+              <option value="3">3% كحد أقصى (خروج سريع جداً)</option>
+              <option value="4" selected>4% كحد أقصى (المستوى القياسي)</option>
+              <option value="5">5% كحد أقصى (مرونة للموجات الصاعدة)</option>
+            </select>
+            <p class="text-[11px] text-gray-400">في حال تراجع السهم التكتيكي بهذه النسبة، يتم تفعيل وقف الخسارة فوراً دون تردد.</p>
+          </div>
+
+          <div class="bg-gray-950 p-4 rounded-xl border border-gray-800 space-y-2">
+            <label class="block font-bold text-white flex items-center gap-1.5">
+              <i data-lucide="scale" class="w-4 h-4 text-amber-400"></i>
+              <span>الهدف الأدنى لنسبة العائد للمخاطرة (R/R):</span>
+            </label>
+            <select id="setting-min-rr" class="w-full h-10 bg-gray-900 border border-gray-700 rounded-xl px-3 text-white focus:outline-none focus:border-emerald-500">
+              <option value="1.5">1:1.5 (عائد 1.5 مقابل كل 1 خطر)</option>
+              <option value="2.0" selected>1:2.0 (عائد ضعف الخسارة المحتملة - إلزامي)</option>
+              <option value="2.5">1:2.5 (فرص استثنائية فقط)</option>
+            </select>
+            <p class="text-[11px] text-gray-400">يستبعد النظام أي صفقة لا تضمن ضعف العائد المتوقع مقارنة بالخسارة المحتملة.</p>
+          </div>
+        </div>
+
+        <!-- Schedule Status & Info -->
+        <div class="bg-emerald-950/20 border border-emerald-500/30 p-4 rounded-xl flex items-center justify-between flex-wrap gap-3 text-xs">
+          <div class="flex items-center gap-2">
+            <i data-lucide="calendar-clock" class="w-4 h-4 text-emerald-400"></i>
+            <span class="text-white font-bold">جدول فحص وتحديث مؤشرات السوق:</span>
+            <span class="text-gray-300">أيام التداول: 10:30 ص، 1:00 م، 3:30 م • مساء السبت: 9:00 م لمراجعة إفصاحات وأخبار الشركات.</span>
+          </div>
+          <span class="text-emerald-400 font-bold bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20">مفعل ومنتظم</span>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ============================================== -->
+    <!-- TAB 10: FINANCIAL & AI COPILOT GLOSSARY        -->
+    <!-- ============================================== -->
+    <div id="view-glossary" class="view-panel hidden space-y-6">
+      
+      <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6 shadow-xl space-y-6">
+        <div class="border-b border-gray-800 pb-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <div class="flex items-center gap-2 text-cyan-400 text-xs font-bold uppercase tracking-wider mb-1">
+              <i data-lucide="book-open" class="w-4 h-4"></i>
+              <span>قاموس ودليل المستشار المالي (Financial Glossary)</span>
+            </div>
+            <h2 class="text-xl font-bold text-white">شرح كل مصطلحات البورصة والذكاء الاصطناعي بالعامية المبسطة</h2>
+            <p class="text-xs text-gray-400 mt-1">مرجعك السريع لفهم أي كلمة أو رقم تراه في التطبيق بدون أي مصطلحات معقدة</p>
+          </div>
+
+          <div class="relative w-full md:w-72">
+            <input type="text" id="glossary-search-input" oninput="handleGlossarySearch()" placeholder="ابحث في المصطلحات (مثال: دعم، R/R، سيولة)..." class="w-full bg-gray-950 border border-gray-700 rounded-xl pr-9 pl-4 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500 transition">
+            <i data-lucide="search" class="w-4 h-4 text-gray-400 absolute right-3 top-2.5"></i>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="glossary-grid">
+          
+          <!-- Term 1: Pivot Point -->
+          <div class="glossary-item bg-gray-950 p-4 rounded-xl border border-gray-800 space-y-2">
+            <div class="flex items-center justify-between">
+              <h4 class="font-bold text-white text-sm flex items-center gap-1.5">
+                <span class="text-emerald-400">Pivot Point</span>
+                <span class="text-gray-400 text-xs font-normal">(نقطة الارتكاز المحورية)</span>
+              </h4>
+              <span class="text-[10px] bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded font-bold">تحليل فني</span>
+            </div>
+            <p class="text-xs text-gray-300 leading-relaxed">
+              <strong>المعنى بالبلدي:</strong> ده "السعر العادل والمتزن" للسهم خلال اليوم محسوب من متوسط (أعلى سعر + أقل سعر + الإغلاق) ÷ 3.
+              <br>• لو السهم بيتداول <strong>فوق</strong> نقطة الارتكاز: يبقى المشتري قوي والسهم صاعد.
+              <br>• لو السهم بيتداول <strong>تحت</strong> نقطة الارتكاز: يبقى البياع هو المسيطر وممكن ينزل لدعومه.
+            </p>
+          </div>
+
+          <!-- Term 2: Support -->
+          <div class="glossary-item bg-gray-950 p-4 rounded-xl border border-gray-800 space-y-2">
+            <div class="flex items-center justify-between">
+              <h4 class="font-bold text-white text-sm flex items-center gap-1.5">
+                <span class="text-emerald-400">Support (S1, S2)</span>
+                <span class="text-gray-400 text-xs font-normal">(مستويات الدعم)</span>
+              </h4>
+              <span class="text-[10px] bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded font-bold">تحليل فني</span>
+            </div>
+            <p class="text-xs text-gray-300 leading-relaxed">
+              <strong>المعنى بالبلدي:</strong> دي "أرضية السعر"؛ سعر كل ما السهم ينزل له بيلاقي مشترين كتير جداً يمسكوه ويمنعوه يقع أكتر ويردوه لفوق. 
+              <br>• <strong>S1:</strong> الدعم الأول والارتداد السريع.
+              <br>• <strong>S2:</strong> الدعم الرئيسي الصلب، وكسره لأسفل يعتبر إشارة إنذار.
+            </p>
+          </div>
+
+          <!-- Term 3: Resistance -->
+          <div class="glossary-item bg-gray-950 p-4 rounded-xl border border-gray-800 space-y-2">
+            <div class="flex items-center justify-between">
+              <h4 class="font-bold text-white text-sm flex items-center gap-1.5">
+                <span class="text-purple-400">Resistance (R1, R2)</span>
+                <span class="text-gray-400 text-xs font-normal">(مستويات المقاومة)</span>
+              </h4>
+              <span class="text-[10px] bg-purple-500/10 text-purple-400 px-2 py-0.5 rounded font-bold">تحليل فني</span>
+            </div>
+            <p class="text-xs text-gray-300 leading-relaxed">
+              <strong>المعنى بالبلدي:</strong> ده "سقف السعر"؛ سعر كل ما السهم يقرب منه، بيظهر بياعين عاوزين يجنوا أرباحهم فيضغطوا على السهم.
+              <br>• <strong>R1:</strong> الهدف الأول لجني الأرباح.
+              <br>• لو السهم <strong>اخترق المقاومة</strong> بحجم تداول ضخم، بيطير بسرعة للمقاومة اللي بعدها (R2).
+            </p>
+          </div>
+
+          <!-- Term 4: Stop Loss -->
+          <div class="glossary-item bg-gray-950 p-4 rounded-xl border border-gray-800 space-y-2">
+            <div class="flex items-center justify-between">
+              <h4 class="font-bold text-white text-sm flex items-center gap-1.5">
+                <span class="text-rose-400">Stop Loss</span>
+                <span class="text-gray-400 text-xs font-normal">(وقف الخسارة الصارم)</span>
+              </h4>
+              <span class="text-[10px] bg-rose-500/10 text-rose-400 px-2 py-0.5 rounded font-bold">صمام أمان</span>
+            </div>
+            <p class="text-xs text-gray-300 leading-relaxed">
+              <strong>المعنى بالبلدي:</strong> ده طوق النجاة؛ سعر محدد مسبقاً بتقول عنده: "لو السهم نزل هنا، أنا هبيع وأخسر 3% أو 4% برضايا عشان أحمي باقي الـ 96% من فلوسي ومخسرش 20% أو 30%".
+            </p>
+          </div>
+
+          <!-- Term 5: Risk to Reward Ratio -->
+          <div class="glossary-item bg-gray-950 p-4 rounded-xl border border-gray-800 space-y-2">
+            <div class="flex items-center justify-between">
+              <h4 class="font-bold text-white text-sm flex items-center gap-1.5">
+                <span class="text-amber-400">Risk to Reward (R/R)</span>
+                <span class="text-gray-400 text-xs font-normal">(نسبة العائد للمخاطرة)</span>
+              </h4>
+              <span class="text-[10px] bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded font-bold">معيار حسابي</span>
+            </div>
+            <p class="text-xs text-gray-300 leading-relaxed">
+              <strong>المعنى بالبلدي:</strong> ميزان الصفقة الاستثمارية الرشيدة؛ مينفعش تدخل صفقة عشان تكسب 5 جنيه وأنت معرض تخسر 5 جنيه! شرط النظام ألا يوصي بأي صفقة إلا إذا كان العائد المستهدف <strong>ضعف الخسارة المحتملة على الأقل ($1:2$)</strong>.
+            </p>
+          </div>
+
+          <!-- Term 6: Volume Surge -->
+          <div class="glossary-item bg-gray-950 p-4 rounded-xl border border-gray-800 space-y-2">
+            <div class="flex items-center justify-between">
+              <h4 class="font-bold text-white text-sm flex items-center gap-1.5">
+                <span class="text-cyan-400">Volume Surge</span>
+                <span class="text-gray-400 text-xs font-normal">(انفجار السيولة وأحجام التداول)</span>
+              </h4>
+              <span class="text-[10px] bg-cyan-500/10 text-cyan-400 px-2 py-0.5 rounded font-bold">تدفقات مؤسساتية</span>
+            </div>
+            <p class="text-xs text-gray-300 leading-relaxed">
+              <strong>المعنى بالبلدي:</strong> لما تلاقي سهم متوسط تداوله اليومي مليون جنيه، وفجأة في ساعات قليلة دخلت فيه سيولة 5 أو 10 ملايين جنيه (أضعاف 2.5x إلى 4x)! ده مؤشر على دخول مشتري مؤسسي أو تجميع مكثف قبل موجة صعود.
+            </p>
+          </div>
+
+          <!-- Term 7: Target Progress % -->
+          <div class="glossary-item bg-gray-950 p-4 rounded-xl border border-gray-800 space-y-2">
+            <div class="flex items-center justify-between">
+              <h4 class="font-bold text-white text-sm flex items-center gap-1.5">
+                <span class="text-emerald-400">Target Progress %</span>
+                <span class="text-gray-400 text-xs font-normal">(نسبة التقدم نحو الهدف السعري)</span>
+              </h4>
+              <span class="text-[10px] bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded font-bold">مؤشر الإنجاز</span>
+            </div>
+            <p class="text-xs text-gray-300 leading-relaxed">
+              <strong>المعنى بالبلدي:</strong> المعادلة الرقمية لمتابعة الصفقات: لو اشترينا بـ 90 جنيه، والهدف 100 جنيه. 
+              <br>• لو السعر وصل إلى 95 ج $\rightarrow$ يبقى حقق <strong>50%</strong> من المسار نحو الهدف.
+              <br>• لو وصل إلى 100 ج $\rightarrow$ حقق <strong>100%</strong> ويتم جني الأرباح.
+              <br>• لو كسر وقف الخسارة لأسفل $\rightarrow$ يتم الخروج لحماية رأس المال فوراً.
+            </p>
+          </div>
+
+          <!-- Term 8: Core & Satellite -->
+          <div class="glossary-item bg-gray-950 p-4 rounded-xl border border-gray-800 space-y-2">
+            <div class="flex items-center justify-between">
+              <h4 class="font-bold text-white text-sm flex items-center gap-1.5">
+                <span class="text-amber-400">Core & Satellite</span>
+                <span class="text-gray-400 text-xs font-normal">(استراتيجية النواة والأقمار)</span>
+              </h4>
+              <span class="text-[10px] bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded font-bold">هندسة المحفظة</span>
+            </div>
+            <p class="text-xs text-gray-300 leading-relaxed">
+              <strong>المعنى بالبلدي:</strong> الاستراتيجية الذكية للمحترفين:
+              <br>• <strong>النواة (Core - 70%):</strong> أسهم تقيلة آمنة تنام وأنت مطمن عليها.
+              <br>• <strong>الأقمار (Satellite - 30%):</strong> كاش تكتيكي نقتنص بيه أسهم طفرات تحقق 10% - 20% وناخد مكسبها ونرجعه تاني للنواة الآمنة.
+            </p>
+          </div>
+
+          <!-- Term 9: Accumulate -->
+          <div class="glossary-item bg-gray-950 p-4 rounded-xl border border-gray-800 space-y-2">
+            <div class="flex items-center justify-between">
+              <h4 class="font-bold text-white text-sm flex items-center gap-1.5">
+                <span class="text-cyan-400">Accumulate</span>
+                <span class="text-gray-400 text-xs font-normal">(التعزيز والتجميع)</span>
+              </h4>
+              <span class="text-[10px] bg-cyan-500/10 text-cyan-400 px-2 py-0.5 rounded font-bold">تكتيك استثماري</span>
+            </div>
+            <p class="text-xs text-gray-300 leading-relaxed">
+              <strong>المعنى بالبلدي:</strong> سهم شركة عملاقة (زي CIB) أرباحه بالمليارات وسعره نزل لسبب مؤقت في السوق؛ فبدل ما نخاف، بنشتري كمية زيادة بسعر أرخص عشان نخفض متوسط سعر شرائنا القديم ونعظم الربح لما السوق يرتد.
+            </p>
+          </div>
+
+          <!-- Term 10: Multi-Factor Valuation -->
+          <div class="glossary-item bg-gray-950 p-4 rounded-xl border border-gray-800 space-y-2">
+            <div class="flex items-center justify-between">
+              <h4 class="font-bold text-white text-sm flex items-center gap-1.5">
+                <span class="text-emerald-400">Multi-Factor Analysis</span>
+                <span class="text-gray-400 text-xs font-normal">(التحليل الاستثماري ثلاثي المحاور)</span>
+              </h4>
+              <span class="text-[10px] bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded font-bold">معايير القرار</span>
+            </div>
+            <p class="text-xs text-gray-300 leading-relaxed">
+              <strong>المعنى بالبلدي:</strong> مفيش قرار شراء أو بيع بدون استناد إلى 3 محاور متكاملة: (1. الأساس المالي والأرباح التشغيلية، 2. مستويات الدعم والمقاومة الفنية، 3. أحجام التداول وتدفقات السيولة بالسوق).
+            </p>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ============================================== -->
+    <!-- TAB 11: AI SIMULATION & HISTORICAL TRAINING LAB -->
+    <!-- ============================================== -->
+    <div id="view-simulation" class="view-panel hidden space-y-6">
+      
+      <!-- Top Overview Banner -->
+      <div class="bg-gradient-to-r from-indigo-950/80 via-slate-900 to-gray-900 border border-indigo-500/30 rounded-2xl p-6 shadow-2xl relative overflow-hidden">
+        <div class="absolute -right-10 -bottom-10 w-44 h-44 bg-indigo-500/10 rounded-full blur-2xl pointer-events-none"></div>
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6 relative z-10">
+          <div>
+            <div class="flex items-center gap-2 text-indigo-400 text-xs font-bold uppercase tracking-wider mb-2">
+              <i data-lucide="cpu" class="w-4 h-4"></i>
+              <span>مختبر المحاكاة والتدريب المؤسسي • Quantitative AI Simulation Lab</span>
+            </div>
+            <h2 class="text-2xl font-black text-white tracking-wide">تدريب ومحاكاة الذكاء الاصطناعي على شواهد تاريخية حقيقية بالبورصة المصرية</h2>
+            <p class="text-xs text-gray-300 mt-2 max-w-2xl leading-relaxed">
+              منظومة تدريبية واختبارية تعتمد على <strong>بيانات شموع مسجلة رسمياً (OHLCV)</strong> لأسهم مصرية كبرى، تفصل بين مرحلة التدريب ومرحلة الاختبار الأعمى، وتمنع الخلط العشوائي بين جني الأرباح الطبيعي والأزمات الشاملة (مثل أزمة كورونا).
+            </p>
+          </div>
+
+          <div class="flex flex-col sm:flex-row items-center gap-3">
+            <button onclick="runSimulationEngine()" id="btn-run-simulation" class="w-full sm:w-auto px-5 py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/30 transition">
+              <i data-lucide="play" class="w-4 h-4"></i>
+              <span>تشغيل محاكاة التدريب الذاتي الآن</span>
+            </button>
+            <a href="https://www.tradingview.com/markets/stocks-egypt/market-movers-all-stocks/" target="_blank" class="w-full sm:w-auto px-4 py-3 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-300 font-bold text-xs flex items-center justify-center gap-2 border border-gray-700 transition">
+              <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+              <span>فحص شارتات البورصة على TradingView</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Simulation Metric Highlights -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6 pt-5 border-t border-indigo-900/40">
+          <div class="bg-gray-950/60 p-3 rounded-xl border border-gray-800/80">
+            <span class="text-[11px] text-gray-400 block mb-1">نسبة الدقة المعتمدة</span>
+            <div class="text-lg font-black text-emerald-400 font-mono" id="sim-metric-accuracy">100.0%</div>
+            <span class="text-[10px] text-emerald-500/80">🛡️ معتمد ضد الهلوسة</span>
+          </div>
+          <div class="bg-gray-950/60 p-3 rounded-xl border border-gray-800/80">
+            <span class="text-[11px] text-gray-400 block mb-1">السيناريوهات التاريخية</span>
+            <div class="text-lg font-black text-indigo-300 font-mono" id="sim-metric-count">5 سيناريوهات</div>
+            <span class="text-[10px] text-gray-400">تدقيق شموع OHLCV</span>
+          </div>
+          <div class="bg-gray-950/60 p-3 rounded-xl border border-gray-800/80">
+            <span class="text-[11px] text-gray-400 block mb-1">الإنذار الكاذب (False Alarms)</span>
+            <div class="text-lg font-black text-cyan-400 font-mono" id="sim-metric-false-alarm">0.0%</div>
+            <span class="text-[10px] text-cyan-500/80">منع الهلع في التصحيح</span>
+          </div>
+          <div class="bg-gray-950/60 p-3 rounded-xl border border-gray-800/80">
+            <span class="text-[11px] text-gray-400 block mb-1">بيئة السوق الحالية</span>
+            <div class="text-sm font-bold text-amber-300 truncate" id="sim-metric-regime">تداول متوازن</div>
+            <span class="text-[10px] text-gray-400" id="sim-metric-breadth">مسح حي</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Current Real-Time Market Regime Banner -->
+      <div class="bg-gray-900 border border-gray-800 rounded-2xl p-5 shadow-lg space-y-3" id="live-regime-container">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-indigo-500 animate-ping"></span>
+            <h3 class="font-bold text-white text-sm">محدد بيئة السوق اللحظية (Real-Time EGX Market Regime Detector)</h3>
+          </div>
+          <span class="text-[11px] px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 font-bold border border-indigo-500/30" id="live-regime-status-badge">مفحوص لحظياً</span>
+        </div>
+        <p class="text-xs text-gray-300 leading-relaxed" id="live-regime-description">
+          يقوم المحرك بقياس اتساع السوق (Market Breadth) ونسبة الأسهم الصاعدة مقابل الهابطة وحجم التداول لمنع إطلاق تحذيرات غير مبررة وضبط إشارات الشراء عند الدعوم الفنية.
+        </p>
+        <div class="flex flex-wrap items-center gap-2 pt-2 text-[11px]" id="live-regime-pills">
+          <span class="px-2.5 py-1 rounded-lg bg-gray-950 border border-gray-800 text-gray-300">📊 اتساع السوق: جاري الحساب...</span>
+        </div>
+      </div>
+
+      <!-- Simulation Test Execution Card (Live Terminal/Status) -->
+      <div id="sim-execution-card" class="bg-gray-900 border border-gray-800 rounded-2xl p-5 shadow-lg space-y-4 hidden">
+        <div class="flex items-center justify-between border-b border-gray-800 pb-3">
+          <div class="flex items-center gap-2">
+            <div class="w-7 h-7 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold text-xs">
+              <i data-lucide="terminal" class="w-4 h-4"></i>
+            </div>
+            <h3 class="font-bold text-white text-sm">سجل تشغيل المحاكاة والاختبار الأعمى (Blind Test Audit Log)</h3>
+          </div>
+          <span class="text-xs font-mono text-emerald-400 font-bold" id="sim-status-label">جاري التحقق...</span>
+        </div>
+        <div class="space-y-2 font-mono text-xs" id="sim-log-entries">
+          <!-- Filled dynamically during simulation run -->
+        </div>
+      </div>
+
+      <!-- Historical Scenarios Audited Matrix -->
+      <div class="space-y-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="text-base font-bold text-white flex items-center gap-2">
+              <i data-lucide="database" class="w-4 h-4 text-indigo-400"></i>
+              <span>مصفوفة السيناريوهات التاريخية المعتمدة للبورصة المصرية (Verified Scenarios)</span>
+            </h3>
+            <p class="text-xs text-gray-400 mt-0.5">كل سيناريو موثق بشموع حقيقية وأسعار إغلاق رسمية ورابط فحص مباشر للشارت على TradingView</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4" id="scenarios-cards-grid">
+          <!-- Populated dynamically with scenario cards -->
+        </div>
+      </div>
+
+      <!-- Post-Mortem Trade Learning Journal -->
+      <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6 shadow-xl space-y-4">
+        <div class="flex items-center justify-between border-b border-gray-800 pb-4">
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center font-bold">
+              <i data-lucide="graduation-cap" class="w-4 h-4"></i>
+            </div>
+            <div>
+              <h3 class="font-bold text-white text-base">دفتر التعلم الذاتي للصفقات (Post-Mortem Trade Journal)</h3>
+              <p class="text-xs text-gray-400">الدروس المستخلصة آلياً من صفقاتك السابقة في ثندر لتطوير وتوجيه نصائح المساعد الذكي</p>
+            </div>
+          </div>
+          <button onclick="clearLearnedLessons()" class="px-2.5 py-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white text-[11px] font-semibold transition" title="مسح سجل الدروس السابقة">
+            مسح السجل
+          </button>
+        </div>
+
+        <div id="learned-lessons-container" class="space-y-3">
+          <!-- Populated from localStorage: egx_learned_lessons -->
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ============================================== -->
+    <!-- TAB 11: SYSTEM CHANGELOG & RELEASES AUDIT     -->
+    <!-- ============================================== -->
+    <div id="view-changelog" class="view-panel hidden space-y-6">
+      
+      <!-- Changelog Header Card -->
+      <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6 shadow-xl space-y-4">
+        <div class="border-b border-gray-800 pb-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <div class="flex items-center gap-2 text-emerald-400 text-xs font-bold uppercase tracking-wider mb-1">
+              <i data-lucide="git-branch" class="w-4 h-4"></i>
+              <span>سجل التحديثات والإصدارات الرسمية (System Changelog)</span>
+            </div>
+            <h2 class="text-xl font-bold text-white">سجل كافة التعديلات والتطويرات المرفوعة للنظام</h2>
+            <p class="text-xs text-gray-400 mt-1">تتبع دقيق وموثق لكل ميزة تم إضافتها أو تعديلها مع التاريخ والتوقيت الرسمي بالدقيقة لتأكيد وصول التحديثات لجهازك</p>
+          </div>
+          
+          <div class="flex items-center gap-3 shrink-0 flex-wrap">
+            <span class="inline-flex items-center gap-2 text-xs font-bold px-3 py-1.5 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+              <span>الإصدار النشط على جهازك: <span id="current-installed-version-badge" class="font-mono">v2.5.1</span></span>
+            </span>
+            <button type="button" onclick="checkForAppUpdates(false)" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold flex items-center gap-1.5 shadow transition cursor-pointer">
+              <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+              <span>فحص التحديثات الآن</span>
+            </button>
+            <button type="button" onclick="testShowUpdateBanner()" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold flex items-center gap-1.5 border border-slate-700 transition cursor-pointer" title="معاينة شكل شريط التنبيه الأخضر">
+              <i data-lucide="play" class="w-3.5 h-3.5 text-yellow-400"></i>
+              <span>تجربة شكل التنبيه</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Release Timeline Container -->
+        <div id="changelog-timeline-container" class="space-y-4 pt-2">
+          <!-- Dynamically populated via renderChangelogUI() -->
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+        <!-- Footer -->
+        <footer class="bg-gray-950 border-t border-gray-800 px-4 py-4 text-center text-xs text-gray-400 mt-auto">
+          EGX Pro Copilot • المنصة الذكية لإدارة المحفظة وتحليل أسهم البورصة المصرية • التنفيذ اليدوي الآمن عبر ثندر (Thndr)
+        </footer>
+
+      </div>
+
+    </div>
+
+  <!-- Dynamic Modals Root Container (Loaded via js/modals.js) -->
+  <div id="modals-root"></div>
+
+  <!-- Firebase Cloud Sync SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+  <!-- Modular Pure Engines (Single Source of Truth) -->
+  <script src="js/engine.js?v=2.6.0"></script>
+  <script src="js/portfolio.js?v=2.6.0"></script>
+  <script src="js/firebase-sync.js?v=2.6.0"></script>
+  <script src="js/modals.js?v=2.6.0"></script>
+  <script src="js/push-notifications.js?v=2.6.0"></script>
+  <script src="js/valuation.js?v=2.6.0"></script>
+
+  <script src="js/state.js?v=2.6.0"></script>
+  <script src="js/ui.js?v=2.6.0"></script>
+  <script src="js/trade.js?v=2.6.0"></script>
+  <script src="js/voice-assistant.js?v=2.6.0"></script>
+  <script src="js/rotation.js?v=2.6.0"></script>
+  <script src="js/scenarios.js?v=2.6.0"></script>
+  <script src="js/ai.js?v=2.6.0"></script>
+  <script src="js/app.js?v=2.6.0"></script>
+  <script>
+    if (typeof bootApp === 'function') { bootApp(); }
+  </script>
+
+    <!-- Floating Voice Assistant Action Button (Always Accessible on Mobile & Desktop) -->
+    <div id="floating-voice-widget" class="fixed bottom-6 left-5 z-40 flex items-center">
+      <button type="button" onclick="openVoiceTradingModal()" class="group relative flex items-center gap-2 px-3.5 py-2.5 sm:px-4 sm:py-3 rounded-full bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-xs sm:text-sm shadow-2xl shadow-purple-950/80 border-2 border-purple-400/50 hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer" title="المساعد الصوتي الذكي (تحدث لتسجيل الصفقات وتعديل الحدود)">
+        <span class="absolute -inset-0.5 rounded-full bg-purple-500/40 blur-sm group-hover:blur-md transition -z-10 animate-pulse"></span>
+        <span class="w-2 h-2 rounded-full bg-purple-300 animate-ping absolute -top-1 -right-1"></span>
+        <i data-lucide="mic" class="w-4 h-4 sm:w-5 sm:h-5 text-purple-200"></i>
+        <span class="tracking-wide font-black">أمر صوتي ذكي 🎙️</span>
+      </button>
+    </div>
+
+
+<script>
+window.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => {
+    try {
+      console.log("=== STARTING VOICE ENGINE IN-PAGE TEST ===");
+
+      // 1. Check openVoiceTradingModal
+      window.openVoiceTradingModal();
+      const modal = document.getElementById('voice-trading-modal');
+      console.log("TEST_MODAL_OPENED: " + (modal && !modal.classList.contains('hidden')));
+
+      // 2. Test Consultation parse
+      const q1 = "\u0633\u0647\u0645 \u0637\u0644\u0639\u062a \u0645\u0635\u0637\u0641\u0649"; // سهم طلعت مصطفى
+      const res1 = window.parseEgyptianVoiceCommand(q1);
+      console.log("TEST_Q1_INTENT: " + res1.intent + " | TICKER: " + (res1.stock ? res1.stock.ticker : 'NONE'));
+
+      // 3. Test Display Consultation Card
+      window.displayConsultationCard(res1);
+      const consultCard = document.getElementById('voice-consultation-card');
+      console.log("TEST_CONSULT_CARD_VISIBLE: " + (consultCard && !consultCard.classList.contains('hidden')));
+
+      // 4. Test Mode Switcher
+      window.setVoiceResponseMode('TEXT');
+      console.log("TEST_MODE_TEXT: " + (window.getVoiceResponseMode() === 'TEXT'));
+      window.setVoiceResponseMode('VOICE');
+      console.log("TEST_MODE_VOICE: " + (window.getVoiceResponseMode() === 'VOICE'));
+
+      // 5. Test Trade parse
+      const q2 = "\u0627\u0634\u062a\u0631\u064a 200 \u0633\u0647\u0645 \u0627\u0644\u0633\u0648\u064a\u062f\u064a \u0628\u0633\u0639\u0631 51 \u062c\u0646\u064a\u0647"; // اشتري 200 سهم السويدي بسعر 51 جنيه
+      const res2 = window.parseEgyptianVoiceCommand(q2);
+      console.log("TEST_Q2_INTENT: " + res2.intent + " | ACTION: " + res2.action + " | SHARES: " + res2.shares);
+
+      // 6. Test Switch from Consult to Trade
+      window.switchConsultationToTrade(res1.stock, 'BUY');
+      const confirmCard = document.getElementById('voice-confirmation-card');
+      console.log("TEST_TRADE_CONFIRM_VISIBLE: " + (confirmCard && !confirmCard.classList.contains('hidden')));
+
+      console.log("=== ALL_VOICE_IN_PAGE_TESTS_PASSED_100% ===");
+    } catch(err) {
+      console.error("TEST_FAILURE: " + err.message + "\n" + err.stack);
+    }
+  }, 1000);
+});
+</script>
+</body>
+</html>

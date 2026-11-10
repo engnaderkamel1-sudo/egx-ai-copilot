@@ -1,0 +1,165 @@
+336:   function ensureVoiceModalDOM() {
+337:     if (document.getElementById('voice-trading-modal')) return;
+338: 
+339:     const modalHTML = `
+340:       <div id="voice-trading-modal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden overflow-y-auto p-3 sm:p-4 items-center justify-center">
+341:         <div class="modal-card bg-gray-900 border border-purple-500/40 rounded-3xl max-w-lg w-full p-5 sm:p-6 shadow-2xl relative my-auto max-h-[calc(100dvh-1.5rem)] flex flex-col">
+342:           
+343:           <!-- Modal Header -->
+344:           <div class="flex items-center justify-between border-b border-gray-800 pb-3 shrink-0">
+345:             <div class="flex items-center gap-2.5">
+346:               <div class="w-9 h-9 rounded-xl bg-purple-500/20 text-purple-400 border border-purple-500/30 flex items-center justify-center font-bold">
+347:                 <i data-lucide="mic" class="w-5 h-5"></i>
+348:               </div>
+349:               <div>
+350:                 <h3 class="font-bold text-white text-base flex items-center gap-2">
+351:                   <span>المساعد الصوتي لتنفيذ الأوامر</span>
+352:                   <span class="text-[10px] px-2 py-0.5 rounded-full bg-purple-950 text-purple-300 border border-purple-700/50 font-normal">ذكاء اصطناعي 100%</span>
+353:                 </h3>
+354:                 <p class="text-[11px] text-gray-400">تحدث بالعامية المصرية لتسجيل شراء، بيع، أوامر محددة، أو حدود أمان</p>
+355:               </div>
+356:             </div>
+357:             <button onclick="closeVoiceTradingModal()" class="text-gray-400 hover:text-white p-1 rounded-lg hover:bg-gray-800 transition" aria-label="إغلاق">
+358:               <i data-lucide="x" class="w-5 h-5"></i>
+359:             </button>
+360:           </div>
+361: 
+362:           <div class="modal-scroll-body flex-1 overflow-y-auto overscroll-contain pr-1 py-4 space-y-4">
+363:             
+364:             <!-- Voice Listening Status Card -->
+365:             <div id="voice-listening-card" class="p-4 rounded-2xl bg-gradient-to-br from-purple-950/40 via-gray-950 to-slate-900 border border-purple-500/30 text-center space-y-3">
+366:               
+367:               <!-- Pulsing Mic Button -->
+368:               <div class="flex justify-center items-center py-2">
+369:                 <button type="button" id="btn-voice-pulse" onclick="toggleVoiceRecording()" class="w-16 h-16 rounded-full bg-purple-600 hover:bg-purple-500 text-white flex items-center justify-center shadow-lg shadow-purple-900/50 transition transform active:scale-95 relative cursor-pointer">
+370:                   <span id="voice-pulse-ring" class="hidden absolute inset-0 rounded-full border-2 border-purple-400 animate-ping"></span>
+371:                   <i data-lucide="mic" id="voice-mic-icon" class="w-8 h-8 text-white"></i>
+372:                 </button>
+373:               </div>
+374: 
+375:               <!-- Status Indicator -->
+376:               <div>
+377:                 <div id="voice-status-heading" class="font-bold text-sm text-purple-300">
+378:                   اضغط على زر المايك وتحدث بأمرك...
+379:                 </div>
+380:                 <p id="voice-status-sub" class="text-xs text-gray-400 mt-1">
+381:                   مثال: «اشتريت 500 سهم في السويدي بسعر 52 جنيه وحد البيع الآمن 58 جنيه»
+382:                 </p>
+383:               </div>
+384: 
+385:               <!-- Live Transcript Box -->
+386:               <div id="voice-transcript-box" class="p-3 bg-gray-950 rounded-xl border border-gray-800 text-xs text-purple-200 min-h-[48px] flex items-center justify-center text-center font-medium">
+387:                 <span class="text-gray-500 text-[11px]">في انتظار الاستماع لكلامك...</span>
+388:               </div>
+389: 
+390:               <!-- Quick Dialect Examples -->
+391:               <div class="flex items-center justify-center gap-1.5 flex-wrap pt-1 text-[10px]">
+392:                 <span class="text-gray-500">جرب أن تقول:</span>
+393:                 <button type="button" onclick="testVoiceCommandSample('اشتريت 500 سهم في السويدي بسعر 52 جنيه')" class="px-2 py-0.5 rounded bg-gray-800 text-purple-300 hover:bg-purple-900/40 border border-gray-700">شراء 500 سهم السويدي</button>
+394:                 <button type="button" onclick="testVoiceCommandSample('بعت نص كمية فوري على سعر 8.20')" class="px-2 py-0.5 rounded bg-gray-800 text-rose-300 hover:bg-rose-900/40 border border-gray-700">بيع نص كمية فوري</button>
+395:                 <button type="button" onclick="testVoiceCommandSample('غير حد البيع الآمن لطلعت مصطفى إلى 85 جنيه')" class="px-2 py-0.5 rounded bg-gray-800 text-cyan-300 hover:bg-cyan-900/40 border border-gray-700">تعديل حد بيع طلعت مصطفى</button>
+396:               </div>
+397:             </div>
+398: 
+399:             <!-- Manual Text Fallback (Input box in case mic is blocked) -->
+400:             <div class="p-2.5 bg-gray-950 rounded-xl border border-gray-800 flex items-center gap-2">
+401:               <input type="text" id="voice-manual-input" placeholder="أو اكتب الأمر هنا لو المايك غير مفعل بالمتصفح..." class="flex-1 bg-transparent text-xs text-white placeholder-gray-500 focus:outline-none">
+402:               <button type="button" onclick="parseVoiceFromManualInput()" class="px-3 py-1.5 rounded-lg bg-gray-800 hover:bg-purple-900/50 text-purple-300 border border-purple-500/30 text-xs font-bold transition">
+403:                 تحليل وتأكيد
+404:               </button>
+405:             </div>
+406: 
+407:             <!-- Dynamic Confirmation Card (Hidden until command is parsed) -->
+408:             <div id="voice-confirmation-card" class="hidden p-4 rounded-2xl bg-gray-950 border border-emerald-500/50 shadow-xl space-y-4 animate-in fade-in zoom-in-95 duration-200">
+409:               
+410:               <!-- Card Header & Badge -->
+411:               <div class="flex items-center justify-between border-b border-gray-800/80 pb-3">
+412:                 <div class="flex items-center gap-2">
+413:                   <span id="confirm-badge-action" class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-600 text-white shadow-sm">
+414:                     شراء مؤكد 🛒
+415:                   </span>
+416:                   <span class="text-xs text-gray-400">مراجعة المعطيات قبل الاعتماد</span>
+417:                 </div>
+418:                 <div class="text-[11px] font-mono text-cyan-400 flex items-center gap-1">
+419:                   <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+420:                   <span>حماية وأمان 100%</span>
+421:                 </div>
+422:               </div>
+423: 
+424:               <!-- Stock Identification & Dynamic Price -->
+425:               <div class="p-3 rounded-xl bg-gray-900 border border-gray-800 flex items-center justify-between">
+426:                 <div>
+427:                   <h4 id="confirm-stock-name" class="font-bold text-white text-sm">السويدي إليكتريك</h4>
+428:                   <div class="flex items-center gap-2 text-xs text-gray-400 mt-0.5">
+429:                     <span id="confirm-stock-ticker" class="font-mono text-cyan-400 font-bold">SWDY</span>
+430:                     <span>•</span>
+431:                     <span id="confirm-stock-category">EGX30 • طاقة وكابلات</span>
+432:                   </div>
+433:                 </div>
+434:                 <div class="text-left font-mono">
+435:                   <span class="text-[10px] text-gray-400 block">سعر البورصة اللحظي:</span>
+436:                   <strong id="confirm-stock-live-price" class="text-sm text-cyan-300">51.40 ج</strong>
+437:                 </div>
+438:               </div>
+439: 
+440:               <!-- Editable Inputs Grid -->
+441:               <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+442:                 <div class="p-2.5 bg-gray-900 rounded-xl border border-gray-800">
+443:                   <label class="text-[11px] text-gray-400 block mb-1">عدد الأسهم:</label>
+444:                   <input type="number" id="confirm-input-shares" oninput="recalcVoiceConfirmationMetrics()" class="w-full bg-gray-950 border border-gray-700 rounded-lg px-2.5 py-1.5 text-xs text-white font-mono font-bold focus:border-purple-500 focus:outline-none">
+445:                 </div>
+446:                 <div class="p-2.5 bg-gray-900 rounded-xl border border-gray-800">
+447:                   <label class="text-[11px] text-gray-400 block mb-1">سعر التنفيذ (ج):</label>
+448:                   <input type="number" step="0.01" id="confirm-input-price" oninput="recalcVoiceConfirmationMetrics()" class="w-full bg-gray-950 border border-gray-700 rounded-lg px-2.5 py-1.5 text-xs text-white font-mono font-bold focus:border-purple-500 focus:outline-none">
+449:                 </div>
+450:                 <div class="col-span-2 sm:col-span-1 p-2.5 bg-gray-900 rounded-xl border border-gray-800">
+451:                   <label class="text-[11px] text-gray-400 block mb-1">حد البيع الآمن (ج):</label>
+452:                   <input type="number" step="0.01" id="confirm-input-safesell" class="w-full bg-gray-950 border border-gray-700 rounded-lg px-2.5 py-1.5 text-xs text-amber-300 font-mono font-bold focus:border-amber-500 focus:outline-none" placeholder="اختياري">
+453:                 </div>
+454:               </div>
+455: 
+456:               <!-- Dynamic Financial Calculation Box -->
+457:               <div class="p-3 rounded-xl bg-gray-900/90 border border-gray-800 text-xs space-y-2">
+458:                 <div class="flex items-center justify-between text-gray-300">
+459:                   <span>إجمالي قيمة الصفقة (مع عمولة البورصة وثندر):</span>
+460:                   <strong id="confirm-metric-total" class="font-mono text-white text-sm">26,046 ج.م</strong>
+461:                 </div>
+462:                 <div class="flex items-center justify-between text-gray-400 text-[11px]">
+463:                   <span>رصيد الكاش المتاح بالمحفظة:</span>
+464:                   <span id="confirm-metric-cash-avail" class="font-mono text-cyan-400">25,320 ج.م</span>
+465:                 </div>
+466:                 <div class="flex items-center justify-between border-t border-gray-800 pt-2 text-[11px]">
+467:                   <span id="confirm-metric-impact-label">أثر الصفقة على رصيد الكاش:</span>
+468:                   <strong id="confirm-metric-impact" class="font-mono text-emerald-400">سيتبقى 12,400 ج.م</strong>
+469:                 </div>
+470:                 <div id="confirm-metric-profit-row" class="hidden flex items-center justify-between border-t border-gray-800 pt-2 text-[11px]">
+471:                   <span>الأرباح الرأسمالية المحققة من متوسط الشراء:</span>
+472:                   <strong id="confirm-metric-profit" class="font-mono text-emerald-400">+3,200 ج (+14.2%)</strong>
+473:                 </div>
+474:               </div>
+475: 
+476:               <!-- Action Confirmation Buttons -->
+477:               <div class="flex items-center gap-2 pt-1">
+478:                 <button type="button" onclick="executeVoiceOrderFromModal()" id="btn-confirm-execute" class="flex-1 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition shadow-lg shadow-emerald-950/50 flex items-center justify-center gap-2 active:scale-95 cursor-pointer">
+479:                   <i data-lucide="check-circle" class="w-4 h-4"></i>
+480:                   <span id="confirm-btn-label">تأكيد وتنفيذ العملية فوراً</span>
+481:                 </button>
+482:                 <button type="button" onclick="resetVoiceModalToListen()" class="px-4 py-3 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-300 font-bold text-xs transition flex items-center gap-1.5 active:scale-95 cursor-pointer">
+483:                   <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+484:                   <span>إعادة</span>
+485:                 </button>
+486:               </div>
+487: 
+488:             </div>
+489: 
+490:           </div>
+491: 
+492:           <!-- Modal Footer Note -->
+493:           <div class="border-t border-gray-800 pt-3 flex items-center justify-between text-[11px] text-gray-500 shrink-0">
+494:             <span>🔒 لا يتم تنفيذ أي أمر مالي دون معاينتك وتأكيدك المباشر.</span>
+495:             <button onclick="closeVoiceTradingModal()" class="text-gray-400 hover:text-white">إلغاء</button>
+496:           </div>
+497: 
+498:         </div>
+499:       </div>
+500:     `;

@@ -1,0 +1,2002 @@
+{
+  "name": "projects/egx-ai-copilot/databases/(default)/documents/portfolios/primary_thndr",
+  "fields": {
+    "version": {
+      "stringValue": "2026_10_zero_assumption_provenance_v215"
+    },
+    "clientDevice": {
+      "stringValue": "Desktop"
+    },
+    "items": {
+      "arrayValue": {
+        "values": [
+          {
+            "mapValue": {
+              "fields": {
+                "returnPct": {
+                  "integerValue": "0"
+                },
+                "status": {
+                  "stringValue": "سيولة نقدية جاهزة"
+                },
+                "decisionUpdatedAt": {
+                  "stringValue": "جلسة اليوم"
+                },
+                "category": {
+                  "stringValue": "محفظة نقدية • سيولة حرة"
+                },
+                "profit": {
+                  "integerValue": "0"
+                },
+                "buyPrice": {
+                  "doubleValue": 18196.79
+                },
+                "thndrUrl": {
+                  "stringValue": "https://app.thndr.app"
+                },
+                "priceUpdatedAt": {
+                  "stringValue": "محفظة ثندر الرسمية"
+                },
+                "currentPrice": {
+                  "doubleValue": 18196.79
+                },
+                "action": {
+                  "stringValue": "HOLD"
+                },
+                "shares": {
+                  "integerValue": "1"
+                },
+                "priceSource": {
+                  "stringValue": "شاشة ثندر اللحظية"
+                },
+                "decisionBasis": {
+                  "stringValue": "سعر السوق اللحظي 18196.79 ج"
+                },
+                "isCashReserve": {
+                  "booleanValue": true
+                },
+                "name": {
+                  "stringValue": "المحفظة (الرصيد النقدي والسيولة)"
+                },
+                "ticker": {
+                  "stringValue": "CASH"
+                },
+                "value": {
+                  "doubleValue": 18196.79
+                },
+                "advice": {
+                  "stringValue": "رصيد كاش حر في حساب ثندر متاح لاقتناص الفرص وتعزيز المراكز"
+                }
+              }
+            }
+          },
+          {
+            "mapValue": {
+              "fields": {
+                "ticker": {
+                  "stringValue": "ABUK"
+                },
+                "name": {
+                  "stringValue": "أبو قير للأسمدة"
+                },
+                "category": {
+                  "stringValue": "EGX • بتروكيماويات وتصدير"
+                },
+                "shares": {
+                  "integerValue": "361"
+                },
+                "buyPrice": {
+                  "doubleValue": 79.86
+                },
+                "currentPrice": {
+                  "doubleValue": 74.19
+                },
+                "value": {
+                  "integerValue": "26783"
+                },
+                "profit": {
+                  "integerValue": "-2046"
+                },
+                "returnPct": {
+                  "doubleValue": -7.1
+                },
+                "status": {
+                  "stringValue": "تراجع"
+                },
+                "advice": {
+                  "stringValue": "🛡️ سهم قيادي من النواة: السعر (74.19 ج) أدنى S1 (80.44 ج) لحظياً ولكنه مستقر أعلى S2 (72.84 ج). تريث؛ ملاءة الشركة وأرباحها تحمي المركز ولا داعي للبيع الذعري أثناء الجلسة."
+                },
+                "action": {
+                  "stringValue": "CORE_BUFFER_WATCH"
+                },
+                "priceUpdatedAt": {
+                  "stringValue": "01:56:30 م (10 Nov)"
+                },
+                "priceSource": {
+                  "stringValue": "شاشة البورصة اللحظية (تداول مباشر)"
+                },
+                "decisionUpdatedAt": {
+                  "stringValue": "01:56:30 م (10 Nov)"
+                },
+                "decisionBasis": {
+                  "stringValue": "سعر البورصة: 74.19 ج | مقاومة R1: 95.69 ج | دعم S1: 80.44 ج"
+                },
+                "thndrUrl": {
+                  "stringValue": "https://app.thndr.app/search?query=ABUK"
+                },
+                "pivotR1": {
+                  "doubleValue": 95.69
+                },
+                "pivotS1": {
+                  "doubleValue": 80.44
+                },
+                "pivotR2": {
+                  "doubleValue": 103.34
+                },
+                "pivotS2": {
+                  "doubleValue": 72.84
+                },
+                "sma50": {
+                  "doubleValue": 87.92
+                },
+                "sma200": {
+                  "doubleValue": 78.92
+                },
+                "rsi": {
+                  "doubleValue": 33.9
+                },
+                "macd": {
+                  "doubleValue": -3.2
+                },
+                "macdSignal": {
+                  "doubleValue": -1.61
+                },
+                "trend": {
+                  "stringValue": "محايد / تذبذب عرضي"
+                },
+                "momentum": {
+                  "stringValue": "زخم بيعي تصحيحي (Bearish MACD)"
+                },
+                "support": {
+                  "stringValue": "72.84 ج"
+                },
+                "target1": {
+                  "stringValue": "95.69 ج"
+                },
+                "target2": {
+                  "stringValue": "103.34 ج"
+                },
+                "stopLoss": {
+                  "stringValue": "79.23 ج (مكسور)"
+                },
+                "rrRatio": {
+                  "integerValue": "0"
+                },
+                "rrDisplay": {
+                  "stringValue": "تحذير (دون الدعم S1)"
+                },
+                "pe": {
+                  "doubleValue": 7.73
+                },
+                "eps": {
+                  "doubleValue": 9.6
+                },
+                "sectorPe": {
+                  "doubleValue": 7.73
+                },
+                "peVsSectorPct": {
+                  "integerValue": "0"
+                },
+                "operatingMargin": {
+                  "doubleValue": 33.1
+                },
+                "netMargin": {
+                  "doubleValue": 35.5
+                },
+                "dividendYield": {
+                  "doubleValue": 11.18
+                },
+                "volume": {
+                  "integerValue": "2712069"
+                },
+                "tradedValue": {
+                  "doubleValue": 201208399.10999998
+                },
+                "rvol": {
+                  "doubleValue": 1.73
+                },
+                "rvolStatus": {
+                  "stringValue": "سيولة ضمن المعدلات الطبيعية"
+                },
+                "rvolBadge": {
+                  "stringValue": "bg-slate-800 text-slate-300 border-slate-700"
+                },
+                "priceToBook": {
+                  "nullValue": null
+                },
+                "operationalStability": {
+                  "stringValue": "أرباح تشغيلية صلبة ومستقرة (هامش تشغيل: 33.1%)"
+                },
+                "valuationStatus": {
+                  "stringValue": "مماثل لمتوسط القطاع (سعر عادل)"
+                },
+                "sector": {
+                  "stringValue": "بتروكيماويات وتصدير"
+                },
+                "alertLevel": {
+                  "stringValue": "NORMAL"
+                }
+              }
+            }
+          },
+          {
+            "mapValue": {
+              "fields": {
+                "ticker": {
+                  "stringValue": "ARCC"
+                },
+                "name": {
+                  "stringValue": "العربية للأسمنت"
+                },
+                "category": {
+                  "stringValue": "EGX70 • مواد بناء وإنشاءات"
+                },
+                "shares": {
+                  "integerValue": "331"
+                },
+                "buyPrice": {
+                  "doubleValue": 66.86
+                },
+                "currentPrice": {
+                  "doubleValue": 69.9
+                },
+                "value": {
+                  "integerValue": "23137"
+                },
+                "profit": {
+                  "integerValue": "1006"
+                },
+                "returnPct": {
+                  "doubleValue": 4.55
+                },
+                "status": {
+                  "stringValue": "ربح"
+                },
+                "advice": {
+                  "stringValue": "اتجاه صاعد صحي أعلى متوسط 50 يوم (+4.5%). استمرار في المركز مستهدفاً 73.16 ج."
+                },
+                "action": {
+                  "stringValue": "HOLD"
+                },
+                "priceUpdatedAt": {
+                  "stringValue": "01:56:30 م (10 Nov)"
+                },
+                "priceSource": {
+                  "stringValue": "شاشة البورصة اللحظية (تداول مباشر)"
+                },
+                "decisionUpdatedAt": {
+                  "stringValue": "01:56:30 م (10 Nov)"
+                },
+                "decisionBasis": {
+                  "stringValue": "سعر البورصة: 69.90 ج | مقاومة R1: 73.16 ج | دعم S1: 56.92 ج"
+                },
+                "thndrUrl": {
+                  "stringValue": "https://app.thndr.app/search?query=ARCC"
+                },
+                "pivotR1": {
+                  "doubleValue": 73.16
+                },
+                "pivotS1": {
+                  "doubleValue": 56.92
+                },
+                "pivotR2": {
+                  "doubleValue": 81.83
+                },
+                "pivotS2": {
+                  "doubleValue": 49.35
+                },
+                "sma50": {
+                  "doubleValue": 69.05
+                },
+                "sma200": {
+                  "doubleValue": 58.53
+                },
+                "rsi": {
+                  "doubleValue": 58.9
+                },
+                "macd": {
+                  "doubleValue": -0.04
+                },
+                "macdSignal": {
+                  "doubleValue": -0.9
+                },
+                "trend": {
+                  "stringValue": "اتجاه صاعد رئيسي (Golden Cross / Bullish)"
+                },
+                "momentum": {
+                  "stringValue": "زخم شرائي صاعد (Bullish MACD)"
+                },
+                "support": {
+                  "stringValue": "56.92 ج"
+                },
+                "target1": {
+                  "stringValue": "73.16 ج"
+                },
+                "target2": {
+                  "stringValue": "81.83 ج"
+                },
+                "stopLoss": {
+                  "stringValue": "56.07 ج"
+                },
+                "rrRatio": {
+                  "doubleValue": 0.24
+                },
+                "rrDisplay": {
+                  "stringValue": "1 : 0.24"
+                },
+                "pe": {
+                  "nullValue": null
+                },
+                "eps": {
+                  "nullValue": null
+                },
+                "sectorPe": {
+                  "doubleValue": 9.5
+                },
+                "peVsSectorPct": {
+                  "nullValue": null
+                },
+                "operatingMargin": {
+                  "nullValue": null
+                },
+                "netMargin": {
+                  "nullValue": null
+                },
+                "dividendYield": {
+                  "doubleValue": 7.74
+                },
+                "volume": {
+                  "integerValue": "302077"
+                },
+                "tradedValue": {
+                  "doubleValue": 21115182.3
+                },
+                "rvol": {
+                  "doubleValue": 0.77
+                },
+                "rvolStatus": {
+                  "stringValue": "سيولة ضمن المعدلات الطبيعية"
+                },
+                "rvolBadge": {
+                  "stringValue": "bg-slate-800 text-slate-300 border-slate-700"
+                },
+                "priceToBook": {
+                  "nullValue": null
+                },
+                "operationalStability": {
+                  "stringValue": "⏳ بانتظار الإفصاح المالي المعتمد لبيانات التشغيل"
+                },
+                "valuationStatus": {
+                  "stringValue": "⏳ بانتظار الإفصاح الرسمي (التقييم معلق)"
+                },
+                "sector": {
+                  "stringValue": "مواد بناء وتشييد"
+                },
+                "alertLevel": {
+                  "stringValue": "NORMAL"
+                }
+              }
+            }
+          },
+          {
+            "mapValue": {
+              "fields": {
+                "ticker": {
+                  "stringValue": "BSB"
+                },
+                "name": {
+                  "stringValue": "صندوق بلتون للأسهم (BSB)"
+                },
+                "category": {
+                  "stringValue": "صناديق استثمارية • بلتون إدخار"
+                },
+                "shares": {
+                  "integerValue": "161"
+                },
+                "buyPrice": {
+                  "doubleValue": 1.83
+                },
+                "currentPrice": {
+                  "doubleValue": 1.67
+                },
+                "value": {
+                  "integerValue": "269"
+                },
+                "profit": {
+                  "integerValue": "-26"
+                },
+                "returnPct": {
+                  "doubleValue": -8.74
+                },
+                "status": {
+                  "stringValue": "تراجع"
+                },
+                "advice": {
+                  "stringValue": "مرجع وثيقة نمو • النمو السنوي الاسترشادي: 22%"
+                },
+                "action": {
+                  "stringValue": "HOLD"
+                },
+                "priceUpdatedAt": {
+                  "stringValue": "مزامنة ثندر الآن"
+                },
+                "priceSource": {
+                  "stringValue": "10 Nov 2026 (إغلاق رسمي)"
+                },
+                "decisionUpdatedAt": {
+                  "stringValue": "جلسة اليوم"
+                },
+                "decisionBasis": {
+                  "stringValue": "سعر الشراء: 1.83 ج • السعر: 1.67 ج"
+                },
+                "thndrUrl": {
+                  "stringValue": "https://app.thndr.app"
+                }
+              }
+            }
+          },
+          {
+            "mapValue": {
+              "fields": {
+                "ticker": {
+                  "stringValue": "CLHO"
+                },
+                "name": {
+                  "stringValue": "مستشفيات كليوباترا"
+                },
+                "category": {
+                  "stringValue": "EGX • رعاية صحية ومستشفيات"
+                },
+                "shares": {
+                  "integerValue": "963"
+                },
+                "buyPrice": {
+                  "doubleValue": 17.73
+                },
+                "currentPrice": {
+                  "doubleValue": 14.85
+                },
+                "value": {
+                  "integerValue": "14301"
+                },
+                "profit": {
+                  "integerValue": "-2773"
+                },
+                "returnPct": {
+                  "doubleValue": -16.24
+                },
+                "status": {
+                  "stringValue": "تراجع"
+                },
+                "advice": {
+                  "stringValue": "احتفاظ بالمركز مع مراقبة الدعم 12.02 ج لانتظار موجة ارتدادية لتخفيف الخسارة (-16.2%)."
+                },
+                "action": {
+                  "stringValue": "HOLD"
+                },
+                "priceUpdatedAt": {
+                  "stringValue": "01:56:30 م (10 Nov)"
+                },
+                "priceSource": {
+                  "stringValue": "شاشة البورصة اللحظية (تداول مباشر)"
+                },
+                "decisionUpdatedAt": {
+                  "stringValue": "01:56:30 م (10 Nov)"
+                },
+                "decisionBasis": {
+                  "stringValue": "سعر البورصة: 14.85 ج | مقاومة R1: 15.61 ج | دعم S1: 12.02 ج"
+                },
+                "thndrUrl": {
+                  "stringValue": "https://app.thndr.app/search?query=CLHO"
+                },
+                "pivotR1": {
+                  "doubleValue": 15.61
+                },
+                "pivotS1": {
+                  "doubleValue": 12.02
+                },
+                "pivotR2": {
+                  "doubleValue": 17.65
+                },
+                "pivotS2": {
+                  "doubleValue": 10.47
+                },
+                "sma50": {
+                  "doubleValue": 15.09
+                },
+                "sma200": {
+                  "doubleValue": 14.71
+                },
+                "rsi": {
+                  "doubleValue": 59.3
+                },
+                "macd": {
+                  "doubleValue": -0.27
+                },
+                "macdSignal": {
+                  "doubleValue": -0.49
+                },
+                "trend": {
+                  "stringValue": "اختبار دعم المتوسط 200 يوم (Pullback)"
+                },
+                "momentum": {
+                  "stringValue": "زخم شرائي صاعد (Bullish MACD)"
+                },
+                "support": {
+                  "stringValue": "12.02 ج"
+                },
+                "target1": {
+                  "stringValue": "15.61 ج"
+                },
+                "target2": {
+                  "stringValue": "17.65 ج"
+                },
+                "stopLoss": {
+                  "stringValue": "11.84 ج"
+                },
+                "rrRatio": {
+                  "doubleValue": 0.25
+                },
+                "rrDisplay": {
+                  "stringValue": "1 : 0.25"
+                },
+                "pe": {
+                  "doubleValue": 22.16
+                },
+                "eps": {
+                  "doubleValue": 0.67
+                },
+                "sectorPe": {
+                  "doubleValue": 22.16
+                },
+                "peVsSectorPct": {
+                  "integerValue": "0"
+                },
+                "operatingMargin": {
+                  "nullValue": null
+                },
+                "netMargin": {
+                  "nullValue": null
+                },
+                "dividendYield": {
+                  "nullValue": null
+                },
+                "volume": {
+                  "integerValue": "5036392"
+                },
+                "tradedValue": {
+                  "doubleValue": 74790421.2
+                },
+                "rvol": {
+                  "doubleValue": 1.58
+                },
+                "rvolStatus": {
+                  "stringValue": "نشاط تدفق شرائي أعلى من المتوسط (1.58x)"
+                },
+                "rvolBadge": {
+                  "stringValue": "bg-emerald-950/70 text-emerald-300 border-emerald-500/40 font-semibold"
+                },
+                "priceToBook": {
+                  "nullValue": null
+                },
+                "operationalStability": {
+                  "stringValue": "أرباح تشغيلية منتظمة (هامش تشغيل: 18.5%)"
+                },
+                "valuationStatus": {
+                  "stringValue": "مماثل لمتوسط القطاع (سعر عادل)"
+                },
+                "sector": {
+                  "stringValue": "رعاية صحية ومستشفيات"
+                },
+                "alertLevel": {
+                  "stringValue": "NORMAL"
+                }
+              }
+            }
+          },
+          {
+            "mapValue": {
+              "fields": {
+                "ticker": {
+                  "stringValue": "COMI"
+                },
+                "name": {
+                  "stringValue": "البنك التجاري الدولي (CIB)"
+                },
+                "category": {
+                  "stringValue": "EGX • بنوك وخدمات مالية"
+                },
+                "shares": {
+                  "integerValue": "122"
+                },
+                "buyPrice": {
+                  "doubleValue": 140.48
+                },
+                "currentPrice": {
+                  "doubleValue": 130.81
+                },
+                "value": {
+                  "integerValue": "15959"
+                },
+                "profit": {
+                  "integerValue": "-1180"
+                },
+                "returnPct": {
+                  "doubleValue": -6.89
+                },
+                "status": {
+                  "stringValue": "تراجع"
+                },
+                "advice": {
+                  "stringValue": "🔄 ارتداد فني لمستوى المقاومة R1 (126.96 ج) • سهم البنك التجاري الدولي (CIB) يختبر المقاومة بتراجع (-6.9%). فرصة مناسبة لتخفيف المركز وتدوير السيولة لأصل أسرع نمواً."
+                },
+                "action": {
+                  "stringValue": "REBALANCE_CANDIDATE"
+                },
+                "priceUpdatedAt": {
+                  "stringValue": "01:56:30 م (10 Nov)"
+                },
+                "priceSource": {
+                  "stringValue": "شاشة البورصة اللحظية (تداول مباشر)"
+                },
+                "decisionUpdatedAt": {
+                  "stringValue": "01:56:30 م (10 Nov)"
+                },
+                "decisionBasis": {
+                  "stringValue": "سعر البورصة: 130.81 ج | مقاومة R1: 126.96 ج | دعم S1: 116.02 ج"
+                },
+                "thndrUrl": {
+                  "stringValue": "https://app.thndr.app/search?query=COMI"
+                },
+                "pivotR1": {
+                  "doubleValue": 126.96
+                },
+                "pivotS1": {
+                  "doubleValue": 116.02
+                },
+                "pivotR2": {
+                  "doubleValue": 133.45
+                },
+                "pivotS2": {
+                  "doubleValue": 111.57
+                },
+                "sma50": {
+                  "doubleValue": 128.64
+                },
+                "sma200": {
+                  "doubleValue": 132.19
+                },
+                "rsi": {
+                  "doubleValue": 60.6
+                },
+                "macd": {
+                  "doubleValue": 0.03
+                },
+                "macdSignal": {
+                  "doubleValue": -1.25
+                },
+                "trend": {
+                  "stringValue": "ارتداد تصحيحي إيجابي (Recovery)"
+                },
+                "momentum": {
+                  "stringValue": "زخم شرائي صاعد (Bullish MACD)"
+                },
+                "support": {
+                  "stringValue": "116.02 ج"
+                },
+                "target1": {
+                  "stringValue": "133.45 ج"
+                },
+                "target2": {
+                  "stringValue": "145.01 ج"
+                },
+                "stopLoss": {
+                  "stringValue": "114.28 ج"
+                },
+                "rrRatio": {
+                  "doubleValue": 0.16
+                },
+                "rrDisplay": {
+                  "stringValue": "1 : 0.16"
+                },
+                "pe": {
+                  "doubleValue": 6.29
+                },
+                "eps": {
+                  "doubleValue": 21.16
+                },
+                "sectorPe": {
+                  "doubleValue": 5.7
+                },
+                "peVsSectorPct": {
+                  "doubleValue": 10.4
+                },
+                "operatingMargin": {
+                  "integerValue": "85"
+                },
+                "netMargin": {
+                  "integerValue": "51"
+                },
+                "dividendYield": {
+                  "doubleValue": 4.69
+                },
+                "volume": {
+                  "integerValue": "3691836"
+                },
+                "tradedValue": {
+                  "doubleValue": 482929067.16
+                },
+                "rvol": {
+                  "doubleValue": 0.98
+                },
+                "rvolStatus": {
+                  "stringValue": "سيولة ضمن المعدلات الطبيعية"
+                },
+                "rvolBadge": {
+                  "stringValue": "bg-slate-800 text-slate-300 border-slate-700"
+                },
+                "priceToBook": {
+                  "doubleValue": 1.87
+                },
+                "operationalStability": {
+                  "stringValue": "أرباح تشغيلية صلبة ومستقرة (هامش تشغيل: 85%)"
+                },
+                "valuationStatus": {
+                  "stringValue": "أعلى من متوسط القطاع بنسبة 10.4% (علاوة نمو / Premium)"
+                },
+                "sector": {
+                  "stringValue": "بنوك وخدمات مالية"
+                },
+                "alertLevel": {
+                  "stringValue": "REBOUND_RESISTANCE"
+                }
+              }
+            }
+          },
+          {
+            "mapValue": {
+              "fields": {
+                "ticker": {
+                  "stringValue": "EGAL"
+                },
+                "name": {
+                  "stringValue": "مصر للألومنيوم"
+                },
+                "category": {
+                  "stringValue": "EGX • معادن وصناعة ثقيلة"
+                },
+                "shares": {
+                  "integerValue": "44"
+                },
+                "buyPrice": {
+                  "doubleValue": 303.52
+                },
+                "currentPrice": {
+                  "doubleValue": 320.9
+                },
+                "value": {
+                  "integerValue": "14120"
+                },
+                "profit": {
+                  "integerValue": "765"
+                },
+                "returnPct": {
+                  "doubleValue": 5.73
+                },
+                "status": {
+                  "stringValue": "ربح"
+                },
+                "advice": {
+                  "stringValue": "أداء إيجابي هادئ (+5.7%). استمرار المتابعة مع حماية الأرباح."
+                },
+                "action": {
+                  "stringValue": "HOLD"
+                },
+                "priceUpdatedAt": {
+                  "stringValue": "01:56:30 م (10 Nov)"
+                },
+                "priceSource": {
+                  "stringValue": "شاشة البورصة اللحظية (تداول مباشر)"
+                },
+                "decisionUpdatedAt": {
+                  "stringValue": "01:56:30 م (10 Nov)"
+                },
+                "decisionBasis": {
+                  "stringValue": "سعر البورصة: 320.90 ج | مقاومة R1: 350.8 ج | دعم S1: 266.1 ج"
+                },
+                "thndrUrl": {
+                  "stringValue": "https://app.thndr.app/search?query=EGAL"
+                },
+                "pivotR1": {
+                  "doubleValue": 350.8
+                },
+                "pivotS1": {
+                  "doubleValue": 266.1
+                },
+                "pivotR2": {
+                  "doubleValue": 397.6
+                },
+                "pivotS2": {
+                  "doubleValue": 228.2
+                },
+                "sma50": {
+                  "doubleValue": 335.93
+                },
+                "sma200": {
+                  "doubleValue": 303.08
+                },
+                "rsi": {
+                  "doubleValue": 53.2
+                },
+                "macd": {
+                  "doubleValue": -3.67
+                },
+                "macdSignal": {
+                  "doubleValue": -7.63
+                },
+                "trend": {
+                  "stringValue": "اختبار دعم المتوسط 200 يوم (Pullback)"
+                },
+                "momentum": {
+                  "stringValue": "زخم شرائي صاعد (Bullish MACD)"
+                },
+                "support": {
+                  "stringValue": "266.1 ج"
+                },
+                "target1": {
+                  "stringValue": "350.8 ج"
+                },
+                "target2": {
+                  "stringValue": "397.6 ج"
+                },
+                "stopLoss": {
+                  "stringValue": "262.11 ج"
+                },
+                "rrRatio": {
+                  "doubleValue": 0.51
+                },
+                "rrDisplay": {
+                  "stringValue": "1 : 0.51"
+                },
+                "pe": {
+                  "doubleValue": 8.54
+                },
+                "eps": {
+                  "doubleValue": 37.55
+                },
+                "sectorPe": {
+                  "doubleValue": 8.54
+                },
+                "peVsSectorPct": {
+                  "integerValue": "0"
+                },
+                "operatingMargin": {
+                  "doubleValue": 36.7
+                },
+                "netMargin": {
+                  "doubleValue": 29.2
+                },
+                "dividendYield": {
+                  "doubleValue": 2.54
+                },
+                "volume": {
+                  "integerValue": "344694"
+                },
+                "tradedValue": {
+                  "doubleValue": 110612304.6
+                },
+                "rvol": {
+                  "doubleValue": 1.25
+                },
+                "rvolStatus": {
+                  "stringValue": "سيولة ضمن المعدلات الطبيعية"
+                },
+                "rvolBadge": {
+                  "stringValue": "bg-slate-800 text-slate-300 border-slate-700"
+                },
+                "priceToBook": {
+                  "doubleValue": 3.91
+                },
+                "operationalStability": {
+                  "stringValue": "أرباح تشغيلية صلبة ومستقرة (هامش تشغيل: 36.7%)"
+                },
+                "valuationStatus": {
+                  "stringValue": "مماثل لمتوسط القطاع (سعر عادل)"
+                },
+                "sector": {
+                  "stringValue": "معادن وصناعة ثقيلة"
+                },
+                "alertLevel": {
+                  "stringValue": "NORMAL"
+                }
+              }
+            }
+          },
+          {
+            "mapValue": {
+              "fields": {
+                "ticker": {
+                  "stringValue": "ETEL"
+                },
+                "name": {
+                  "stringValue": "المصرية للاتصالات (وي)"
+                },
+                "category": {
+                  "stringValue": "EGX • اتصالات وتكنولوجيا"
+                },
+                "shares": {
+                  "integerValue": "41"
+                },
+                "buyPrice": {
+                  "doubleValue": 120.38
+                },
+                "currentPrice": {
+                  "doubleValue": 135.15
+                },
+                "value": {
+                  "integerValue": "5541"
+                },
+                "profit": {
+                  "integerValue": "605"
+                },
+                "returnPct": {
+                  "doubleValue": 12.26
+                },
+                "status": {
+                  "stringValue": "ربح"
+                },
+                "advice": {
+                  "stringValue": "اتجاه صاعد صحي أعلى متوسط 50 يوم (+12.3%). استمرار في المركز مستهدفاً 145.73 ج."
+                },
+                "action": {
+                  "stringValue": "HOLD"
+                },
+                "priceUpdatedAt": {
+                  "stringValue": "01:56:30 م (10 Nov)"
+                },
+                "priceSource": {
+                  "stringValue": "شاشة البورصة اللحظية (تداول مباشر)"
+                },
+                "decisionUpdatedAt": {
+                  "stringValue": "01:56:30 م (10 Nov)"
+                },
+                "decisionBasis": {
+                  "stringValue": "سعر البورصة: 135.15 ج | مقاومة R1: 145.73 ج | دعم S1: 104.73 ج"
+                },
+                "thndrUrl": {
+                  "stringValue": "https://app.thndr.app/search?query=ETEL"
+                },
+                "pivotR1": {
+                  "doubleValue": 145.73
+                },
+                "pivotS1": {
+                  "doubleValue": 104.73
+                },
+                "pivotR2": {
+                  "doubleValue": 171.37
+                },
+                "pivotS2": {
+                  "doubleValue": 89.37
+                },
+                "sma50": {
+                  "doubleValue": 132.18
+                },
+                "sma200": {
+                  "doubleValue": 103.77
+                },
+                "rsi": {
+                  "doubleValue": 55.3
+                },
+                "macd": {
+                  "doubleValue": -1.26
+                },
+                "macdSignal": {
+                  "doubleValue": -2.02
+                },
+                "trend": {
+                  "stringValue": "اتجاه صاعد رئيسي (Golden Cross / Bullish)"
+                },
+                "momentum": {
+                  "stringValue": "زخم شرائي صاعد (Bullish MACD)"
+                },
+                "support": {
+                  "stringValue": "104.73 ج"
+                },
+                "target1": {
+                  "stringValue": "145.73 ج"
+                },
+                "target2": {
+                  "stringValue": "171.37 ج"
+                },
+                "stopLoss": {
+                  "stringValue": "103.16 ج"
+                },
+                "rrRatio": {
+                  "doubleValue": 0.33
+                },
+                "rrDisplay": {
+                  "stringValue": "1 : 0.33"
+                },
+                "pe": {
+                  "doubleValue": 19.88
+                },
+                "eps": {
+                  "doubleValue": 6.8
+                },
+                "sectorPe": {
+                  "doubleValue": 19.88
+                },
+                "peVsSectorPct": {
+                  "integerValue": "0"
+                },
+                "operatingMargin": {
+                  "nullValue": null
+                },
+                "netMargin": {
+                  "nullValue": null
+                },
+                "dividendYield": {
+                  "doubleValue": 1.12
+                },
+                "volume": {
+                  "integerValue": "1338223"
+                },
+                "tradedValue": {
+                  "doubleValue": 180860838.45000002
+                },
+                "rvol": {
+                  "doubleValue": 0.95
+                },
+                "rvolStatus": {
+                  "stringValue": "سيولة ضمن المعدلات الطبيعية"
+                },
+                "rvolBadge": {
+                  "stringValue": "bg-slate-800 text-slate-300 border-slate-700"
+                },
+                "priceToBook": {
+                  "doubleValue": 3.13
+                },
+                "operationalStability": {
+                  "stringValue": "أرباح تشغيلية منتظمة (هامش تشغيل: 22.4%)"
+                },
+                "valuationStatus": {
+                  "stringValue": "مماثل لمتوسط القطاع (سعر عادل)"
+                },
+                "sector": {
+                  "stringValue": "اتصالات وتكنولوجيا"
+                },
+                "alertLevel": {
+                  "stringValue": "NORMAL"
+                }
+              }
+            }
+          },
+          {
+            "mapValue": {
+              "fields": {
+                "ticker": {
+                  "stringValue": "HALN"
+                },
+                "name": {
+                  "stringValue": "إم إن تي حالا (HALN)"
+                },
+                "category": {
+                  "stringValue": "EGX • تكنولوجيا مالية وتمويل استهلاكي"
+                },
+                "shares": {
+                  "integerValue": "74"
+                },
+                "buyPrice": {
+                  "doubleValue": 24.5
+                },
+                "currentPrice": {
+                  "doubleValue": 22.9
+                },
+                "value": {
+                  "integerValue": "1695"
+                },
+                "profit": {
+                  "integerValue": "-118"
+                },
+                "returnPct": {
+                  "doubleValue": -6.53
+                },
+                "status": {
+                  "stringValue": "تراجع"
+                },
+                "advice": {
+                  "stringValue": "احتفاظ بالمركز مع مراقبة الدعم -- ج لانتظار موجة ارتدادية لتخفيف الخسارة (-6.5%)."
+                },
+                "action": {
+                  "stringValue": "HOLD"
+                },
+                "priceUpdatedAt": {
+                  "stringValue": "مزامنة ثندر الآن"
+                },
+                "priceSource": {
+                  "stringValue": "محفظة ثندر اللحظية"
+                },
+                "decisionUpdatedAt": {
+                  "stringValue": "جلسة اليوم"
+                },
+                "decisionBasis": {
+                  "stringValue": "سعر الشراء: 24.50 ج • السعر: 22.90 ج"
+                },
+                "thndrUrl": {
+                  "stringValue": "https://app.thndr.app"
+                }
+              }
+            }
+          },
+          {
+            "mapValue": {
+              "fields": {
+                "ticker": {
+                  "stringValue": "HDBK"
+                },
+                "name": {
+                  "stringValue": "بنك التعمير والإسكان"
+                },
+                "category": {
+                  "stringValue": "EGX30 • قطاع بنكي وعوائد نقدية"
+                },
+                "shares": {
+                  "integerValue": "122"
+                },
+                "buyPrice": {
+                  "doubleValue": 81.63
+                },
+                "currentPrice": {
+                  "integerValue": "102"
+                },
+                "value": {
+                  "integerValue": "12444"
+                },
+                "profit": {
+                  "integerValue": "2485"
+                },
+                "returnPct": {
+                  "doubleValue": 24.95
+                },
+                "status": {
+                  "stringValue": "ربح"
+                },
+                "advice": {
+                  "stringValue": "السهم حقق مكاسب قوية (+24.9%). يُنصح بتأمين جزء من الأرباح لحماية المكاسب المحققة."
+                },
+                "action": {
+                  "stringValue": "REBALANCE_CANDIDATE"
+                },
+                "priceUpdatedAt": {
+                  "stringValue": "01:56:30 م (10 Nov)"
+                },
+                "priceSource": {
+                  "stringValue": "شاشة البورصة اللحظية (تداول مباشر)"
+                },
+                "decisionUpdatedAt": {
+                  "stringValue": "01:56:30 م (10 Nov)"
+                },
+                "decisionBasis": {
+                  "stringValue": "سعر البورصة: 102.00 ج | مقاومة R1: 112 ج | دعم S1: 82.61 ج"
+                },
+                "thndrUrl": {
+                  "stringValue": "https://app.thndr.app/search?query=HDBK"
+                },
+                "pivotR1": {
+                  "integerValue": "112"
+                },
+                "pivotS1": {
+                  "doubleValue": 82.61
+                },
+                "pivotR2": {
+                  "doubleValue": 126.89
+                },
+                "pivotS2": {
+                  "doubleValue": 68.11
+                },
+                "sma50": {
+                  "doubleValue": 106.11
+                },
+                "sma200": {
+                  "doubleValue": 78.81
+                },
+                "rsi": {
+                  "doubleValue": 52.7
+                },
+                "macd": {
+                  "doubleValue": -1.3
+                },
+                "macdSignal": {
+                  "doubleValue": -2.07
+                },
+                "trend": {
+                  "stringValue": "اختبار دعم المتوسط 200 يوم (Pullback)"
+                },
+                "momentum": {
+                  "stringValue": "زخم شرائي صاعد (Bullish MACD)"
+                },
+                "support": {
+                  "stringValue": "82.61 ج"
+                },
+                "target1": {
+                  "stringValue": "112 ج"
+                },
+                "target2": {
+                  "stringValue": "126.89 ج"
+                },
+                "stopLoss": {
+                  "stringValue": "81.37 ج"
+                },
+                "rrRatio": {
+                  "doubleValue": 0.48
+                },
+                "rrDisplay": {
+                  "stringValue": "1 : 0.48"
+                },
+                "pe": {
+                  "doubleValue": 5.45
+                },
+                "eps": {
+                  "doubleValue": 18.73
+                },
+                "sectorPe": {
+                  "doubleValue": 5.45
+                },
+                "peVsSectorPct": {
+                  "integerValue": "0"
+                },
+                "operatingMargin": {
+                  "doubleValue": 73.2
+                },
+                "netMargin": {
+                  "doubleValue": 57.8
+                },
+                "dividendYield": {
+                  "doubleValue": 4.02
+                },
+                "volume": {
+                  "integerValue": "406655"
+                },
+                "tradedValue": {
+                  "integerValue": "41478810"
+                },
+                "rvol": {
+                  "doubleValue": 1.8
+                },
+                "rvolStatus": {
+                  "stringValue": "نشاط تدفق شرائي أعلى من المتوسط (1.8x)"
+                },
+                "rvolBadge": {
+                  "stringValue": "bg-emerald-950/70 text-emerald-300 border-emerald-500/40 font-semibold"
+                },
+                "priceToBook": {
+                  "doubleValue": 2.32
+                },
+                "operationalStability": {
+                  "stringValue": "أرباح تشغيلية صلبة ومستقرة (هامش تشغيل: 73.2%)"
+                },
+                "valuationStatus": {
+                  "stringValue": "مماثل لمتوسط القطاع (سعر عادل)"
+                },
+                "sector": {
+                  "stringValue": "بنوك وتمويل عقاري"
+                },
+                "alertLevel": {
+                  "stringValue": "TARGET_HIT"
+                }
+              }
+            }
+          },
+          {
+            "mapValue": {
+              "fields": {
+                "ticker": {
+                  "stringValue": "NCS"
+                },
+                "name": {
+                  "stringValue": "صندوق إن آي كابيتال (NCS)"
+                },
+                "category": {
+                  "stringValue": "صناديق استثمارية • إن آي إدخار"
+                },
+                "shares": {
+                  "integerValue": "3037"
+                },
+                "buyPrice": {
+                  "doubleValue": 20.61
+                },
+                "currentPrice": {
+                  "doubleValue": 19.15
+                },
+                "value": {
+                  "integerValue": "58159"
+                },
+                "profit": {
+                  "integerValue": "-4434"
+                },
+                "returnPct": {
+                  "doubleValue": -7.08
+                },
+                "status": {
+                  "stringValue": "تراجع"
+                },
+                "advice": {
+                  "stringValue": "مرجع وثيقة نقدية • العائد السنوي الاسترشادي: 22.4%"
+                },
+                "action": {
+                  "stringValue": "HOLD"
+                },
+                "priceUpdatedAt": {
+                  "stringValue": "مزامنة ثندر الآن"
+                },
+                "priceSource": {
+                  "stringValue": "10 Nov 2026 (إغلاق رسمي)"
+                },
+                "decisionUpdatedAt": {
+                  "stringValue": "جلسة اليوم"
+                },
+                "decisionBasis": {
+                  "stringValue": "سعر الشراء: 20.61 ج • السعر: 19.15 ج"
+                },
+                "thndrUrl": {
+                  "stringValue": "https://app.thndr.app"
+                }
+              }
+            }
+          },
+          {
+            "mapValue": {
+              "fields": {
+                "ticker": {
+                  "stringValue": "ORAS"
+                },
+                "name": {
+                  "stringValue": "أوراسكوم كونستراكشون"
+                },
+                "category": {
+                  "stringValue": "EGX • مقاولات وبنية تحتية دولارية"
+                },
+                "shares": {
+                  "integerValue": "17"
+                },
+                "buyPrice": {
+                  "doubleValue": 715.01
+                },
+                "currentPrice": {
+                  "integerValue": "825"
+                },
+                "value": {
+                  "integerValue": "14025"
+                },
+                "profit": {
+                  "integerValue": "1870"
+                },
+                "returnPct": {
+                  "doubleValue": 15.38
+                },
+                "status": {
+                  "stringValue": "ربح"
+                },
+                "advice": {
+                  "stringValue": "أداء إيجابي هادئ (+15.4%). استمرار المتابعة مع حماية الأرباح."
+                },
+                "action": {
+                  "stringValue": "HOLD"
+                },
+                "priceUpdatedAt": {
+                  "stringValue": "01:56:30 م (10 Nov)"
+                },
+                "priceSource": {
+                  "stringValue": "شاشة البورصة اللحظية (تداول مباشر)"
+                },
+                "decisionUpdatedAt": {
+                  "stringValue": "01:56:30 م (10 Nov)"
+                },
+                "decisionBasis": {
+                  "stringValue": "سعر البورصة: 825.00 ج | مقاومة R1: 907.33 ج | دعم S1: 754.33 ج"
+                },
+                "thndrUrl": {
+                  "stringValue": "https://app.thndr.app/search?query=ORAS"
+                },
+                "pivotR1": {
+                  "doubleValue": 907.33
+                },
+                "pivotS1": {
+                  "doubleValue": 754.33
+                },
+                "pivotR2": {
+                  "doubleValue": 992.67
+                },
+                "pivotS2": {
+                  "doubleValue": 686.67
+                },
+                "sma50": {
+                  "doubleValue": 835.03
+                },
+                "sma200": {
+                  "doubleValue": 666.57
+                },
+                "rsi": {
+                  "doubleValue": 51.1
+                },
+                "macd": {
+                  "doubleValue": -8.83
+                },
+                "macdSignal": {
+                  "doubleValue": -7.69
+                },
+                "trend": {
+                  "stringValue": "اختبار دعم المتوسط 200 يوم (Pullback)"
+                },
+                "momentum": {
+                  "stringValue": "زخم بيعي تصحيحي (Bearish MACD)"
+                },
+                "support": {
+                  "stringValue": "754.33 ج"
+                },
+                "target1": {
+                  "stringValue": "907.33 ج"
+                },
+                "target2": {
+                  "stringValue": "992.67 ج"
+                },
+                "stopLoss": {
+                  "stringValue": "743.02 ج"
+                },
+                "rrRatio": {
+                  "integerValue": "1"
+                },
+                "rrDisplay": {
+                  "stringValue": "1 : 1"
+                },
+                "pe": {
+                  "doubleValue": 7.99
+                },
+                "eps": {
+                  "doubleValue": 103.27
+                },
+                "sectorPe": {
+                  "doubleValue": 7.99
+                },
+                "peVsSectorPct": {
+                  "integerValue": "0"
+                },
+                "operatingMargin": {
+                  "doubleValue": 5.1
+                },
+                "netMargin": {
+                  "doubleValue": 3.7
+                },
+                "dividendYield": {
+                  "doubleValue": 3.21
+                },
+                "volume": {
+                  "integerValue": "296747"
+                },
+                "tradedValue": {
+                  "integerValue": "244816275"
+                },
+                "rvol": {
+                  "doubleValue": 1.46
+                },
+                "rvolStatus": {
+                  "stringValue": "نشاط تدفق شرائي أعلى من المتوسط (1.46x)"
+                },
+                "rvolBadge": {
+                  "stringValue": "bg-emerald-950/70 text-emerald-300 border-emerald-500/40 font-semibold"
+                },
+                "priceToBook": {
+                  "doubleValue": 1.84
+                },
+                "operationalStability": {
+                  "stringValue": "أرباح تشغيلية منتظمة (هامش تشغيل: 5.1%)"
+                },
+                "valuationStatus": {
+                  "stringValue": "مماثل لمتوسط القطاع (سعر عادل)"
+                },
+                "sector": {
+                  "stringValue": "مقاولات وبنية تحتية دولارية"
+                },
+                "alertLevel": {
+                  "stringValue": "NORMAL"
+                }
+              }
+            }
+          },
+          {
+            "mapValue": {
+              "fields": {
+                "ticker": {
+                  "stringValue": "RAYA"
+                },
+                "name": {
+                  "stringValue": "راية القابضة للاستثمارات"
+                },
+                "category": {
+                  "stringValue": "EGX70 • تكنولوجيا ومضاربة (الأقمار)"
+                },
+                "shares": {
+                  "integerValue": "2193"
+                },
+                "buyPrice": {
+                  "doubleValue": 6.88
+                },
+                "currentPrice": {
+                  "doubleValue": 6.2
+                },
+                "value": {
+                  "integerValue": "13597"
+                },
+                "profit": {
+                  "integerValue": "-1491"
+                },
+                "returnPct": {
+                  "doubleValue": -9.88
+                },
+                "status": {
+                  "stringValue": "تراجع"
+                },
+                "advice": {
+                  "stringValue": "احتفاظ بالمركز مع مراقبة الدعم 4.79 ج لانتظار موجة ارتدادية لتخفيف الخسارة (-9.9%)."
+                },
+                "action": {
+                  "stringValue": "HOLD"
+                },
+                "priceUpdatedAt": {
+                  "stringValue": "01:56:30 م (10 Nov)"
+                },
+                "priceSource": {
+                  "stringValue": "شاشة البورصة اللحظية (تداول مباشر)"
+                },
+                "decisionUpdatedAt": {
+                  "stringValue": "01:56:30 م (10 Nov)"
+                },
+                "decisionBasis": {
+                  "stringValue": "سعر البورصة: 6.20 ج | مقاومة R1: 6.64 ج | دعم S1: 4.79 ج"
+                },
+                "thndrUrl": {
+                  "stringValue": "https://app.thndr.app/search?query=RAYA"
+                },
+                "pivotR1": {
+                  "doubleValue": 6.64
+                },
+                "pivotS1": {
+                  "doubleValue": 4.79
+                },
+                "pivotR2": {
+                  "doubleValue": 7.68
+                },
+                "pivotS2": {
+                  "doubleValue": 3.98
+                },
+                "sma50": {
+                  "doubleValue": 6.36
+                },
+                "sma200": {
+                  "doubleValue": 6.32
+                },
+                "rsi": {
+                  "doubleValue": 57.7
+                },
+                "macd": {
+                  "doubleValue": -0.16
+                },
+                "macdSignal": {
+                  "doubleValue": -0.28
+                },
+                "trend": {
+                  "stringValue": "محايد / تذبذب عرضي"
+                },
+                "momentum": {
+                  "stringValue": "زخم شرائي صاعد (Bullish MACD)"
+                },
+                "support": {
+                  "stringValue": "4.79 ج"
+                },
+                "target1": {
+                  "stringValue": "6.64 ج"
+                },
+                "target2": {
+                  "stringValue": "7.68 ج"
+                },
+                "stopLoss": {
+                  "stringValue": "4.72 ج"
+                },
+                "rrRatio": {
+                  "doubleValue": 0.3
+                },
+                "rrDisplay": {
+                  "stringValue": "1 : 0.3"
+                },
+                "pe": {
+                  "doubleValue": 10.89
+                },
+                "eps": {
+                  "doubleValue": 0.57
+                },
+                "sectorPe": {
+                  "doubleValue": 10.89
+                },
+                "peVsSectorPct": {
+                  "integerValue": "0"
+                },
+                "operatingMargin": {
+                  "doubleValue": 8.1
+                },
+                "netMargin": {
+                  "doubleValue": 3.5
+                },
+                "dividendYield": {
+                  "doubleValue": 0.68
+                },
+                "volume": {
+                  "integerValue": "11413135"
+                },
+                "tradedValue": {
+                  "integerValue": "70761437"
+                },
+                "rvol": {
+                  "doubleValue": 2.6
+                },
+                "rvolStatus": {
+                  "stringValue": "تجميع وسيولة مؤسسية استثنائية (2.6x ضعف المعتاد)"
+                },
+                "rvolBadge": {
+                  "stringValue": "bg-purple-950/70 text-purple-300 border-purple-500/50 font-bold"
+                },
+                "priceToBook": {
+                  "doubleValue": 4.01
+                },
+                "operationalStability": {
+                  "stringValue": "أرباح تشغيلية منتظمة (هامش تشغيل: 8.1%)"
+                },
+                "valuationStatus": {
+                  "stringValue": "مماثل لمتوسط القطاع (سعر عادل)"
+                },
+                "sector": {
+                  "stringValue": "استثمارات وتكنولوجيا"
+                },
+                "alertLevel": {
+                  "stringValue": "NORMAL"
+                }
+              }
+            }
+          },
+          {
+            "mapValue": {
+              "fields": {
+                "ticker": {
+                  "stringValue": "SWDY"
+                },
+                "name": {
+                  "stringValue": "السويدي إليكتريك"
+                },
+                "category": {
+                  "stringValue": "EGX30 • طاقة وتصدير"
+                },
+                "shares": {
+                  "integerValue": "110"
+                },
+                "buyPrice": {
+                  "doubleValue": 93.86
+                },
+                "currentPrice": {
+                  "doubleValue": 121.4
+                },
+                "value": {
+                  "integerValue": "13354"
+                },
+                "profit": {
+                  "integerValue": "3029"
+                },
+                "returnPct": {
+                  "doubleValue": 29.34
+                },
+                "status": {
+                  "stringValue": "ربح"
+                },
+                "advice": {
+                  "stringValue": "السهم حقق مكاسب قوية (+29.3%). يُنصح بتأمين جزء من الأرباح لحماية المكاسب المحققة."
+                },
+                "action": {
+                  "stringValue": "REBALANCE_CANDIDATE"
+                },
+                "priceUpdatedAt": {
+                  "stringValue": "01:56:30 م (10 Nov)"
+                },
+                "priceSource": {
+                  "stringValue": "شاشة البورصة اللحظية (تداول مباشر)"
+                },
+                "decisionUpdatedAt": {
+                  "stringValue": "01:56:30 م (10 Nov)"
+                },
+                "decisionBasis": {
+                  "stringValue": "سعر البورصة: 121.40 ج | مقاومة R1: 125.42 ج | دعم S1: 98.04 ج"
+                },
+                "thndrUrl": {
+                  "stringValue": "https://app.thndr.app/search?query=SWDY"
+                },
+                "pivotR1": {
+                  "doubleValue": 125.42
+                },
+                "pivotS1": {
+                  "doubleValue": 98.04
+                },
+                "pivotR2": {
+                  "doubleValue": 138.59
+                },
+                "pivotS2": {
+                  "doubleValue": 83.83
+                },
+                "sma50": {
+                  "doubleValue": 117.92
+                },
+                "sma200": {
+                  "doubleValue": 95.62
+                },
+                "rsi": {
+                  "doubleValue": 61.6
+                },
+                "macd": {
+                  "doubleValue": 0.78
+                },
+                "macdSignal": {
+                  "doubleValue": -1.01
+                },
+                "trend": {
+                  "stringValue": "اتجاه صاعد رئيسي (Golden Cross / Bullish)"
+                },
+                "momentum": {
+                  "stringValue": "زخم شرائي صاعد (Bullish MACD)"
+                },
+                "support": {
+                  "stringValue": "98.04 ج"
+                },
+                "target1": {
+                  "stringValue": "125.42 ج"
+                },
+                "target2": {
+                  "stringValue": "138.59 ج"
+                },
+                "stopLoss": {
+                  "stringValue": "96.57 ج"
+                },
+                "rrRatio": {
+                  "doubleValue": 0.16
+                },
+                "rrDisplay": {
+                  "stringValue": "1 : 0.16"
+                },
+                "pe": {
+                  "doubleValue": 15.94
+                },
+                "eps": {
+                  "doubleValue": 7.62
+                },
+                "sectorPe": {
+                  "doubleValue": 15.94
+                },
+                "peVsSectorPct": {
+                  "integerValue": "0"
+                },
+                "operatingMargin": {
+                  "doubleValue": 8.8
+                },
+                "netMargin": {
+                  "doubleValue": 5.1
+                },
+                "dividendYield": {
+                  "doubleValue": 1.54
+                },
+                "volume": {
+                  "integerValue": "279994"
+                },
+                "tradedValue": {
+                  "doubleValue": 33991271.6
+                },
+                "rvol": {
+                  "doubleValue": 0.49
+                },
+                "rvolStatus": {
+                  "stringValue": "هدوء وتراجع في السيولة (0.49x)"
+                },
+                "rvolBadge": {
+                  "stringValue": "bg-slate-900 text-slate-400 border-slate-700"
+                },
+                "priceToBook": {
+                  "doubleValue": 3.69
+                },
+                "operationalStability": {
+                  "stringValue": "أرباح تشغيلية منتظمة (هامش تشغيل: 8.8%)"
+                },
+                "valuationStatus": {
+                  "stringValue": "مماثل لمتوسط القطاع (سعر عادل)"
+                },
+                "sector": {
+                  "stringValue": "طاقة وكابلات وتصدير"
+                },
+                "alertLevel": {
+                  "stringValue": "TARGET_HIT"
+                }
+              }
+            }
+          },
+          {
+            "mapValue": {
+              "fields": {
+                "ticker": {
+                  "stringValue": "TMGH"
+                },
+                "name": {
+                  "stringValue": "مجموعة طلعت مصطفى"
+                },
+                "category": {
+                  "stringValue": "EGX • تطوير عقاري وفنادق"
+                },
+                "shares": {
+                  "integerValue": "55"
+                },
+                "buyPrice": {
+                  "doubleValue": 97.62
+                },
+                "currentPrice": {
+                  "doubleValue": 85.8
+                },
+                "value": {
+                  "integerValue": "4719"
+                },
+                "profit": {
+                  "integerValue": "-650"
+                },
+                "returnPct": {
+                  "doubleValue": -12.11
+                },
+                "status": {
+                  "stringValue": "تراجع"
+                },
+                "advice": {
+                  "stringValue": "احتفاظ بالمركز مع مراقبة الدعم 75.53 ج لانتظار موجة ارتدادية لتخفيف الخسارة (-12.1%)."
+                },
+                "action": {
+                  "stringValue": "HOLD"
+                },
+                "priceUpdatedAt": {
+                  "stringValue": "01:56:30 م (10 Nov)"
+                },
+                "priceSource": {
+                  "stringValue": "شاشة البورصة اللحظية (تداول مباشر)"
+                },
+                "decisionUpdatedAt": {
+                  "stringValue": "01:56:30 م (10 Nov)"
+                },
+                "decisionBasis": {
+                  "stringValue": "سعر البورصة: 85.80 ج | مقاومة R1: 89.13 ج | دعم S1: 75.53 ج"
+                },
+                "thndrUrl": {
+                  "stringValue": "https://app.thndr.app/search?query=TMGH"
+                },
+                "pivotR1": {
+                  "doubleValue": 89.13
+                },
+                "pivotS1": {
+                  "doubleValue": 75.53
+                },
+                "pivotR2": {
+                  "doubleValue": 97.87
+                },
+                "pivotS2": {
+                  "doubleValue": 70.67
+                },
+                "sma50": {
+                  "doubleValue": 88.81
+                },
+                "sma200": {
+                  "doubleValue": 90.68
+                },
+                "rsi": {
+                  "doubleValue": 53.5
+                },
+                "macd": {
+                  "doubleValue": -1.5
+                },
+                "macdSignal": {
+                  "doubleValue": -2.29
+                },
+                "trend": {
+                  "stringValue": "اتجاه هابط رئيسي (Bearish)"
+                },
+                "momentum": {
+                  "stringValue": "زخم شرائي صاعد (Bullish MACD)"
+                },
+                "support": {
+                  "stringValue": "75.53 ج"
+                },
+                "target1": {
+                  "stringValue": "89.13 ج"
+                },
+                "target2": {
+                  "stringValue": "97.87 ج"
+                },
+                "stopLoss": {
+                  "stringValue": "74.4 ج"
+                },
+                "rrRatio": {
+                  "doubleValue": 0.29
+                },
+                "rrDisplay": {
+                  "stringValue": "1 : 0.29"
+                },
+                "pe": {
+                  "doubleValue": 11.45
+                },
+                "eps": {
+                  "doubleValue": 7.49
+                },
+                "sectorPe": {
+                  "doubleValue": 11.45
+                },
+                "peVsSectorPct": {
+                  "integerValue": "0"
+                },
+                "operatingMargin": {
+                  "doubleValue": 28.3
+                },
+                "netMargin": {
+                  "doubleValue": 21.6
+                },
+                "dividendYield": {
+                  "doubleValue": 0.36
+                },
+                "volume": {
+                  "integerValue": "2919875"
+                },
+                "tradedValue": {
+                  "integerValue": "250525275"
+                },
+                "rvol": {
+                  "doubleValue": 0.99
+                },
+                "rvolStatus": {
+                  "stringValue": "سيولة ضمن المعدلات الطبيعية"
+                },
+                "rvolBadge": {
+                  "stringValue": "bg-slate-800 text-slate-300 border-slate-700"
+                },
+                "priceToBook": {
+                  "doubleValue": 1.93
+                },
+                "operationalStability": {
+                  "stringValue": "أرباح تشغيلية صلبة ومستقرة (هامش تشغيل: 28.3%)"
+                },
+                "valuationStatus": {
+                  "stringValue": "مماثل لمتوسط القطاع (سعر عادل)"
+                },
+                "sector": {
+                  "stringValue": "تطوير عقاري وفنادق"
+                },
+                "alertLevel": {
+                  "stringValue": "NORMAL"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "updatedAt": {
+      "integerValue": "1794311790631"
+    }
+  },
+  "createTime": "2026-10-19T15:09:20.706860Z",
+  "updateTime": "2026-11-10T11:56:31.425907Z"
+}

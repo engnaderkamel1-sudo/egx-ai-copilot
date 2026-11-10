@@ -147,7 +147,12 @@ const TECHNICAL_COLUMNS = [
   "MACD.macd", "MACD.signal", "price_52_week_high", "price_52_week_low",
   "price_earnings_ttm", "earnings_per_share_basic_ttm", "operating_margin",
   "net_margin", "dividends_yield_current", "price_book_fq",
-  "relative_volume_10d_calc", "average_volume_30d_calc"
+  "relative_volume_10d_calc", "average_volume_30d_calc",
+  // Extended Technical Suite (Investing & TradingView Benchmark)
+  "ADX", "ATR", "Recommend.MA", "Recommend.Other",
+  "Stoch.K", "Stoch.D",
+  "SMA10", "SMA20", "SMA100",
+  "EMA10", "EMA20", "EMA50", "EMA100", "EMA200"
 ];
 
 function parseTechnicalRecord(item) {
@@ -188,6 +193,117 @@ function parseTechnicalRecord(item) {
   let rvol = rawRvol;
   if (rvol === null && avgVolume30 && avgVolume30 > 0 && volume > 0) {
     rvol = Number((volume / avgVolume30).toFixed(2));
+  }
+
+  // Extended Technical Suite: ADX, ATR, Stochastic, Moving Averages Voting
+  const adx = (item.d && item.d[29] != null && !isNaN(Number(item.d[29]))) ? Number(Number(item.d[29]).toFixed(1)) : null;
+  const atr = (item.d && item.d[30] != null && !isNaN(Number(item.d[30]))) ? Number(Number(item.d[30]).toFixed(2)) : null;
+  const recMA = (item.d && item.d[31] != null && !isNaN(Number(item.d[31]))) ? Number(Number(item.d[31]).toFixed(2)) : null;
+  const recOther = (item.d && item.d[32] != null && !isNaN(Number(item.d[32]))) ? Number(Number(item.d[32]).toFixed(2)) : null;
+  const stochK = (item.d && item.d[33] != null && !isNaN(Number(item.d[33]))) ? Number(Number(item.d[33]).toFixed(1)) : null;
+  const stochD = (item.d && item.d[34] != null && !isNaN(Number(item.d[34]))) ? Number(Number(item.d[34]).toFixed(1)) : null;
+
+  const sma10 = (item.d && item.d[35] != null && !isNaN(Number(item.d[35]))) ? Number(Number(item.d[35]).toFixed(2)) : null;
+  const sma20 = (item.d && item.d[36] != null && !isNaN(Number(item.d[36]))) ? Number(Number(item.d[36]).toFixed(2)) : null;
+  const sma100 = (item.d && item.d[37] != null && !isNaN(Number(item.d[37]))) ? Number(Number(item.d[37]).toFixed(2)) : null;
+  const ema10 = (item.d && item.d[38] != null && !isNaN(Number(item.d[38]))) ? Number(Number(item.d[38]).toFixed(2)) : null;
+  const ema20 = (item.d && item.d[39] != null && !isNaN(Number(item.d[39]))) ? Number(Number(item.d[39]).toFixed(2)) : null;
+  const ema50 = (item.d && item.d[40] != null && !isNaN(Number(item.d[40]))) ? Number(Number(item.d[40]).toFixed(2)) : null;
+  const ema100 = (item.d && item.d[41] != null && !isNaN(Number(item.d[41]))) ? Number(Number(item.d[41]).toFixed(2)) : null;
+  const ema200 = (item.d && item.d[42] != null && !isNaN(Number(item.d[42]))) ? Number(Number(item.d[42]).toFixed(2)) : null;
+
+  // Moving Averages Voting (10 MAs)
+  const maList = [sma10, sma20, sma50, sma100, sma200, ema10, ema20, ema50, ema100, ema200];
+  let maBuyCount = 0;
+  let maSellCount = 0;
+  let maNeutralCount = 0;
+  maList.forEach(mVal => {
+    if (mVal !== null && mVal > 0) {
+      if (price > mVal) maBuyCount++;
+      else if (price < mVal) maSellCount++;
+      else maNeutralCount++;
+    }
+  });
+
+  // Oscillators Voting (RSI, MACD, Stochastic, ADX)
+  let oscBuyCount = 0;
+  let oscSellCount = 0;
+  let oscNeutralCount = 0;
+
+  if (rsi !== null) {
+    if (rsi < 35) oscBuyCount++;
+    else if (rsi > 70) oscSellCount++;
+    else if (rsi >= 50) oscBuyCount++;
+    else oscNeutralCount++;
+  }
+
+  if (macd != null && macdSignal != null) {
+    if (macd > macdSignal) oscBuyCount++;
+    else if (macd < macdSignal) oscSellCount++;
+    else oscNeutralCount++;
+  }
+
+  if (stochK != null && stochD != null) {
+    if (stochK < 20 || (stochK > stochD && stochK < 80)) oscBuyCount++;
+    else if (stochK > 80 || (stochK < stochD && stochK > 20)) oscSellCount++;
+    else oscNeutralCount++;
+  }
+
+  if (adx != null) {
+    if (adx >= 25 && price > (sma50 || price)) oscBuyCount++;
+    else if (adx >= 25 && price < (sma50 || price)) oscSellCount++;
+    else oscNeutralCount++;
+  }
+
+  const techBuyVotes = maBuyCount + oscBuyCount;
+  const techSellVotes = maSellCount + oscSellCount;
+  const techNeutralVotes = maNeutralCount + oscNeutralCount;
+
+  // Consensus Rating (Investing / TradingView Standard)
+  let techConsensusText = 'متعادل';
+  let techConsensusBadge = 'bg-gray-800 text-gray-300 border-gray-700';
+
+  if (recommendation >= 0.35 || (techBuyVotes >= 9 && techSellVotes <= 2)) {
+    techConsensusText = 'شراء قوي';
+    techConsensusBadge = 'bg-emerald-950/80 text-emerald-300 border-emerald-500/50 font-black';
+  } else if (recommendation >= 0.10 || (techBuyVotes > techSellVotes + 1)) {
+    techConsensusText = 'شراء';
+    techConsensusBadge = 'bg-cyan-950/80 text-cyan-300 border-cyan-500/50 font-bold';
+  } else if (recommendation <= -0.35 || (techSellVotes >= 8 && techBuyVotes <= 2)) {
+    techConsensusText = 'بيع قوي';
+    techConsensusBadge = 'bg-rose-950/80 text-rose-300 border-rose-500/50 font-black';
+  } else if (recommendation <= -0.10 || (techSellVotes > techBuyVotes + 1)) {
+    techConsensusText = 'بيع';
+    techConsensusBadge = 'bg-amber-950/80 text-amber-300 border-amber-500/50 font-bold';
+  }
+
+  // ADX Directional Trend Strength
+  let adxStatus = 'حركة عرضية ضعيفة الاتجاه (< 20)';
+  let adxTag = 'neutral';
+  let adxBadgeColor = 'bg-slate-800 text-slate-300 border-slate-700';
+  if (adx !== null) {
+    if (adx >= 25) {
+      const isBull = price >= (sma50 || price);
+      adxStatus = isBull ? 'اتجاه صاعد قوي ومؤكد (زخم قيادي)' : 'اتجاه هابط قوي (ضغط تصحيحي حاد)';
+      adxTag = isBull ? 'strong_bull' : 'strong_bear';
+      adxBadgeColor = isBull ? 'bg-emerald-950/80 text-emerald-300 border-emerald-500/40 font-bold' : 'bg-rose-950/80 text-rose-300 border-rose-500/40 font-bold';
+    } else if (adx >= 20) {
+      adxStatus = 'اتجاه متوسط في طور التشكل (20 - 25)';
+      adxTag = 'forming_trend';
+      adxBadgeColor = 'bg-cyan-950/80 text-cyan-300 border-cyan-500/40';
+    } else {
+      adxStatus = 'حركة عرضية ضعيفة الاتجاه (< 20 - مسار هادئ)';
+      adxTag = 'ranging';
+      adxBadgeColor = 'bg-slate-900 text-slate-400 border-slate-800';
+    }
+  }
+
+  // ATR Volatility & Dynamic Buffer Stop
+  let atrStopLoss = null;
+  let atrPct = null;
+  if (atr !== null && price > 0) {
+    atrPct = Number(((atr / price) * 100).toFixed(1));
+    atrStopLoss = Number((price - (atr * 1.5)).toFixed(2));
   }
 
   // Institutional Volume Classification
@@ -506,6 +622,29 @@ function parseTechnicalRecord(item) {
     rvolStatus: rvolStatus,
     rvolTag: rvolTag,
     rvolBadge: rvolBadge,
+    // Extended Technical Suite (Investing & TradingView Benchmark)
+    adx: adx,
+    adxStatus: adxStatus,
+    adxTag: adxTag,
+    adxBadgeColor: adxBadgeColor,
+    atr: atr,
+    atrPct: atrPct,
+    atrStopLoss: atrStopLoss,
+    stochK: stochK,
+    stochD: stochD,
+    maBuyCount: maBuyCount,
+    maSellCount: maSellCount,
+    maNeutralCount: maNeutralCount,
+    oscBuyCount: oscBuyCount,
+    oscSellCount: oscSellCount,
+    oscNeutralCount: oscNeutralCount,
+    techBuyVotes: techBuyVotes,
+    techSellVotes: techSellVotes,
+    techNeutralVotes: techNeutralVotes,
+    techConsensusText: techConsensusText,
+    techConsensusBadge: techConsensusBadge,
+    recMA: recMA,
+    recOther: recOther,
     // Dividend Champions Profile
     isDividendChampion: isDividendChampion,
     dividendProfile: divProfile,

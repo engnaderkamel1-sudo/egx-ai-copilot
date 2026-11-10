@@ -1,0 +1,61 @@
+﻿<!DOCTYPE html>
+<html lang="ar">
+<head><meta charset="utf-8"><title>Voice Test</title></head>
+<body>
+<div id="test-output"></div>
+<script>
+  window.portfolioData = [
+    { ticker: 'CASH', name: 'Ø§Ù„Ù…Ø­ÙØ¸Ø© (Ø§Ù„Ø±ØµÙŠØ¯ Ø§Ù„Ù†Ù‚Ø¯ÙŠ)', value: 25000, shares: 25000, buyPrice: 25000 },
+    { ticker: 'TMGH', name: 'Ù…Ø¬Ù…ÙˆØ¹Ø© Ø·Ù„Ø¹Øª Ù…ØµØ·ÙÙ‰', shares: 500, buyPrice: 50.0, currentPrice: 54.0, value: 27000, profit: 2000, returnPct: 8.0 }
+  ];
+  window.fullMarketRadar = [
+    { ticker: 'TMGH', name: 'Ù…Ø¬Ù…ÙˆØ¹Ø© Ø·Ù„Ø¹Øª Ù…ØµØ·ÙÙ‰ Ø§Ù„Ù‚Ø§Ø¨Ø¶Ø©', price: 54.0, support: '50.00 Ø¬', target1: '64.00 Ø¬', target2: '72.00 Ø¬', stopLoss: '48.00 Ø¬', volumeMultiplier: '1.2x', catalyst: 'Ù…Ø´Ø±ÙˆØ¹ Ø±Ø£Ø³ Ø§Ù„Ø­ÙƒÙ…Ø©' },
+    { ticker: 'SWDY', name: 'Ø§Ù„Ø³ÙˆÙŠØ¯ÙŠ Ø¥Ù„ÙŠÙƒØªØ±ÙŠÙƒ', price: 51.4, support: '48.50 Ø¬', target1: '58.00 Ø¬', target2: '65.00 Ø¬', stopLoss: '46.80 Ø¬', volumeMultiplier: '2.1x', catalyst: 'Ø¹Ù‚ÙˆØ¯ ÙƒØ§Ø¨Ù„Ø§Øª' }
+  ];
+</script>
+<script src="../js/voice-assistant.js"></script>
+<script>
+  try {
+    // 1. Ensure modal opens and elements exist
+    window.openVoiceTradingModal();
+    const modal = document.getElementById('voice-trading-modal');
+    console.log("TEST_MODAL_EXISTS: " + (modal !== null));
+
+    // 2. Test Consultation Parse: 'Ø³Ù‡Ù… Ø·Ù„Ø¹Øª Ù…ØµØ·ÙÙ‰'
+    const resConsult = window.parseEgyptianVoiceCommand('Ø³Ù‡Ù… Ø·Ù„Ø¹Øª Ù…ØµØ·ÙÙ‰');
+    console.log("TEST_CONSULT_DEBUG: " + JSON.stringify(resConsult));
+
+    // 3. Test Consultation Card Generation
+    const consultData = window.generateConsultationContent(resConsult);
+    console.log("TEST_CONSULT_TITLE: " + consultData.title);
+    console.log("TEST_CONSULT_SPOKEN: " + (consultData.spokenText.length > 10));
+
+    // 4. Test Display Consultation Card
+    window.displayConsultationCard(resConsult);
+    const consultCard = document.getElementById('voice-consultation-card');
+    const isConsultVisible = !consultCard.classList.contains('hidden');
+    console.log("TEST_CONSULT_CARD_VISIBLE: " + isConsultVisible);
+
+    // 5. Test Mode Toggle
+    window.setVoiceResponseMode('TEXT');
+    console.log("TEST_MODE_TEXT: " + (window.getVoiceResponseMode() === 'TEXT'));
+    window.setVoiceResponseMode('VOICE');
+    console.log("TEST_MODE_VOICE: " + (window.getVoiceResponseMode() === 'VOICE'));
+
+    // 6. Test Explicit Trade Parse: 'Ø§Ø´ØªØ±ÙŠ 100 Ø³Ù‡Ù… Ø§Ù„Ø³ÙˆÙŠØ¯ÙŠ Ø¨Ø³Ø¹Ø± 50 Ø¬Ù†ÙŠÙ‡'
+    const resTrade = window.parseEgyptianVoiceCommand('Ø§Ø´ØªØ±ÙŠ 100 Ø³Ù‡Ù… Ø§Ù„Ø³ÙˆÙŠØ¯ÙŠ Ø¨Ø³Ø¹Ø± 50 Ø¬Ù†ÙŠÙ‡');
+    console.log("TEST_TRADE_INTENT: " + resTrade.intent + " | ACTION: " + resTrade.action + " | SHARES: " + resTrade.shares);
+
+    // 7. Test Transition from Consult to Trade
+    window.switchConsultationToTrade(resConsult.stock, 'BUY');
+    const confirmCard = document.getElementById('voice-confirmation-card');
+    const isTradeVisible = !confirmCard.classList.contains('hidden');
+    console.log("TEST_SWITCH_TO_TRADE_VISIBLE: " + isTradeVisible);
+
+    console.log("ALL_VOICE_TESTS_COMPLETED_SUCCESSFULLY");
+  } catch (err) {
+    console.error("TEST_ERROR: " + err.message + "\n" + err.stack);
+  }
+</script>
+</body>
+</html>

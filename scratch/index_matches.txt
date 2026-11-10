@@ -1,0 +1,15 @@
+528: html.light .text-gray-500,
+530: html:not(.dark) .text-gray-500,
+1095: html.dark .text-gray-500,
+1346: <span id="header-alert-count" class="hidden bg-rose-600 text-white font-mono text-[9px] px-1.5 py-0.2 rounded-full font-bold">0</span>
+1615: <span class="text-[11px] text-gray-500">يتم الحفظ التلقائي في المتصفح فوراً ✅</span>
+1674: <span class="text-[9.5px] opacity-80 font-normal block mt-0.5">بيع لجني الأرباح 🎯</span>
+1681: <span class="text-[9.5px] opacity-80 font-normal block mt-0.5">وقف الخسارة للأمان 🛑</span>
+1841: <span class="text-[9px] text-gray-400 block mt-0.5">القيمة المضافة فوق عائد السوق</span>
+1846: <span class="text-[9px] text-gray-400 block mt-0.5">حساسية المحفظة لتذبذب EGX30</span>
+1851: <span class="text-[9px] text-gray-400 block mt-0.5">جودة العائد لكل وحدة مخاطرة</span>
+1856: <span class="text-[9px] text-gray-400 block mt-0.5">عائد وثائق السيولة اليومية المركب</span>
+2458: <div class="text-[11px] text-gray-500 mt-1 font-mono">الزمن: منذ 12 دقيقة • الأولوية: عالية</div>
+2481: <div class="text-[11px] text-gray-500 mt-1 font-mono">الزمن: تم التحديث اليوم • الأولوية: متوسطة</div>
+2504: <div class="text-[11px] text-gray-500 mt-1 font-mono">الزمن: منذ ساعتين • الأولوية: فرصة ذهبية</div>
+2864: <span class="text-gray-500">•</span>

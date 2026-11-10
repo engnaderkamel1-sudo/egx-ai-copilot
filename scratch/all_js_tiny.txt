@@ -1,0 +1,102 @@
+js\ai.js:364: <span class="text-gray-500">لا يتم رفع المفتاح على كود عام أبداً</span>
+js\ai.js:748: <span class="px-2 py-0.5 rounded-full text-[9px] font-mono font-bold ${r.violations.length === 0 ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'}">
+js\app.js:728: <div class="p-6 text-center text-gray-500 font-medium bg-gray-950/60 rounded-xl border border-gray-800">
+js\app.js:756: <span class="text-[9px] px-1.5 py-0.2 rounded font-mono ${badgeCls}">${alert.time}</span>
+js\modals.js:231: <span class="text-[11px] text-gray-500">يتم الحفظ التلقائي في جهازك وإعادة حساب الأسعار اللحظية فوراً ✅</span>
+js\modals.js:272: <span class="text-[10px] text-gray-500">حساب تلقائي للقيمة والأرباح</span>
+js\modals.js:481: <span class="text-[10px] text-gray-500">سعر التكلفة للسهم</span>
+js\modals.js:494: <span class="text-[9px] text-gray-400">ضبط سريع:</span>
+js\modals.js:521: <span class="text-[9px] text-gray-400">ضبط سريع:</span>
+js\modals.js:537: <span id="ft-price-source-badge" class="px-1.5 py-0.5 rounded text-[9px] bg-cyan-500/20 text-cyan-300 font-bold">شاشة البورصة</span>
+js\modals.js:538: <button type="button" onclick="fetchSingleStockLivePrice()" class="text-[9px] text-cyan-400 hover:text-cyan-300 underline font-bold flex items-center gap-0.5 cursor-pointer" title="سحب السعر اللحظي الحالي من البورصة لهذا السهم">
+js\modals.js:569: <span class="text-[9px] text-gray-500 block font-mono" id="ft-preview-cost-detail">0 سهم @ 0 ج</span>
+js\modals.js:575: <span class="text-[9px] text-cyan-400/90 block font-mono" id="ft-preview-val-detail">0 سهم @ 0 ج</span>
+js\modals.js:581: <span class="text-[9px] font-mono block" id="ft-preview-return-pct">0.00%</span>
+js\modals.js:665: <span class="text-[9px] text-gray-500 block font-sans mt-0.5" id="rot-sell-shares-pct">(حوالي 30% من الكمية)</span>
+js\modals.js:671: <span class="text-[9px] text-emerald-400/80 block font-sans mt-0.5" id="rot-realized-profit-pill">منها 775 ج ربح صافي محقق</span>
+js\modals.js:677: <span class="text-[9px] text-gray-500 block font-sans mt-0.5" id="rot-remaining-value">بقيمة 10,440 ج (أصل دائم)</span>
+js\modals.js:782: <span class="text-[9px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-mono font-bold shrink-0">100% Verified</span>
+js\modals.js:899: <div class="p-4 text-center text-gray-500 font-medium">لا توجد تنبيهات عاجلة حتى الآن. السوق يتحرك في النطاق الطبيعي.</div>
+js\rotation.js:203: profitPill.className = 'text-[9px] text-rose-400/90 block font-sans mt-0.5';
+js\rotation.js:206: profitPill.className = 'text-[9px] text-emerald-400/80 block font-sans mt-0.5';
+js\rotation.js:710: <span class="text-[10px] text-gray-500 block">سقف الهروب (+4%): ${plan.breakoutThreshold} ج</span>
+js\rotation.js:783: <span class="text-[10px] text-gray-500 block">بعت: ${plan.sellShares} أسهم</span>
+js\rotation.js:883: <button onclick="cancelRotationPlan('${plan.id}')" class="text-gray-500 hover:text-rose-400 text-xs font-bold transition cursor-pointer" title="إلغاء المراقبة">
+js\rotation.js:893: <span class="text-[9px] text-gray-500 block">${plan.realizedProfit >= 0 ? `كاش محقق: ${plan.sellCash.toLocaleString('en-US')} ج` : `كاش مسترد: ${plan.sellCash.toLocaleString('en-US')} ج`}</span>
+js\rotation.js:898: <span class="text-[9px] ${priceDiffPct >= 0 ? 'text-rose-400' : 'text-emerald-400'} block">
+js\rotation.js:905: <span class="text-[9px] text-emerald-300 block">باقي ${distToDip} ج (${distToDipPct}%)</span>
+js\rotation.js:910: <span class="text-[9px] text-rose-300 block">باقي ${distToBreakout} ج (${distToBreakoutPct}%)</span>
+js\rotation.js:932: <div class="flex items-center justify-between text-[10px] text-gray-500">
+js\scenarios.js:133: <span class="text-[10px] text-gray-500 font-bold">مغلقة ومسجلة</span>
+js\scenarios.js:564: <span class="font-mono text-gray-500">${s.id}</span>
+js\trade.js:894: ? 'px-1.5 py-0.5 rounded text-[9px] bg-amber-500/20 text-amber-300 font-bold'
+js\trade.js:895: : 'px-1.5 py-0.5 rounded text-[9px] bg-cyan-500/20 text-cyan-300 font-bold';
+js\trade.js:982: returnPctEl.className = `text-[9px] font-mono block ${isPositive ? 'text-emerald-400' : 'text-rose-400'}`;
+js\trade.js:1004: badge.className = 'px-1.5 py-0.5 rounded text-[9px] bg-emerald-500/20 text-emerald-300 font-bold';
+js\trade.js:1163: tbody.innerHTML = '<tr><td colspan="7" class="py-4 text-center text-gray-500">لا توجد صفقات تجريبية مفتوحة حالياً. اختر سهماً ونفذ شراءً وهمياً أعلاه.</td></tr>';
+js\ui.js:424: <div class="text-[9px] text-emerald-400 font-bold">1. فوري (40%)</div>
+js\ui.js:426: <div class="text-gray-400 text-[8.5px]">${item.dcaPlan.tranches[0].allocationCash.toLocaleString('en-US')} ج</div>
+js\ui.js:429: <div class="text-[9px] text-cyan-400 font-bold">2. ارتداد (30%)</div>
+js\ui.js:431: <div class="text-gray-400 text-[8.5px]">عند ${item.dcaPlan.tranches[1].targetPrice} ج</div>
+js\ui.js:434: <div class="text-[9px] text-purple-400 font-bold">3. اختراق (30%)</div>
+js\ui.js:436: <div class="text-gray-400 text-[8.5px]">عند ${item.dcaPlan.tranches[2].targetPrice} ج</div>
+js\ui.js:524: <span class="text-[9px] text-rose-400 block font-sans">معرض لخسارة المكسب</span>
+js\ui.js:529: <span class="text-[9px] text-emerald-400 block font-sans">يحبس ربح +${item.lockedProfitPct}%</span>
+js\ui.js:534: <span class="text-[9px] text-gray-400 block font-sans">${item.shares} سهم مملوك</span>
+js\ui.js:753: badgeClass: counts.profitTaking > 0 ? 'bg-amber-500/30 text-amber-300 border border-amber-500/50' : 'bg-gray-800 text-gray-500'
+js\ui.js:763: badgeClass: counts.riskDefense > 0 ? 'bg-rose-500/30 text-rose-300 border border-rose-500/50' : 'bg-gray-800 text-gray-500'
+js\ui.js:773: badgeClass: counts.safetyLevelUpdates > 0 ? 'bg-blue-500/30 text-blue-300 border border-blue-500/50' : 'bg-gray-800 text-gray-500'
+js\ui.js:783: badgeClass: counts.accumulation > 0 ? 'bg-emerald-500/30 text-emerald-300 border border-emerald-500/50' : 'bg-gray-800 text-gray-500'
+js\ui.js:793: badgeClass: counts.marketOpportunities > 0 ? 'bg-cyan-500/30 text-cyan-300 border border-cyan-500/50' : 'bg-gray-800 text-gray-500'
+js\ui.js:803: badgeClass: counts.waitAndHold > 0 ? 'bg-slate-700 text-slate-300 border border-slate-600' : 'bg-gray-800 text-gray-500'
+js\ui.js:1085: <span class="px-1.5 py-0.5 rounded text-[9.5px] font-bold ${fund.peVsSectorPct <= 0 ? 'bg-emerald-950/90 text-emerald-300 border border-emerald-800/60' : 'bg-amber-950/90 text-amber-300 border border-amber-800/60'}" title="${fund.valuationStatus || ''}">
+js\ui.js:1109: <div class="flex items-center gap-1 mt-1 text-[9px] text-gray-400 font-mono">
+js\ui.js:1113: <span class="text-[8.5px] text-gray-500 font-sans mt-0.5">(${item.priceSource || 'شاشة البورصة اللحظية'})</span>
+js\ui.js:1115: : `<span class="text-gray-500 font-normal">--</span>`}
+js\ui.js:1124: <span class="text-[9.5px] text-gray-500 font-sans">تكلفة: ${Math.round(cost).toLocaleString('en-US')} ج</span>
+js\ui.js:1127: <span class="text-gray-500 font-normal">--</span>
+js\ui.js:1140: ? `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-500 text-white animate-pulse shadow-sm">🎯 وصل للهدف!</span>`
+js\ui.js:1141: : `<span class="px-1.5 py-0.5 rounded text-[9px] font-mono font-semibold text-emerald-300 bg-emerald-950/80 border border-emerald-500/30">+${targetGainPct}% ربح</span>`
+js\ui.js:1143: ${isCustomTarget ? `<span class="text-[8px] px-1 rounded bg-amber-500/20 text-amber-300 font-bold" title="رقم مخصص قمت بوضعه بنفسك">مخصص</span>` : ''}
+js\ui.js:1145: <button onclick="openPriceLevelsModal('${item.ticker}')" class="text-[9.5px] text-emerald-400 hover:text-emerald-300 font-bold flex items-center justify-center gap-0.5 mt-0.5 underline cursor-pointer" title="فحص المعادلة والمصدر وتعديل الرقم">
+js\ui.js:1151: <span class="text-gray-500 font-normal">--</span>
+js\ui.js:1164: ? `<span class="px-1.5 py-0.5 rounded text-[9px] font-black bg-rose-600 text-white animate-pulse shadow-sm" title="انهيار حاد: نفذ الخروج فوراً">🚨 خروج طارئ!</span>`
+js\ui.js:1166: ? `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40" title="كسر لحظي أثناء الجلسة: انتظر تأكيد إغلاق 02:30 م">🟡 كسر لحظي (انتظر)</span>`
+js\ui.js:1168: ? `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-blue-500/20 text-blue-300 border border-blue-500/40" title="سهم قيادي استثماري: مستقر ضمن وسادة الأمان أعلى S2">🛡️ وسادة أمان</span>`
+js\ui.js:1170: ? `<span class="px-1.5 py-0.5 rounded text-[9px] font-black bg-rose-600 text-white shadow-sm" title="تم تأكيد كسر الدعم بالإغلاق">🔴 تأكيد كسر S1</span>`
+js\ui.js:1171: : `<span class="px-1.5 py-0.5 rounded text-[9px] font-mono font-semibold text-rose-300 bg-rose-950/80 border border-rose-500/30">أمان ${stopLossBuffer}%</span>`
+js\ui.js:1176: ${isCustomStop ? `<span class="text-[8px] px-1 rounded bg-amber-500/20 text-amber-300 font-bold" title="رقم مخصص قمت بوضعه بنفسك">مخصص</span>` : ''}
+js\ui.js:1178: <button onclick="openPriceLevelsModal('${item.ticker}')" class="text-[9.5px] text-rose-400 hover:text-rose-300 font-bold flex items-center justify-center gap-0.5 mt-0.5 underline cursor-pointer" title="فحص المعادلة والمصدر وتعديل الرقم">
+js\ui.js:1184: <span class="text-gray-500 font-normal">--</span>
+js\ui.js:1209: <button onclick="openAuditModal('${item.ticker}')" class="text-[9.5px] px-2 py-0.5 rounded bg-emerald-950/70 hover:bg-emerald-900 border border-emerald-500/40 text-emerald-300 font-bold flex items-center gap-1 transition cursor-pointer" title="تقرير الاقتراح والمصادر الاستثمارية">
+js\ui.js:1222: <div class="mt-1 flex items-center gap-1 text-[9.5px] font-sans font-semibold px-2 py-0.5 rounded border ${fund.pe ? 'text-emerald-300 bg-emerald-950/40 border-emerald-800/40' : 'text-amber-300 bg-amber-950/40 border-amber-800/40'}" title="فحص الأرباح التشغيلية">
+js\ui.js:1227: <div class="mt-1 flex items-center gap-1 text-[9.5px] font-sans font-semibold px-2 py-0.5 rounded border text-amber-300 bg-amber-950/40 border-amber-800/40" title="فحص الأرباح التشغيلية">
+js\ui.js:1667: <div class="grid grid-cols-4 text-[9.5px] text-center font-bold text-gray-400 pt-0.5">
+js\ui.js:1698: <span class="text-[9px] text-gray-500 block font-sans">سعر السهم / ربحه</span>
+js\ui.js:1703: <span class="text-[9px] text-gray-500 block font-sans">متوسط شركات القطاع</span>
+js\ui.js:1708: <span class="text-[9px] text-gray-500 block font-sans">نصيب السهم من الربح</span>
+js\ui.js:1713: <span class="text-[9px] text-gray-500 block font-sans">قوة الأرباح التشغيلية</span>
+js\ui.js:1779: <span class="text-[9px] text-gray-500 block font-sans">وسادة الأمان القصوى</span>
+js\ui.js:1784: <span class="text-[9px] text-gray-500 block font-sans">قاع الأمان الأقرب</span>
+js\ui.js:1789: <span class="text-[9px] text-gray-500 block font-sans">مستهدف جني الأرباح</span>
+js\ui.js:1794: <span class="text-[9px] text-gray-500 block font-sans">المستهدف الصاعد الممتد</span>
+js\ui.js:1829: <div class="grid grid-cols-2 sm:grid-cols-5 gap-1.5 text-[9.5px] text-center pt-1 font-sans">
+js\ui.js:1860: <span class="text-[9px] text-gray-500 block font-sans">عدد الأسهم المنفذة</span>
+js\ui.js:1865: <span class="text-[9px] text-gray-500 block font-sans">السيولة النقدية المتدفقة</span>
+js\ui.js:1870: <span class="text-[9px] ${techEvidence.rvolBadgeColor} px-1.5 py-0.2 rounded mt-0.5 inline-block font-sans text-[8.5px]">${techEvidence.rvolStatusText}</span>
+js\ui.js:1933: <span class="text-[9px] text-gray-500 block font-sans">خط الدفاع الأخير</span>
+js\ui.js:1938: <span class="text-[9px] text-gray-500 block font-sans">مكسب متوقع مقابل المخاطرة</span>
+js\ui.js:1943: <span class="text-[9px] text-gray-500 block font-sans">من إجمالي رأس مال المحفظة</span>
+js\ui.js:2299: <span class="text-[9.5px] text-gray-400 font-sans">التقييم معلق حتى إعلان الأرباح</span>
+js\ui.js:2301: <div class="flex items-center justify-between text-[9px] pt-1 border-t border-gray-800/60">
+js\ui.js:2303: <i data-lucide="shield-alert" class="w-3 h-3 text-gray-500 shrink-0"></i>
+js\ui.js:2306: <span class="text-gray-500 font-mono shrink-0">EPS: معلق</span>
+js\ui.js:2328: <div class="flex items-center justify-between text-[9px] pt-1 border-t border-gray-800/60">
+js\ui.js:2341: <span class="text-gray-400 block text-[9px]" title="سعر الدعم الأول الذي إذا تماسك فوقه السهم يبدأ بالصعود">الدعم S1 (سعر الأمان)</span>
+js\ui.js:2345: <span class="text-gray-400 block text-[9px]" title="مستوى المقاومة والهدف السعري الأول المتوقع">المقاومة R1 (الهدف الأول)</span>
+js\ui.js:2349: <span class="text-gray-400 block text-[9px]" title="سعر الخروج الحامي لرأس المال لو هبط السهم دونه">وقف الخسارة (حماية رأس المال)</span>
+js\ui.js:2360: ${item.rrDisplay ? `<span class="px-1.5 py-0.2 rounded bg-indigo-950/80 border border-indigo-500/40 text-indigo-300 font-bold text-[9px]">R/R: ${item.rrDisplay}</span>` : ''}
+js\voice-assistant.js:387: <span class="text-gray-500 text-[11px]">في انتظار الاستماع لكلامك...</span>
+js\voice-assistant.js:392: <span class="text-gray-500">جرب أن تقول:</span>
+js\voice-assistant.js:493: <div class="border-t border-gray-800 pt-3 flex items-center justify-between text-[11px] text-gray-500 shrink-0">
+js\voice-assistant.js:552: transcriptBox.innerHTML = '<span class="text-gray-500 text-[11px]">في انتظار الاستماع لكلامك...</span>';
