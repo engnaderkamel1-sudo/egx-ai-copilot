@@ -963,7 +963,7 @@
     // ============================================================
     // Real-Time System Auto-Update Engine
     // ============================================================
-    const LOCAL_APP_VERSION = '2.8.1';
+    const LOCAL_APP_VERSION = '2.8.2';
     window.LOCAL_APP_VERSION = LOCAL_APP_VERSION;
 
     let isUpdateBannerDismissed = false;

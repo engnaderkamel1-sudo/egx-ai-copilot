@@ -726,29 +726,29 @@
 
             <!-- 4-Stage Action Traffic Light Widget -->
             <div class="market-traffic-widget bg-black/80 border border-gray-800 rounded-2xl p-3 flex md:flex-col items-center justify-center gap-2.5 shrink-0 shadow-inner">
-              <div class="flex items-center gap-3 md:flex-col">
+              <div class="flex items-center gap-2.5 md:flex-col w-full">
                 <!-- Red Light: Crisis / Shock -->
-                <div class="flex items-center gap-1.5 stage-red" title="إشارة حمراء: هبوط ذعري أو ضغط بيعي عام (تجميد الشراء كلياً)">
-                  <span class="w-3.5 h-3.5 rounded-full ${isRed ? 'bg-rose-500 shadow-lg shadow-rose-500/80 animate-ping' : 'bg-rose-950/50 border border-rose-900/50 opacity-40'}"></span>
-                  <span class="text-[10px] font-bold ${isRed ? 'text-rose-400 font-black active-stage' : 'text-gray-600 inactive-stage'} hidden md:inline">هبوط ذعري</span>
+                <div class="flex items-center gap-2 stage-red p-1.5 rounded-xl transition w-full ${isRed ? 'bg-rose-500/15 border border-rose-500/40' : ''}" title="إشارة حمراء: هبوط ذعري أو ضغط بيعي عام (تجميد الشراء كلياً)">
+                  <span class="w-3.5 h-3.5 rounded-full shrink-0 ${isRed ? 'bg-rose-500 shadow-lg shadow-rose-500/80 animate-ping ring-2 ring-rose-400' : 'bg-rose-200 border-2 border-rose-400 dark:bg-rose-950/50 dark:border-rose-900/50'}"></span>
+                  <span class="text-xs font-bold ${isRed ? 'text-rose-700 dark:text-rose-400 font-black active-stage' : 'text-slate-700 dark:text-gray-400 inactive-stage'} hidden md:inline">هبوط ذعري</span>
                 </div>
 
                 <!-- Orange Light: Topping / Overbought -->
-                <div class="flex items-center gap-1.5 stage-orange" title="إشارة برتقالية: قمم وتشبع شرائي (جني وتأمين أرباح • حظر الشراء بالقمم)">
-                  <span class="w-3.5 h-3.5 rounded-full ${isOverbought ? 'bg-amber-500 shadow-lg shadow-amber-500/80 animate-ping' : 'bg-amber-950/50 border border-amber-900/50 opacity-40'}"></span>
-                  <span class="text-[10px] font-bold ${isOverbought ? 'text-amber-300 font-black active-stage' : 'text-gray-600 inactive-stage'} hidden md:inline">قمم وتشبع</span>
+                <div class="flex items-center gap-2 stage-orange p-1.5 rounded-xl transition w-full ${isOverbought ? 'bg-amber-500/15 border border-amber-500/40' : ''}" title="إشارة برتقالية: قمم وتشبع شرائي (جني وتأمين أرباح • حظر الشراء بالقمم)">
+                  <span class="w-3.5 h-3.5 rounded-full shrink-0 ${isOverbought ? 'bg-amber-500 shadow-lg shadow-amber-500/80 animate-ping ring-2 ring-amber-400' : 'bg-amber-200 border-2 border-amber-400 dark:bg-amber-950/50 dark:border-amber-900/50'}"></span>
+                  <span class="text-xs font-bold ${isOverbought ? 'text-amber-800 dark:text-amber-300 font-black active-stage' : 'text-slate-700 dark:text-gray-400 inactive-stage'} hidden md:inline">قمم وتشبع</span>
                 </div>
 
                 <!-- Yellow Light: Consolidation -->
-                <div class="flex items-center gap-1.5 stage-yellow" title="إشارة صفراء: تداول عرضي متوازن (مراقبة وتريث وانتقائية)">
-                  <span class="w-3.5 h-3.5 rounded-full ${isYellow ? 'bg-yellow-400 shadow-lg shadow-yellow-400/80 animate-pulse' : 'bg-yellow-950/50 border border-yellow-900/50 opacity-40'}"></span>
-                  <span class="text-[10px] font-bold ${isYellow ? 'text-yellow-300 font-black active-stage' : 'text-gray-600 inactive-stage'} hidden md:inline">تداول متوازن</span>
+                <div class="flex items-center gap-2 stage-yellow p-1.5 rounded-xl transition w-full ${isYellow ? 'bg-yellow-500/15 border border-yellow-500/40' : ''}" title="إشارة صفراء: تداول عرضي متوازن (مراقبة وتريث وانتقائية)">
+                  <span class="w-3.5 h-3.5 rounded-full shrink-0 ${isYellow ? 'bg-yellow-400 shadow-lg shadow-yellow-400/80 animate-pulse ring-2 ring-yellow-400' : 'bg-yellow-200 border-2 border-yellow-400 dark:bg-yellow-950/50 dark:border-yellow-900/50'}"></span>
+                  <span class="text-xs font-bold ${isYellow ? 'text-yellow-800 dark:text-yellow-300 font-black active-stage' : 'text-slate-700 dark:text-gray-400 inactive-stage'} hidden md:inline">تداول متوازن</span>
                 </div>
 
                 <!-- Green Light: Pullback Accumulation or Balanced Momentum -->
-                <div class="flex items-center gap-1.5 stage-green" title="إشارة خضراء: قاع وتصحيح هادئ أو صعود متزن (تجميع هادئ بالأمر المحدد)">
-                  <span class="w-3.5 h-3.5 rounded-full ${(isPullback || isGreen) ? 'bg-emerald-400 shadow-lg shadow-emerald-400/80 animate-pulse' : 'bg-emerald-950/50 border border-emerald-900/50 opacity-40'}"></span>
-                  <span class="text-[10px] font-bold ${(isPullback || isGreen) ? 'text-emerald-300 font-black active-stage' : 'text-gray-600 inactive-stage'} hidden md:inline">${isPullback ? 'قاع وتجميع' : 'صعود متزن'}</span>
+                <div class="flex items-center gap-2 stage-green p-1.5 rounded-xl transition w-full ${(isPullback || isGreen) ? 'bg-emerald-500/15 border border-emerald-500/40' : ''}" title="إشارة خضراء: قاع وتصحيح هادئ أو صعود متزن (تجميع هادئ بالأمر المحدد)">
+                  <span class="w-3.5 h-3.5 rounded-full shrink-0 ${(isPullback || isGreen) ? 'bg-emerald-400 shadow-lg shadow-emerald-400/80 animate-pulse ring-2 ring-emerald-400' : 'bg-emerald-200 border-2 border-emerald-400 dark:bg-emerald-950/50 dark:border-emerald-900/50'}"></span>
+                  <span class="text-xs font-bold ${(isPullback || isGreen) ? 'text-emerald-800 dark:text-emerald-300 font-black active-stage' : 'text-slate-700 dark:text-gray-400 inactive-stage'} hidden md:inline">${isPullback ? 'قاع وتجميع' : 'صعود متزن'}</span>
                 </div>
               </div>
             </div>
